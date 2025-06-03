@@ -2,7 +2,6 @@
 
 {% block head_assets %}
     {{ parent() }}
-    <style>@import url("/Static/CSS/Unorganised/Console.css");</style>
 {% endblock %}
 
 {% block content %}
@@ -72,7 +71,7 @@
             network.on("click", function (params) {
                 if (params.nodes.length) {
                     const nodeId = params.nodes[0];
-                    alert("Clicked node: " + nodes.get(nodeId).label);
+                    window.location = "/graph/~" + nodes.get(nodeId).id.replace("{", "").replace("}", "");
                 }
             });
         </script>
