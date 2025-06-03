@@ -8,7 +8,6 @@ use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\DatabaseInteractions\MariaDB\MariaDBServerConnection;
 use Auxilium\DatabaseInteractions\MariaDB\MariaDBTable;
 use Auxilium\DatabaseInteractions\MariaDB\SQLQueryBuilderWrapper;
-use Auxilium\DatabaseInteractions\Redis\RedisServerConnection;
 use Auxilium\Schemas\CaseSchema;
 use Auxilium\Schemas\CollectionSchema;
 use Auxilium\Schemas\MessageSchema;
@@ -20,9 +19,6 @@ class ExampleData
 {
     public static function WriteExampleData(): void
     {
-        $redisConn = new RedisServerConnection();
-
-
         $exampleData = file_get_contents(__DIR__ . "/../../example-data.json");
         $exampleData = json_decode($exampleData, true, 512, JSON_THROW_ON_ERROR);
 
@@ -142,20 +138,6 @@ class ExampleData
                 node:   $node_todos,
                 actor:  User::get_system_node()
             );
-            for ($i = 0, $iMax = count($case['ToDos']); $i < $iMax; $i++)
-            {
-                $todoNode = GraphDatabaseConnection::new_node(
-                    "data:text/calendar;base64,QkVHSU46VkNBTEVOREFSDQpWRVJTSU9OOjIuMA0KQkVHSU46VlRPRE8NClVJRDoySEhUUlVZNElaVldONEhDNlQ2QzVHVDJDTFpBSUNUMjJSR0E3R0ZXVkc0SElMMlMNCkRUU1RBTVA6MjAyNTA1MDVUMTc0NTQxWg0KU1VNTUFSWTpNRU9XDQpFTkQ6VlRPRE8NCkVORDpWQ0FMRU5EQVINCg==",
-                    null,
-                    URLHandling::GetURLForSchema(CollectionSchema::class),
-                    User::get_system_node()
-                );
-                $node_todos->addProperty(
-                    key:    $i,
-                    node:   $todoNode,
-                    actor:  User::get_system_node()
-                );
-            }
 
 
             $node_documents = GraphDatabaseConnection::new_node(

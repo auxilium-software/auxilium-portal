@@ -32,6 +32,7 @@
         "ext-sodium": "*",
         "ext-pdo": "*",
         "ext-mbstring": "*",
+        "ext-fileinfo": "*",
 
         "ext-zip": "*",
 

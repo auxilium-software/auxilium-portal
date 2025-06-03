@@ -123,7 +123,9 @@ try
 
                         $next_location = array_pop($form_data["form_stack"]);
                         if($next_location === null)
+                        {
                             NavigationUtilities::Redirect(target: "/dashboard");
+                        }
                         NavigationUtilities::Redirect(target: $next_location);
                     }
                 }

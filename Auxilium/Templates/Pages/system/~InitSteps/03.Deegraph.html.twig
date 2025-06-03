@@ -1,0 +1,40 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <h1>Step 3/?: Deegraph connection details</h1>
+
+        {% if Variables.error != null %}
+            <div class="critical-note">
+                {{ Variables.error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/system/init?page=3.1&setup_key={{ SetupKey }}">
+            <label for="deegraph-host">Host or IP address</label>
+            <input type="text" id="deegraph-host" name="deegraph-host" placeholder="localhost" required value="{{ Variables['deegraph-host'] }}" />
+
+            <label for="deegraph-port">Port</label>
+            <input type="number" id="deegraph-port" name="deegraph-port" placeholder="8880" required value="{{ Variables['deegraph-port'] }}" />
+
+            <label for="deegraph-rootNode">Root node</label>
+            <input type="text" id="deegraph-rootNode" name="deegraph-rootNode" placeholder="00000000-0000-0000-0000-000000000000" required value="{{ Variables['deegraph-rootNode'] }}" />
+
+            <label for="deegraph-loginNode">Login node</label>
+            <input type="text" id="deegraph-loginNode" name="deegraph-loginNode" placeholder="00000000-0000-0000-0000-000000000000" required value="{{ Variables['deegraph-loginNode'] }}" />
+
+            <label for="deegraph-token">Token</label>
+            <input type="password" id="deegraph-token" name="deegraph-token" required value="{{ Variables['deegraph-token'] }}" />
+
+            <label for="deegraph-allowSelfSignedCerts">Allow self-signed certificates?</label>
+            <input type="checkbox" id="deegraph-allowSelfSignedCerts" name="deegraph-allowSelfSignedCerts" {% if Variables['deegraph-allowSelfSignedCerts'] == "on" %}checked{% endif %} />
+
+            <div class="button-box">
+                <a href="/system/init?page=2&setup_key={{ SetupKey }}" class="button">Previous step</a>
+                <input type="submit" value="Next step" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
