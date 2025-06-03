@@ -103,7 +103,7 @@ class ExampleData
 
         foreach($exampleData['Cases'] as $case)
         {
-            $actorNode = User::get_system_node();
+            $actorNode = new User($userIDs[$case['Beneficiaries'][0]]);
             $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
 
 
