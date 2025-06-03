@@ -1,0 +1,695 @@
+{
+  "Users": [
+    {
+      "Name": "Hannah Malik",
+      "EmailAddress": "hannah.malik@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Tom Whitaker",
+      "EmailAddress": "tom.whitaker@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Freya Chan",
+      "EmailAddress": "freya.chan@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Rajiv Patel",
+      "EmailAddress": "rajiv.patel@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Zoe Matthews",
+      "EmailAddress": "zoe.matthews@example.com",
+      "Password": "hunter2"
+    },
+
+
+    {
+      "Name": "Sgt. James Turner (Ret.)",
+      "EmailAddress": "james@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "PC Emma Rees (Ret.)",
+      "EmailAddress": "emma@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Cpl. Liam Ncube (Discharged)",
+      "EmailAddress": "liam@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Mr. Alex Dobson",
+      "EmailAddress": "alex@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Col. Karen Ofori (Ret.)",
+      "EmailAddress": "karen@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "WO2 Sarah Mitchell (Ret.)",
+      "EmailAddress": "sarah.mitchell@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Maj. David Chen (Med. Discharge)",
+      "EmailAddress": "david.chen@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "PC Mark Williams (Ret.)",
+      "EmailAddress": "mark.williams@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Sophie Reynolds (Ret.)",
+      "EmailAddress": "sophie.reynolds@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Sgt. Michael Thompson (Discharged)",
+      "EmailAddress": "michael.thompson@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "CPO Janet Foster (Ret.)",
+      "EmailAddress": "janet.foster@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Cpl. Amy Rodriguez (Med. Discharge)",
+      "EmailAddress": "amy.rodriguez@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Inspector Paul Jackson (Ret.)",
+      "EmailAddress": "paul.jackson@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Cmdr. Rachel Green (Ret.)",
+      "EmailAddress": "rachel.green@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Sgt. Kevin O'Brien (Discharged)",
+      "EmailAddress": "kevin.obrien@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Capt. Lisa Davies (Med. Discharge)",
+      "EmailAddress": "lisa.davies@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "PC Daniel Murphy (Ret.)",
+      "EmailAddress": "daniel.murphy@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "WO1 Graham Scott (Ret.)",
+      "EmailAddress": "graham.scott@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Anna Kowalski (Discharged)",
+      "EmailAddress": "anna.kowalski@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Sgt. Maj. Robert Taylor (Ret.)",
+      "EmailAddress": "robert.taylor@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "PC Jennifer Walsh (Med. Ret.)",
+      "EmailAddress": "jennifer.walsh@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Col. Harrison Webb (Ret.)",
+      "EmailAddress": "harrison.webb@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "CPO Marcus Johnson (Discharged)",
+      "EmailAddress": "marcus.johnson@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Col. Priya Singh (Med. Discharge)",
+      "EmailAddress": "priya.singh@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Sgt. William Clarke (Ret.)",
+      "EmailAddress": "william.clarke@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Inspector Marie Dubois (Ret.)",
+      "EmailAddress": "marie.dubois@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Maj. Christopher Lee (Discharged)",
+      "EmailAddress": "christopher.lee@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "PC Susan Wright (Ret.)",
+      "EmailAddress": "susan.wright@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Lt. Cmdr. James Patterson (Med. Ret.)",
+      "EmailAddress": "james.patterson@example.com",
+      "Password": "hunter2"
+    },
+    {
+      "Name": "Cpl. Victoria Barnes (Discharged)",
+      "EmailAddress": "victoria.barnes@example.com",
+      "Password": "hunter2"
+    }
+  ],
+  "Cases": [
+    {
+      "Title": "Employment Discrimination Case – PTSD Disclosure",
+      "Description": "Former sergeant facing discrimination from a civilian employer after disclosing PTSD diagnosis. Seeking support with an employment tribunal.",
+      "Beneficiaries": [
+        "Sgt. James Turner (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik",
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Request and review employment contract and HR correspondence",
+        "Draft initial tribunal claim (ET1 form)",
+        "Arrange mental health assessment for evidence",
+        "Schedule prep call with client before preliminary hearing"
+      ]
+    },
+    {
+      "Title": "Ill-Health Pension Appeal – Partial Award Dispute",
+      "Description": "Former police officer disputing the decision to award only a partial ill-health pension after medical retirement.",
+      "Beneficiaries": [
+        "PC Emma Rees (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker",
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Request copy of medical board decision from pension authority",
+        "Contact occupational health for supporting documents",
+        "Draft appeal letter to pension provider",
+        "Submit SAR (Subject Access Request) to force HR"
+      ]
+    },
+    {
+      "Title": "Eviction Risk Due to Benefit Delay – RAF Veteran",
+      "Description": "RAF veteran facing eviction from council housing following a benefits delay. Needs emergency legal advice and representation at hearing.",
+      "Beneficiaries": [
+        "Cpl. Liam Ncube (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan",
+        "Tom Whitaker"
+      ],
+      "ToDos": [
+        "Request adjournment from court to allow time for legal aid",
+        "Contact housing officer to confirm arrears amount",
+        "Apply for backdated housing benefit",
+        "Prepare defence statement for eviction hearing"
+      ]
+    },
+    {
+      "Title": "Domestic Allegation Representation – Firefighter Veteran",
+      "Description": "Firefighter veteran seeking representation following an arrest over an alleged domestic incident. No charges filed yet. Requires legal advocacy and support with professional body.",
+      "Beneficiaries": [
+        "Mr. Alex Dobson"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Obtain custody record and police report",
+        "Arrange initial client interview to gather account",
+        "Review Fire Service disciplinary code and policies",
+        "Draft letter to professional body requesting case delay"
+      ]
+    },
+    {
+      "Title": "Spousal Visa Legal Support – Veteran Application",
+      "Description": "Veteran supporting an application for spousal visa for partner residing overseas. Needs legal assistance with Home Office documentation and appeals process.",
+      "Beneficiaries": [
+        "Lt. Col. Karen Ofori (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Verify financial eligibility under Appendix FM",
+        "Request certified English translations of marriage documents",
+        "Complete and submit Form IAFT-6 for appeal",
+        "Contact barrister for tribunal representation options"
+      ]
+    },
+    {
+      "Title": "War Pension Appeal – Service-Related Injury Claim",
+      "Description": "Army veteran appealing rejection of war pension claim for hearing loss and tinnitus sustained during active service in Afghanistan.",
+      "Beneficiaries": [
+        "WO2 Sarah Mitchell (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik"
+      ],
+      "ToDos": [
+        "Obtain complete military medical records from MoD",
+        "Arrange independent audiological assessment",
+        "Draft grounds of appeal to Veterans UK",
+        "Gather witness statements from former unit members"
+      ]
+    },
+    {
+      "Title": "Medical Negligence – Military Hospital Treatment",
+      "Description": "Former major pursuing medical negligence claim against military hospital for delayed diagnosis of cancer during routine screening.",
+      "Beneficiaries": [
+        "Maj. David Chen (Med. Discharge)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker"
+      ],
+      "ToDos": [
+        "Request full medical records from Defence Medical Services",
+        "Instruct independent medical expert for opinion",
+        "Calculate loss of earnings and future care costs",
+        "Issue Letter of Claim under Pre-Action Protocol"
+      ]
+    },
+    {
+      "Title": "Police Pension Forfeiture Challenge",
+      "Description": "Retired police constable challenging forfeiture of pension following misconduct conviction. Seeking restoration of pension rights.",
+      "Beneficiaries": [
+        "PC Mark Williams (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan"
+      ],
+      "ToDos": [
+        "Review disciplinary hearing transcripts and evidence",
+        "Research precedent cases on pension forfeiture",
+        "Draft application to Police Pension Appeal Tribunal",
+        "Prepare character references and mitigation evidence"
+      ]
+    },
+    {
+      "Title": "Service Accommodation Dispute – Unfair Eviction",
+      "Description": "Navy lieutenant facing eviction from service family accommodation following medical discharge. Challenging notice period and alternative housing provision.",
+      "Beneficiaries": [
+        "Lt. Sophie Reynolds (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Review Service Family Accommodation policy documents",
+        "Challenge medical discharge categorisation",
+        "Apply for extended notice period on medical grounds",
+        "Contact local authority for priority housing registration"
+      ]
+    },
+    {
+      "Title": "Criminal Injuries Compensation – Military Assault",
+      "Description": "Former sergeant seeking criminal injuries compensation for assault by fellow service member during deployment. PTSD and ongoing treatment required.",
+      "Beneficiaries": [
+        "Sgt. Michael Thompson (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Submit CICA application within time limits",
+        "Gather military police investigation reports",
+        "Arrange psychiatric assessment for trauma evaluation",
+        "Calculate special expenses and loss of earnings"
+      ]
+    },
+    {
+      "Title": "Armed Forces Covenant Housing Application",
+      "Description": "Royal Navy veteran seeking priority housing under Armed Forces Covenant after relationship breakdown. Currently homeless with dependent children.",
+      "Beneficiaries": [
+        "CPO Janet Foster (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik"
+      ],
+      "ToDos": [
+        "Submit homelessness application to local authority",
+        "Provide evidence of military service and discharge",
+        "Challenge any decision not to provide temporary accommodation",
+        "Apply for school places and child benefit transfers"
+      ]
+    },
+    {
+      "Title": "Disability Discrimination – Reasonable Adjustments",
+      "Description": "Army corporal with service-related mobility issues facing discrimination from employer who refuses to make reasonable workplace adjustments.",
+      "Beneficiaries": [
+        "Cpl. Amy Rodriguez (Med. Discharge)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker"
+      ],
+      "ToDos": [
+        "Document all requests for adjustments and employer responses",
+        "Obtain occupational health assessment recommendations",
+        "Draft early conciliation notification to ACAS",
+        "Prepare witness statements from colleagues"
+      ]
+    },
+    {
+      "Title": "Police Injury Pension Review Appeal",
+      "Description": "Retired police inspector appealing reduction in injury pension following medical review. Arguing deterioration in condition since original award.",
+      "Beneficiaries": [
+        "Inspector Paul Jackson (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan"
+      ],
+      "ToDos": [
+        "Request all medical evidence from pension authority",
+        "Arrange independent medical examination",
+        "Review original injury pension decision and medical board notes",
+        "Prepare submission to Police Medical Appeal Board"
+      ]
+    },
+    {
+      "Title": "Military Covenant Childcare Dispute",
+      "Description": "Navy commander seeking enforcement of childcare support commitments under Military Covenant following deployment-related family breakdown.",
+      "Beneficiaries": [
+        "Lt. Cmdr. Rachel Green (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Review Military Covenant provisions on family support",
+        "Document impact of deployment on family circumstances",
+        "Challenge withdrawal of childcare assistance",
+        "Apply for judicial review if internal appeals fail"
+      ]
+    },
+    {
+      "Title": "Court Martial Appeal – Wrongful Dismissal",
+      "Description": "Army captain appealing court martial conviction and dismissal from service. Claims procedural irregularities and inadequate legal representation during original proceedings.",
+      "Beneficiaries": [
+        "Capt. Lisa Davies (Med. Discharge)"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel",
+        "Zoe Matthews",
+        "Hannah Malik"
+      ],
+      "ToDos": [
+        "Review complete court martial transcript and evidence bundle",
+        "Identify procedural errors and grounds for appeal",
+        "Instruct specialist military law counsel",
+        "Prepare application to Court Martial Appeal Court",
+        "Gather character witnesses and service record evidence"
+      ]
+    },
+    {
+      "Title": "Historical Sexual Abuse Compensation Claim",
+      "Description": "Former police constable pursuing compensation claim for historical sexual abuse suffered during training college. Seeking damages for psychological trauma and career impact.",
+      "Beneficiaries": [
+        "PC Daniel Murphy (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik",
+        "Tom Whitaker"
+      ],
+      "ToDos": [
+        "Submit claim within limitation period extensions",
+        "Gather contemporaneous records from training college",
+        "Arrange specialist psychological assessment",
+        "Research similar successful claims for precedent",
+        "Prepare detailed witness statement from client"
+      ]
+    },
+    {
+      "Title": "Multiple Deployment PTSD War Pension",
+      "Description": "Warrant Officer with multiple Iraq and Afghanistan deployments seeking war pension for complex PTSD. Previous applications rejected due to insufficient medical evidence.",
+      "Beneficiaries": [
+        "WO1 Graham Scott (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan"
+      ],
+      "ToDos": [
+        "Compile comprehensive deployment history and incident reports",
+        "Arrange assessment with military psychiatrist",
+        "Request witness statements from former colleagues",
+        "Challenge previous rejection decisions",
+        "Prepare detailed chronology of symptoms development"
+      ]
+    },
+    {
+      "Title": "Immigration Detention Challenge – Veteran Rights",
+      "Description": "Polish-born RAF veteran challenging immigration detention and deportation order. Arguing breach of veterans' rights and family life under Article 8 ECHR.",
+      "Beneficiaries": [
+        "Lt. Anna Kowalski (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews",
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Apply for urgent bail from immigration detention",
+        "Gather evidence of military service and conduct",
+        "Prepare human rights challenge under Article 8",
+        "Contact media and veterans' charities for support",
+        "Research Armed Forces Covenant provisions on citizenship"
+      ]
+    },
+    {
+      "Title": "Mesothelioma Compensation – Asbestos Exposure",
+      "Description": "Retired sergeant major diagnosed with mesothelioma from asbestos exposure during naval service. Pursuing compensation claim against Ministry of Defence.",
+      "Beneficiaries": [
+        "Sgt. Maj. Robert Taylor (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker",
+        "Hannah Malik",
+        "Freya Chan"
+      ],
+      "ToDos": [
+        "Document all naval postings and potential asbestos exposure",
+        "Instruct specialist asbestos solicitors for joint representation",
+        "Arrange fast-track medical evidence due to prognosis",
+        "Calculate compensation including family provision",
+        "Coordinate with other naval asbestos exposure cases"
+      ]
+    },
+    {
+      "Title": "Unfair Dismissal – PTSD Discrimination",
+      "Description": "Former police constable dismissed from civilian security job after PTSD episode. Claiming unfair dismissal and disability discrimination at employment tribunal.",
+      "Beneficiaries": [
+        "PC Jennifer Walsh (Med. Ret.)"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Submit ET1 claim form before three-month deadline",
+        "Gather medical evidence of PTSD and reasonable adjustments needed",
+        "Request disciplinary hearing records and HR policies",
+        "Prepare schedule of loss including future earnings",
+        "Arrange workplace assessment for discrimination evidence"
+      ]
+    },
+    {
+      "Title": "Military Honours Appeal – Gallantry Recognition",
+      "Description": "Retired colonel appealing decision not to award military honours for actions during Falklands conflict. Seeking recognition through Honours Forfeiture Committee.",
+      "Beneficiaries": [
+        "Col. Harrison Webb (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Research original nomination and decision-making process",
+        "Gather witness statements from surviving unit members",
+        "Review declassified operational reports and citations",
+        "Prepare submission to Honours Forfeiture Committee",
+        "Contact regimental association for support"
+      ]
+    },
+    {
+      "Title": "Naval Pension Sharing Dispute – Divorce Settlement",
+      "Description": "Chief Petty Officer challenging ex-spouse's claim to naval pension in divorce proceedings. Arguing exceptional circumstances and service-related hardship.",
+      "Beneficiaries": [
+        "CPO Marcus Johnson (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker",
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Review divorce settlement and pension sharing order",
+        "Calculate actual pension values and sharing implications",
+        "Argue exceptional circumstances for reduced sharing",
+        "Prepare evidence of service-related sacrifices and hardship",
+        "Research precedent cases in military pension disputes"
+      ]
+    },
+    {
+      "Title": "Medical Malpractice – Military Hospital Negligence",
+      "Description": "Army lieutenant colonel pursuing clinical negligence claim for botched surgery at military hospital resulting in permanent disability and early medical discharge.",
+      "Beneficiaries": [
+        "Lt. Col. Priya Singh (Med. Discharge)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik",
+        "Tom Whitaker"
+      ],
+      "ToDos": [
+        "Obtain complete medical records and surgical notes",
+        "Instruct independent medical expert for liability opinion",
+        "Calculate loss of military career and pension rights",
+        "Prepare Letter of Claim under Clinical Negligence Protocol",
+        "Arrange occupational therapy assessment for future care needs"
+      ]
+    },
+    {
+      "Title": "Veterans' Housing Possession Defence",
+      "Description": "Army veteran facing mortgage possession proceedings following PTSD-related financial difficulties. Seeking time to sell and challenging lender's conduct.",
+      "Beneficiaries": [
+        "Sgt. William Clarke (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan",
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "File defence to possession claim citing exceptional circumstances",
+        "Challenge lender's compliance with pre-action protocol",
+        "Apply for time order under Consumer Credit Act",
+        "Arrange independent property valuation for forced sale argument",
+        "Negotiate payment plan based on veteran's benefits and capacity"
+      ]
+    },
+    {
+      "Title": "Police Disciplinary Appeal – Misconduct Charges",
+      "Description": "Retired police inspector appealing disciplinary findings and seeking restoration of reputation. Claims investigation was flawed and evidence was circumstantial.",
+      "Beneficiaries": [
+        "Inspector Marie Dubois (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews",
+        "Hannah Malik"
+      ],
+      "ToDos": [
+        "Review disciplinary investigation file and interview transcripts",
+        "Identify procedural breaches in investigation process",
+        "Prepare grounds of appeal to Police Appeals Tribunal",
+        "Gather character evidence and service record testimonials",
+        "Challenge reliability and admissibility of key evidence"
+      ]
+    },
+    {
+      "Title": "Armed Forces Covenant Education Support",
+      "Description": "Army major's children denied school places despite Armed Forces Covenant provisions. Challenging local authority's failure to prioritize military families.",
+      "Beneficiaries": [
+        "Maj. Christopher Lee (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Freya Chan"
+      ],
+      "ToDos": [
+        "Review school admission policies and covenant obligations",
+        "Gather evidence of frequent postings and impact on children",
+        "Challenge local authority decision through appeals process",
+        "Prepare judicial review application if necessary",
+        "Contact other military families with similar issues"
+      ]
+    },
+    {
+      "Title": "Police Injury Benefit Termination Challenge",
+      "Description": "Former police constable challenging termination of injury benefit payments following medical review. Arguing condition has worsened rather than improved.",
+      "Beneficiaries": [
+        "PC Susan Wright (Ret.)"
+      ],
+      "CaseWorkers": [
+        "Tom Whitaker",
+        "Rajiv Patel"
+      ],
+      "ToDos": [
+        "Request all medical evidence relied upon by pension authority",
+        "Arrange independent medical examination and specialist reports",
+        "Review original injury award decision and medical board findings",
+        "Prepare detailed grounds of appeal with medical evidence",
+        "Calculate financial impact of benefit termination"
+      ]
+    },
+    {
+      "Title": "Naval Nuclear Test Compensation Claim",
+      "Description": "Royal Navy veteran seeking compensation for radiation exposure during nuclear testing programs. Pursuing group litigation for health consequences and inadequate protection.",
+      "Beneficiaries": [
+        "Lt. Cmdr. James Patterson (Med. Ret.)"
+      ],
+      "CaseWorkers": [
+        "Hannah Malik",
+        "Tom Whitaker",
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Join existing group litigation against Ministry of Defence",
+        "Compile service records showing presence at nuclear tests",
+        "Obtain medical evidence linking health conditions to radiation",
+        "Research declassified documents on safety procedures",
+        "Coordinate with other nuclear test veterans and support groups"
+      ]
+    },
+    {
+      "Title": "Military Sexual Trauma Legal Support",
+      "Description": "Army corporal pursuing criminal injuries compensation and civil claim for sexual assault during military service. Seeking justice and ongoing therapeutic support.",
+      "Beneficiaries": [
+        "Cpl. Victoria Barnes (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Rajiv Patel",
+        "Hannah Malik"
+      ],
+      "ToDos": [
+        "Submit CICA application with specialist trauma solicitor support",
+        "Gather military police investigation records and witness statements",
+        "Arrange specialist psychological assessment and ongoing therapy",
+        "Prepare civil claim against Ministry of Defence for institutional failure",
+        "Coordinate with military sexual trauma support organizations"
+      ]
+    },
+    {
+      "Title": "Veterans' Mental Health Tribunal Support",
+      "Description": "Former army sergeant appealing Mental Health Act detention. Arguing that PTSD symptoms are being misinterpreted and requiring specialist veteran mental health advocacy.",
+      "Beneficiaries": [
+        "Sgt. Kevin O'Brien (Discharged)"
+      ],
+      "CaseWorkers": [
+        "Zoe Matthews"
+      ],
+      "ToDos": [
+        "Review mental health assessment and detention papers",
+        "Instruct independent psychiatric expert with military experience",
+        "Prepare grounds for tribunal appeal",
+        "Arrange legal aid and tribunal representation"
+      ]
+    }
+  ]
+}
