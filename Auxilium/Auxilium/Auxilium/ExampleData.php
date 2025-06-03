@@ -14,9 +14,15 @@ use Auxilium\Schemas\MessageSchema;
 use Auxilium\Schemas\UserSchema;
 use Auxilium\TwigHandling\PageBuilder2;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
+use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
 
 class ExampleData
 {
+    /**
+     * @throws InvalidUUIDFormatException
+     * @throws \JsonException
+     * @throws \Exception
+     */
     public static function WriteExampleData(): void
     {
         $exampleData = file_get_contents(__DIR__ . "/../../example-data.json");
@@ -97,126 +103,118 @@ class ExampleData
 
         foreach($exampleData['Cases'] as $case)
         {
+            $actorNode = User::get_system_node();
+            $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
+
+
+            // create the case node
             $caseNode = GraphDatabaseConnection::new_node(
-                null,
-                null,
-                URLHandling::GetURLForSchema(CaseSchema::class),
-                User::get_system_node()
+                schema: URLHandling::GetURLForSchema(CaseSchema::class),
+                creator: $creatorNode
             );
             $caseNode = new DeegraphNode($caseNode->getId());
-
             $caseNode->addProperty(
                 key:    "title",
                 node:   GraphDatabaseConnection::new_node(
                     data: $case["Title"],
                     media_type: "text/plain",
-                    schema: null,
-                    creator: User::get_system_node()
+                    creator: $creatorNode
                 ),
-                actor:  User::get_system_node()
+                actor: $actorNode
             );
             $caseNode->addProperty(
                 key:    "description",
                 node:   GraphDatabaseConnection::new_node(
                     data: $case["Description"],
                     media_type: "text/plain",
-                    schema: null,
-                    creator: User::get_system_node()
+                    creator: $creatorNode
                 ),
-                actor:  User::get_system_node()
+                actor: $actorNode
             );
 
 
+            // handle todos
             $node_todos = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
-                schema: null,
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "todos",
                 node:   $node_todos,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
 
 
+            // handle documents
             $node_documents = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
-                schema: null,
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "documents",
                 node:   $node_documents,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
 
 
+            // handle messages
             $node_messages = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
                 schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "messages",
                 node:   $node_messages,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
 
 
+            // handle timeline
             $node_timeline = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
                 schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "timeline",
                 node:   $node_timeline,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
 
 
+            // handle caseworkers
             $node_caseWorkers = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
                 schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "workers",
                 node:   $node_caseWorkers,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
             for ($i = 0, $iMax = count($case['CaseWorkers']); $i < $iMax; $i++)
             {
                 $node_caseWorkers->addProperty(
                     key:    $i,
                     node:   new User($userIDs[$case['CaseWorkers'][$i]]),
-                    actor:  User::get_system_node()
+                    actor:  $actorNode
                 );
             }
 
 
+            // handle clients
             $node_beneficiaries = GraphDatabaseConnection::new_node(
-                data: null,
-                media_type: null,
                 schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: User::get_system_node()
+                creator: $creatorNode
             );
             $caseNode->addProperty(
                 key:    "clients",
                 node:   $node_beneficiaries,
-                actor:  User::get_system_node()
+                actor:  $actorNode
             );
             for ($i = 0, $iMax = count($case['Beneficiaries']); $i < $iMax; $i++)
             {
                 $node_beneficiaries->addProperty(
                     key:    $i,
                     node:   new User($userIDs[$case['Beneficiaries'][$i]]),
-                    actor:  User::get_system_node()
+                    actor:  $actorNode
                 );
             }
         }
