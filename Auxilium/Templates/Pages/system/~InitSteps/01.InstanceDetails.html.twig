@@ -1,0 +1,20 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <h1>Step 1/?: Instance details</h1>
+
+        <form method="POST" action="/system/init?page=2&setup_key={{ SetupKey }}">
+            <label for="instance-domain">Domain name</label>
+            <input type="text" id="instance-domain" name="instance-domain" placeholder="showcase.auxiliumsoftware.co.uk" required value="{{ Variables['instance-domain'] }}"/>
+
+
+            <div class="button-box">
+                <a href="/system/init?page=0&setup_key={{ SetupKey }}" class="button">Previous step</a>
+                <input type="submit" value="Next step" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

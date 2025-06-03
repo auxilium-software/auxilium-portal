@@ -18,9 +18,10 @@ Auxilium/phpDocumentor.phar
 nohup.out
 
 # Config Files
-Auxilium/Configuration/Configuration/Secrets.yaml
 Auxilium/Configuration/Configuration/Credentials.php
 Auxilium/Configuration/Configuration/Environment.php
+Auxilium/Configuration/Configuration/Credentials.dev.php
+Auxilium/Configuration/Configuration/Environment.dev.php
 Auxilium/Configuration/Configuration/msft-access-token-primary.json
 
 # Local Storage Files

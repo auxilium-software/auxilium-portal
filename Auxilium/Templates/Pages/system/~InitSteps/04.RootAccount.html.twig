@@ -1,0 +1,25 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <h1>Step 4/?: Root account</h1>
+
+        <form method="POST" action="/system/init?page=5&setup_key={{ SetupKey }}">
+            <label for="rootAccount-name">Name</label>
+            <input type="text" id="rootAccount-name" name="rootAccount-name" placeholder="Jane Doe" required value="{{ Variables['rootAccount-name'] }}" />
+
+            <label for="rootAccount-email">Email address</label>
+            <input type="text" id="rootAccount-email" name="rootAccount-email" placeholder="jane@example.com" required value="{{ Variables['rootAccount-email'] }}" />
+
+            <label for="rootAccount-password">Password</label>
+            <input type="password" id="rootAccount-password" name="rootAccount-password" required value="{{ Variables['rootAccount-password'] }}" />
+
+            <div class="button-box">
+                <a href="/system/init?page=3&setup_key={{ SetupKey }}" class="button">Previous step</a>
+                <input type="submit" value="Next step" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

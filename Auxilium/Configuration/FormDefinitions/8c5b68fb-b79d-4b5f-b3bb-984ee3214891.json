@@ -196,6 +196,9 @@
             "target": "$user/cases",
             "property": "$output_var_case_root_node"
         },
+
+
+
         {
             "type": "NEW_NODE",
             "content": "::auxpckstr:ui_text/new_case::",
@@ -203,6 +206,9 @@
             "name": "title",
             "target": "$output_var_case_root_node"
         },
+
+
+
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
@@ -215,6 +221,9 @@
             "target": "$output_var_case_root_node/clients",
             "property": "$output_var_case_client"
         },
+
+
+
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
