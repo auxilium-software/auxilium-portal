@@ -42,6 +42,8 @@ class ExampleData
 
 
             $user_node = GraphDatabaseConnection::new_node(
+                null,
+                null,
                 URLHandling::GetURLForSchema(UserSchema::class),
                 User::get_system_node()
             );
@@ -59,16 +61,8 @@ class ExampleData
                     ->bindValue(name: '__password__', value: $hashed_password)
             );
 
-            $email_prop = GraphDatabaseConnection::new_node(
-                data: $user["EmailAddress"],
-                media_type: "text/plain",
-                creator: User::get_system_node()
-            );
-            $user_node->addProperty(
-                "contact_email",
-                $email_prop,
-                User::get_system_node()
-            ); // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
+            $email_prop = GraphDatabaseConnection::new_node($user["EmailAddress"], "text/plain", null, User::get_system_node());
+            $user_node->addProperty("contact_email", $email_prop, User::get_system_node()); // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
 
 
             $language_prop = GraphDatabaseConnection::new_node(
@@ -80,7 +74,7 @@ class ExampleData
                 key  : "preferred_language",
                 node : $language_prop,
                 actor: $user_node
-            );
+            ); // Set it to whatever the language is currently in
             $full_name_prop = GraphDatabaseConnection::new_node(
                 data      : $user["Name"],
                 media_type: "text/plain",
@@ -94,19 +88,33 @@ class ExampleData
             $name_prop = GraphDatabaseConnection::new_node(
                 data      : explode(" ", $user["Name"])[0],
                 media_type: "text/plain",
+                schema    : null,
                 creator   : $user_node
             );
             $user_node->addProperty(
                 key  : "display_name",
                 node : $name_prop,
                 actor: $user_node
-            );
+            ); // Create this as default the user's first name - they can change it later if they want
 
         }
 
         foreach($exampleData['Cases'] as $case)
         {
-            $actorNode   = User::get_system_node();
+            /*
+            if (true)
+            {
+                $actorNode = User::get_system_node();
+                $creatorNode = User::get_system_node();
+            }
+            else
+            {
+                $actorNode = new User($userIDs[$case['Beneficiaries'][0]]);
+                $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
+            }
+            */
+
+            $actorNode = User::get_system_node();
             $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
 
 
@@ -197,7 +205,7 @@ class ExampleData
                 $node_caseWorkers->addProperty(
                     key:    $i,
                     node:   new User($userIDs[$case['CaseWorkers'][$i]]),
-                    actor:  $actorNode,
+                    actor:  new User($userIDs[$case['CaseWorkers'][$i]]),
                 );
             }
 
@@ -217,7 +225,7 @@ class ExampleData
                 $node_beneficiaries->addProperty(
                     key:    $i,
                     node:   new User($userIDs[$case['Beneficiaries'][$i]]),
-                    actor:  $actorNode,
+                    actor:  new User($userIDs[$case['Beneficiaries'][$i]]),
                 );
             }
         }
