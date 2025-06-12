@@ -87,10 +87,10 @@ class ExampleData
      * @throws InvalidUUIDFormatException
      * @throws \Exception
      */
-    private static function CreateCase($allUsers, $case): DeegraphNode
+    private static function CreateCase($case): DeegraphNode
     {
         $actorNode = User::get_system_node();
-        $creatorNode = new User($allUsers[$case['Beneficiaries'][0]]);
+        $creatorNode = User::get_system_node();
 
 
         // create the case node
@@ -213,26 +213,38 @@ class ExampleData
 
         foreach($exampleData['Cases'] as $case)
         {
-            $caseNode = self::CreateCase($allUserIDs, $case);
+            $caseNode = self::CreateCase($case);
 
-            $node_caseWorkers = $caseNode->getProperty(property: 'workers');
-            $node_beneficiaries = $caseNode->getProperty(property: 'clients');
+            $caseNode_caseWorkers = $caseNode->getProperty(property: 'workers');
+            $caseNode_beneficiaries = $caseNode->getProperty(property: 'clients');
 
             for ($i = 0, $iMax = count($case['CaseWorkers']); $i < $iMax; $i++)
             {
-                $node_caseWorkers->addProperty(
+                $caseWorker =new User($allUserIDs[$case['CaseWorkers'][$i]]);
+                $caseNode_caseWorkers->addProperty(
                     key:    $i,
-                    node:   new User($allUserIDs[$case['CaseWorkers'][$i]]),
+                    node:   $caseWorker,
+                    actor:  User::get_system_node(),
+                );
+                $caseWorker->addProperty(
+                    key:    "/cases/#",
+                    node:   $caseNode,
                     actor:  User::get_system_node(),
                 );
             }
 
             for ($i = 0, $iMax = count($case['Beneficiaries']); $i < $iMax; $i++)
             {
-                $node_beneficiaries->addProperty(
+                $client = new User($allUserIDs[$case['Beneficiaries'][$i]]);
+                $caseNode_beneficiaries->addProperty(
                     key:    $i,
-                    node:   new User($allUserIDs[$case['Beneficiaries'][$i]]),
-                    actor:  new User($allUserIDs[$case['Beneficiaries'][$i]]),
+                    node:   $client,
+                    actor:  User::get_system_node(),
+                );
+                $client->addProperty(
+                    key:    "/cases/#",
+                    node:   $caseNode,
+                    actor:  User::get_system_node(),
                 );
             }
         }
