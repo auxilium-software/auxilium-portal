@@ -129,7 +129,8 @@ else
 }
 
 $definition = file_get_contents(__DIR__ . "/../Configuration/FormDefinitions/" . $uri_components[0] . ".json");
-$definition = json_decode($definition, true);
+// $definition = json_decode($definition, true);
+$definition = JSONC::decode($definition);
 
 if(!isset($form_persistent_data["variables"]))
 {
