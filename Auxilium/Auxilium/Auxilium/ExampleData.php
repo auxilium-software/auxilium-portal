@@ -227,7 +227,7 @@ class ExampleData
                     actor:  User::get_system_node(),
                 );
                 $caseWorker->addProperty(
-                    key:    "/cases/#",
+                    key:    "cases/#",
                     node:   $caseNode,
                     actor:  User::get_system_node(),
                 );
@@ -242,7 +242,7 @@ class ExampleData
                     actor:  User::get_system_node(),
                 );
                 $client->addProperty(
-                    key:    "/cases/#",
+                    key:    "cases/#",
                     node:   $caseNode,
                     actor:  User::get_system_node(),
                 );
