@@ -1,42 +1,58 @@
 {
     "$schema": "https://schemas.darksparrow.uk/AuxiliumFormDefinition.json?version=4",
     "text_prefab_path": "forms/new_case",
+
     "pages": [
         {
+            // First page: Determine who the case is for
             "title": "Which best describes your situation?",
             "id": "who_is_case_about",
+
+            // Only show this page if no target user is pre-selected
             "if": "not(exists($target))",
+
             "components": [
                 {
+                    // Multiple choice field for case type selection
                     "type": "CHOICE_FIELD",
                     "options": [
                         {
+                            // Option 1: Self-application
                             "label_strong": "I am applying for help myself.",
                             "value": "MYSELF"
                         },
                         {
+                            // Option 2: Applying on behalf of someone with ongoing management
                             "label_strong": "I am helping someone else with their application.",
                             "label_secondary": "I need ongoing access to manage the case on behalf of someone else.",
                             "value": "SOMEONE_ELSE_MANAGED"
                         },
                         {
+                            // Option 3: Simple referral without ongoing management
                             "label_strong": "I am referring someone.",
                             "label_secondary": "I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.",
                             "value": "SOMEONE_ELSE"
                         }
                     ],
+                    // Store the selection in this variable
                     "output_variable": "on_behalf_of",
                     "required": true
                 }
             ]
         },
         {
+            // Second page: Contact details for self-applications
             "title": "Your contact details",
+
+            // Only show if user selected "MYSELF"
             "if": "equals($form_var_on_behalf_of,\"MYSELF\")",
+
             "components": [
                 {
                     "type": "TEXT_FIELD",
+                    // Localized label for full name field
                     "label": "::auxpckstr:data_types/full_name::",
+                    // Pre-populate with current user's name
                     "default_value": "$user/name",
                     "output_variable": "full_name",
                     "required": true
@@ -44,13 +60,18 @@
             ]
         },
         {
+            // Third page: Contact details for third-party applications
             "title": "Contact details for individual you are applying on behalf of",
             "description": "Please enter as the contact details for the person you are applying on behalf of.",
+
+            // Show if user selected either third-party option
             "if": "or(equals($form_var_on_behalf_of,\"SOMEONE_ELSE\"),equals($form_var_on_behalf_of,\"SOMEONE_ELSE_MANAGED\"))",
+
             "components": [
                 {
                     "type": "TEXT_FIELD",
                     "label": "::auxpckstr:data_types/full_name::",
+                    // Pre-populate with target user's name if available
                     "default_value": "$target/name",
                     "output_variable": "full_name",
                     "required": true
@@ -58,10 +79,12 @@
             ]
         },
         {
+            // Fourth page: Case description
             "title": "Case details",
             "id": "case_details",
             "components": [
                 {
+                    // Large text area for case description
                     "type": "LARGE_TEXT_FIELD",
                     "rows": 12,
                     "label": "::auxpckstr:data_types/case_description::",
@@ -71,15 +94,22 @@
             ]
         }
     ],
+
+    // Enable final review page before submission
     "final_review": true,
+
+    // Configuration for the review page
     "review": {
         "components": [
             {
+                // Section header for beneficiary details
                 "type": "SUBHEADING",
-                "value": "Beneficiery details",
+                "value": "Beneficiery details", // Note: "Beneficiary" is misspelled in original
+                // Allow jumping back to the first page from review
                 "jump_to_page": "who_is_case_about"
             },
             {
+                // Show target user details if a target exists
                 "type": "DESCRIPTION_LIST",
                 "if": "exists($target)",
                 "dictionary": {
@@ -88,6 +118,7 @@
                 }
             },
             {
+                // Show form-entered name if no pre-existing target
                 "type": "DESCRIPTION_LIST",
                 "if": "not(exists($target))",
                 "dictionary": {
@@ -95,35 +126,47 @@
                 }
             },
             {
+                // Section header for case description
                 "type": "SUBHEADING",
                 "value": "Case description",
+                // Allow jumping back to case details page
                 "jump_to_page": "case_details"
             },
             {
+                // Display the entered case description
                 "type": "PARAGRAPH",
                 "value": "$form_var_case_description"
             }
         ]
     },
+
+    // Actions to perform when form is submitted
     "on_submit": [
+        // Optional WEMWBS (Wellbeing) data handling
         {
+            // Create JSON structure for WEMWBS data if it exists
             "type": "CONSTRUCT_JSON",
             "if": "exists($form_var_wemwbs)",
             "struct": {},
             "output_variable": "wemwbs_json"
         },
         {
+            // Create a node for WEMWBS data if constructed
             "type": "NEW_NODE",
             "if": "exists($form_var_wemwbs_json)",
             "content": "$output_var_wemwbs_json",
             "mime_type": "application/json",
             "schema": "https://schemas.veteranslegallink.org/v1/wemwbs.json"
         },
+
+        // Create the main case node
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/case.json",
             "output_variable": "case_root_node"
         },
+
+        // Add case description to the case node
         {
             "type": "NEW_NODE",
             "content": "$form_var_case_description",
@@ -131,19 +174,24 @@
             "name": "description",
             "target": "$output_var_case_root_node"
         },
+
+        // Handle client/beneficiary user creation for third-party cases
         {
+            // Set flag to create new user for third-party applications
             "type": "SET",
             "if": "or(equals($form_var_on_behalf_of,\"SOMEONE_ELSE\"),equals($form_var_on_behalf_of,\"SOMEONE_ELSE_MANAGED\"))",
             "output_variable": "create_new_target",
             "value": "true"
         },
         {
+            // Create new user node if needed
             "type": "NEW_NODE",
             "if": "$output_var_create_new_target",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/user.json",
             "output_variable": "case_client"
         },
         {
+            // Add name to the new user
             "type": "NEW_NODE",
             "if": "$output_var_create_new_target",
             "content": "$form_var_full_name",
@@ -151,18 +199,24 @@
             "name": "name",
             "target": "$output_var_case_client"
         },
+
+        // Determine the case client (who the case is for)
         {
+            // Use existing target user if available
             "type": "SET",
             "if": "exists($target)",
             "eval": "$target",
             "output_variable": "case_client"
         },
         {
+            // Use current user for self-applications
             "type": "SET",
             "if": "equals($form_var_on_behalf_of,\"MYSELF\")",
             "eval": "$user",
             "output_variable": "case_client"
         },
+
+        // Create "cases" collection for client if it doesn't exist
         {
             "type": "NEW_NODE",
             "if": "not(exists($output_var_case_client/cases/@id))",
@@ -170,6 +224,8 @@
             "name": "cases",
             "target": "$output_var_case_client"
         },
+
+        // Create "cases" collection for current user if it doesn't exist
         {
             "type": "NEW_NODE",
             "if": "not(exists($user/cases/@id))",
@@ -177,12 +233,16 @@
             "name": "cases",
             "target": "user"
         },
+
+        // Link the case to the client's cases collection
         {
             "type": "LINK",
             "if": "exists($output_var_case_client)",
             "target": "$output_var_case_client/cases",
             "property": "$output_var_case_root_node"
         },
+
+        // For managed third-party cases, also link to current user's cases
         {
             "type": "NEW_NODE",
             "if": "equals($form_var_on_behalf_of,\"SOMEONE_ELSE_MANAGED\")",
@@ -197,8 +257,7 @@
             "property": "$output_var_case_root_node"
         },
 
-
-
+        // Add case title (using localized string)
         {
             "type": "NEW_NODE",
             "content": "::auxpckstr:ui_text/new_case::",
@@ -207,8 +266,7 @@
             "target": "$output_var_case_root_node"
         },
 
-
-
+        // Create and link clients collection to case
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
@@ -217,14 +275,15 @@
             "target": "$output_var_case_root_node"
         },
         {
+            // Link the case client to the clients collection
             "type": "LINK",
             "target": "$output_var_case_root_node/clients",
             "property": "$output_var_case_client"
         },
 
-
-
+        // Create empty collections for case management
         {
+            // Todos collection for task management
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
             "output_variable": "todo_node",
@@ -232,6 +291,7 @@
             "target": "$output_var_case_root_node"
         },
         {
+            // Workers collection for case staff
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
             "output_variable": "workers_node",
@@ -239,6 +299,7 @@
             "target": "$output_var_case_root_node"
         },
         {
+            // Documents collection for file storage
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
             "output_variable": "documents_node",
@@ -246,6 +307,7 @@
             "target": "$output_var_case_root_node"
         },
         {
+            // Messages collection for communication
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
             "output_variable": "messages_node",
@@ -253,18 +315,23 @@
             "target": "$output_var_case_root_node"
         },
         {
+            // Timeline collection for case history
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
             "output_variable": "timeline_node",
             "name": "timeline",
             "target": "$output_var_case_root_node"
         },
+
+        // Navigation: redirect to the new case page
         {
+            // Build the URL for the new case
             "type": "SET",
             "eval": "concat(\"/graph/~\",$output_var_case_root_node/@id)",
             "output_variable": "return_url"
         },
         {
+            // Navigate to the new case, replacing the last return URL in history
             "type": "NAVIGATE",
             "replace_last_return_url": true,
             "value": "$output_var_return_url"
