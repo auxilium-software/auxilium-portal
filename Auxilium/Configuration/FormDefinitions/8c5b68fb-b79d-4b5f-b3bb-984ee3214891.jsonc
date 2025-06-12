@@ -142,7 +142,9 @@
 
     // Actions to perform when form is submitted
     "on_submit": [
-        // Optional WEMWBS (Wellbeing) data handling
+        /*
+        Optional WEMWBS (Wellbeing) data handling
+        */
         {
             // Create JSON structure for WEMWBS data if it exists
             "type": "CONSTRUCT_JSON",
@@ -159,14 +161,20 @@
             "schema": "https://schemas.veteranslegallink.org/v1/wemwbs.json"
         },
 
-        // Create the main case node
+
+        /*
+        Create the main case node
+        */
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/case.json",
             "output_variable": "case_root_node"
         },
 
-        // Add case description to the case node
+
+        /*
+        Add case description to the case node
+        */
         {
             "type": "NEW_NODE",
             "content": "$form_var_case_description",
@@ -175,7 +183,10 @@
             "target": "$output_var_case_root_node"
         },
 
-        // Handle client/beneficiary user creation for third-party cases
+
+        /*
+        Handle client/beneficiary user creation for third-party cases
+        */
         {
             // Set flag to create new user for third-party applications
             "type": "SET",
@@ -200,7 +211,10 @@
             "target": "$output_var_case_client"
         },
 
-        // Determine the case client (who the case is for)
+
+        /*
+        Determine the case client (who the case is for)
+        */
         {
             // Use existing target user if available
             "type": "SET",
@@ -216,7 +230,10 @@
             "output_variable": "case_client"
         },
 
-        // Create "cases" collection for client if it doesn't exist
+
+        /*
+        Create "cases" collection for client if it doesn't exist
+        */
         {
             "type": "NEW_NODE",
             "if": "not(exists($output_var_case_client/cases/@id))",
@@ -225,7 +242,10 @@
             "target": "$output_var_case_client"
         },
 
-        // Create "cases" collection for current user if it doesn't exist
+
+        /*
+        Create "cases" collection for current user if it doesn't exist
+        */
         {
             "type": "NEW_NODE",
             "if": "not(exists($user/cases/@id))",
@@ -234,7 +254,9 @@
             "target": "user"
         },
 
-        // Link the case to the client's cases collection
+        /*
+        Link the case to the client's cases collection
+        */
         {
             "type": "LINK",
             "if": "exists($output_var_case_client)",
@@ -242,7 +264,10 @@
             "property": "$output_var_case_root_node"
         },
 
-        // For managed third-party cases, also link to current user's cases
+        
+        /*
+        For managed third-party cases, also link to current user's cases
+        */
         {
             "type": "NEW_NODE",
             "if": "equals($form_var_on_behalf_of,\"SOMEONE_ELSE_MANAGED\")",
@@ -257,7 +282,10 @@
             "property": "$output_var_case_root_node"
         },
 
-        // Add case title (using localized string)
+
+        /*
+        Add case title (using localized string)
+        */
         {
             "type": "NEW_NODE",
             "content": "::auxpckstr:ui_text/new_case::",
@@ -266,7 +294,10 @@
             "target": "$output_var_case_root_node"
         },
 
-        // Create and link clients collection to case
+
+        /*
+        Create and link clients collection to case
+        */
         {
             "type": "NEW_NODE",
             "schema": "https://schemas.auxiliumsoftware.co.uk/v1/collection.json",
@@ -281,7 +312,10 @@
             "property": "$output_var_case_client"
         },
 
-        // Create empty collections for case management
+
+        /*
+        Create empty collections for case management
+        */
         {
             // Todos collection for task management
             "type": "NEW_NODE",
@@ -323,7 +357,10 @@
             "target": "$output_var_case_root_node"
         },
 
-        // Navigation: redirect to the new case page
+
+        /*
+        Navigation: redirect to the new case page
+        */
         {
             // Build the URL for the new case
             "type": "SET",
