@@ -264,7 +264,7 @@
             "property": "$output_var_case_root_node"
         },
 
-        
+
         /*
         For managed third-party cases, also link to current user's cases
         */
