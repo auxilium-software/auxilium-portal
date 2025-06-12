@@ -18,10 +18,183 @@ use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
 
 class ExampleData
 {
+    private static function CreateUser($db, $user): User
+    {
+        $pre_hashed_password = base64_encode(hash("sha256", $user["Password"], true));
+        $hash_options = [
+            "cost" => 12,
+        ];
+        $hashed_password = password_hash($pre_hashed_password, PASSWORD_BCRYPT, $hash_options);
+
+        $user_node = GraphDatabaseConnection::new_node(
+            null,
+            null,
+            URLHandling::GetURLForSchema(UserSchema::class),
+            User::get_system_node()
+        );
+        $user_node = new User($user_node->getId());
+
+        $db->RunInsert(
+            queryBuilder: SQLQueryBuilderWrapper::INSERT(MariaDBTable::STANDARD_LOGINS)
+                ->set(col: 'email_address', value: ':__email_address__')
+                ->set(col: 'user_uuid', value: ':__user_uuid__')
+                ->set(col: 'password', value: ':__password__')
+                ->bindValue(name: '__email_address__', value: $user["EmailAddress"])
+                ->bindValue(name: '__user_uuid__', value: $user_node->getId())
+                ->bindValue(name: '__password__', value: $hashed_password)
+        );
+
+        $email_prop = GraphDatabaseConnection::new_node($user["EmailAddress"], "text/plain", null, User::get_system_node());
+        $user_node->addProperty("contact_email", $email_prop, User::get_system_node()); // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
+
+        $language_prop = GraphDatabaseConnection::new_node(
+            data      : strtoupper(PageBuilder2::GetVariable("lang", "en")),
+            media_type: "text/plain",
+            creator   : $user_node
+        );
+        $user_node->addProperty(
+            key  : "preferred_language",
+            node : $language_prop,
+            actor: $user_node
+        ); // Set it to whatever the language is currently in
+        $full_name_prop = GraphDatabaseConnection::new_node(
+            data      : $user["Name"],
+            media_type: "text/plain",
+            creator   : $user_node
+        );
+        $user_node->addProperty(
+            key  : "name",
+            node : $full_name_prop,
+            actor: $user_node
+        );
+        $name_prop = GraphDatabaseConnection::new_node(
+            data      : explode(" ", $user["Name"])[0],
+            media_type: "text/plain",
+            schema    : null,
+            creator   : $user_node
+        );
+        $user_node->addProperty(
+            key  : "display_name",
+            node : $name_prop,
+            actor: $user_node
+        ); // Create this as default the user's first name - they can change it later if they want
+
+        return $user_node;
+    }
+
+
+    /**
+     * @throws InvalidUUIDFormatException
+     * @throws \Exception
+     */
+    private static function CreateCase($allUsers, $case): DeegraphNode
+    {
+        $actorNode = User::get_system_node();
+        $creatorNode = new User($allUsers[$case['Beneficiaries'][0]]);
+
+
+        // create the case node
+        $caseNode = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CaseSchema::class),
+            creator: $creatorNode
+        );
+        $caseNode = new DeegraphNode($caseNode->getId());
+        $caseNode->addProperty(
+            key:    "title",
+            node:   GraphDatabaseConnection::new_node(
+                data: $case["Title"],
+                media_type: "text/plain",
+                creator: $creatorNode
+            ),
+            actor: $actorNode
+        );
+        $caseNode->addProperty(
+            key:    "description",
+            node:   GraphDatabaseConnection::new_node(
+                data: $case["Description"],
+                media_type: "text/plain",
+                creator: $creatorNode
+            ),
+            actor: $actorNode
+        );
+
+
+        // handle todos
+        $node_todos = GraphDatabaseConnection::new_node(
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "todos",
+            node:   $node_todos,
+            actor:  $actorNode
+        );
+
+
+        // handle documents
+        $node_documents = GraphDatabaseConnection::new_node(
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "documents",
+            node:   $node_documents,
+            actor:  $actorNode
+        );
+
+
+        // handle messages
+        $node_messages = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "messages",
+            node:   $node_messages,
+            actor:  $actorNode
+        );
+
+
+        // handle timeline
+        $node_timeline = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "timeline",
+            node:   $node_timeline,
+            actor:  $actorNode
+        );
+
+
+        // handle caseworkers
+        $node_caseWorkers = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "workers",
+            node:   $node_caseWorkers,
+            actor:  $actorNode
+        );
+
+
+        // handle clients
+        $node_beneficiaries = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: $creatorNode
+        );
+        $caseNode->addProperty(
+            key:    "clients",
+            node:   $node_beneficiaries,
+            actor:  $actorNode
+        );
+
+        return $caseNode;
+    }
+
+
     /**
      * @throws InvalidUUIDFormatException
      * @throws \JsonException
-     * @throws \Exception
      */
     public static function WriteExampleData(): void
     {
@@ -30,202 +203,36 @@ class ExampleData
 
         $db = new MariaDBServerConnection();
 
-        $userIDs = [];
+        $allUserIDs = [];
 
         foreach($exampleData['Users'] as $user)
         {
-            $pre_hashed_password = base64_encode(hash("sha256", $user["Password"], true));
-            $hash_options = [
-                "cost" => 12,
-            ];
-            $hashed_password = password_hash($pre_hashed_password, PASSWORD_BCRYPT, $hash_options);
-
-
-            $user_node = GraphDatabaseConnection::new_node(
-                null,
-                null,
-                URLHandling::GetURLForSchema(UserSchema::class),
-                User::get_system_node()
-            );
-            $user_node = new User($user_node->getId());
-
-            $userIDs[$user['Name']] = $user_node->getId();
-
-            $db->RunInsert(
-                queryBuilder: SQLQueryBuilderWrapper::INSERT(MariaDBTable::STANDARD_LOGINS)
-                    ->set(col: 'email_address', value: ':__email_address__')
-                    ->set(col: 'user_uuid', value: ':__user_uuid__')
-                    ->set(col: 'password', value: ':__password__')
-                    ->bindValue(name: '__email_address__', value: $user["EmailAddress"])
-                    ->bindValue(name: '__user_uuid__', value: $user_node->getId())
-                    ->bindValue(name: '__password__', value: $hashed_password)
-            );
-
-            $email_prop = GraphDatabaseConnection::new_node($user["EmailAddress"], "text/plain", null, User::get_system_node());
-            $user_node->addProperty("contact_email", $email_prop, User::get_system_node()); // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
-
-
-            $language_prop = GraphDatabaseConnection::new_node(
-                data      : strtoupper(PageBuilder2::GetVariable("lang", "en")),
-                media_type: "text/plain",
-                creator   : $user_node
-            );
-            $user_node->addProperty(
-                key  : "preferred_language",
-                node : $language_prop,
-                actor: $user_node
-            ); // Set it to whatever the language is currently in
-            $full_name_prop = GraphDatabaseConnection::new_node(
-                data      : $user["Name"],
-                media_type: "text/plain",
-                creator   : $user_node
-            );
-            $user_node->addProperty(
-                key  : "name",
-                node : $full_name_prop,
-                actor: $user_node
-            );
-            $name_prop = GraphDatabaseConnection::new_node(
-                data      : explode(" ", $user["Name"])[0],
-                media_type: "text/plain",
-                schema    : null,
-                creator   : $user_node
-            );
-            $user_node->addProperty(
-                key  : "display_name",
-                node : $name_prop,
-                actor: $user_node
-            ); // Create this as default the user's first name - they can change it later if they want
-
+            $allUserIDs[$user['Name']] = self::CreateUser($db, $user)->getId();
         }
+
 
         foreach($exampleData['Cases'] as $case)
         {
-            /*
-            if (true)
-            {
-                $actorNode = User::get_system_node();
-                $creatorNode = User::get_system_node();
-            }
-            else
-            {
-                $actorNode = new User($userIDs[$case['Beneficiaries'][0]]);
-                $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
-            }
-            */
+            $caseNode = self::CreateCase($allUserIDs, $case);
 
-            $actorNode = User::get_system_node();
-            $creatorNode = new User($userIDs[$case['Beneficiaries'][0]]);
+            $node_caseWorkers = $caseNode->getProperty(property: 'workers');
+            $node_beneficiaries = $caseNode->getProperty(property: 'clients');
 
-
-            // create the case node
-            $caseNode = GraphDatabaseConnection::new_node(
-                schema: URLHandling::GetURLForSchema(CaseSchema::class),
-                creator: $creatorNode
-            );
-            $caseNode = new DeegraphNode($caseNode->getId());
-            $caseNode->addProperty(
-                key:    "title",
-                node:   GraphDatabaseConnection::new_node(
-                    data: $case["Title"],
-                    media_type: "text/plain",
-                    creator: $creatorNode
-                ),
-                actor: $actorNode
-            );
-            $caseNode->addProperty(
-                key:    "description",
-                node:   GraphDatabaseConnection::new_node(
-                    data: $case["Description"],
-                    media_type: "text/plain",
-                    creator: $creatorNode
-                ),
-                actor: $actorNode
-            );
-
-
-            // handle todos
-            $node_todos = GraphDatabaseConnection::new_node(
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "todos",
-                node:   $node_todos,
-                actor:  $actorNode
-            );
-
-
-            // handle documents
-            $node_documents = GraphDatabaseConnection::new_node(
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "documents",
-                node:   $node_documents,
-                actor:  $actorNode
-            );
-
-
-            // handle messages
-            $node_messages = GraphDatabaseConnection::new_node(
-                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "messages",
-                node:   $node_messages,
-                actor:  $actorNode
-            );
-
-
-            // handle timeline
-            $node_timeline = GraphDatabaseConnection::new_node(
-                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "timeline",
-                node:   $node_timeline,
-                actor:  $actorNode
-            );
-
-
-            // handle caseworkers
-            $node_caseWorkers = GraphDatabaseConnection::new_node(
-                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "workers",
-                node:   $node_caseWorkers,
-                actor:  $actorNode
-            );
             for ($i = 0, $iMax = count($case['CaseWorkers']); $i < $iMax; $i++)
             {
                 $node_caseWorkers->addProperty(
                     key:    $i,
-                    node:   new User($userIDs[$case['CaseWorkers'][$i]]),
-                    actor:  new User($userIDs[$case['CaseWorkers'][$i]]),
+                    node:   new User($allUserIDs[$case['CaseWorkers'][$i]]),
+                    actor:  User::get_system_node(),
                 );
             }
 
-
-            // handle clients
-            $node_beneficiaries = GraphDatabaseConnection::new_node(
-                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-                creator: $creatorNode
-            );
-            $caseNode->addProperty(
-                key:    "clients",
-                node:   $node_beneficiaries,
-                actor:  $actorNode
-            );
             for ($i = 0, $iMax = count($case['Beneficiaries']); $i < $iMax; $i++)
             {
                 $node_beneficiaries->addProperty(
                     key:    $i,
-                    node:   new User($userIDs[$case['Beneficiaries'][$i]]),
-                    actor:  new User($userIDs[$case['Beneficiaries'][$i]]),
+                    node:   new User($allUserIDs[$case['Beneficiaries'][$i]]),
+                    actor:  new User($allUserIDs[$case['Beneficiaries'][$i]]),
                 );
             }
         }
