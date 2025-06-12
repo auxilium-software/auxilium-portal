@@ -89,14 +89,10 @@ class ExampleData
      */
     private static function CreateCase($case): DeegraphNode
     {
-        $actorNode = User::get_system_node();
-        $creatorNode = User::get_system_node();
-
-
         // create the case node
         $caseNode = GraphDatabaseConnection::new_node(
             schema: URLHandling::GetURLForSchema(CaseSchema::class),
-            creator: $creatorNode
+            creator: User::get_system_node()
         );
         $caseNode = new DeegraphNode($caseNode->getId());
         $caseNode->addProperty(
@@ -106,16 +102,16 @@ class ExampleData
                 media_type: "text/plain",
                 creator: $creatorNode
             ),
-            actor: $actorNode
+            actor: User::get_system_node()
         );
         $caseNode->addProperty(
             key:    "description",
             node:   GraphDatabaseConnection::new_node(
                 data: $case["Description"],
                 media_type: "text/plain",
-                creator: $creatorNode
+                creator: User::get_system_node()
             ),
-            actor: $actorNode
+            actor: User::get_system_node()
         );
 
 
@@ -126,7 +122,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "todos",
             node:   $node_todos,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
 
@@ -137,7 +133,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "documents",
             node:   $node_documents,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
 
@@ -149,7 +145,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "messages",
             node:   $node_messages,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
 
@@ -161,7 +157,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "timeline",
             node:   $node_timeline,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
 
@@ -173,7 +169,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "workers",
             node:   $node_caseWorkers,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
 
@@ -185,7 +181,7 @@ class ExampleData
         $caseNode->addProperty(
             key:    "clients",
             node:   $node_beneficiaries,
-            actor:  $actorNode
+            actor:  User::get_system_node()
         );
 
         return $caseNode;
