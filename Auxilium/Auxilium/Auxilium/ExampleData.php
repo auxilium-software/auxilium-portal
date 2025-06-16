@@ -15,6 +15,7 @@ use Auxilium\Schemas\UserSchema;
 use Auxilium\TwigHandling\PageBuilder2;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
+use Exception;
 
 class ExampleData
 {
@@ -95,97 +96,144 @@ class ExampleData
             creator: User::get_system_node()
         );
         $caseNode = new DeegraphNode($caseNode->getId());
-        $caseNode->addProperty(
-            key:    "title",
-            node:   GraphDatabaseConnection::new_node(
-                data: $case["Title"],
-                media_type: "text/plain",
-                creator: $creatorNode
-            ),
-            actor: User::get_system_node()
+
+
+        
+        // Add title property
+        $titleNode = GraphDatabaseConnection::new_node(
+            data: $case["Title"],
+            media_type: "text/plain",
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "description",
-            node:   GraphDatabaseConnection::new_node(
-                data: $case["Description"],
-                media_type: "text/plain",
-                creator: User::get_system_node()
-            ),
+            key: "title",
+            node: $titleNode,
             actor: User::get_system_node()
         );
 
 
-        // handle todos
+
+        // Add description property
+        $descriptionNode = GraphDatabaseConnection::new_node(
+            data: $case["Description"],
+            media_type: "text/plain",
+            creator: User::get_system_node()
+        );
+        $caseNode->addProperty(
+            key: "description",
+            node: $descriptionNode,
+            actor: User::get_system_node()
+        );
+
+
+
+        // Create todos collection
         $node_todos = GraphDatabaseConnection::new_node(
-            creator: $creatorNode
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "todos",
-            node:   $node_todos,
-            actor:  User::get_system_node()
+            key: "todos",
+            node: $node_todos,
+            actor: User::get_system_node()
         );
 
 
-        // handle documents
+
+        // Create workers collection
+        $node_workers = GraphDatabaseConnection::new_node(
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: User::get_system_node()
+        );
+        $caseNode->addProperty(
+            key: "workers",
+            node: $node_workers,
+            actor: User::get_system_node()
+        );
+
+
+
+        // Create documents collection
         $node_documents = GraphDatabaseConnection::new_node(
-            creator: $creatorNode
+            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "documents",
-            node:   $node_documents,
-            actor:  User::get_system_node()
+            key: "documents",
+            node: $node_documents,
+            actor: User::get_system_node()
         );
 
 
-        // handle messages
+
+        // Create messages collection
         $node_messages = GraphDatabaseConnection::new_node(
             schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-            creator: $creatorNode
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "messages",
-            node:   $node_messages,
-            actor:  User::get_system_node()
+            key: "messages",
+            node: $node_messages,
+            actor: User::get_system_node()
         );
 
 
-        // handle timeline
+
+        // Create timeline collection
         $node_timeline = GraphDatabaseConnection::new_node(
             schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-            creator: $creatorNode
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "timeline",
-            node:   $node_timeline,
-            actor:  User::get_system_node()
+            key: "timeline",
+            node: $node_timeline,
+            actor: User::get_system_node()
         );
 
 
-        // handle caseworkers
-        $node_caseWorkers = GraphDatabaseConnection::new_node(
+
+        // Create clients collection
+        $node_clients = GraphDatabaseConnection::new_node(
             schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-            creator: $creatorNode
+            creator: User::get_system_node()
         );
         $caseNode->addProperty(
-            key:    "workers",
-            node:   $node_caseWorkers,
-            actor:  User::get_system_node()
-        );
-
-
-        // handle clients
-        $node_beneficiaries = GraphDatabaseConnection::new_node(
-            schema: URLHandling::GetURLForSchema(CollectionSchema::class),
-            creator: $creatorNode
-        );
-        $caseNode->addProperty(
-            key:    "clients",
-            node:   $node_beneficiaries,
-            actor:  User::get_system_node()
+            key: "clients",
+            node: $node_clients,
+            actor: User::get_system_node()
         );
 
         return $caseNode;
     }
+
+
+
+    /**
+     * Helper method to ensure a user has a cases collection and link a case to it
+     */
+    private static function linkCaseToUser(DeegraphNode $caseNode, User $user): void
+    {
+        $userCasesCollection = $user->getProperty('cases');
+        if($userCasesCollection === null)
+        {
+            $userCasesCollection = GraphDatabaseConnection::new_node(
+                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+                creator: User::get_system_node()
+            );
+            $user->addProperty(
+                key: "cases",
+                node: $userCasesCollection,
+                actor: User::get_system_node()
+            );
+        }
+
+        $userCasesCollection->addProperty(
+            key: "#",
+            node: $caseNode,
+            actor: User::get_system_node()
+        );
+    }
+
 
 
     /**
@@ -222,11 +270,7 @@ class ExampleData
                     node:   $caseWorker,
                     actor:  User::get_system_node(),
                 );
-                $caseWorker->addProperty(
-                    key:    "cases/#",
-                    node:   $caseNode,
-                    actor:  User::get_system_node(),
-                );
+                self::linkCaseToUser($caseNode, $caseWorker);
             }
 
             for ($i = 0, $iMax = count($case['Beneficiaries']); $i < $iMax; $i++)
@@ -237,11 +281,7 @@ class ExampleData
                     node:   $client,
                     actor:  User::get_system_node(),
                 );
-                $client->addProperty(
-                    key:    "cases/#",
-                    node:   $caseNode,
-                    actor:  User::get_system_node(),
-                );
+                self::linkCaseToUser($caseNode, $client);
             }
         }
     }
