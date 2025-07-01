@@ -67,11 +67,9 @@
 
             const network = new vis.Network(container, data, options);
 
-            // Optional interaction: log clicked node
             network.on("click", function (params) {
                 if (params.nodes.length) {
-                    const nodeId = params.nodes[0];
-                    window.location = "/graph/~" + nodes.get(nodeId).id.replace("{", "").replace("}", "");
+                    window.location = "/graph/~" + nodes.get(params.nodes[0]).id.replace("{", "").replace("}", "");
                 }
             });
         </script>

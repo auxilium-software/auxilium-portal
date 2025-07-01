@@ -264,7 +264,7 @@ class ExampleData
 
             for ($i = 0, $iMax = count($case['CaseWorkers']); $i < $iMax; $i++)
             {
-                $caseWorker =new User($allUserIDs[$case['CaseWorkers'][$i]]);
+                $caseWorker = new User($allUserIDs[$case['CaseWorkers'][$i]]);
                 $caseNode_caseWorkers->addProperty(
                     key:    $i,
                     node:   $caseWorker,

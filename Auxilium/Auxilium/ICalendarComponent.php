@@ -3,7 +3,7 @@
 namespace Auxilium;
 class ICalendarComponent
 {
-$properties = null;
+    private $properties = null;
 
     public function __construct(array $content = null)
     {
@@ -30,7 +30,7 @@ $properties = null;
                 $this->properties[$key] = [
                     "value" => $value,
                     "attributes" => $attributeArray
-                ]
+                ];
             }
         }
     }
@@ -52,7 +52,7 @@ $properties = null;
             $this->properties[$key] = [
                 "value" => $value,
                 "attributes" => []
-            ]
+            ];
             foreach($attribs as $attribKey => $attribValue)
             {
                 $this->properties[$key]["attributes"][strtoupper($attribKey)] = $attribValue;
@@ -73,7 +73,7 @@ $properties = null;
             $attribs = [];
             foreach($value["attributes"] as $attribKey => $attribValue)
             {
-                array_push($attribs, strtoupper($attribKey) . "=" . $attribValue);
+                $attribs[] = strtoupper($attribKey) . "=" . $attribValue;
             }
             $stringified .= ICalendarObject::fold(strtoupper($key) . implode(";", $attribs) . ":" . ICalendarObject::escape($value["value"]) . "\r\n");
         }
