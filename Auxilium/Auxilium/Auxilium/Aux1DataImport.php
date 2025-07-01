@@ -382,7 +382,8 @@ $summary
 END:VTODO
 END:VCALENDAR
 ";
-        return "data:text/calendar;base64," . base64_encode(string: $temp);
+        // error_log($temp);
+        return $temp;
     }
 
 }
