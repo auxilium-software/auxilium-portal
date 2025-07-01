@@ -349,11 +349,24 @@ class Aux1DataImport
         return $text;
     }
 
+    private static function iCALRandomUID(): string
+    {
+        $output = "";
+        $characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        $charactersLength = strlen($characters);
+        for ($i = 0; $i < 48; $i++)
+        {
+            $output .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $output;
+    }
+
     private static function processToDoJSON(string $input): string
     {
         $input = json_decode($input, true, 512, JSON_THROW_ON_ERROR);
 
 
+        $id = self::iCALRandomUID();
         $title = $input["title"];
         $timestamp = $input["timestamp"];
         $description = $input["description"];
@@ -363,7 +376,7 @@ class Aux1DataImport
         $temp = "BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VTODO
-UID:000000000000000000000000000000000000000000000000
+UID:$id
 DTSTAMP:$timestamp
 $summary
 END:VTODO
