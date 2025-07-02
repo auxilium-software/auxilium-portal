@@ -15,6 +15,7 @@ use Auxilium\Schemas\UserSchema;
 use Auxilium\TwigHandling\PageBuilder2;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
+use DateTime;
 use Exception;
 use JsonException;
 
@@ -290,20 +291,17 @@ class Aux1DataImport
                 );
             }
         }
-        foreach($caseDetails['ExtendedProperties'] as $dataType=>$subData)
+        foreach($caseDetails['TimeLine'] as $subData)
         {
-            if($subData['ObjectSchema'] === "TIMELINE_NOTE_JSON_V1")
-            {
-                $node_timeline->addProperty(
-                    key  : '#',
-                    node : GraphDatabaseConnection::new_node(
-                        data   : self::processToDoJSON($subData['DataAccess']),
-                        media_type: "text/calendar",
-                        creator: User::get_system_node()
-                    ),
-                    actor: User::get_system_node(),
-                );
-            }
+            $node_timeline->addProperty(
+                key  : '#',
+                node : GraphDatabaseConnection::new_node(
+                    data   : self::processTimeLineJSON($subData['DataAccess']),
+                    media_type: "text/calendar",
+                    creator: User::get_system_node()
+                ),
+                actor: User::get_system_node(),
+            );
         }
 
 
@@ -361,17 +359,33 @@ class Aux1DataImport
         return $output;
     }
 
+    private static function processVCalendarTimestamp($input): string
+    {
+        $input = new DateTime($input);
+        return $input->format('Ymd\THis\Z');
+    }
+
     private static function processToDoJSON(string $input): string
     {
         $input = json_decode($input, true, 512, JSON_THROW_ON_ERROR);
 
-
         $id = self::iCALRandomUID();
         $title = $input["title"];
-        $timestamp = $input["timestamp"];
+        $timestamp = self::processVCalendarTimestamp($input["timestamp"]);
         $description = $input["description"];
 
-        $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($title . "\n" . $description));
+        if(($title === null || $title === "") && ($description === null || $description === ""))
+        {
+            $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($title . "\n" . $description));
+        }
+        elseif($title === null || $title === "")
+        {
+            $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($description));
+        }
+        elseif($description === null || $description === "")
+        {
+            $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($title));
+        }
 
         $temp = "BEGIN:VCALENDAR
 VERSION:2.0
@@ -382,7 +396,31 @@ $summary
 END:VTODO
 END:VCALENDAR
 ";
-        // error_log($temp);
+        return $temp;
+    }
+
+    private static function processTimeLineJSON(string $input): string
+    {
+        $input = json_decode($input, true, 512, JSON_THROW_ON_ERROR);
+
+        $id = self::iCALRandomUID();
+        $title = $input["title"];
+        $timestamp = self::processVCalendarTimestamp($input["timestamp"]);
+        $description = $input["description"];
+
+        $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($title));
+        $description = self::iCALWrap("DESCRIPTION:" . self::iCALSanitise($description));
+
+        $temp = "BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VJOURNAL
+UID:$id
+DTSTAMP:$timestamp
+$summary
+$description
+END:VJOURNAL
+END:VCALENDAR
+";
         return $temp;
     }
 
