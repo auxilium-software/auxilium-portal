@@ -195,7 +195,7 @@ switch($_GET['page'])
                 // "GRANT READ ON /cases/#/workers/#/name ON /cases/#/workers/#/display_name ON /cases/#/workers/#/preferred_language ON /cases/#/workers/#/contact_email",
                 // misc permissions
                 "GRANT READ ON /messages/#",                    //
-                "GRANT READ,WRITE,DELETE ON /assigned_cases/# ON /assigned_cases/#/* ON /assigned_cases/#/messages/# DELEGATABLE", //
+                // "GRANT READ,WRITE,DELETE ON /assigned_cases/# ON /assigned_cases/#/* ON /assigned_cases/#/messages/# DELEGATABLE", //
             ];
 
             foreach($initialQueries as $query)
