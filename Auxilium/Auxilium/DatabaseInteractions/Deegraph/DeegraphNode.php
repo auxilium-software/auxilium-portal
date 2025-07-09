@@ -366,14 +366,12 @@ class DeegraphNode
      */
     public function getProperty(string $property, User $actor = null): mixed
     {
-        if($actor == null)
+        if($actor === null)
         {
-            $actor = Session::get_current()->getUser();
+            $actor = Session::get_current()?->getUser();
         }
         $temp = $this->getProperties($actor);
-        if(isset($temp[$property]))
-            return $temp[$property];
-        return null;
+        return $temp[$property] ?? null;
     }
 
     public function getProperties(User $actor = null): ?array
