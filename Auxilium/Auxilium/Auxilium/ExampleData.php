@@ -213,7 +213,10 @@ class ExampleData
      */
     private static function linkCaseToUser(DeegraphNode $caseNode, User $user): void
     {
-        $userCasesCollection = $user->getProperty('cases');
+        $userCasesCollection = $user->getProperty(
+            property: 'cases',
+            actor: User::get_system_node(),
+        );
         if($userCasesCollection === null)
         {
             $userCasesCollection = GraphDatabaseConnection::new_node(
@@ -259,9 +262,14 @@ class ExampleData
         {
             $caseNode = self::CreateCase($case);
 
-            $caseNode_caseWorkers = $caseNode->getProperty(property: 'workers');
-            $caseNode_beneficiaries = $caseNode->getProperty(property: 'clients');
-
+            $caseNode_caseWorkers = $caseNode->getProperty(
+                property: 'workers',
+                actor: User::get_system_node()
+            );
+            $caseNode_beneficiaries = $caseNode->getProperty(
+                property: 'clients',
+                actor: User::get_system_node()
+            );
             for ($i = 0, $iMax = count($case['CaseWorkers']); $i < $iMax; $i++)
             {
                 $caseWorker = new User($allUserIDs[$case['CaseWorkers'][$i]]);
