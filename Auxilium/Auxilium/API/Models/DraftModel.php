@@ -16,8 +16,6 @@ use OpenApi\Attributes\Schema;
 )]
 class DraftModel extends APIModel
 {
-
-
     public mixed $DraftID = null;
     public ?int $BytesWritten = null;
     public ?array $Content = null;
@@ -30,9 +28,9 @@ class DraftModel extends APIModel
     public function ToAssocArray(): array
     {
         return [
-            "response_code" => $this->ResponseCode,
-            "status" => $this->Status->value,
-            "error_message" => $this->ErrorText,
+            "response_code" => $this->ResponseCode ?? null,
+            "status" => $this->Status->value ?? null,
+            "error_message" => $this->ErrorText ?? null,
 
             "draft_id" => $this->DraftID,
             "bytes_written" => $this->BytesWritten,

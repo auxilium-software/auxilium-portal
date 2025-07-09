@@ -10,10 +10,12 @@ use Auxilium\API\Controllers\JobLookupController;
 use Auxilium\API\Controllers\JobRunnerController;
 use Auxilium\API\Controllers\JobStatisticsController;
 use Auxilium\API\Controllers\LFSController;
+use Auxilium\API\Controllers\MessageController;
 use Auxilium\API\Controllers\NodeController;
 use Auxilium\API\Controllers\PDFController;
 use Auxilium\API\Controllers\QueryController;
 use Auxilium\API\Superclasses\APIController;
+use Auxilium\Schemas\MessageSchema;
 use Composer\Pcre\UnexpectedNullMatchException;
 
 class APIMaster
@@ -51,6 +53,7 @@ class APIMaster
             "/api/v2/job-run"                       => JobRunnerController::class,
             "/api/v2/indexes(/.+)"                  => IndexController::class,
             "/api/v2/pdf(/.+)"                      => PDFController::class,
+            "/api/v2/drafts(/.+)"                   => MessageController::class,
         ];
 
         foreach ($routes as $regex => $controllerClass)

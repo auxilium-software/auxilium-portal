@@ -30,7 +30,11 @@ class MessageController extends APIController
     }
 
 
-    #[NoReturn]
+    public function Post()
+    {
+        return $this->Get();
+    }
+
     #[Get(
         path       : "/api/v2/drafts",
         operationId: "[GET]/api/v2/drafts",
@@ -74,7 +78,7 @@ class MessageController extends APIController
         {
             $this->Model = new APIModel();
             $this->Model->ErrorText = "Malformed uuid";
-            $this->Render();
+            return $this->Model;
         }
         $message_draft_path = LOCAL_EPHEMERAL_CREDENTIAL_STORE . "/MessageDrafts/" . Session::get_current()->getUser()->getId() . "/" . $draft_id . ".json";
         if(!file_exists(LOCAL_EPHEMERAL_CREDENTIAL_STORE . "/MessageDrafts/" . Session::get_current()->getUser()->getId() . "/"))
@@ -102,18 +106,16 @@ class MessageController extends APIController
                 {
                     $this->Model = new APIModel();
                     $this->Model->ErrorText = "Failed to write new message to RAM disk";
-                    $this->Render();
+                    return $this->Model;
                 }
-                else
-                {
-                    $this->Model->BytesWritten = $bytes_written;
-                }
+
+                $this->Model->BytesWritten = $bytes_written;
             }
             else
             {
                 $this->Model->Content = json_decode(file_get_contents($message_draft_path), true);
             }
-            $this->Render();
+            return $this->Model;
         }
         elseif($action === "send")
         {
@@ -233,7 +235,7 @@ class MessageController extends APIController
             {
                 $this->Model = new APIModel();
                 $this->Model->ErrorText = "Failed to write new RFC822 object to RAM disk";
-                $this->Render();
+                return $this->Model;
             }
             else
             {
@@ -298,14 +300,12 @@ class MessageController extends APIController
                     $this->Model->AttachedTo = $notified_parties;
                 }
                 $this->Model->MessageNodeID = $message_node->getId();
-                $this->Render();
+                return $this->Model;
             }
         }
-        else
-        {
-            $this->Model = new APIModel();
-            $this->Model->ErrorText = "Invalid action";
-            $this->Render();
-        }
+
+        $this->Model = new APIModel();
+        $this->Model->ErrorText = "Invalid action";
+        return $this->Model;
     }
 }
