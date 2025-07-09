@@ -29,6 +29,9 @@ class Aux1DataImport
      */
     public static function Go(string $dumpFilePath): void
     {
+        $originalLimit = ini_get('memory_limit');
+        ini_set('memory_limit', -1);
+
         if(!file_exists($dumpFilePath))
         {
             throw new Exception("Dump file not found");
@@ -38,15 +41,52 @@ class Aux1DataImport
 
         $db = new MariaDBServerConnection();
 
+        $allUserIDs = [];
 
-        foreach(self::$Data['Users'] as $userDetails)
+        foreach(self::$Data['Users'] as $userID=>$userDetails)
         {
-            self::CreateUser($db, $userDetails);
+            $userNode = self::CreateUser($db, $userDetails);
+            $allUserIDs[$userID] = $userNode;
         }
-        foreach(self::$Data['Cases'] as $userDetails)
+        foreach(self::$Data['Cases'] as $case)
         {
-            self::CreateCase($db, $userDetails);
+            $caseNode = self::CreateCase($db, $case);
+
+            $caseNode_caseWorkers = $caseNode->getProperty(
+                property: 'workers',
+                actor: User::get_system_node()
+            );
+            $caseNode_beneficiaries = $caseNode->getProperty(
+                property: 'clients',
+                actor: User::get_system_node()
+            );
+
+
+            foreach($case['CaseWorkers'] as $i => $iValue)
+            {
+                $caseWorker = $allUserIDs[$iValue];
+                $caseNode_caseWorkers->addProperty(
+                    key:    $i,
+                    node:   $caseWorker,
+                    actor:  User::get_system_node(),
+                );
+                self::linkCaseToUser($caseNode, $caseWorker);
+            }
+
+
+            foreach($case['Subjects'] as $i => $iValue)
+            {
+                $client = $allUserIDs[$iValue];
+                $caseNode_beneficiaries->addProperty(
+                    key:    $i,
+                    node:   $client,
+                    actor:  User::get_system_node(),
+                );
+                self::linkCaseToUser($caseNode, $client);
+            }
         }
+
+        ini_set('memory_limit', $originalLimit);
     }
 
     /**
@@ -126,7 +166,7 @@ class Aux1DataImport
 
 
         // handle extended properties
-        foreach($userDetails['ExtendedProperties'] as $subData)
+        foreach($userDetails['Properties'] as $subData)
         {
             if(in_array(needle: $subData['ObjectSchema'], haystack: [
                 "TEXT",
@@ -176,7 +216,7 @@ class Aux1DataImport
 
 
         // case description
-        foreach($caseDetails['ExtendedProperties'] as $dataType=>$subData)
+        foreach($caseDetails['Data']['Properties'] as $dataType=>$subData)
         {
             if($dataType === "CASE_DESCRIPTION")
             {
@@ -256,13 +296,10 @@ class Aux1DataImport
         );
 
 
-        // handle extended properties
-        foreach($caseDetails['ExtendedProperties'] as $dataType=>$subData)
+        // handle properties
+        foreach($caseDetails['Data']['Properties'] as $dataType=>$subData)
         {
-            if(
-                    in_array(needle: $subData['ObjectSchema'],  haystack: ["TEXT", "TEXT_ISO_DATE"],        strict: true)
-                && !in_array(needle: $dataType,                 haystack: ["TITLE", "CASE_DESCRIPTION"],    strict: true)
-            )
+            if(!in_array(needle: $dataType, haystack: ["TITLE", "CASE_DESCRIPTION"], strict: true))
             {
                 $tempNode = GraphDatabaseConnection::new_node(
                     data      : $subData['DataAccess'],
@@ -276,7 +313,27 @@ class Aux1DataImport
                 );
             }
         }
-        foreach($caseDetails['ToDos'] as $subData)
+
+
+        // handle enumerators
+        foreach($caseDetails['Data']['Enumerators'] as $dataType=>$subData)
+        {
+            $dataAccess = json_decode($subData['DataAccess'], true, 512, JSON_THROW_ON_ERROR);
+            $tempNode = GraphDatabaseConnection::new_node(
+                data      : (string)$dataAccess['value'],
+                media_type: "text/plain",
+                creator   : User::get_system_node()
+            );
+            $caseNode->addProperty(
+                key  : strtolower($dataType),
+                node : $tempNode,
+                actor: User::get_system_node(),
+            );
+        }
+
+
+        // handle todos
+        foreach($caseDetails['Data']['ToDos'] as $subData)
         {
             if($subData['ObjectSchema'] === "TODO_JSON_V1")
             {
@@ -291,7 +348,10 @@ class Aux1DataImport
                 );
             }
         }
-        foreach($caseDetails['TimeLine'] as $subData)
+
+
+        // handle timeline
+        foreach($caseDetails['Data']['TimeLine'] as $subData)
         {
             $node_timeline->addProperty(
                 key  : '#',
@@ -307,6 +367,39 @@ class Aux1DataImport
 
         return $caseNode;
     }
+
+
+
+
+
+
+    private static function linkCaseToUser(DeegraphNode $caseNode, User $user): void
+    {
+        $userCasesCollection = $user->getProperty(
+            property: 'cases',
+            actor: User::get_system_node(),
+        );
+        if($userCasesCollection === null)
+        {
+            $userCasesCollection = GraphDatabaseConnection::new_node(
+                schema: URLHandling::GetURLForSchema(CollectionSchema::class),
+                creator: User::get_system_node()
+            );
+            $user->addProperty(
+                key: "cases",
+                node: $userCasesCollection,
+                actor: User::get_system_node()
+            );
+        }
+
+        $userCasesCollection->addProperty(
+            key: "#",
+            node: $caseNode,
+            actor: User::get_system_node()
+        );
+    }
+
+
 
 
 
