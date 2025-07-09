@@ -84,7 +84,9 @@ if(str_starts_with($path, "/api/v1"))
 if(str_starts_with($path, "/api/v2"))
 {
     requireComponents();
-    APIMaster::Go();
+    $apiResponse = APIMaster::Go();
+    echo json_encode($apiResponse, JSON_PRETTY_PRINT);
+    die();
 }
 
 // handle index page
@@ -127,5 +129,5 @@ if(file_exists($file))
 
 // Return a 404 response for unmatched routes
 http_response_code(404);
-echo "404";
+echo "404 - could not route";
 die();
