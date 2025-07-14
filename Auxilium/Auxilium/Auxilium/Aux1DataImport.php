@@ -30,7 +30,9 @@ class Aux1DataImport
     public static function Go(string $dumpFilePath): void
     {
         $originalLimit = ini_get('memory_limit');
+        $originalTimeLimit = ini_get('max_execution_time');
         ini_set('memory_limit', -1);
+        ini_set('max_execution_time', 0);
 
         if(!file_exists($dumpFilePath))
         {
@@ -65,28 +67,35 @@ class Aux1DataImport
             foreach($case['CaseWorkers'] as $i => $iValue)
             {
                 $caseWorker = $allUserIDs[$iValue];
-                $caseNode_caseWorkers->addProperty(
-                    key:    $i,
-                    node:   $caseWorker,
-                    actor:  User::get_system_node(),
-                );
-                self::linkCaseToUser($caseNode, $caseWorker);
+                if($caseWorker !== null)
+                {
+                    $caseNode_caseWorkers->addProperty(
+                        key:    $i,
+                        node:   $caseWorker,
+                        actor:  User::get_system_node(),
+                    );
+                    self::linkCaseToUser($caseNode, $caseWorker);
+                }
             }
 
 
             foreach($case['Subjects'] as $i => $iValue)
             {
                 $client = $allUserIDs[$iValue];
-                $caseNode_beneficiaries->addProperty(
-                    key:    $i,
-                    node:   $client,
-                    actor:  User::get_system_node(),
-                );
-                self::linkCaseToUser($caseNode, $client);
+                if($client !== null)
+                {
+                    $caseNode_beneficiaries->addProperty(
+                        key:    $i,
+                        node:   $client,
+                        actor:  User::get_system_node(),
+                    );
+                    self::linkCaseToUser($caseNode, $client);
+                }
             }
         }
 
         ini_set('memory_limit', $originalLimit);
+        ini_set('max_execution_time', $originalTimeLimit);
     }
 
     /**
@@ -105,29 +114,30 @@ class Aux1DataImport
         $user_node = new User($user_node->getId());
 
 
-        // create the user in sql
-        $db->RunInsert(
-            queryBuilder: SQLQueryBuilderWrapper::INSERT(MariaDBTable::STANDARD_LOGINS)
-                ->set(col: 'email_address', value: ':__email_address__')
-                ->set(col: 'user_uuid', value: ':__user_uuid__')
-                ->set(col: 'password', value: ':__password__')
-                ->bindValue(name: '__email_address__', value: $userDetails["EmailAddress"])
-                ->bindValue(name: '__user_uuid__', value: $user_node->getId())
-                ->bindValue(name: '__password__', value: $userDetails["Password"])
-        );
-
-
-        // handle email address
-        // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
-        $user_node->addProperty(
-            key  : "contact_email",
-            node : GraphDatabaseConnection::new_node(
-                data      : $userDetails["EmailAddress"],
-                media_type: "text/plain",
-                creator   : User::get_system_node()
-            ),
-            actor: User::get_system_node()
-        );
+        if($userDetails['Active'] === 1)
+        {
+            // create the user in sql
+            $db->RunInsert(
+                queryBuilder: SQLQueryBuilderWrapper::INSERT(MariaDBTable::STANDARD_LOGINS)
+                    ->set(col: 'email_address', value: ':__email_address__')
+                    ->set(col: 'user_uuid', value: ':__user_uuid__')
+                    ->set(col: 'password', value: ':__password__')
+                    ->bindValue(name: '__email_address__', value: $userDetails["EmailAddress"])
+                    ->bindValue(name: '__user_uuid__', value: $user_node->getId())
+                    ->bindValue(name: '__password__', value: $userDetails["Password"])
+            );
+            // handle email address
+            // Do all of this as the system node, since userIDs shouldn't just be able to randomly change their email address
+            $user_node->addProperty(
+                key  : "contact_email",
+                node : GraphDatabaseConnection::new_node(
+                    data      : $userDetails["EmailAddress"],
+                    media_type: "text/plain",
+                    creator   : User::get_system_node()
+                ),
+                actor: User::get_system_node()
+            );
+        }
 
 
         // handle language
