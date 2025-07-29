@@ -19,6 +19,7 @@ use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
 use DateTime;
 use Exception;
 use JsonException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 
@@ -27,6 +28,7 @@ class Aux1DataImport
 
     private static string $DecryptedFilesLocation;
     private static array $Data;
+
 
     /**
      * @throws JsonException
@@ -201,7 +203,9 @@ class Aux1DataImport
                             media_type: $subData['MIMEType'],
                             creator   : $user_node
                         ),
-                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                        Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
+                            data: $da,
+                        ),
                     },
                     actor: User::get_system_node(),
                 );
@@ -251,7 +255,9 @@ class Aux1DataImport
                             media_type: $subData['MIMEType'],
                             creator   : User::get_system_node()
                         ),
-                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                        Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
+                            data: $da,
+                        ),
                     },
                     actor: User::get_system_node(),
                 );
@@ -335,7 +341,9 @@ class Aux1DataImport
                             media_type: $subData['MIMEType'],
                             creator   : User::get_system_node()
                         ),
-                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                        Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
+                            data: $da,
+                        ),
                     },
                     actor: User::get_system_node(),
                 );
@@ -375,7 +383,9 @@ class Aux1DataImport
                             media_type: "text/calendar",
                             creator   : User::get_system_node()
                         ),
-                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                        Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
+                            data: self::processToDoJSON($da),
+                        ),
                     },
                     actor: User::get_system_node(),
                 );
@@ -395,7 +405,9 @@ class Aux1DataImport
                         media_type: "text/calendar",
                         creator   : User::get_system_node()
                     ),
-                    Aux1DataAccessLocation::LOCAL_FILE => $da
+                    Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
+                        data: self::processTimeLineJSON($da),
+                    ),
                 },
                 actor: User::get_system_node(),
             );
@@ -455,28 +467,35 @@ class Aux1DataImport
             $filePath = self::$DecryptedFilesLocation . $fileID;
             $fileContents = file_get_contents($filePath);
 
-            $binFilePath = __DIR__ . "/../../LocalStorage/LocalStorage/LFS/$fileID";
-
-            file_put_contents($binFilePath, $fileContents);
-
-            $fileNode = GraphDatabaseConnection::new_node(
-                data   : "auxlfs://localhost/++video%3Amp4+" . filesize($binFilePath),
-                creator: User::get_system_node(),
-            );
-            $fileNode->addProperty(
-                key: 'filename',
-                node: GraphDatabaseConnection::new_node(
-                    data: '',
-                    creator: User::get_system_node(),
-                ),
-                actor: User::get_system_node(),
-            );
-
-            return [Aux1DataAccessLocation::LOCAL_FILE, $fileNode];
+            return [Aux1DataAccessLocation::LOCAL_FILE, $fileContents];
         }
 
         throw new RuntimeException("invalid data location");
     }
+
+    private static function storeDataToLFS(string $data): DeegraphNode
+    {
+
+        $fileNode = GraphDatabaseConnection::new_node(
+            data   : "auxlfs://localhost/++video%3Amp4+" . strlen($data),
+            creator: User::get_system_node(),
+        );
+        $fileNode->addProperty(
+            key: 'filename',
+            node: GraphDatabaseConnection::new_node(
+                data: '',
+                creator: User::get_system_node(),
+            ),
+            actor: User::get_system_node(),
+        );
+
+        $binFilePath = __DIR__ . "/../../LocalStorage/LocalStorage/LFS/" . $fileNode->getId();
+        file_put_contents($binFilePath, $data);
+
+
+        return $fileNode;
+    }
+
 
 
 
