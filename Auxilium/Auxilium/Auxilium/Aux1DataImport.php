@@ -3,6 +3,7 @@
 namespace Auxilium\Auxilium;
 
 use Auxilium\DatabaseInteractions\Deegraph\DeegraphNode;
+use Auxilium\DatabaseInteractions\Deegraph\DeegraphServerConnection;
 use Auxilium\DatabaseInteractions\Deegraph\Nodes\User;
 use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\DatabaseInteractions\MariaDB\MariaDBServerConnection;
@@ -18,17 +19,23 @@ use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
 use DateTime;
 use Exception;
 use JsonException;
+use RuntimeException;
+
 
 class Aux1DataImport
 {
+
+    private static string $DecryptedFilesLocation;
     private static array $Data;
 
     /**
      * @throws JsonException
      * @throws Exception
      */
-    public static function Go(string $dumpFilePath): void
+    public static function Go(string $dumpFilePath, string $decryptedFilesDirectory): void
     {
+        self::$DecryptedFilesLocation = $decryptedFilesDirectory;
+
         $originalLimit = ini_get('memory_limit');
         $originalTimeLimit = ini_get('max_execution_time');
         ini_set('memory_limit', -1);
@@ -82,6 +89,7 @@ class Aux1DataImport
             foreach($case['Subjects'] as $i => $iValue)
             {
                 $client = $allUserIDs[$iValue];
+
                 if($client !== null)
                 {
                     $caseNode_beneficiaries->addProperty(
@@ -176,7 +184,7 @@ class Aux1DataImport
 
 
         // handle extended properties
-        foreach($userDetails['Properties'] as $subData)
+        foreach($userDetails['Data']['Properties'] as $subData)
         {
             if(in_array(needle: $subData['ObjectSchema'], haystack: [
                 "TEXT",
@@ -184,14 +192,18 @@ class Aux1DataImport
             ],          strict: true
             ))
             {
+                [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
                 $user_node->addProperty(
                     key  : strtolower($subData['DataType']),
-                    node : GraphDatabaseConnection::new_node(
-                        data      : $subData['DataAccess'],
-                        media_type: $subData['MIMEType'],
-                        creator   : $user_node
-                    ),
-                    actor: $user_node
+                    node : match($dt) {
+                        Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                            data      : $da,
+                            media_type: $subData['MIMEType'],
+                            creator   : $user_node
+                        ),
+                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                    },
+                    actor: User::get_system_node(),
                 );
             }
         }
@@ -230,14 +242,17 @@ class Aux1DataImport
         {
             if($dataType === "CASE_DESCRIPTION")
             {
-                $tempNode = GraphDatabaseConnection::new_node(
-                    data      : $subData['DataAccess'],
-                    media_type: $subData['MIMEType'],
-                    creator   : User::get_system_node()
-                );
+                [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
                 $caseNode->addProperty(
-                    key  : "description",
-                    node : $tempNode,
+                    key  : 'description',
+                    node : match($dt) {
+                        Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                            data      : $da,
+                            media_type: $subData['MIMEType'],
+                            creator   : User::get_system_node()
+                        ),
+                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                    },
                     actor: User::get_system_node(),
                 );
             }
@@ -311,14 +326,17 @@ class Aux1DataImport
         {
             if(!in_array(needle: $dataType, haystack: ["TITLE", "CASE_DESCRIPTION"], strict: true))
             {
-                $tempNode = GraphDatabaseConnection::new_node(
-                    data      : $subData['DataAccess'],
-                    media_type: $subData['MIMEType'],
-                    creator   : User::get_system_node()
-                );
+                [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
                 $caseNode->addProperty(
                     key  : strtolower($dataType),
-                    node : $tempNode,
+                    node : match($dt) {
+                        Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                            data      : $da,
+                            media_type: $subData['MIMEType'],
+                            creator   : User::get_system_node()
+                        ),
+                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                    },
                     actor: User::get_system_node(),
                 );
             }
@@ -328,7 +346,8 @@ class Aux1DataImport
         // handle enumerators
         foreach($caseDetails['Data']['Enumerators'] as $dataType=>$subData)
         {
-            $dataAccess = json_decode($subData['DataAccess'], true, 512, JSON_THROW_ON_ERROR);
+            [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
+            $dataAccess = json_decode($da, true, 512, JSON_THROW_ON_ERROR);
             $tempNode = GraphDatabaseConnection::new_node(
                 data      : (string)$dataAccess['value'],
                 media_type: "text/plain",
@@ -347,13 +366,17 @@ class Aux1DataImport
         {
             if($subData['ObjectSchema'] === "TODO_JSON_V1")
             {
-                $node_todos->addProperty(
+                [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
+                $caseNode->addProperty(
                     key  : '#',
-                    node : GraphDatabaseConnection::new_node(
-                        data   : self::processToDoJSON($subData['DataAccess']),
-                        media_type: "text/calendar",
-                        creator: User::get_system_node()
-                    ),
+                    node : match($dt) {
+                        Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                            data      : self::processToDoJSON($da),
+                            media_type: "text/calendar",
+                            creator   : User::get_system_node()
+                        ),
+                        Aux1DataAccessLocation::LOCAL_FILE => $da
+                    },
                     actor: User::get_system_node(),
                 );
             }
@@ -363,13 +386,17 @@ class Aux1DataImport
         // handle timeline
         foreach($caseDetails['Data']['TimeLine'] as $subData)
         {
-            $node_timeline->addProperty(
+            [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
+            $caseNode->addProperty(
                 key  : '#',
-                node : GraphDatabaseConnection::new_node(
-                    data   : self::processTimeLineJSON($subData['DataAccess']),
-                    media_type: "text/calendar",
-                    creator: User::get_system_node()
-                ),
+                node : match($dt) {
+                    Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                        data      : self::processTimeLineJSON($da),
+                        media_type: "text/calendar",
+                        creator   : User::get_system_node()
+                    ),
+                    Aux1DataAccessLocation::LOCAL_FILE => $da
+                },
                 actor: User::get_system_node(),
             );
         }
@@ -408,6 +435,49 @@ class Aux1DataImport
             actor: User::get_system_node()
         );
     }
+
+
+
+
+
+
+
+    private static function handleDataAccess(string $access, string $dataAccess): array
+    {
+        if($access === "IN_DATABASE")
+        {
+            return [Aux1DataAccessLocation::IN_DATABASE, $dataAccess];
+        }
+
+        if($access === "LOCAL_FILE")
+        {
+            $fileID = str_replace(search: '/srv/web/prod-files', replace: '', subject: $dataAccess);
+            $filePath = self::$DecryptedFilesLocation . $fileID;
+            $fileContents = file_get_contents($filePath);
+
+            $binFilePath = __DIR__ . "/../../LocalStorage/LocalStorage/LFS/$fileID";
+
+            file_put_contents($binFilePath, $fileContents);
+
+            $fileNode = GraphDatabaseConnection::new_node(
+                data   : "auxlfs://localhost/++video%3Amp4+" . filesize($binFilePath),
+                creator: User::get_system_node(),
+            );
+            $fileNode->addProperty(
+                key: 'filename',
+                node: GraphDatabaseConnection::new_node(
+                    data: '',
+                    creator: User::get_system_node(),
+                ),
+                actor: User::get_system_node(),
+            );
+
+            return [Aux1DataAccessLocation::LOCAL_FILE, $fileNode];
+        }
+
+        throw new RuntimeException("invalid data location");
+    }
+
 
 
 
@@ -526,5 +596,4 @@ END:VCALENDAR
 ";
         return $temp;
     }
-
 }
