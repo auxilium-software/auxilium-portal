@@ -119,12 +119,17 @@ class IndexController extends APIController
                     {
                         foreach($cell as $path => $value)
                         {
+                            // TODO: come up with a better solution for this...
+                            if ($value === null || $value === "")
+                            {
+                                continue;
+                            }
                             $value = mb_strtolower((new DataURL($value))->getData());
                             if(!array_key_exists($value, $new_index["lookup_table"]))
                             {
                                 $new_index["lookup_table"][$value] = [];
                             }
-                            array_push($new_index["lookup_table"][$value], $path);
+                            $new_index["lookup_table"][$value][] = $path;
                         }
                     }
 

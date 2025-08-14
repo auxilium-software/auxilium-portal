@@ -18,6 +18,11 @@ try
         Security::RequireLogin();
         ICMPWrapper::RequireSchemaRepo();
 
+        $originalLimit = ini_get('memory_limit');
+        $originalTimeLimit = ini_get('max_execution_time');
+        ini_set('memory_limit', -1);
+        ini_set('max_execution_time', 0);
+
         $userIDs = GraphDatabaseConnection::query(actor: null, query: 'SELECT @id FROM ** INSTANCEOF "https://schemas.auxiliumsoftware.co.uk/v1/user.json"');
         $caseIDs = GraphDatabaseConnection::query(actor: null, query: 'SELECT @id FROM ** INSTANCEOF "https://schemas.auxiliumsoftware.co.uk/v1/case.json"');
 
@@ -90,12 +95,12 @@ try
                     ];
                 }
             }
-
-
         }
 
 
 
+        ini_set('memory_limit', $originalLimit);
+        ini_set('max_execution_time', $originalTimeLimit);
 
         PageBuilder2::AutoRender(variables: [
             "all_users"=>$users,

@@ -46,7 +46,6 @@ function requireComponents(): void
         echo $twig->render('/VirtualPages/MissingCredentialsFile.html.twig', []);
         die();
     }
-
 }
 
 
@@ -83,9 +82,18 @@ if(str_starts_with($path, "/api/v1"))
 }
 if(str_starts_with($path, "/api/v2"))
 {
+    $originalLimit = ini_get('memory_limit');
+    $originalTimeLimit = ini_get('max_execution_time');
+    ini_set('memory_limit', -1);
+    ini_set('max_execution_time', 0);
+
     requireComponents();
     $apiResponse = APIMaster::Go();
-    echo json_encode($apiResponse, JSON_PRETTY_PRINT);
+    echo json_encode($apiResponse, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+
+    ini_set('memory_limit', $originalLimit);
+    ini_set('max_execution_time', $originalTimeLimit);
+
     die();
 }
 

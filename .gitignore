@@ -28,3 +28,4 @@ Auxilium/Configuration/Configuration/msft-access-token-primary.json
 !Auxilium/LocalStorage/.gitkeep
 !Auxilium/LocalStorage/**/.gitkeep
 Auxilium/LocalStorage
+Auxilium/Public/test.php

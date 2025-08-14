@@ -14,6 +14,7 @@ use Auxilium\Schemas\CollectionSchema;
 use Auxilium\Schemas\MessageSchema;
 use Auxilium\Schemas\UserSchema;
 use Auxilium\TwigHandling\PageBuilder2;
+use Composer\Pcre\UnexpectedNullMatchException;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
 use DateTime;
@@ -79,7 +80,7 @@ class Aux1DataImport
                 if($caseWorker !== null)
                 {
                     $caseNode_caseWorkers->addProperty(
-                        key:    $i,
+                        key:    '#',
                         node:   $caseWorker,
                         actor:  User::get_system_node(),
                     );
@@ -95,7 +96,7 @@ class Aux1DataImport
                 if($client !== null)
                 {
                     $caseNode_beneficiaries->addProperty(
-                        key:    $i,
+                        key:    '#',
                         node:   $client,
                         actor:  User::get_system_node(),
                     );
@@ -226,6 +227,10 @@ class Aux1DataImport
             schema : URLHandling::GetURLForSchema(CaseSchema::class),
             creator: User::get_system_node()
         );
+        if($caseNode === null)
+        {
+            throw new UnexpectedNullMatchException("case node is null!!!");
+        }
         $caseNode = new DeegraphNode($caseNode->getId());
 
 
@@ -349,8 +354,6 @@ class Aux1DataImport
                 );
             }
         }
-
-
         // handle enumerators
         foreach($caseDetails['Data']['Enumerators'] as $dataType=>$subData)
         {
@@ -375,7 +378,7 @@ class Aux1DataImport
             if($subData['ObjectSchema'] === "TODO_JSON_V1")
             {
                 [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
-                $caseNode->addProperty(
+                $node_todos->addProperty(
                     key  : '#',
                     node : match($dt) {
                         Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
@@ -397,7 +400,7 @@ class Aux1DataImport
         foreach($caseDetails['Data']['TimeLine'] as $subData)
         {
             [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
-            $caseNode->addProperty(
+            $node_timeline->addProperty(
                 key  : '#',
                 node : match($dt) {
                     Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
@@ -407,6 +410,30 @@ class Aux1DataImport
                     ),
                     Aux1DataAccessLocation::LOCAL_FILE => self::storeDataToLFS(
                         data: self::processTimeLineJSON($da),
+                    ),
+                },
+                actor: User::get_system_node(),
+            );
+        }
+
+
+        // handle files
+        foreach($caseDetails['Data']['Files'] as $subData)
+        {
+            [$dt, $da] = self::handleDataAccess($subData['DataLocation'], $subData['DataAccess']);
+            $node_documents->addProperty(
+                key  : '#',
+                node : match($dt) {
+                    Aux1DataAccessLocation::IN_DATABASE => GraphDatabaseConnection::new_node(
+                        data      : $da,
+                        creator   : User::get_system_node()
+                    ),
+                    // default => throw new RuntimeException("file in database?!"),
+                    Aux1DataAccessLocation::LOCAL_FILE => self::storeFileToLFS(
+                        data: $da,
+                        filename: $subData['DataType'],
+                        type: explode(separator: '/', string: $subData['MIMEType'])[0],
+                        fileExtension: explode(separator: '/', string: $subData['MIMEType'])[1],
                     ),
                 },
                 actor: User::get_system_node(),
@@ -473,26 +500,36 @@ class Aux1DataImport
         throw new RuntimeException("invalid data location");
     }
 
-    private static function storeDataToLFS(string $data): DeegraphNode
+    private static function storeDataToLFS(string $data, string $type = "text", string $fileExtension = "txt"): DeegraphNode
     {
+        $length = strlen($data);
 
         $fileNode = GraphDatabaseConnection::new_node(
-            data   : "auxlfs://localhost/++video%3Amp4+" . strlen($data),
+            data   : "auxlfs://localhost/++$type%3A$fileExtension+$length",
             creator: User::get_system_node(),
+        );
+        $binFilePath = __DIR__ . "/../../LocalStorage/LocalStorage/LFS/" . $fileNode->getId();
+        file_put_contents($binFilePath, $data);
+
+        // $t = "auxlfs://" . INSTANCE_CREDENTIAL_DDS_HOST . "/" . $fileID . "+" . $this->file_hash . "+" . urlencode($this->mime_type);
+
+        return $fileNode;
+    }
+    private static function storeFileToLFS(string $data, string $filename, string $type, string $fileExtension): DeegraphNode
+    {
+        $fileNode = self::storeDataToLFS(
+            data: $data,
+            type: $type,
+            fileExtension: $fileExtension,
         );
         $fileNode->addProperty(
             key: 'filename',
             node: GraphDatabaseConnection::new_node(
-                data: '',
+                data: $filename,
                 creator: User::get_system_node(),
             ),
             actor: User::get_system_node(),
         );
-
-        $binFilePath = __DIR__ . "/../../LocalStorage/LocalStorage/LFS/" . $fileNode->getId();
-        file_put_contents($binFilePath, $data);
-
-
         return $fileNode;
     }
 
@@ -551,10 +588,14 @@ class Aux1DataImport
         return $output;
     }
 
-    private static function processVCalendarTimestamp($input): string
+    private static function processVCalendarTimestamp($input): ?string
     {
-        $input = new DateTime($input);
-        return $input->format('Ymd\THis\Z');
+        if($input === null)
+        {
+            return (new DateTime())->format('Ymd\THis\Z');
+        }
+
+        return (new DateTime($input))->format('Ymd\THis\Z');
     }
 
     private static function processToDoJSON(string $input): string
@@ -563,7 +604,7 @@ class Aux1DataImport
 
         $id = self::iCALRandomUID();
         $title = $input["title"];
-        $timestamp = self::processVCalendarTimestamp($input["timestamp"]);
+        $timestamp = self::processVCalendarTimestamp($input["timestamp"] ?? null);
         $description = $input["description"];
 
         if(($title === null || $title === "") && ($description === null || $description === ""))
@@ -577,6 +618,10 @@ class Aux1DataImport
         elseif($description === null || $description === "")
         {
             $summary = self::iCALWrap("SUMMARY:" . self::iCALSanitise($title));
+        }
+        else
+        {
+            $summary = "SUMMARY:";
         }
 
         $temp = "BEGIN:VCALENDAR
