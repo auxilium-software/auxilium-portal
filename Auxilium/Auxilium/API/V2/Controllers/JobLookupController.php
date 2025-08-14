@@ -1,11 +1,11 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Enumerators\JobStatus;
-use Auxilium\API\Models\JobLookupModel;
-use Auxilium\API\Superclasses\APIController;
-use Auxilium\API\Superclasses\APIModel;
+use Auxilium\API\V2\Enumerators\JobStatus;
+use Auxilium\API\V2\Models\JobLookupModel;
+use Auxilium\API\V2\Superclasses\APIController;
+use Auxilium\API\V2\Superclasses\APIModel;
 use JetBrains\PhpStorm\NoReturn;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\JsonContent;

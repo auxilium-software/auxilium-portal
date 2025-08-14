@@ -1,6 +1,6 @@
 <?php
 
-namespace Auxilium\API\Enumerators;
+namespace Auxilium\API\V2\Enumerators;
 
 enum JobStatus: string
 {

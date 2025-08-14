@@ -1,8 +1,8 @@
 <?php
 
-namespace Auxilium\API\Superclasses;
+namespace Auxilium\API\V2\Superclasses;
 
-use Auxilium\API\Enumerators\APIResponseStatus;
+use Auxilium\API\V2\Enumerators\APIResponseStatus;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Schema;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Superclasses\APIController;
+use Auxilium\API\V2\Superclasses\APIController;
 use Auxilium\APITools;
 use Auxilium\Helpers\PDF\PDFGeneration;
 use Auxilium\Utilities\URIUtilities;

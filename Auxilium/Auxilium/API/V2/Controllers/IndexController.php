@@ -1,10 +1,10 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Models\IndexModel;
-use Auxilium\API\Superclasses\APIController;
-use Auxilium\API\Superclasses\APIModel;
+use Auxilium\API\V2\Models\IndexModel;
+use Auxilium\API\V2\Superclasses\APIController;
+use Auxilium\API\V2\Superclasses\APIModel;
 use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\SessionHandling\Session;
 use Darksparrow\DeegraphInteractions\DataStructures\DataURL;

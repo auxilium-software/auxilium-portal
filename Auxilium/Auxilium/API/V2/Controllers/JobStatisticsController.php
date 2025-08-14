@@ -1,9 +1,9 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Models\JobStatsModel;
-use Auxilium\API\Superclasses\APIController;
+use Auxilium\API\V2\Models\JobStatsModel;
+use Auxilium\API\V2\Superclasses\APIController;
 use JetBrains\PhpStorm\NoReturn;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\JsonContent;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Models\DraftModel;
-use Auxilium\API\Superclasses\APIController;
-use Auxilium\API\Superclasses\APIModel;
+use Auxilium\API\V2\Models\DraftModel;
+use Auxilium\API\V2\Superclasses\APIController;
+use Auxilium\API\V2\Superclasses\APIModel;
 use Auxilium\Auxilium\API\Controllers\User;
 use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\EmailHandling\InternetMessageTransport;
@@ -15,7 +15,6 @@ use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\Security;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use Exception;
-use JetBrains\PhpStorm\NoReturn;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Response;

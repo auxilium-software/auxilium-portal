@@ -1,9 +1,9 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Models\JobInQueueModel;
-use Auxilium\API\Superclasses\APIController;
+use Auxilium\API\V2\Models\JobInQueueModel;
+use Auxilium\API\V2\Superclasses\APIController;
 use Auxilium\Auxilium\API\Controllers\RuntimeException;
 use Auxilium\EmailHandling\InternetMessageTransport;
 use Exception;

@@ -1,21 +1,20 @@
 <?php
 
-namespace Auxilium\API;
+namespace Auxilium\API\V2;
 
 use App\API\Controllers\IncidentEventController;
 use App\Common\UUID;
 use App\Enumerators\ItemPrepend;
-use Auxilium\API\Controllers\IndexController;
-use Auxilium\API\Controllers\JobLookupController;
-use Auxilium\API\Controllers\JobRunnerController;
-use Auxilium\API\Controllers\JobStatisticsController;
-use Auxilium\API\Controllers\LFSController;
-use Auxilium\API\Controllers\MessageController;
-use Auxilium\API\Controllers\NodeController;
-use Auxilium\API\Controllers\PDFController;
-use Auxilium\API\Controllers\QueryController;
-use Auxilium\API\Superclasses\APIController;
-use Auxilium\Schemas\MessageSchema;
+use Auxilium\API\V2\Controllers\IndexController;
+use Auxilium\API\V2\Controllers\JobLookupController;
+use Auxilium\API\V2\Controllers\JobRunnerController;
+use Auxilium\API\V2\Controllers\JobStatisticsController;
+use Auxilium\API\V2\Controllers\LFSController;
+use Auxilium\API\V2\Controllers\MessageController;
+use Auxilium\API\V2\Controllers\NodeController;
+use Auxilium\API\V2\Controllers\PDFController;
+use Auxilium\API\V2\Controllers\QueryController;
+use Auxilium\API\V2\Superclasses\APIController;
 use Composer\Pcre\UnexpectedNullMatchException;
 
 class APIMaster

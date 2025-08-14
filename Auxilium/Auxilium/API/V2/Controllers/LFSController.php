@@ -1,10 +1,10 @@
 <?php
 
-namespace Auxilium\API\Controllers;
+namespace Auxilium\API\V2\Controllers;
 
-use Auxilium\API\Models\LFSModel;
-use Auxilium\API\Superclasses\APIController;
-use Auxilium\API\Superclasses\APIModel;
+use Auxilium\API\V2\Models\LFSModel;
+use Auxilium\API\V2\Superclasses\APIController;
+use Auxilium\API\V2\Superclasses\APIModel;
 use Auxilium\Auxilium\AuxiliumLFSObject;
 use Auxilium\Utilities\Security;
 use JetBrains\PhpStorm\NoReturn;
