@@ -1,6 +1,6 @@
 <?php
 
-use Auxilium\API\APIMaster;
+use Auxilium\API\V2\APIMaster;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
 use Twig\Environment;
