@@ -3,6 +3,7 @@
 namespace Auxilium\EmailHandling;
 
 use Auxilium\NodeFactory;
+use Auxilium\Utilities\Security;
 use ZBateson\MailMimeParser\Message;
 
 class RFC822ObjectFactory extends NodeFactory
@@ -26,7 +27,7 @@ class RFC822ObjectFactory extends NodeFactory
         {
             if($non_normal_content_part->getContentId() == null)
             {
-                $content_key = rtrim(strtr(base64_encode(openssl_random_pseudo_bytes(24)), '+/', '-_'), '=');
+                $content_key = rtrim(strtr(base64_encode(Security::GeneratePseudoRandomBytes(length: 24)), '+/', '-_'), '=');
                 $non_normal_content_part->setRawHeader("Content-ID", "vnd-auxilium-random-id-" . $content_key);
             }
         } // If we force everything to have a Content-ID it makes attachments a lot simpler!

@@ -5,12 +5,13 @@ namespace Auxilium\TwigHandling\Extensions;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\MicroTemplate;
 use Auxilium\SessionHandling\CookieHandling;
+use Auxilium\Utilities\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class CommonFunctions extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('proplist', [$this, 'proplist'], ['is_safe' => ['html']]),
@@ -25,9 +26,9 @@ class CommonFunctions extends AbstractExtension
         $compact = false,
         $sort = null,
         $recursive = false
-    )
+    ): string
     {
-        $rid = openssl_random_pseudo_bytes(16);
+        $rid = Security::GeneratePseudoRandomBytes(length: 16);
         $rid = bin2hex($rid);
         return "<span id=\"dynamic_property_list_element_$rid\"></span><script>document.getElementById(\"dynamic_property_list_element_$rid\").appendChild((new PropertyList(\"$path\", " . ($compact ? "true" : "false") . ", " . json_encode($hidden_props) . ", " . json_encode($sort) . ", " . ($recursive ? "true" : "false") . ")).render())</script>";
     }
@@ -35,16 +36,14 @@ class CommonFunctions extends AbstractExtension
     public function ui_template(
         $path,
         $template_variables = []
-    )
+    ): string
     {
-        return strval(
-            new MicroTemplate(
-                "ui_templates/" . $path,
-                // $this->twigVariables["selected_lang"],
-                CookieHandling::GetCookieValue(CookieKey::LANGUAGE),
-                $template_variables,
-                false
-            )
+        return (string)new MicroTemplate(
+            "ui_templates/" . $path,
+            // $this->twigVariables["selected_lang"],
+            CookieHandling::GetCookieValue(CookieKey::LANGUAGE),
+            $template_variables,
+            false
         );
     }
 }

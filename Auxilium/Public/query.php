@@ -14,7 +14,7 @@ if(isset($_POST["query"]))
 {
     $query = trim($_POST["query"]);
     $result = GraphDatabaseConnection::query(Session::get_current()->getUser(), $query);
-    $pb->setVariable("result", json_encode($result, JSON_PRETTY_PRINT));
+    $pb->setVariable("result", json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     $pb->setVariable("query", $query, JSON_PRETTY_PRINT);
 }
 $pb->render();

@@ -126,14 +126,14 @@ class NewPropertyPopup
                 let propNameString = propName.value;
                 if (propNameDefault != null)
                 {
-                    if (propNameString.length == 0)
+                    if (propNameString.length === 0)
                     {
                         propNameString = propNameDefault; // If we didn't get a good name supplied by the user, fallback to defaulkt
                     }
                 }
                 propNameString = propNameString.substring(0, 1).replace(/[^a-z]/gi, '_') + propNameString.substring(1, propNameString.length).replace(/[^0-9a-z]/gi, '_');
                 propNameString = propNameString.toLowerCase();
-                if (propNameString.length == 0)
+                if (propNameString.length === 0)
                 {
                     propNameString = "#" // Fallback to just letting deegraph enumerate if everything has gone to pot
                 }

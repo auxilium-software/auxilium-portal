@@ -8,6 +8,7 @@ use Auxilium\Exceptions\MessageSendException;
 use Auxilium\Helpers\Messaging\SMTPUtilities;
 use Auxilium\Helpers\MSGraph\MSGraphInteractions;
 use Auxilium\Utilities\EncodingTools;
+use Auxilium\Utilities\Security;
 use Aws\S3\S3Client;
 use Aws\Ses\SesClient;
 use Exception;
@@ -45,7 +46,7 @@ class InternetMessageTransport
                 );
                 foreach($response["Contents"] as $object)
                 {
-                    $job_id = bin2hex(pack("J", time())) . "." . EncodingTools::Base64EncodeURLSafe(openssl_random_pseudo_bytes(3 * 8));
+                    $job_id = bin2hex(pack("J", time())) . "." . EncodingTools::Base64EncodeURLSafe(Security::GeneratePseudoRandomBytes(length: 3 * 8));
                     $job_path = LOCAL_EPHEMERAL_CREDENTIAL_STORE . "/Jobs/Queue/" . $job_id . ".json";
 
                     $job = [
@@ -154,8 +155,8 @@ class InternetMessageTransport
 
     public static function send(string $internet_message, string $type)
     {
-        $job_id = bin2hex(pack("J", time())) . "." . EncodingTools::Base64EncodeURLSafe(openssl_random_pseudo_bytes(3 * 8));
-        $job_change_key = EncodingTools::Base64EncodeURLSafe(openssl_random_pseudo_bytes(3 * 16));
+        $job_id = bin2hex(pack("J", time())) . "." . EncodingTools::Base64EncodeURLSafe(Security::GeneratePseudoRandomBytes(length: 3 * 8));
+        $job_change_key = EncodingTools::Base64EncodeURLSafe(Security::GeneratePseudoRandomBytes(length: 3 * 16));
         $job_path = LOCAL_EPHEMERAL_CREDENTIAL_STORE . "/Jobs/Queue/" . $job_id . ".json";
 
         if($type == "MIME")

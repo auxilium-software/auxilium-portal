@@ -621,7 +621,7 @@ class InlineNodeView
 
             http.onreadystatechange = (e) =>
             {
-                if (http.readyState == 4 && !responseHad)
+                if (http.readyState === 4 && !responseHad)
                 {
                     let response = {};
                     responseHad = true;
@@ -630,9 +630,13 @@ class InlineNodeView
 
                     const uid = "2ed3d7cf-460e-47b8-bebb-2157924ccf7f";
                     if (response.from.startsWith("auxiliuminbox+" + uid))
+                    {
                         messageBox.classList.add("sent");
+                    }
                     else
+                    {
                         messageBox.classList.add("received");
+                    }
 
                     if (response["text-content"] == null)
                     {
@@ -688,6 +692,11 @@ class InlineNodeView
             this.#target.appendChild(content);
         }
     }
+
+
+
+
+
 
     #mimeDisplay()
     {

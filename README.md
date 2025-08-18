@@ -1,4 +1,12 @@
 # Auxilium
+![GitHub commit activity](https://img.shields.io/github/commit-activity/y/auxilium-software/auxilium) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/auxilium-software/auxilium)
+![GitHub contributors](https://img.shields.io/github/contributors/auxilium-software/auxilium)
+![GitHub language count](https://img.shields.io/github/languages/count/auxilium-software/auxilium) ![GitHub top language](https://img.shields.io/github/languages/top/auxilium-software/auxilium)
+
+
+
+
+
 Auxilium is a hosted case management, referral management and client portal system for 3rd sector and public sector organisations.
 
 > [!WARNING]
@@ -43,20 +51,38 @@ For development purposes, pull the repository and use `install.sh` to get starte
 Auxilium was created in [Aberystwyth University](https://aber.ac.uk) with funding from the [UK National Lottery's Community Fund](https://www.tnlcommunityfund.org.uk). This software is used to support the work of [Veterans Legal Link](https://veteranslegallink.org/), a service providing free legal advice for UK veterans.
 
 ## Dependencies and Licenses
-### Libraries
-- Twig: Revised BSD License
-- endroid/qr-code: MIT License
-- FDPF: BSD Zero Clause License
-- ezyang/htmlpurifier: LGPL v2.1
-- bigfish/pdf417: MIT License
-- zbateson/mail-mime-parser: BSD Two Clause License
-- lcobucci/jwt: BSD Three Clause License
-- web-token/jwt-core: MIT License
+### PHP Dependencies
+| Dependency                                                                                                | License                                                                                                               |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [twig/twig](https://packagist.org/packages/twig/twig)                                                     | [Revised BSD License](https://github.com/twigphp/Twig?tab=BSD-3-Clause-1-ov-file)                                     |
+| [fpdf/fpdf](https://packagist.org/packages/fpdf/fpdf)                                                     | [Custom License](https://github.com/coreydoughty/Fpdf?tab=License-1-ov-file)                                          |
+|                                                                                                           |                                                                                                                       |
+| [endroid/qr-code-bundle](https://packagist.org/packages/endroid/qr-code-bundle)                           | [MIT License](https://github.com/endroid/qr-code-bundle/blob/main/LICENSE)                                            |
+| [bigfish/pdf417](https://packagist.org/packages/bigfish/pdf417)                                           | [MIT License](https://github.com/ihabunek/pdf417-php?tab=License-1-ov-file)                                           |
+|                                                                                                           |                                                                                                                       |
+| [lcobucci/jwt](https://packagist.org/packages/lcobucci/jwt)                                               | [BSD Three Clause License](https://github.com/lcobucci/jwt?tab=BSD-3-Clause-1-ov-file)                                |
+| [web-token/jwt-core](https://packagist.org/packages/web-token/jwt-core])                                  | [MIT License](https://github.com/web-token/jwt-core?tab=MIT-1-ov-file)                                                |
+|                                                                                                           |                                                                                                                       |
+| [aws/aws-sdk-php](https://packagist.org/packages/aws/aws-sdk-php-laravel)                                 | [Apache 2.0 License](https://github.com/aws/aws-sdk-php-laravel?tab=Apache-2.0-1-ov-file)                             |
+|                                                                                                           |                                                                                                                       |
+| [ezyang/htmlpurifier](https://packagist.org/packages/ezyang/htmlpurifier)                                 | [LGPL v2.1](https://github.com/ezyang/htmlpurifier?tab=LGPL-2.1-1-ov-file)                                            |
+|                                                                                                           |                                                                                                                       |
+| [aura/sqlquery](https://packagist.org/packages/aura/sqlquery)                                             | [MIT License](https://github.com/auraphp/Aura.SqlQuery?tab=MIT-1-ov-file)                                             |
+|                                                                                                           |                                                                                                                       |
+| [darksparrow/deegraph-interactions](https://packagist.org/packages/darksparrow/deegraph-interactions)     | [Mozilla Public License 2.0](https://git.darksparrow.uk/Packages_PHP/DeegraphInteractions/src/branch/master/LICENSE)  |
+| [darksparrow/auxilium-schema-builder](https://packagist.org/packages/darksparrow/auxilium-schema-builder) | [Mozilla Public License 2.0](https://git.darksparrow.uk/Packages_PHP/AuxiliumSchemaBuilder/src/branch/master/LICENSE) |
+|                                                                                                           |                                                                                                                       |
+| [geerlingguy/ping](https://packagist.org/packages/geerlingguy/ping)                                       | [MIT License](https://github.com/geerlingguy/Ping?tab=MIT-1-ov-file)                                                  |
+|                                                                                                           |                                                                                                                       |
+| [phpfui/icalendar](https://packagist.org/packages/phpfui/icalendar)                                       | [GPL3.0 License](https://github.com/phpfui/icalendar?tab=License-1-ov-file)                                           |
+
 ### Supporting Software
-- PHP: PHP License v3.01
-- msgconvert: GPL v1 or later
-- Apache 2: Apache License v2.0
-- deegraph: GPL v3
+| Software                                               | License             |
+| ------------------------------------------------------ | ------------------- |
+| [PHP](https://www.php.net/)                            | PHP License v3.01   |
+| [msgconvert](https://www.matijs.net/software/msgconv/) | GPL v1 or later     |
+| [Apache 2](https://httpd.apache.org/)                  | Apache License v2.0 |
+| [deegraph](https://deegraph.org/)                      | GPL v3              |
 
 ## License
 Copyright 2021-2024 Aberystwyth University and contributors

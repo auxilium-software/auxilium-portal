@@ -9,6 +9,7 @@ use Auxilium\TwigHandling\PageBuilder2;
 use Auxilium\URLMetadata;
 use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
+use Unional\Jsonc\JSONC;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
@@ -79,7 +80,7 @@ if(!isset($uri_components[0]))
 
 FormBuilderHelpers::CheckForPathTraversal($uri_components);
 
-if(!file_exists(__DIR__ . "/../Configuration/FormDefinitions/" . $uri_components[0] . ".json"))
+if(!file_exists(__DIR__ . "/../Configuration/FormDefinitions/" . $uri_components[0] . ".jsonc"))
 {
     PageBuilder2::Render(
         template : 'Pages/invalid.html.twig',
@@ -128,8 +129,9 @@ else
     $form_persistent_data = json_decode($form_persistent_data, true);
 }
 
-$definition = file_get_contents(__DIR__ . "/../Configuration/FormDefinitions/" . $uri_components[0] . ".json");
-$definition = json_decode($definition, true);
+$definition = file_get_contents(__DIR__ . "/../Configuration/FormDefinitions/" . $uri_components[0] . ".jsonc");
+// $definition = json_decode($definition, true);
+$definition = JSONC::decode($definition, true);
 
 if(!isset($form_persistent_data["variables"]))
 {

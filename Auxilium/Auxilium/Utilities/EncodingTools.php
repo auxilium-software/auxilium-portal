@@ -86,7 +86,7 @@ class EncodingTools
      */
     public static function GenerateNewUUID(): string
     {
-        $data = openssl_random_pseudo_bytes(16); // Use openssl rand as mt_rand is known to produce duplicates.
+        $data = Security::GeneratePseudoRandomBytes(length: 16);
 
         $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);

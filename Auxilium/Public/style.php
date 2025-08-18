@@ -6,21 +6,16 @@ use Auxilium\Utilities\NavigationUtilities;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
 
-$pb = PageBuilder::get_instance();
-
 $style_options = [];
 
-function toggle_style($style_name)
+function toggle_style($style_name): void
 {
     global $style_options;
     if(isset($_COOKIE["style"]))
     {
-        if(isset($_COOKIE["style"]))
-        {
-            $style_options = explode(" ", $_COOKIE["style"]);
-        }
+        $style_options = explode(" ", $_COOKIE["style"]);
     }
-    $index = array_search($style_name, $style_options);
+    $index = array_search($style_name, $style_options, true);
     if($index !== false)
     {
         unset($style_options[$index]);

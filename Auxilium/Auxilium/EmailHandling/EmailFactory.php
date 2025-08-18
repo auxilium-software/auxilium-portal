@@ -7,6 +7,7 @@ use Auxilium\Exceptions\MessageSendException;
 use Auxilium\MicroTemplate;
 use Auxilium\Schemas\MessageSchema;
 use Auxilium\SessionHandling\Session;
+use Auxilium\Utilities\Security;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -244,7 +245,7 @@ class EmailFactory extends RFC822ObjectFactory
 
             $url = "https://graph.microsoft.com/v1.0/users/" . INSTANCE_CREDENTIAL_EMAIL_ACCOUNTS["primary"]["user_guid"] . "/sendMail";
 
-            $throwawayMessageId = bin2hex(openssl_random_pseudo_bytes(16));
+            $throwawayMessageId = bin2hex(Security::GeneratePseudoRandomBytes(length: 16));
             //$throwawayMessageId = "beans";
 
             $payload = [

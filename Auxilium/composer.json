@@ -32,6 +32,9 @@
         "ext-sodium": "*",
         "ext-pdo": "*",
         "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+
+        "ext-zip": "*",
 
 
 
@@ -63,7 +66,11 @@
 
         "geerlingguy/ping": "1.2.1",
 
-        "phpfui/icalendar": "1.1.0"
+        "phpfui/icalendar": "1.1.0",
+
+        "zircote/swagger-php": "~4.8.7",
+
+        "unional/jsonc": "~1.0.1"
     },
     "require-dev": {
         "phpdocumentor/shim": "*"

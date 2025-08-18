@@ -55,22 +55,23 @@ if [ -f /etc/ssl/ext-certs/rootCA.crt ]; then
 #update-ca-certificates
 fi
 
-mkdir /var/ecs/
-mkdir /var/ecs/jobs/
-mkdir /var/ecs/forms-in-progress/
-mkdir /var/ecs/indexes/
-mkdir /var/ecs/message-drafts/
-mkdir /var/ecs/certs/
-mkdir /var/ecs/certs/deegraph/
-mkdir /var/ecs/certs/apache/
-cp /etc/ssl/ext-certs/* /var/ecs/certs/apache/
+mkdir -p /store/Auxilium/{LFS,Messages,Misc}
 
-ln -s /store/local-assets /var/www/Public/assets/local
+mkdir -p /var/EphemeralCredentialsStore/FormsInProgress
+mkdir -p /var/EphemeralCredentialsStore/Indexes
+mkdir -p /var/EphemeralCredentialsStore/Jobs/{Completed,Failed,Queue}
+mkdir -p /var/EphemeralCredentialsStore/MessageDrafts
+mkdir -p /var/EphemeralCredentialsStore/Certificates/{Deegraph,Nginx}/
+cp /etc/ssl/ext-certs/* /var/EphemeralCredentialsStore/Certificates/Nginx/
 
-chown www-data:www-data /var/ecs -R
+mkdir -p /srv/Auxilium/Public/Static/LocalAssets
+ln -s /store/local-assets /srv/Auxilium/Public/Static/LocalAssets
 
-cp /etc/ssl/ext-certs/* /var/ecs/certs/deegraph/
-chown deegraph:deegraph /var/ecs/certs/deegraph -R
+chown -R www-data:www-data /var/EphemeralCredentialsStore
+chown -R www-data:www-data /store/Auxilium
+
+cp /etc/ssl/ext-certs/* /var/EphemeralCredentialsStore/Certificates/Deegraph/
+chown deegraph:deegraph /var/EphemeralCredentialsStore/Certificates/Deegraph -R
 
 echo "127.0.0.1     $CONTAINER_FQDN" >> /etc/hosts
 
@@ -79,8 +80,8 @@ cat > /app/config.json << EOF
     "fqdn": "$CONTAINER_FQDN",
     "data_directory": "/store/deegraph/dgdata/",
     "ssl_certs": {
-        "private_key": "/var/ecs/certs/deegraph/privkey.pem",
-        "full_chain": "/var/ecs/certs/deegraph/fullchain.pem"
+        "private_key": "/var/EphemeralCredentialsStore/Certificates/Deegraph/privkey.pem",
+        "full_chain": "/var/EphemeralCredentialsStore/Certificates/Deegraph/fullchain.pem"
     },
     "port": 8880,
     "root_auth_tokens": ["$DEEGRAPH_ROOT_AUTH_TOKEN"],
@@ -107,8 +108,6 @@ while [ $lines -eq 0 ]; do
 done
 DDS_ROOT_NODE=$(find . -maxdepth 1 -name "*.private.jwk" | cut -d '/' -f2 | cut -d '.' -f1)
 cd $QUICK_RETURN
-
-#/etc/init.d/apache2 start
 
 cat > /app/credentials.php << EOF
 <?php
@@ -151,13 +150,18 @@ const INSTANCE_CREDENTIAL_EMAIL_ACCOUNTS = [
         "client_secret" => 'REDACTED'
     ]
 ];
-?>
+
+const ACCEPT_SELF_SIGNED_CERTIFICATES = FALSE;
 EOF
 
 chown www-data:www-data /app/credentials.php
 
-source /etc/apache2/envvars
-apache2
+#export NGINX_USER=www-data
+#export NGINX_GROUP=www-data
+#export NGINX_PID_FILE=/var/run/nginx.pid
+#export NGINX_LOG_DIR=/var/log/nginx
+service nginx start
+service php8.2-fpm start
 
 trap "/etc/init.d/mariadb stop; kill -s SIGTERM \$(cat /store/deegraph/deegraph.pid.tmp); echo \$(date +%s) > /store/last-shutdown.txt" EXIT
 

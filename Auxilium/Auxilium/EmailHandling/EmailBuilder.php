@@ -4,6 +4,7 @@ namespace Auxilium\EmailHandling;
 
 use Auxilium\MicroTemplate;
 use Auxilium\Utilities\EncodingTools;
+use Auxilium\Utilities\Security;
 use Exception;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -122,7 +123,7 @@ class EmailBuilder
         $this->EmailData["body"] = $content;
 
         $build_content = "MIME-Version: 1.0\r\n";
-        $boundary = EncodingTools::Base64EncodeURLSafe(openssl_random_pseudo_bytes(48));
+        $boundary = EncodingTools::Base64EncodeURLSafe(Security::GeneratePseudoRandomBytes(length: 48));
 
         $message_parties = [];
 

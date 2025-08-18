@@ -1,6 +1,8 @@
 <?php
 
+use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
+use Auxilium\Utilities\Security;
 use Auxilium\Utilities\URIUtilities;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
@@ -15,7 +17,7 @@ require_once __DIR__ . '/../../../Configuration/Configuration/Environment.php';
 //$at->setVariable("req", );
 //$at->output();
 
-$nonce = \Auxilium\Utilities\EncodingTools::Base64EncodeURLSafe(openssl_random_pseudo_bytes(16));
+$nonce = EncodingTools::Base64EncodeURLSafe(Security::GeneratePseudoRandomBytes(length: 16));
 
 $uri = new URIUtilities();
 

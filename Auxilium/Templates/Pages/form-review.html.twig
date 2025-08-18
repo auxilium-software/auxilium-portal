@@ -49,7 +49,7 @@
                             {% set inline_node_path = "/graph/~" ~ value.object.id %}
                             {% set inline_node_new_tab = true %}
                             {% set hide_edit_button = true %}
-                            <dd>{{ include("node-views/inline-node-view.html.twig") }}</dd>
+                            <dd>{{ include("/Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</dd>
                             {% set inline_node_new_tab = false %}
                             {% set hide_edit_button = false %}
                         {% elseif value.text %}

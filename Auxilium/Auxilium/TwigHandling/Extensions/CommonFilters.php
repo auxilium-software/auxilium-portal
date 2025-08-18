@@ -10,6 +10,7 @@ use Auxilium\Enumerators\CookieKey;
 use Auxilium\MicroTemplate;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\Utilities\EncodingTools;
+use Auxilium\Utilities\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -18,31 +19,22 @@ use Twig\TwigFilter;
  */
 class CommonFilters extends AbstractExtension
 {
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            /*
-            new TwigFilter('json_encode', [$this, 'JSONEncode']),
-            new TwigFilter('json_decode', [$this, 'JSONDecode']),
-            */
-
-            new TwigFilter('uiprop', [$this, 'uiprop']),
-            new TwigFilter('uitxt', [$this, 'uitxt']),
-            new TwigFilter('uitxtrt', [$this, 'uitxtrt']),
-            new TwigFilter('ndtitle', [$this, 'ndtitle']),
-            new TwigFilter('ndsentence', [$this, 'ndsentence']),
-            new TwigFilter('uihdg', [$this, 'uihdg']),
-            new TwigFilter('unpack_string', [$this, 'unpack_string']),
-            new TwigFilter('b64_url_safe', [$this, 'b64_url_safe']),
-            new TwigFilter('un_b64_url_safe', [$this, 'un_b64_url_safe']),
-            new TwigFilter('human_filesize', [$this, 'human_filesize']),
-            new TwigFilter('dnd', [$this, 'dnd']),
+            new TwigFilter('uiprop',            [$this, 'uiprop']),
+            new TwigFilter('uitxt',             [$this, 'uitxt']),
+            new TwigFilter('uitxtrt',           [$this, 'uitxtrt']),
+            new TwigFilter('ndtitle',           [$this, 'ndtitle']),
+            new TwigFilter('ndsentence',        [$this, 'ndsentence']),
+            new TwigFilter('uihdg',             [$this, 'uihdg']),
+            new TwigFilter('unpack_string',     [$this, 'unpack_string']),
+            new TwigFilter('b64_url_safe',      [$this, 'b64_url_safe']),
+            new TwigFilter('un_b64_url_safe',   [$this, 'un_b64_url_safe']),
+            new TwigFilter('human_filesize',    [$this, 'human_filesize']),
+            new TwigFilter('dnd',               [$this, 'dnd']),
         ];
     }
-
-    public function JSONEncode($value): string { return json_encode($value); }
-
-    public function JSONDecode($value): array { return json_decode($value, true); }
 
     /**
      *
@@ -108,35 +100,35 @@ class CommonFilters extends AbstractExtension
      *
      * @return string The formatted file size with appropriate units (B, KiB, MiB, GiB, or TiB).
      */
-    public function human_filesize($string): string
+    public function human_filesize(string $string): string
     {
-        $size = intval($string);
+        $size = (int)$string;
         if($size <= 256)
         {
             return $size . " B";
         }
-        elseif($size <= 256 * pow(1024, 1))
+        elseif($size <= 256 * (1024 ** 1))
         {
-            return substr($size / pow(1024, 1), 0, 3) . " KiB";
+            return substr($size / (1024 ** 1), 0, 3) . " KiB";
         }
-        elseif($size <= 256 * pow(1024, 2))
+        elseif($size <= 256 * (1024 ** 2))
         {
-            return substr($size / pow(1024, 2), 0, 3) . " MiB";
+            return substr($size / (1024 ** 2), 0, 3) . " MiB";
         }
-        elseif($size <= 256 * pow(1024, 3))
+        elseif($size <= 256 * (1024 ** 3))
         {
-            return substr($size / pow(1024, 3), 0, 3) . " GiB";
+            return substr($size / (1024 ** 3), 0, 3) . " GiB";
         }
         else
         {
-            return substr($size / pow(1024, 4), 0, 3) . " TiB";
+            return substr($size / (1024 ** 4), 0, 3) . " TiB";
         }
     }
 
     // Macro to insert a dynamically loaded node view
     public function dnd($path): string
     {
-        $rid = openssl_random_pseudo_bytes(16);
+        $rid = Security::GeneratePseudoRandomBytes(length: 16);
         $rid = bin2hex($rid);
         return "<span id=\"dynamic_inline_node_element_$rid\"></span><script>document.getElementById(\"dynamic_inline_node_element_$rid\").appendChild((new InlineNodeView(\"$path\")).render())</script>";
     }

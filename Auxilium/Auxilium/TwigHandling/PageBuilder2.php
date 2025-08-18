@@ -23,7 +23,7 @@ class PageBuilder2
 
     public function __construct()
     {
-        $this->loader = new FilesystemLoader(dirname($_SERVER["DOCUMENT_ROOT"]) . "/Templates/");
+        $this->loader = new FilesystemLoader(__DIR__ . "/../../Templates/");
         $this->twig = new Environment($this->loader, [
                 "debug" => true,
                 "cache" => false,
@@ -221,9 +221,13 @@ class PageBuilder2
     public static function GetVariable(string $variableName, ?string $default = null): mixed
     {
         if(array_key_exists($variableName, self::$AdditionalVariables))
+        {
             return self::$AdditionalVariables[$variableName];
-        if($default != null)
+        }
+        if($default !== null)
+        {
             return $default;
+        }
         echo "variable \"" . $variableName . "\" does not exist";
         die();
     }

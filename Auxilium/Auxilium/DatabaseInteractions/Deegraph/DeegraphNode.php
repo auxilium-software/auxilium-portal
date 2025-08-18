@@ -140,15 +140,23 @@ class DeegraphNode
     {
         if($actor == null)
         {
-            $actor = Session::get_current()->getUser();
+            $actor = Session::get_current()?->getUser();
         }
-        if(preg_match('/^[a-z_][a-z0-9_]*$/', $key) || preg_match('/^[0-9]+$/', $key) || $key == "#")
-        { // Let's not allow injections! (Even though DDS handles permissions and damage will be limited to this user anyway, there's not really a benefit to *not* preventing injections)
+
+        /*
+         * Let's not allow injections! (Even though DDS handles permissions and damage will be limited to this user anyway,
+         * there's not really a benefit to *not* preventing injections)
+         */
+        if($key === "#" || preg_match('/^[a-z_][a-z0-9_]*$/', $key) || preg_match('/^[0-9]+$/', $key))
+        {
             // $query = "LINK {".$node->NodeID."} AS ".$key." OF {".$this->NodeID."}".($force ? " FORCE" : "");
             $query = QueryBuilder::Link()
                 ->linkOfRelativePath($node->NodeID, $this->NodeID)
                 ->as($key);
-            if($force) $query = $query->force();
+            if($force)
+            {
+                $query = $query->force();
+            }
             $query = $query->build();
             return GraphDatabaseConnection::query($actor, $query);
         }
@@ -358,14 +366,12 @@ class DeegraphNode
      */
     public function getProperty(string $property, User $actor = null): mixed
     {
-        if($actor == null)
+        if($actor === null)
         {
-            $actor = Session::get_current()->getUser();
+            $actor = Session::get_current()?->getUser();
         }
         $temp = $this->getProperties($actor);
-        if(isset($temp[$property]))
-            return $temp[$property];
-        return null;
+        return $temp[$property] ?? null;
     }
 
     public function getProperties(User $actor = null): ?array

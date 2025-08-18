@@ -1,7 +1,10 @@
 <?php
 
+use Auxilium\DatabaseInteractions\RelationalDatabaseConnection;
 use Auxilium\SessionHandling\CookieHandling;
+use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
+use Auxilium\Utilities\Security;
 use Jose\Component\Core\Util\RSAKey;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Signer\Eddsa;
@@ -62,7 +65,7 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
 
     $trusted_jwks = [];
 
-    $jwt_header = json_decode(\Auxilium\Utilities\EncodingTools::Base64DecodeURLSafe(explode(".", $id_token)[0]), true);
+    $jwt_header = json_decode(EncodingTools::Base64DecodeURLSafe(explode(".", $id_token)[0]), true);
     $jwt_alg = $jwt_header["alg"];
 
     $token_valid = false;
@@ -184,7 +187,7 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
                     "unique_sub" => $combined_id
                 ];
                 $sql = "SELECT unique_sub, user_uuid FROM oauth_logins WHERE unique_sub=:unique_sub";
-                $statement = \Auxilium\DatabaseInteractions\RelationalDatabaseConnection::get_pdo()->prepare($sql);
+                $statement = RelationalDatabaseConnection::get_pdo()->prepare($sql);
                 $statement->execute($bind_variables);
                 $returned_data = $statement->fetch();
                 if($returned_data == null)
@@ -194,7 +197,7 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
                         "unique_sub" => $combined_id
                     ];
                     $sql = "INSERT INTO oauth_logins (unique_sub, user_uuid) VALUES (:unique_sub, :user_uuid)";
-                    $statement = \Auxilium\DatabaseInteractions\RelationalDatabaseConnection::get_pdo()->prepare($sql);
+                    $statement = RelationalDatabaseConnection::get_pdo()->prepare($sql);
                     $statement->execute($bind_variables);
                     NavigationUtilities::Redirect(target: "/graph/~" . $state_claims["sub"]);
                     exit();
@@ -211,7 +214,7 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
                     "unique_sub" => $combined_id
                 ];
                 $sql = "SELECT unique_sub, user_uuid FROM oauth_logins WHERE unique_sub=:unique_sub";
-                $statement = \Auxilium\DatabaseInteractions\RelationalDatabaseConnection::get_pdo()->prepare($sql);
+                $statement = RelationalDatabaseConnection::get_pdo()->prepare($sql);
                 $statement->execute($bind_variables);
                 $returned_data = $statement->fetch();
                 if($returned_data == null)
@@ -220,10 +223,10 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
                 }
                 else
                 {
-                    $session_key = rtrim(strtr(base64_encode(openssl_random_pseudo_bytes(64)), '+/', '-_'), '='); // Taken from /login
+                    $session_key = rtrim(strtr(base64_encode(Security::GeneratePseudoRandomBytes(length: 64)), '+/', '-_'), '='); // Taken from /login
 
                     $session_info = [
-                        "session_uuid" => \Auxilium\Utilities\EncodingTools::GenerateNewUUID("sessions"),
+                        "session_uuid" => EncodingTools::GenerateNewUUID("sessions"),
                         "session_key" => $session_key,
                         "user_uuid" => $returned_data["user_uuid"],
                         "unique_sub" => $combined_id,
@@ -231,7 +234,7 @@ if(isset($_POST["id_token"]) || isset($_GET["id_token"]))
                         "active" => 1,
                     ];
                     $sql = "INSERT INTO portal_sessions (session_uuid, session_key, user_uuid, ip_address, active, unique_sub) VALUES (:session_uuid, :session_key, :user_uuid, :ip_address, :active, :unique_sub)";
-                    $statement = \Auxilium\DatabaseInteractions\RelationalDatabaseConnection::get_pdo()->prepare($sql);
+                    $statement = RelationalDatabaseConnection::get_pdo()->prepare($sql);
                     $statement->execute($session_info);
                     CookieHandling::SetSessionKey(sessionKey: $session_key);
                     if($form_data == null)

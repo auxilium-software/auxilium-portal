@@ -3,11 +3,11 @@
 use Auxilium\DatabaseInteractions\Deegraph\DeegraphNode;
 use Auxilium\DatabaseInteractions\RelationalDatabaseConnection;
 use Auxilium\EmailHandling\EmailBuilder;
-use Auxilium\SessionHandling\Security;
 use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
+use Auxilium\Utilities\Security;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
@@ -131,7 +131,7 @@ switch($uri_components[1])
 
                         $word_list = json_decode(file_get_contents(__DIR__ . "/../byte-word-list.json"), true);
 
-                        $garbage_data = openssl_random_pseudo_bytes(4);
+                        $garbage_data = Security::GeneratePseudoRandomBytes(length: 4);
 
                         $verification_code = $word_list[ord($garbage_data[0])] . " " . $word_list[ord($garbage_data[1])] . " " . $word_list[ord($garbage_data[2])] . " " . $word_list[ord($garbage_data[3])];
                         $temporary_data = [

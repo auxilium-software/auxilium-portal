@@ -1,11 +1,10 @@
 <?php
 
-use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\Exceptions\DatabaseConnectionException;
 use Auxilium\SessionHandling\CookieHandling;
-use Auxilium\SessionHandling\Security;
 use Auxilium\TwigHandling\PageBuilder2;
+use Auxilium\Utilities\Security;
 use Auxilium\Wrappers\ICMPWrapper;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -21,14 +20,8 @@ try
 
         PageBuilder2::AutoRender(variables: [
             "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
-            "is_admin" => (
-            in_array(
-                needle  : "ACT",
-                haystack: GraphDatabaseConnection::get_instance_node()->getPermissions()
-            )
-            ),
-        ]
-        );
+            "is_admin" => Security::IsAdmin(),
+        ]);
     }
     catch(DatabaseConnectionException $e)
     {

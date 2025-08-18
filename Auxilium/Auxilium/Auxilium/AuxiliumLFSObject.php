@@ -103,7 +103,9 @@ class AuxiliumLFSObject
     public function getFilePath(): string
     {
         if(str_starts_with(haystack: $this->getMimeType(), needle: "message"))
+        {
             return LOCAL_STORAGE_DIRECTORY . "/Messages/" . $this->getId();
+        }
         return LOCAL_STORAGE_DIRECTORY . "/LFS/" . $this->getId();
     }
 

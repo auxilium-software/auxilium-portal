@@ -1,0 +1,69 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <h1>Step 5/?: Summary</h1>
+
+        <div class="marked-section">
+            <h2>Instance details</h2><br />
+
+            <dl>
+                <dt>Name</dt>
+                <dd>{{ Variables['instance-domain'] }}</dd>
+                <dt>UUID</dt>
+                <dd>{{ Variables['deegraph-rootNode'] }}</dd>
+            </dl>
+        </div>
+
+        <div class="marked-section">
+            <h2>MariaDB details</h2><br />
+            <dl>
+                <dt>Host</dt>
+                <dd>{{ Variables['mariadb-host'] }}</dd>
+                <dt>Port</dt>
+                <dd>{{ Variables['mariadb-port'] }}</dd>
+                <dt>Username</dt>
+                <dd>{{ Variables['mariadb-username'] }}</dd>
+                <dt>Password</dt>
+                <dd>[REDACTED]</dd>
+                <dt>Database</dt>
+                <dd>{{ Variables['mariadb-database'] }}</dd>
+            </dl>
+        </div>
+
+        <div class="marked-section">
+            <h2>Deegraph details</h2><br />
+            <dl>
+                <dt>Host</dt>
+                <dd>{{ Variables['deegraph-host'] }}</dd>
+                <dt>Port</dt>
+                <dd>{{ Variables['deegraph-port'] }}</dd>
+                <dt>Login node</dt>
+                <dd>{{ Variables['deegraph-loginNode'] }}</dd>
+                <dt>Token</dt>
+                <dd>[REDACTED]</dd>
+                <dt>Allow self-signed certificates</dt>
+                <dd>{{ Variables['deegraph-allowSelfSignedCerts'] }}</dd>
+            </dl>
+        </div>
+
+        <div class="marked-section">
+            <h2>Root account details</h2><br />
+            <dl>
+                <dt>Name</dt>
+                <dd>{{ Variables['rootAccount-name'] }}</dd>
+                <dt>Email</dt>
+                <dd>{{ Variables['rootAccount-email'] }}</dd>
+                <dt>Password</dt>
+                <dd>[REDACTED]</dd>
+            </dl>
+        </div>
+
+        <div class="button-box">
+            <a href="/system/init?page=4&setup_key={{ SetupKey }}" class="button">Previous step</a>
+            <a href="/system/init?page=5.1&setup_key={{ SetupKey }}" class="button">Initialise Databases</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

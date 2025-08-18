@@ -9,6 +9,7 @@ use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder2;
 use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
+use Auxilium\Utilities\Security;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
@@ -224,7 +225,7 @@ try
      * Even allowing one guess per millesecond (which is already better than the bottleneck of the JISC network) it will take 5 395 141 535 403 007 094 485 264 577 years.
      * This is conserably longer than the time we have left before the Earth is consumed by the Sun turning into a red giant.
      */
-    $session_key = rtrim(strtr(base64_encode(openssl_random_pseudo_bytes(64)), '+/', '-_'), '=');
+    $session_key = rtrim(strtr(base64_encode(Security::GeneratePseudoRandomBytes(length: 64)), '+/', '-_'), '=');
 
 
     $mariaDBConnection->RunInsert(queryBuilder: SQLQueryBuilderWrapper::INSERT(MariaDBTable::PORTAL_SESSIONS)

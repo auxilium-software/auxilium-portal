@@ -1,0 +1,37 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <h1>Step 2/?: MariaDB connection details</h1>
+
+        {% if Variables.error != null %}
+            <div class="critical-note">
+                {{ Variables.error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/system/init?page=2.1&setup_key={{ SetupKey }}">
+            <label for="mariadb-host">Host or IP address</label>
+            <input type="text" id="mariadb-host" name="mariadb-host" placeholder="localhost"  required value="{{ Variables['mariadb-host'] }}" />
+
+            <label for="mariadb-port">Port</label>
+            <input type="number" id="mariadb-port" name="mariadb-port" placeholder="3306" required value="{{ Variables['mariadb-port'] }}" />
+
+            <label for="mariadb-username">Username</label>
+            <input type="text" id="mariadb-username" name="mariadb-username" placeholder="auxilium"  required value="{{ Variables['mariadb-username'] }}" />
+
+            <label for="mariadb-password">Password</label>
+            <input type="password" id="mariadb-password" name="mariadb-password"  required value="{{ Variables['mariadb-password'] }}" />
+
+            <label for="mariadb-database">Database</label>
+            <input type="text" id="mariadb-database" name="mariadb-database" placeholder="auxilium" required value="{{ Variables['mariadb-database'] }}" />
+
+            <div class="button-box">
+                <a href="/system/init?page=1&setup_key={{ SetupKey }}" class="button">Previous step</a>
+                <input type="submit" value="Next step" />
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

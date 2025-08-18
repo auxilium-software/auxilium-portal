@@ -1,0 +1,19 @@
+{% extends "/Bases/SystemInitWizard.html.twig" %}
+
+{% block content %}
+    <div>
+    <div class="inner-content">
+        <div class="welcome-box">
+            <span class="inline-icon task-completed-icon-white"></span>
+            <h1>Welcome</h1>
+            <h1>Croseo</h1>
+        </div>
+
+        <div class="left-preferential-box">
+            <p>This wizard will guide you through initialising a new instance of Auxilium.</p>
+            <a href="/system/init?page=1&setup_key={{ SetupKey }}" class="navigational-link">Begin</a>
+            <div class="large-spacer"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

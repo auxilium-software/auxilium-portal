@@ -1,0 +1,48 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block head_assets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block content %}
+    <div class="inner-content">
+        <div class="navigation-breadcrumb-container">
+            <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | uihdg }}</a>
+            <a class="navigation-breadcrumb" href="/system">{{ "system_settings" | uihdg }}</a>
+            <a class="navigation-breadcrumb" href="/system/server-management">{{ "server_management" | uihdg }}</a>
+            <a class="navigation-breadcrumb" href="/system/server-management/contact-details">{{ "modify_contact_details" | uihdg }}</a>
+        </div>
+
+        <h1><span class="inline-icon-shift-left inline-icon-low-margin terminal-icon"></span>{{ "modify_contact_details" | uihdg }}</h1>
+
+        <form action="/system/server-management/contact-details" method="POST">
+            <h2>Main Contact Information</h2>
+
+            <label for="main-emailAddress">Email address</label>
+            <input type="text" id="main-emailAddress" name="main-emailAddress" placeholder="help@example.com" required value="{{ Main.EmailAddress }}" />
+            <label for="main-phoneNumber">Phone</label>
+            <input type="text" id="main-phoneNumber" name="main-phoneNumber" placeholder="+44 1234 567890" required value="{{ Main.PhoneNumber }}" />
+            <label for="main-phoneOpeningHours">Phone Opening Hours</label>
+            <input type="text" id="main-phoneOpeningHours" name="main-phoneOpeningHours" placeholder="Mon-Fri 09:00-17:00" required value="{{ Main.PhoneOpeningHours }}" />
+            <label for="main-textNumber">Text</label>
+            <input type="text" id="main-textNumber" name="main-textNumber" placeholder="+44 9876 543210" required value="{{ Main.TextNumber }}" />
+            <label for="main-textOpeningHours">Text Opening Hours</label>
+            <input type="text" id="main-textOpeningHours" name="main-textOpeningHours" placeholder="24/7" required value="{{ Main.TextOpeningHours }}" />
+
+            <h2>Maintainer Information</h2>
+            <label for="maintainer-name">Name</label>
+            <input type="text" id="maintainer-name" name="maintainer-name" placeholder="Jane Doe" required value="{{ Maintainer.Name }}" />
+            <label for="maintainer-emailAddress">Email address</label>
+            <input type="text" id="maintainer-emailAddress" name="maintainer-emailAddress" placeholder="support@example.com" required value="{{ Maintainer.EmailAddress }}" />
+
+            <h2>General Enquiries Information</h2>
+            <label for="generalEnquiries-name">Name</label>
+            <input type="text" id="generalEnquiries-name" name="generalEnquiries-name" placeholder="Jane Doe" required value="{{ GeneralEnquiries.Name }}" />
+            <label for="generalEnquiries-emailAddress">Email address</label>
+            <input type="text" id="generalEnquiries-emailAddress" name="generalEnquiries-emailAddress" placeholder="help@example.com" required value="{{ GeneralEnquiries.EmailAddress }}" />
+
+            <input type="submit" value="Save changes" />
+
+        </form>
+    </div>
+{% endblock %}

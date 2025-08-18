@@ -11,13 +11,12 @@ use Auxilium\Schemas\MessageSchema;
 use Auxilium\Schemas\OrganisationSchema;
 use Auxilium\Schemas\UserSchema;
 use Auxilium\SessionHandling\CookieHandling;
-use Auxilium\SessionHandling\Security;
 use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\PageBuilder2;
 use Auxilium\URLMetadata;
 use Auxilium\Utilities\EncodingTools;
 use Auxilium\Utilities\NavigationUtilities;
-use Auxilium\Utilities\URIUtilities;
+use Auxilium\Utilities\Security;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -46,19 +45,19 @@ array_shift($uri_components);
 $method = array_shift($uri_components);
 if(count($uri_components) > 0)
 {
-    if(mb_strlen(end($uri_components)) == 0)
+    if(mb_strlen(end($uri_components)) === 0)
     {
         array_pop($uri_components);
     }
 }
 if(count($uri_components) > 0)
 {
-    if(mb_strlen($uri_components[0]) == 0)
+    if(mb_strlen($uri_components[0]) === 0)
     {
         array_shift($uri_components);
     }
 }
-if(count($uri_components) == 0)
+if(count($uri_components) === 0)
 {
     NavigationUtilities::Redirect(target: " /graph/~" . Session::get_current()->getUser()->getUuid());
 }
@@ -77,7 +76,7 @@ foreach($uri_components as &$uri_component)
     {
         if(str_starts_with($uri_component, "@"))
         {
-            if(mb_strtolower($uri_component) == "@creator")
+            if(mb_strtolower($uri_component) === "@creator")
             {
                 $path_primary[] = $uri_component;
             }
@@ -123,7 +122,7 @@ $deegraph_path = implode("/", $path_parsed);
 PageBuilder2::AddVariable("deegraph_path", $deegraph_path);
 
 $primary_node_path_order = [];
-if(PageBuilder2::GetVariable("progressive_load"))
+if(PageBuilder2::GetVariable("progressive_load") === true)
 {
     $primary_node_deegraph_paths = [];
     $absolute_path = "";

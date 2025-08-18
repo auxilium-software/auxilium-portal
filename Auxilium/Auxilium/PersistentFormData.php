@@ -3,6 +3,7 @@
 namespace Auxilium;
 
 use Auxilium\DatabaseInteractions\RelationalDatabaseConnection;
+use Auxilium\Utilities\Security;
 use PDO;
 
 class PersistentFormData
@@ -50,7 +51,7 @@ class PersistentFormData
             $formPersistenceKey = $_GET["fpk"];
             if(!preg_match("/^[a-zA-Z0-9\-_]*={0,2}$/", $formPersistenceKey))
             {
-                $formPersistenceKeyBytes = openssl_random_pseudo_bytes(64);
+                $formPersistenceKeyBytes = Security::GeneratePseudoRandomBytes(length: 64);
                 $formPersistenceKey = rtrim(strtr(base64_encode($formPersistenceKeyBytes), '+/', '-_'), '=');
             }
             else
@@ -68,7 +69,7 @@ class PersistentFormData
         }
         else
         {
-            $formPersistenceKeyBytes = openssl_random_pseudo_bytes(64);
+            $formPersistenceKeyBytes = Security::GeneratePseudoRandomBytes(length: 64);
             $formPersistenceKey = rtrim(strtr(base64_encode($formPersistenceKeyBytes), '+/', '-_'), '=');
         }
         $bindVariables = [

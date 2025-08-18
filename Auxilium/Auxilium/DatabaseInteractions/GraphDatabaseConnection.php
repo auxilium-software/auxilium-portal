@@ -13,6 +13,7 @@ use Auxilium\Schemas\MessageSchema;
 use Auxilium\Schemas\OrganisationSchema;
 use Auxilium\Schemas\UserSchema;
 use Auxilium\SessionHandling\Session;
+use Auxilium\Utilities\Security;
 use Darksparrow\AuxiliumSchemaBuilder\Utilities\URLHandling;
 use Darksparrow\DeegraphInteractions\DataStructures\UUID;
 
@@ -52,7 +53,7 @@ class GraphDatabaseConnection
                 $var_id = null;
                 while($var_id === null)
                 {
-                    $var_id = bin2hex(openssl_random_pseudo_bytes(32));
+                    $var_id = bin2hex(Security::GeneratePseudoRandomBytes(length: 32));
                     if(strpos($query, $var_id) !== false)
                     {
                         $var_id = null;

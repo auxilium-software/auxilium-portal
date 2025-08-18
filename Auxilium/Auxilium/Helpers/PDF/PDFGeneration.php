@@ -4,7 +4,6 @@ namespace Auxilium\Helpers\PDF;
 
 use Auxilium\DatabaseInteractions\Deegraph\DeegraphServerConnection;
 use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
-use Auxilium\ICalendarObject;
 use Auxilium\SessionHandling\Session;
 use Darksparrow\DeegraphInteractions\DataStructures\UUID;
 use Darksparrow\DeegraphInteractions\QueryBuilder\QueryBuilder;
