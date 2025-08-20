@@ -129,16 +129,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.347.0",
+            "version": "3.356.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "c66a35e650f077caddd7db8d3a1f58b2c2b8c78b"
+                "reference": "d7162d154e4b9a14986e362dfc01f920442db1e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/c66a35e650f077caddd7db8d3a1f58b2c2b8c78b",
-                "reference": "c66a35e650f077caddd7db8d3a1f58b2c2b8c78b",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d7162d154e4b9a14986e362dfc01f920442db1e8",
+                "reference": "d7162d154e4b9a14986e362dfc01f920442db1e8",
                 "shasum": ""
             },
             "require": {
@@ -220,9 +220,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.347.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.356.0"
             },
-            "time": "2025-06-23T18:12:15+00:00"
+            "time": "2025-08-19T18:09:08+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -2582,71 +2582,6 @@
                 }
             ],
             "time": "2025-06-03T07:45:57+00:00"
-        },
-        {
-            "name": "phpfui/icalendar",
-            "version": "V1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpfui/icalendar.git",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpfui/icalendar/zipball/1642b0c200ba83912685940a7b76946fc158723f",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4 <8.5"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.3",
-                "phpfui/phpunit-syntax-coverage": "dev-master",
-                "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "<12.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ICalendarOrg\\": "src/ICalendarOrg/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Bruce Wells",
-                    "email": "brucekwells@gmail.com"
-                }
-            ],
-            "description": "A modern fork of the icalendar.org PHP implementation of rfc5545, management of iCal formatted files",
-            "homepage": "https://icalendar.org/php-library.html",
-            "keywords": [
-                "calendar",
-                "daylight",
-                "file",
-                "iCalendar",
-                "management",
-                "rfc2445",
-                "rfc5545",
-                "rfc6321",
-                "standard",
-                "vCalendar",
-                "valarm",
-                "vevent",
-                "vfreebusy",
-                "vjournal",
-                "vtimezone",
-                "vtodo"
-            ],
-            "support": {
-                "issues": "https://github.com/phpfui/icalendar/issues",
-                "source": "https://github.com/phpfui/icalendar/tree/V1.1.0"
-            },
-            "time": "2019-10-31T00:00:00+00:00"
         },
         {
             "name": "phpfui/icalendar",
@@ -6548,7 +6483,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.32.0",
+            "version": "v1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -6609,7 +6544,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.32.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -6618,6 +6553,10 @@
                 },
                 {
                     "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
                     "type": "github"
                 },
                 {
