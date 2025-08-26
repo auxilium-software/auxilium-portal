@@ -5,42 +5,9 @@
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <pages>
         <page>
-            <id>consent</id>
-            <title>Data processing consent</title>
-            <description>
-                By completing these questions you consent to us processing your data,
-                opening a case and considering the information that you have provided.
-
-                Please confirm that you are happy for your data to be used for these purposes,
-                and that you consent to us contacting you once your form has been received.
-
-                Alternatively, confirm that your service user or beneficiary consents to the above.
-            </description>
-            <renderIf>true</renderIf>
-            <components>
-                <component>
-                    <id>data_processing_consent</id>
-                    <type>CHOICE_FIELD</type>
-                    <required>true</required>
-                    <options>
-                        <option>
-                            <primaryLabel>I consent / they consent</primaryLabel>
-                            <value>CONSENT_GIVEN</value>
-                        </option>
-                        <option>
-                            <primaryLabel>I do not consent / they do not consent</primaryLabel>
-                            <value>NO_CONSENT</value>
-                        </option>
-                    </options>
-                </component>
-            </components>
-        </page>
-
-
-        <page>
             <id>who_is_case_about</id>
             <title>Which best describes your situation?</title>
-            <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
+            <renderIf>true</renderIf>
             <components>
                 <component>
                     <id>on_behalf_of</id>
@@ -65,6 +32,98 @@
                 </component>
             </components>
         </page>
+
+
+
+
+
+        <page>
+            <id>consent</id>
+            <title>Data processing consent</title>
+            <description>
+                By completing these questions you consent to us processing your data,
+                opening a case and considering the information that you have provided.
+
+                Please confirm that you are happy for your data to be used for these purposes,
+                and that you consent to us contacting you once your form has been received.
+
+                Alternatively, confirm that your service user or beneficiary consents to the above.
+            </description>
+            <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
+            <components>
+                <component>
+                    <id>data_processing_consent</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>I consent</primaryLabel>
+                            <value>CONSENT_GIVEN</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I do not consent</primaryLabel>
+                            <value>NO_CONSENT</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+        <page>
+            <id>consent</id>
+            <title>Data processing consent</title>
+            <description>
+                By completing these questions you consent to us processing your data,
+                opening a case and considering the information that you have provided.
+
+                Please confirm that you are happy for your data to be used for these purposes,
+                and that you consent to us contacting you once your form has been received.
+
+                Alternatively, confirm that your service user or beneficiary consents to the above.
+            </description>
+            <renderIf>
+                or(
+                    equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                    equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                )
+            </renderIf>
+            <components>
+                <component>
+                    <id>data_processing_consent</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>They consent</primaryLabel>
+                            <value>CONSENT_GIVEN</value>
+                        </option>
+                        <option>
+                            <primaryLabel>They do not consent</primaryLabel>
+                            <value>NO_CONSENT</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+
+
+
+
+
+        <page>
+            <id>consent_not_given</id>
+            <title>Data processing consent is required</title>
+            <description>
+                Data consent is required, sorry lol.
+            </description>
+            <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
+            <components>
+            </components>
+        </page>
+
+
+
+
+
         <page>
             <id>contact_details</id>
             <title>Your contact details</title>
@@ -80,6 +139,19 @@
                     <type>TEXT_FIELD</type>
                     <required>true</required>
                     <primaryLabel>Full Name</primaryLabel>
+                </component>
+                <component>
+                    <id>telephone_number</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Telephone Number</primaryLabel>
+                </component>
+                <component>
+                    <id>full_address</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>5</rows>
+                    <required>true</required>
+                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
                 </component>
             </components>
         </page>
@@ -103,8 +175,159 @@
                     <required>true</required>
                     <primaryLabel>Full Name</primaryLabel>
                 </component>
+                <component>
+                    <id>telephone_number</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Telephone Number</primaryLabel>
+                </component>
+                <component>
+                    <id>full_address</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>5</rows>
+                    <required>true</required>
+                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
+                </component>
             </components>
         </page>
+
+
+
+
+
+        <page>
+            <id>about_you</id>
+            <title>About You</title>
+            <renderIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    equals($formData["on_behalf_of"],"MYSELF")
+                )
+            </renderIf>
+            <components>
+                <component>
+                    <id>gender</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>Female</primaryLabel>
+                            <value>female</value>
+                        </option>
+                        <option>
+                            <primaryLabel>Male</primaryLabel>
+                            <value>male</value>
+                        </option>
+                        <option>
+                            <primaryLabel>Other</primaryLabel>
+                            <value>other</value>
+                        </option>
+                    </options>
+                </component>
+                <component>
+                    <id>ethnic_group</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Ethnic group</primaryLabel>
+                </component>
+                <component>
+                    <id>date_of_birth</id>
+                    <type>DATE_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Date of birth</primaryLabel>
+                </component>
+                <component>
+                    <id>how_did_you_find_out_about_our_service</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>4</rows>
+                    <required>true</required>
+                    <primaryLabel>How did you find out about our service?</primaryLabel>
+                </component>
+            </components>
+        </page>
+        <page>
+            <id>about_individual_applying_behalf_of</id>
+            <title>About individual you are applying on behalf of</title>
+            <description>Please enter information for the person you are applying on behalf of.</description>
+            <renderIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    or(
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                    )
+                )
+            </renderIf>
+            <components>
+                <component>
+                    <id>gender</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>Female</primaryLabel>
+                            <value>female</value>
+                        </option>
+                        <option>
+                            <primaryLabel>Male</primaryLabel>
+                            <value>male</value>
+                        </option>
+                        <option>
+                            <primaryLabel>Other</primaryLabel>
+                            <value>other</value>
+                        </option>
+                    </options>
+                </component>
+                <component>
+                    <id>ethnic_group</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Ethnic group</primaryLabel>
+                </component>
+                <component>
+                    <id>date_of_birth</id>
+                    <type>DATE_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Date of birth</primaryLabel>
+                </component>
+                <component>
+                    <id>how_did_you_find_out_about_our_service</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>4</rows>
+                    <required>true</required>
+                    <primaryLabel>How did you find out about our service?</primaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+
+
+
+        <page>
+            <id>login_details</id>
+            <title>Login details</title>
+            <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
+            <components>
+                <component>
+                    <id>email_address</id>
+                    <type>EMAIL_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Email Address</primaryLabel>
+                </component>
+                <component>
+                    <id>password</id>
+                    <type>PASSWORD_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Password</primaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+
+
+
         <page>
             <id>case_details</id>
             <title>Case details</title>
@@ -120,6 +343,16 @@
             </components>
         </page>
     </pages>
+
+
+
+
+
+
+
+
+
+    
     <reviewPage>
         <components>
             <component>
