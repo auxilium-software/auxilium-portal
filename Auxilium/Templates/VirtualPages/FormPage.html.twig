@@ -1,0 +1,143 @@
+{% extends '/Bases/StandardWebPage.html.twig' %}
+
+{% block content %}
+
+    <div class="inner-content">
+        <form id="{{ FormSpec.id }}" action="/form/{{ FormInstanceID }}" method="POST">
+
+            <input type="hidden" id="FormInstanceID" name="FormInstanceID" value="{{ FormInstanceID }}">
+            <input type="hidden" id="action" name="action" value="continue">
+
+            <h1 class="no-lower-margin">{{ FormSpec.pages.page[ActualPageIndex].title|ndtitle }}</h1>
+
+            {% for componentDetails in FormSpec.pages.page[ActualPageIndex].components.component %}
+
+                {% if componentDetails.type == 'TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="text"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'MULTILINE_TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <textarea
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            rows="4"
+                            {% if componentDetails.required %}required{% endif %}
+                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>=
+
+                {% elseif componentDetails.type == 'LARGE_TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <textarea
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            class="fullwidth-text-input"
+                            rows="{{ componentDetails.rows }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
+
+                {% elseif componentDetails.type == 'CHOICE_FIELD' %}
+                    <label>{{ componentDetails.label }}</label>
+                    {% for optionDetails in componentDetails.options.option %}
+                        <div class="radio-button-holder">
+                            <input
+                                    type="radio"
+                                    id="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                    name="{{ componentDetails.id }}"
+                                    value="{{ optionDetails.value }}"
+                                    {% if FormData.Data[componentDetails.id] == optionDetails.value %}checked{% endif %}
+                                    {% if componentDetails.required and loop.first %}required{% endif %}
+                            >
+                            <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
+                                <p>
+                                    {% if optionDetails.primaryLabel %}<strong>{{ optionDetails.primaryLabel }}</strong><br/>{% endif %}
+                                    {% if optionDetails.secondaryLabel %}<span>{{ optionDetails.secondaryLabel }}</span>{% endif %}
+                                </p>
+                            </label>
+                        </div>
+                    {% endfor %}
+
+                {% elseif componentDetails.type == 'CHECKBOX_FIELD' %}
+                    <div class="form-group">
+                        <div class="checkbox-holder">
+                            <input
+                                    type="checkbox"
+                                    id="{{ componentDetails.id }}"
+                                    name="{{ componentDetails.id }}"
+                                    value="true"
+                                    {% if FormData.Data[componentDetails.id] == 'true' %}checked{% endif %}
+                            >
+                            <label for="{{ componentDetails.id }}">
+                                {{ componentDetails.label }}
+                            </label>
+                        </div>
+                    </div>
+
+                {% elseif componentDetails.type == 'SELECT_FIELD' %}
+                    <div class="form-group">
+                        {% if componentDetails.label %}
+                            <label for="{{ componentDetails.id }}">{{ componentDetails.label }}</label>
+                        {% endif %}
+                        <select
+                                id="{{ componentDetails.id }}"
+                                name="{{ componentDetails.id }}"
+                                {% if componentDetails.required %}required{% endif %}
+                        >
+                            <option value="">-- Select --</option>
+                            {% for optionDetails in componentDetails.options.option %}
+                                <option
+                                        value="{{ optionDetails.value }}"
+                                        {% if FormData.Data[componentDetails.id] == optionDetails.value %}selected{% endif %}
+                                >
+                                    {{ optionDetails.label|default(optionDetails.value) }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                {% else %}
+                    <div class="alert alert-warning">
+                        <strong>Unknown component type:</strong> {{ componentDetails.type }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {# Navigation buttons #}
+            <div class="form-navigation">
+                {% if ShowBackButton %}
+                    <input type="submit" value="Back" onclick="submitFormWithAction('back')" />
+                {% endif %}
+
+                {% if ShowReviewButton %}
+                    <input type="submit" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
+                {% elseif ShowNextButton %}
+                    <input type="submit" value="Continue" />
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function submitFormWithAction(action) {
+            const actionInput = document.getElementById('action');
+            const form = document.querySelector('form');
+
+            actionInput.value = action;
+
+            if (action === 'back') {
+                const requiredElements = form.querySelectorAll('[required]');
+                requiredElements.forEach(el => {
+                    el.removeAttribute('required');
+                });
+            }
+
+            form.submit();
+        }
+    </script>
+
+{% endblock %}

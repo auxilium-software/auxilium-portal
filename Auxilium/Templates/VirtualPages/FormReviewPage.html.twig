@@ -1,0 +1,70 @@
+{% extends '/Bases/StandardWebPage.html.twig' %}
+
+{% block content %}
+
+    <div class="inner-content">
+        <form id="{{ FormSpec.id }}-review" action="/form/{{ FormInstanceID }}" method="POST">
+
+            <input type="hidden" id="FormInstanceID" name="FormInstanceID" value="{{ FormInstanceID }}">
+            <input type="hidden" id="action" name="action" value="continue">
+
+            <h1 class="no-lower-margin">Review Your Information</h1>
+            <p>Please review the information below before submitting your application.</p>
+
+            {% for component in ReviewComponents %}
+                {% if component.type == 'SUBHEADING' %}
+                    <div class="review-section">
+                        <h2 class="review-subheading">
+                            {{ component.value }}
+                            {% if component.jumpToPage %}
+                                <button type="submit" name="jumpToPage" value="{{ component.jumpToPage }}" class="edit-button">
+                                    Edit
+                                </button>
+                            {% endif %}
+                        </h2>
+                    </div>
+
+                {% elseif component.type == 'DESCRIPTION_LIST' %}
+                    <div class="review-description-list">
+                        <dl>
+                            {% for item in component.dictionary.item %}
+                                <dt>{{ item.key }}</dt>
+                                <dd>{{ item.value|default('Not provided') }}</dd>
+                            {% endfor %}
+                        </dl>
+                    </div>
+
+                {% elseif component.type == 'PARAGRAPH' %}
+                    <div class="review-paragraph">
+                        <p>{{ component.value|nl2br }}</p>
+                    </div>
+
+                {% else %}
+                    <div class="alert alert-warning">
+                        <strong>Unknown review component type:</strong> {{ component.type }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {# Navigation buttons #}
+            <div class="form-navigation review-navigation">
+                {% if ShowBackButton %}
+                    <input type="submit" value="Back to Edit" onclick="submitFormWithAction('back')" class="back-button" />
+                {% endif %}
+
+                <div class="review-actions">
+                    <input type="submit" value="Submit Application" onclick="submitFormWithAction('submit')" class="submit-button primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function submitFormWithAction(action) {
+            const actionInput = document.getElementById('action');
+            actionInput.value = action;
+            document.querySelector('form').submit();
+        }
+    </script>
+
+{% endblock %}

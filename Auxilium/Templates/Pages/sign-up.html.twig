@@ -1,16 +1,16 @@
-{% extends "/Bases/StandardWebPage.html.twig" %}
+{% extends "/Bases/LoggedOutPage.html.twig" %}
 
 {% block title %}{{ "Login"|translate }}{% endblock %}
 
 {% block content %}
     <div>
         <div class="inner-content">
-            <h1>{{ "Login"|translate }}</h1>
+            <h1>{{ "Sign Up"|translate }}</h1>
             <form method="POST">
                 <label for="email_address">{{ "Email Address"|translate }} <span class="asterisk-hidden-text">({{ "required"|translate }})</span></label>
                 <input type="text" name="email_address" placeholder="{{ "Email Address"|translate }}" id="email_address" />
                 <p class="error-toast" {% if form_validation.email_address %} style="display:none;" {% endif %}>
-                    {{ "This email address is not registered with our online portal"|translate }}
+                    {{ "This email address is not valid or is already associated with an account with our online portal"|translate }}
                 </p>
 
                 <label for="raw_password">{{ "Password"|translate }} <span class="asterisk-hidden-text">({{ "required"|translate }})</span></label>

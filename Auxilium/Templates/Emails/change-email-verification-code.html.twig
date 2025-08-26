@@ -1,7 +1,0 @@
-{% extends "/Bases/AutomatedEmail.html.twig" %}
-
-{% block message %}
-<p style="{{ default_text_style }}">Here's the verification code we need to change the email address on your account:</p>
-<span id="verification-code" style="font-size: 7.5mm; font-family: monospace;">{{ verification_code }}</span>
-<p style="{{ default_text_style }}">If you didn't request this code you should immediately change your password. Never share this code with someone over the phone, even if they claim to be staff.</p>
-{% endblock %}

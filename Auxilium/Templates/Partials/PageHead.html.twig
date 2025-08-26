@@ -1,0 +1,43 @@
+<meta charset="utf-8">
+        <meta id="viewport" name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,maximum-scale=5,user-scalable=yes">
+        <meta name="description" content="{{ page.description }}">
+        <link rel="shortcut icon" type="image/svg" href="/favicon-handler.php?type=svg" />
+        <link rel="shortcut icon" type="image/png" href="/favicon-handler.php?type=png" />
+{% block head_assets %}
+    <style>@import url("/Static/CSS/Mapper.css");</style>
+    {% if "dark-mode" in head_asset_options %}
+        <style>@import url("/Static/CSS/Themes/DarkMode.css");</style>
+    {% endif %}
+    {% if "large-fonts" in head_asset_options %}
+        <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
+    {% endif %}
+{% endblock %}
+<title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ INSTANCE_BRANDING_NAME }}</title>
+
+<!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
+<script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
+<script src="/Static/JS/ThirdParty/JSZip.min.js"></script>
+
+<script src="/Static/JS/General/Utils.js"></script>
+
+<script src="/Static/JS/Classes/ToastNotification.js"></script>
+<script src="/Static/JS/Classes/SearchEngine.js"></script>
+<script src="/Static/JS/Classes/LanguagePack.js"></script>
+<script src="/Static/JS/Classes/MicroTemplate.js"></script>
+<script src="/Static/JS/Classes/TemplateString.js"></script>
+<script src="/Static/JS/Classes/Schema.js"></script>
+<script src="/Static/JS/General/PopupUI.js"></script>
+
+<script src="/Static/JS/ThirdParty/iCal.js"></script>
+
+<script src="/Static/JS/Classes/MessageView.js"></script>
+<script src="/Static/JS/Classes/MessageDraft.js"></script>
+<script src="/Static/JS/Classes/InlineNodeView.js"></script>
+<script src="/Static/JS/Classes/PathNameView.js"></script>
+<script src="/Static/JS/Classes/PropertyList.js"></script>
+<script src="/Static/JS/Classes/InfiniteScroller.js"></script>
+<script src="/Static/JS/Classes/NewPropertyPopup.js"></script>
+<script src="/Static/JS/General/RFC822Parser.js"></script>
+
+<script src="/Static/JS/Classes/AuxiliumClient.js"></script>
+<script src="/Static/JS/Classes/AuxiliumNode.js"></script>

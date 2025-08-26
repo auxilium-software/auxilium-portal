@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<auxForm>
+    <id>OnboardNewCase</id>
+    <title>Onboard a New Case</title>
+    <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
+    <pages>
+        <page>
+            <id>who_is_case_about</id>
+            <title>Which best describes your situation?</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>on_behalf_of</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>I am applying for help myself.</primaryLabel>
+                            <value>MYSELF</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I am helping someone else with their application.</primaryLabel>
+                            <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
+                            <value>SOMEONE_ELSE_MANAGED</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I am referring someone.</primaryLabel>
+                            <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
+                            <value>SOMEONE_ELSE</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+        <page>
+            <id>contact_details</id>
+            <title>Your contact details</title>
+            <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
+            <components>
+                <component>
+                    <id>full_name</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Full Name</primaryLabel>
+                </component>
+            </components>
+        </page>
+        <page>
+            <id>contact_details_for_individual_applying_behalf_of</id>
+            <title>Contact details for individual you are applying on behalf of</title>
+            <description>Please enter as the contact details for the person you are applying on behalf of.</description>
+            <renderIf>or(equals($formData["on_behalf_of"],"SOMEONE_ELSE"),equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED"))</renderIf>
+            <components>
+                <component>
+                    <id>full_name</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Full Name</primaryLabel>
+                </component>
+            </components>
+        </page>
+        <page>
+            <id>case_details</id>
+            <title>Case details</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>case_description</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>12</rows>
+                    <required>true</required>
+                    <primaryLabel>Case Description</primaryLabel>
+                </component>
+            </components>
+        </page>
+    </pages>
+    <reviewPage>
+        <components>
+            <component>
+                <type>SUBHEADING</type>
+                <value>Beneficiary Details</value>
+                <jumpToPage>who_is_case_about</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>exists($target)</if>
+                <dictionary>
+                    <item>
+                        <key>User</key>
+                        <value>$target</value>
+                    </item>
+                    <item>
+                        <key>Full Name</key>
+                        <value>$formData["full_name"]</value>
+                    </item>
+                </dictionary>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>not(exists($target))</if>
+                <dictionary>
+                    <item>
+                        <key>Full Name</key>
+                        <value>$formData["full_name"]</value>
+                    </item>
+                </dictionary>
+            </component>
+            <component>
+                <type>SUBHEADING</type>
+                <value>Case Description</value>
+                <jumpToPage>case_details</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>PARAGRAPH</type>
+                <value>$formData["case_description"]</value>
+                <if>true</if>
+            </component>
+        </components>
+    </reviewPage>
+    <submissionActions>
+        <apiRequest>
+            <endpoint>/register</endpoint>
+
+        </apiRequest>
+    </submissionActions>
+</auxForm>

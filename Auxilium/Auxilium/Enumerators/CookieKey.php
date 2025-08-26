@@ -11,4 +11,8 @@ enum CookieKey: string
     case PROGRESSIVE_LOAD = "progressiveload";
     case SESSION_KEY = "session_key";
     case STYLE = "style";
+
+
+    case ACCESS_TOKEN = "access_token";
+    case REFRESH_TOKEN = "refresh_token";
 }

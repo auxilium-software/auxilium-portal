@@ -15,7 +15,7 @@
                 <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
             {% endif %}
         {% endblock %}
-        <title>{% block title %}{{ "case_portal" | uihdg }}{% endblock %} - {{ INSTANCE_BRANDING_NAME }}</title>
+        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ INSTANCE_BRANDING_NAME }}</title>
         
         <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
         <script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
@@ -63,19 +63,19 @@
         
         <nav>
             <div class="inner-content">
-                <a id="skip-to-content-link" href="#main-content">{{ "skip_to_content" | uitxt | capitalize }}</a>
+                <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
                 <a id="navigation-logo" href="/"><img alt="{{ INSTANCE_BRANDING_NAME }} Logo" src="/Static/Images/Logos/{{ INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR }}" />{{ INSTANCE_BRANDING_NAME }}<sup> BETA</sup></a>
                 <a id="navigation-logo-ultra-small" href="/"><img alt="{{ INSTANCE_BRANDING_NAME }} Logo" src="/Static/Images/Logos/{{ INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR }}" /></a>
                 <div id="navigation-buttons">
                     {% if ABOUT_PAGE_URL %}
-                        <a href="{{ ABOUT_PAGE_URL }}">{{ "about" | uihdg }}</a>
+                        <a href="{{ ABOUT_PAGE_URL }}">{{ "About"|translate }}</a>
                     {% endif %}
                     {% if current_user %}
-                        <a href="/onboard-new-case">{{ "new_case" | uihdg }}</a>
-                        <a href="/dashboard">{{ "case_portal" | uihdg }}</a>
+                        <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
+                        <a href="/dashboard">{{ "Case Portal"|translate }}</a>
                     {% else %}
-                        <a href="/onboard-new-case">{{ "new_clients" | uihdg }}</a>
-                        <a href="/dashboard">{{ "login" | uihdg }}</a>
+                        <a href="/onboard-new-case">{{ "New Clients"|translate }}</a>
+                        <a href="/dashboard">{{ "Login"|translate }}</a>
                     {% endif %}
                     {% if selected_lang == "en" %}
                         <a href="/lang?switch=cy" class="language-swap" lang="cy" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
@@ -92,15 +92,15 @@
                     <div id="navigation-menu">
                         <div class="inner-content">
                         {% if ABOUT_PAGE_URL %}
-                            <a href="{{ ABOUT_PAGE_URL }}">{{ "about" | uihdg }}</a>
+                            <a href="{{ ABOUT_PAGE_URL }}">{{ "About"|translate }}</a>
                         {% endif %}
                         {% if current_user %}
-                            <a href="/onboard-new-case">{{ "new_case" | uihdg }}</a>
-                            <a href="/dashboard">{{ "case_portal" | uihdg }}</a>
-                            <a href="/logout">{{ "logout" | title }}</a>
+                            <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
+                            <a href="/dashboard">{{ "Case Portal"|translate }}</a>
+                            <a href="/logout">{{ "Logout"|translate|title }}</a>
                         {% else %}
-                            <a href="/onboard-new-case">{{ "new_clients" | uihdg }}</a>
-                            <a href="/dashboard">{{ "login" | uihdg }}</a>
+                            <a href="/onboard-new-case">{{ "New Clients"|translate|title }}</a>
+                            <a href="/dashboard">{{ "Login"|translate|title }}</a>
                         {% endif %}
                         {% if selected_lang == "en" %}
                             <a href="/lang?switch=cy" class="language-swap" lang="cy" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
@@ -138,7 +138,7 @@
         <div id="portal-authenticated-user-bar">
             <div class="inner-content">
                 <p>{{ ui_template("logged_in_as", { "node": current_user }) }}</p>
-                <a href="/logout" class="button">{{ "logout" | uitxt | title }}</a>
+                <a href="/logout" class="button">{{ "Logout"|translate|title }}</a>
             </div>
         </div>
         
@@ -152,7 +152,7 @@
     
         <footer>
             <div class="inner-content">
-                <p><strong>{{ "copyright" | uitxt | ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ INSTANCE_BRANDING_NAME }}</strong></p>
+                <p><strong>{{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ INSTANCE_BRANDING_NAME }}</strong></p>
                 {% if OPERATOR_NAME %}a
                     <p>{{ INSTANCE_BRANDING_NAME }} is owned and operated by {{ OPERATOR_NAME }}.</p>
                 {% endif %}
@@ -171,27 +171,27 @@
                     <li><a href="/contact">Contact us</a></li>
                     -->
                     {% if PRIVACY_POLICY_URL %}
-                        <a href="{{ PRIVACY_POLICY_URL }}">{{ "privacy_policy" | uitxt | ndsentence }}</a>
+                        <a href="{{ PRIVACY_POLICY_URL }}">{{ "Privacy Policy"|translate|ndsentence }}</a>
                     {% endif %}
                     {% if ACCESSIBILITY_STATEMENT_URL %}
-                        <a href="{{ ACCESSIBILITY_STATEMENT_URL }}">{{ "accessibility_statement" | uitxt | ndsentence }}</a>
+                        <a href="{{ ACCESSIBILITY_STATEMENT_URL }}">{{ "Accessibility Statement"|translate|ndsentence }}</a>
                     {% endif %}
                     {% if CONTACT_US_URL %}
-                        <a href="{{ CONTACT_US_URL }}">{{ "contact_us" | uitxt | ndsentence }}</a>
+                        <a href="{{ CONTACT_US_URL }}">{{ "Contact Us"|translate|ndsentence }}</a>
                     {% endif %}
                     {% if ABOUT_PAGE_URL %}
-                        <a href="{{ ABOUT_PAGE_URL }}">{{ "about_us" | uitxt | ndsentence }}</a>
+                        <a href="{{ ABOUT_PAGE_URL }}">{{ "About Us"|translate|ndsentence }}</a>
                     {% endif %}
                     
-                    <li><a href="/onboard-new-case">{{ "open_new_case" | uitxt | ndsentence }}</a></li>
-                    <li><a href="/dashboard">{{ "home" | uitxt | ndsentence }}</a></li>
+                    <li><a href="/onboard-new-case">{{ "Open New Case"|translate|ndsentence }}</a></li>
+                    <li><a href="/dashboard">{{ "Home"|translate|ndsentence }}</a></li>
                     {% if selected_lang == "en" %}
                         <li><a href="/lang?switch=cy" lang="cy">Newid iaith i'r Gymraeg (Switch language to Welsh)</a></li>
                     {% else %}
                         <li><a href="/lang?switch=en" lang="en">Switch language to English (Newid iaith i'r Saesneg)</a></li>
                     {% endif %}
-                    <li><a href="/style?switch=dark-mode">{{ "toggle_dark_mode" | uitxt | ndsentence }}</a></li>
-                    <li><a href="/style?switch=large-fonts">{{ "toggle_large_fonts" | uitxt | ndsentence }}</a></li>
+                    <li><a href="/style?switch=dark-mode">{{ "Toggle Dark Mode"|translate|ndsentence }}</a></li>
+                    <li><a href="/style?switch=large-fonts">{{ "Toggle Large Fonts"|translate|ndsentence }}</a></li>
                 </ul>
                 <div class="spacer"></div>
                 <span>Auxilium v2.0-RC1</span>

@@ -1,15 +1,14 @@
 <?php
 
-use Auxilium\Auxilium\InitHelpers;
+use Auxilium\ConfigurationManagement\CredentialManagement;
+use Auxilium\ConfigurationManagement\EnvironmentManagement;
 use Auxilium\DatabaseInteractions\Deegraph\DeegraphServerConnection;
 use Auxilium\DatabaseInteractions\Deegraph\Nodes\User;
 use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
 use Auxilium\DatabaseInteractions\MariaDB\MariaDBServerConnection;
-use Auxilium\Helpers\ConfigurationManagement\CredentialManagement;
-use Auxilium\Helpers\ConfigurationManagement\EnvironmentManagement;
-use Auxilium\TwigHandling\PageBuilder2;
+use Auxilium\TwigHandling\PageBuilder;
+use Auxilium\Utilities\InitUtilities;
 use Auxilium\Utilities\NavigationUtilities;
-use Auxilium\Utilities\Security;
 use Darksparrow\DeegraphInteractions\Core\DeegraphServer;
 use Darksparrow\DeegraphInteractions\DataStructures\UUID;
 use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
@@ -19,7 +18,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 
-$setup_key = InitHelpers::HandleSetupKey();
+$setup_key = InitUtilities::HandleSetupKey();
 
 if(!file_exists(__DIR__ . "/../../LocalStorage/LocalStorage/setup.vars"))
 {
@@ -49,9 +48,9 @@ require_once __DIR__ . '/../../Configuration/Configuration/Environment.php';
 
 foreach($_POST as $key => $value)
 {
-    InitHelpers::AddVariable($key, $value);
+    InitUtilities::AddVariable($key, $value);
 }
-$variables = InitHelpers::GetVariables();
+$variables = InitUtilities::GetVariables();
 
 
 
@@ -61,7 +60,7 @@ $variables = InitHelpers::GetVariables();
 switch($_GET['page'])
 {
     case "0":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/00.Welcome.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -69,7 +68,7 @@ switch($_GET['page'])
             ]
         );
     case "1":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/01.InstanceDetails.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -77,7 +76,7 @@ switch($_GET['page'])
             ]
         );
     case "2":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/02.MariaDB.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -106,19 +105,19 @@ switch($_GET['page'])
             );
             $pdo->setAttribute(attribute: PDO::ATTR_ERRMODE, value: PDO::ERRMODE_EXCEPTION);
 
-            InitHelpers::AddVariable("error", null);
+            InitUtilities::AddVariable("error", null);
             NavigationUtilities::Redirect(
                 target: "/system/init?page=3&setup_key=$setup_key",
             );
         }
         catch (PDOException $e) {
-            InitHelpers::AddVariable("error", $e->getMessage());
+            InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=2&setup_key=$setup_key",
             );
         }
     case "3":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/03.Deegraph.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -139,7 +138,7 @@ switch($_GET['page'])
             $actorID = new UUID($variables['deegraph-loginNode']);
         }
         catch(InvalidUUIDFormatException $e) {
-            InitHelpers::AddVariable("error", $e->getMessage());
+            InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=3&setup_key=$setup_key",
             );
@@ -147,19 +146,19 @@ switch($_GET['page'])
         try {
             $t = DeegraphServerConnection::GetConnection()->serverInfo($actorID);
 
-            InitHelpers::AddVariable("error", null);
+            InitUtilities::AddVariable("error", null);
             NavigationUtilities::Redirect(
                 target: "/system/init?page=4&setup_key=$setup_key",
             );
         }
         catch (Exception $e) {
-            InitHelpers::AddVariable("error", $e->getMessage());
+            InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=3&setup_key=$setup_key",
             );
         }
     case "4":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/04.RootAccount.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -167,7 +166,7 @@ switch($_GET['page'])
             ]
         );
     case "5":
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/05.Summary.html.twig",
             variables: [
                 "Variables"=>$variables,
@@ -177,7 +176,7 @@ switch($_GET['page'])
     case "5.1":
         if(!(array_key_exists(key: 'setupComplete-mariadb', array: $variables) && $variables['setupComplete-mariadb'] === true))
         {
-            InitHelpers::AddVariable("setupComplete-mariadb", (new MariaDBServerConnection())->InitialDatabaseSetup());
+            InitUtilities::AddVariable("setupComplete-mariadb", (new MariaDBServerConnection())->InitialDatabaseSetup());
         }
 
         if(!(array_key_exists(key: 'setupComplete-deegraph', array: $variables) && $variables['setupComplete-deegraph'] === true))
@@ -209,10 +208,10 @@ switch($_GET['page'])
                 }
                 catch(Exception $e)
                 {
-                    InitHelpers::RenderCriticalError(errorMessage: $e->getMessage());
+                    InitUtilities::RenderCriticalError(errorMessage: $e->getMessage());
                 }
             }
-            InitHelpers::AddVariable("setupComplete-deegraph", true);
+            InitUtilities::AddVariable("setupComplete-deegraph", true);
         }
 
         $envs = new EnvironmentManagement(newInstance: true, newVariables: $variables);
@@ -220,8 +219,8 @@ switch($_GET['page'])
 
         if(!(array_key_exists(key: 'setupComplete-rootUser', array: $variables) && $variables['setupComplete-rootUser'] === true))
         {
-            InitHelpers::CreateRootAccount($variables);
-            InitHelpers::AddVariable("setupComplete-rootUser", true);
+            InitUtilities::CreateRootAccount($variables);
+            InitUtilities::AddVariable("setupComplete-rootUser", true);
         }
 
 
@@ -236,7 +235,7 @@ switch($_GET['page'])
     case "6":
         unlink(LOCAL_STORAGE_DIRECTORY . "/setup.key");
         unlink(LOCAL_STORAGE_DIRECTORY . "/setup.vars");
-        PageBuilder2::Render(
+        PageBuilder::Render(
             template : "Pages/system/~InitSteps/06.Completed.html.twig",
             variables: [
                 "Variables"=>$variables,

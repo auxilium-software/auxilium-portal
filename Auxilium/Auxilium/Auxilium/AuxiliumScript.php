@@ -10,10 +10,18 @@ class AuxiliumScript
     public static function evaluate_expression(string $string, array $vars)
     {
         $string = trim($string);
+
+        // Handle empty string
+        if ($string === '') {
+            return null;
+        }
+
+        // Handle variables
         if(str_starts_with($string, "\$"))
         {
             return self::evaluate_variable_path($string, $vars);
         }
+        // Handle string literals
         elseif(str_starts_with($string, "\""))
         {
             $id = 1;
@@ -21,12 +29,12 @@ class AuxiliumScript
             while($id < strlen($string))
             {
                 $contents = substr($string, $id, 1);
-                if($contents == "\\")
+                if($contents === "\\")
                 {
                     $id++;
                     $output .= substr($string, $id, 1);
                 }
-                elseif($contents == "\"")
+                elseif($contents === "\"")
                 {
                     break;
                 }
@@ -38,10 +46,35 @@ class AuxiliumScript
             }
             return $output;
         }
+        // Handle function calls
         else
         {
             $id = strpos($string, "(");
+
+            // If no parentheses found, treat as a simple value
+            if ($id === false) {
+                // Check if it's a number
+                if (is_numeric($string)) {
+                    return $string + 0; // Convert to int or float
+                }
+                // Check for boolean keywords without parentheses
+                if (strtolower($string) === 'true') {
+                    return true;
+                }
+                if (strtolower($string) === 'false') {
+                    return false;
+                }
+                // Otherwise return as string
+                return $string;
+            }
+
             $fn = substr($string, 0, $id);
+
+            // Handle case where function name is empty
+            if ($fn === '') {
+                return null;
+            }
+
             $bl = 1;
             $id++;
             $args = [];
@@ -49,24 +82,24 @@ class AuxiliumScript
             while(($bl > 0) && ($id < strlen($string)))
             {
                 $contents = substr($string, $id, 1);
-                if($contents == "(")
+                if($contents === "(")
                 {
                     $arg .= "(";
                     $bl++;
                 }
-                elseif($contents == ")")
+                elseif($contents === ")")
                 {
-                    if($bl != 1)
+                    if($bl !== 1)
                     {
                         $arg .= ")";
                     }
                     $bl--;
                 }
-                elseif($contents == ",")
+                elseif($contents === ",")
                 {
-                    if($bl == 1)
+                    if($bl === 1)
                     {
-                        $args[] = $arg;
+                        $args[] = trim($arg);
                         $arg = "";
                     }
                     else
@@ -80,7 +113,13 @@ class AuxiliumScript
                 }
                 $id++;
             }
-            $args[] = $arg;
+
+            // Add the last argument if not empty
+            $arg = trim($arg);
+            if ($arg !== '' || count($args) > 0) {
+                $args[] = $arg;
+            }
+
             switch(strtolower($fn))
             {
                 case "true":
@@ -88,23 +127,27 @@ class AuxiliumScript
                 case "false":
                     return false;
                 case "not":
-                    return !AuxiliumScript::evaluate_expression($args[0], $vars);
+                    if (count($args) < 1) return false;
+                    return !self::evaluate_expression($args[0], $vars);
                 case "exists":
-                    $expr = AuxiliumScript::evaluate_expression($args[0], $vars);
-                    return !($expr == null || (is_string($expr) ? strlen($expr) == 0 : false));
+                    if (count($args) < 1) return false;
+                    $expr = self::evaluate_expression($args[0], $vars);
+                    return !($expr === null || $expr === '' || $expr === false);
                 case "or":
-                    for($i = 0; $i < count($args); $i++)
+                    if (count($args) < 1) return false;
+                    for($i = 0, $iMax = count($args); $i < $iMax; $i++)
                     {
-                        if(AuxiliumScript::evaluate_expression($args[$i], $vars) == true)
+                        if(self::evaluate_expression($args[$i], $vars))
                         {
                             return true;
                         }
                     }
                     return false;
                 case "and":
-                    for($i = 0; $i < count($args); $i++)
+                    if (count($args) < 1) return true;
+                    for($i = 0, $iMax = count($args); $i < $iMax; $i++)
                     {
-                        if(AuxiliumScript::evaluate_expression($args[$i], $vars) == false)
+                        if(!self::evaluate_expression($args[$i], $vars))
                         {
                             return false;
                         }
@@ -112,11 +155,12 @@ class AuxiliumScript
                     return true;
                 case "eq":
                 case "equals":
-                    $evali0 = AuxiliumScript::evaluate_expression($args[0], $vars);
-                    for($i = 1; $i < count($args); $i++)
+                    if (count($args) < 2) return false;
+                    $evali0 = self::evaluate_expression($args[0], $vars);
+                    for($i = 1, $iMax = count($args); $i < $iMax; $i++)
                     {
-                        $evalin = AuxiliumScript::evaluate_expression($args[$i], $vars);
-                        if($evali0 != $evalin)
+                        $evalin = self::evaluate_expression($args[$i], $vars);
+                        if($evali0 !== $evalin)
                         {
                             return false;
                         }
@@ -124,12 +168,13 @@ class AuxiliumScript
                     return true;
                 case "concat":
                     $evald_args = [];
-                    for($i = 0; $i < count($args); $i++)
+                    for($i = 0, $iMax = count($args); $i < $iMax; $i++)
                     {
-                        $evald_args[] = AuxiliumScript::evaluate_expression($args[$i], $vars);
+                        $evald_args[] = self::evaluate_expression($args[$i], $vars);
                     }
                     return implode("", $evald_args);
                 default:
+                    // Unknown function - return null
                     return null;
             }
         }
@@ -139,58 +184,33 @@ class AuxiliumScript
     {
         if(str_starts_with($string, "\$"))
         {
-            $pth = explode("/", $string);
-            $st = substr(array_shift($pth), 1);
-            if(isset($vars[$st]))
-            {
-                if(is_a($vars[$st], DeegraphNode::class))
-                {
-                    array_unshift($pth, "{" . $vars[$st]->getId() . "}");
-                    $fcn = "@view";
-                    if(str_starts_with(end($pth), "@"))
-                    {
-                        $fcn = array_pop($pth);
-                    }
-                    $string = implode("/", $pth);
-                    switch($fcn)
-                    {
-                        case "@created":
-                            $node = GraphDatabaseConnection::node_from_path($string);
-                            return ($node == null) ? null : $node->getTimestamp();
-                        case "@schema":
-                            $node = GraphDatabaseConnection::node_from_path($string);
-                            return ($node == null) ? null : $node->getSchemaUrl();
-                        case "@creator":
-                            $node = GraphDatabaseConnection::node_from_path($string);
-                            return ($node == null) ? null : $node->getCreator();
-                        case "@creator_id":
-                            $node = GraphDatabaseConnection::node_from_path($string);
-                            if($node != null)
-                            {
-                                $node = $node->getCreator();
-                            }
-                            return ($node == null) ? null : $node->getId();
-                        case "@id":
-                            $node = GraphDatabaseConnection::node_from_path($string);
-                            return ($node == null) ? null : $node->getId();
-                        case "@view":
-                            return GraphDatabaseConnection::node_from_path($string);
-                    }
-                    return null;
+            // Handle array access like $formData["field_name"]
+            if (preg_match('/^\$(\w+)\["([^"]+)"\]$/', $string, $matches)) {
+                $varName = $matches[1];
+                $key = $matches[2];
+                if (isset($vars[$varName]) && is_array($vars[$varName])) {
+                    return $vars[$varName][$key] ?? null;
                 }
-                else
-                {
-                    $string = $vars[$st];
-                }
-            }
-            else
-            {
                 return null;
             }
+
+            // Handle array access with single quotes like $formData['field_name']
+            if (preg_match('/^\$(\w+)\[\'([^\']+)\'\]$/', $string, $matches)) {
+                $varName = $matches[1];
+                $key = $matches[2];
+                if (isset($vars[$varName]) && is_array($vars[$varName])) {
+                    return $vars[$varName][$key] ?? null;
+                }
+                return null;
+            }
+
+            $varName = substr($string, 1);
+            return $vars[$varName] ?? null;
         }
-        elseif(str_starts_with($string, "\\\$"))
+
+        if(str_starts_with($string, "\\\$"))
         {
-            $string = substr($string, 1);
+            return substr($string, 1);
         }
         return $string;
     }
