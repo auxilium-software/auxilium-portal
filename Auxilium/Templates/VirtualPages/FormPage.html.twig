@@ -10,6 +10,8 @@
 
             <h1 class="no-lower-margin">{{ FormSpec.pages.page[ActualPageIndex].title|ndtitle }}</h1>
 
+            <p>{{ FormSpec.pages.page[ActualPageIndex].description }}</p>
+
             {% for componentDetails in FormSpec.pages.page[ActualPageIndex].components.component %}
 
                 {% if componentDetails.type == 'TEXT_FIELD' %}

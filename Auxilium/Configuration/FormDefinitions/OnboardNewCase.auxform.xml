@@ -5,9 +5,42 @@
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <pages>
         <page>
+            <id>consent</id>
+            <title>Data processing consent</title>
+            <description>
+                By completing these questions you consent to us processing your data,
+                opening a case and considering the information that you have provided.
+
+                Please confirm that you are happy for your data to be used for these purposes,
+                and that you consent to us contacting you once your form has been received.
+
+                Alternatively, confirm that your service user or beneficiary consents to the above.
+            </description>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>data_processing_consent</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <options>
+                        <option>
+                            <primaryLabel>I consent / they consent</primaryLabel>
+                            <value>CONSENT_GIVEN</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I do not consent / they do not consent</primaryLabel>
+                            <value>NO_CONSENT</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
             <id>who_is_case_about</id>
             <title>Which best describes your situation?</title>
-            <renderIf>true</renderIf>
+            <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
                     <id>on_behalf_of</id>
@@ -35,7 +68,12 @@
         <page>
             <id>contact_details</id>
             <title>Your contact details</title>
-            <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
+            <renderIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    equals($formData["on_behalf_of"],"MYSELF")
+                )
+            </renderIf>
             <components>
                 <component>
                     <id>full_name</id>
@@ -49,7 +87,15 @@
             <id>contact_details_for_individual_applying_behalf_of</id>
             <title>Contact details for individual you are applying on behalf of</title>
             <description>Please enter as the contact details for the person you are applying on behalf of.</description>
-            <renderIf>or(equals($formData["on_behalf_of"],"SOMEONE_ELSE"),equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED"))</renderIf>
+            <renderIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    or(
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                    )
+                )
+            </renderIf>
             <components>
                 <component>
                     <id>full_name</id>
@@ -62,7 +108,7 @@
         <page>
             <id>case_details</id>
             <title>Case details</title>
-            <renderIf>true</renderIf>
+            <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
                     <id>case_description</id>
