@@ -24,6 +24,36 @@
                             {% if componentDetails.required %}required{% endif %}
                     >
 
+                {% elseif componentDetails.type == 'EMAIL_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="email"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'PASSWORD_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="password"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'DATE_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="date"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
                 {% elseif componentDetails.type == 'MULTILINE_TEXT_FIELD' %}
                     <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel }}</label>
                     <textarea
@@ -141,5 +171,22 @@
             form.submit();
         }
     </script>
+
+    <style>
+        .review-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .review-button:hover {
+            background: #0056b3;
+        }
+    </style>
 
 {% endblock %}
