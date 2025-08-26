@@ -352,7 +352,7 @@
 
 
 
-    
+
     <reviewPage>
         <components>
             <component>
@@ -363,7 +363,7 @@
             </component>
             <component>
                 <type>DESCRIPTION_LIST</type>
-                <if>exists($target)</if>
+                <if>true</if>
                 <dictionary>
                     <item>
                         <key>User</key>
@@ -373,8 +373,50 @@
                         <key>Full Name</key>
                         <value>$formData["full_name"]</value>
                     </item>
+                    <item>
+                        <key>Telephone Number</key>
+                        <value>$formData["telephone_number"]</value>
+                    </item>
+                    <item>
+                        <key>Full Address</key>
+                        <value>$formData["full_address"]</value>
+                    </item>
                 </dictionary>
             </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Beneficiary Details</value>
+                <jumpToPage>about_you</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Gender</key>
+                        <value>$formData["gender"]</value>
+                    </item>
+                    <item>
+                        <key>Ethic Group</key>
+                        <value>$formData["ethnic_group"]</value>
+                    </item>
+                    <item>
+                        <key>Date of Birth</key>
+                        <value>$formData["date_of_birth"]</value>
+                    </item>
+                </dictionary>
+            </component>
+
+
+
+
+
             <component>
                 <type>DESCRIPTION_LIST</type>
                 <if>not(exists($target))</if>
@@ -398,10 +440,36 @@
             </component>
         </components>
     </reviewPage>
+
+
+
+
+
+
+
+
+
+
     <submissionActions>
         <apiRequest>
             <endpoint>/register</endpoint>
-
+            <method>POST</method>
+            <payload>
+                {
+                    "who_is_case_about": $formData["who_is_case_about"],
+                    "consent_given": $formData["data_processing_consent"],
+                    "full_name": $formData["full_name"],
+                    "telephone_number": $formData["telephone_number],
+                    "full_address": $formData["full_address"],
+                    "gender": $formData["gender"],
+                    "ethnic_group": $formData["ethnic_group"],
+                    "date_of_birth": $formData["date_of_birth"],
+                    "how_did_you_find_out_about_our_service": $formData["how_did_you_find_out_about_our_service"],
+                    "email_address": $formData["email_address"],
+                    "password": $formData["password"],
+                    "case_description": $formData["case_description"]
+                }
+            </payload>
         </apiRequest>
     </submissionActions>
 </auxForm>
