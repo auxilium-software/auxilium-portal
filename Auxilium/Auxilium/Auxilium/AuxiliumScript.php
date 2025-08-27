@@ -12,7 +12,8 @@ class AuxiliumScript
         $string = trim($string);
 
         // Handle empty string
-        if ($string === '') {
+        if($string === '')
+        {
             return null;
         }
 
@@ -52,16 +53,20 @@ class AuxiliumScript
             $id = strpos($string, "(");
 
             // If no parentheses found, treat as a simple value
-            if ($id === false) {
+            if($id === false)
+            {
                 // Check if it's a number
-                if (is_numeric($string)) {
+                if(is_numeric($string))
+                {
                     return $string + 0; // Convert to int or float
                 }
                 // Check for boolean keywords without parentheses
-                if (strtolower($string) === 'true') {
+                if(strtolower($string) === 'true')
+                {
                     return true;
                 }
-                if (strtolower($string) === 'false') {
+                if(strtolower($string) === 'false')
+                {
                     return false;
                 }
                 // Otherwise return as string
@@ -71,7 +76,8 @@ class AuxiliumScript
             $fn = substr($string, 0, $id);
 
             // Handle case where function name is empty
-            if ($fn === '') {
+            if($fn === '')
+            {
                 return null;
             }
 
@@ -116,7 +122,8 @@ class AuxiliumScript
 
             // Add the last argument if not empty
             $arg = trim($arg);
-            if ($arg !== '' || count($args) > 0) {
+            if($arg !== '' || count($args) > 0)
+            {
                 $args[] = $arg;
             }
 
@@ -127,14 +134,23 @@ class AuxiliumScript
                 case "false":
                     return false;
                 case "not":
-                    if (count($args) < 1) return false;
+                    if(count($args) < 1)
+                    {
+                        return false;
+                    }
                     return !self::evaluate_expression($args[0], $vars);
                 case "exists":
-                    if (count($args) < 1) return false;
+                    if(count($args) < 1)
+                    {
+                        return false;
+                    }
                     $expr = self::evaluate_expression($args[0], $vars);
                     return !($expr === null || $expr === '' || $expr === false);
                 case "or":
-                    if (count($args) < 1) return false;
+                    if(count($args) < 1)
+                    {
+                        return false;
+                    }
                     for($i = 0, $iMax = count($args); $i < $iMax; $i++)
                     {
                         if(self::evaluate_expression($args[$i], $vars))
@@ -144,7 +160,10 @@ class AuxiliumScript
                     }
                     return false;
                 case "and":
-                    if (count($args) < 1) return true;
+                    if(count($args) < 1)
+                    {
+                        return true;
+                    }
                     for($i = 0, $iMax = count($args); $i < $iMax; $i++)
                     {
                         if(!self::evaluate_expression($args[$i], $vars))
@@ -155,7 +174,10 @@ class AuxiliumScript
                     return true;
                 case "eq":
                 case "equals":
-                    if (count($args) < 2) return false;
+                    if(count($args) < 2)
+                    {
+                        return false;
+                    }
                     $evali0 = self::evaluate_expression($args[0], $vars);
                     for($i = 1, $iMax = count($args); $i < $iMax; $i++)
                     {
@@ -185,20 +207,24 @@ class AuxiliumScript
         if(str_starts_with($string, "\$"))
         {
             // Handle array access like $formData["field_name"]
-            if (preg_match('/^\$(\w+)\["([^"]+)"\]$/', $string, $matches)) {
+            if(preg_match('/^\$(\w+)\["([^"]+)"\]$/', $string, $matches))
+            {
                 $varName = $matches[1];
                 $key = $matches[2];
-                if (isset($vars[$varName]) && is_array($vars[$varName])) {
+                if(isset($vars[$varName]) && is_array($vars[$varName]))
+                {
                     return $vars[$varName][$key] ?? null;
                 }
                 return null;
             }
 
             // Handle array access with single quotes like $formData['field_name']
-            if (preg_match('/^\$(\w+)\[\'([^\']+)\'\]$/', $string, $matches)) {
+            if(preg_match('/^\$(\w+)\[\'([^\']+)\'\]$/', $string, $matches))
+            {
                 $varName = $matches[1];
                 $key = $matches[2];
-                if (isset($vars[$varName]) && is_array($vars[$varName])) {
+                if(isset($vars[$varName]) && is_array($vars[$varName]))
+                {
                     return $vars[$varName][$key] ?? null;
                 }
                 return null;

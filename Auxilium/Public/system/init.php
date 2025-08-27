@@ -9,13 +9,10 @@ use Auxilium\DatabaseInteractions\MariaDB\MariaDBServerConnection;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\InitUtilities;
 use Auxilium\Utilities\NavigationUtilities;
-use Darksparrow\DeegraphInteractions\Core\DeegraphServer;
 use Darksparrow\DeegraphInteractions\DataStructures\UUID;
 use Darksparrow\DeegraphInteractions\Exceptions\InvalidUUIDFormatException;
-use JetBrains\PhpStorm\NoReturn;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
-
 
 
 $setup_key = InitUtilities::HandleSetupKey();
@@ -36,8 +33,9 @@ if(!file_exists(__DIR__ . "/../../LocalStorage/LocalStorage/setup.vars"))
         'deegraph-port' => 0,
         'deegraph-loginNode' => "",
         'deegraph-rootNode' => "",
-        'deegraph-token'=>"",
-    ]);
+        'deegraph-token' => "",
+    ]
+    );
     $creds->Write();
     $envs = new EnvironmentManagement(newInstance: true, newVariables: []);
     $envs->Write();
@@ -53,46 +51,43 @@ foreach($_POST as $key => $value)
 $variables = InitUtilities::GetVariables();
 
 
-
-
-
-
 switch($_GET['page'])
 {
     case "0":
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/00.Welcome.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "1":
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/01.InstanceDetails.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "2":
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/02.MariaDB.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "2.1":
         $creds21 = new CredentialManagement();
-        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_HOST',        value: $variables['mariadb-host']);
+        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_HOST', value: $variables['mariadb-host']);
         // $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_PORT', value: $variables['mariadb-port']);
-        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_USERNAME',    value: $variables['mariadb-username']);
-        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_PASSWORD',    value: $variables['mariadb-password']);
-        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_DATABASE',    value: $variables['mariadb-database']);
+        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_USERNAME', value: $variables['mariadb-username']);
+        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_PASSWORD', value: $variables['mariadb-password']);
+        $creds21->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_SQL_DATABASE', value: $variables['mariadb-database']);
         $creds21->Write();
 
-        try {
+        try
+        {
             $servername = INSTANCE_CREDENTIAL_SQL_HOST;
             $database = INSTANCE_CREDENTIAL_SQL_DATABASE;
             $username = INSTANCE_CREDENTIAL_SQL_USERNAME;
@@ -110,7 +105,8 @@ switch($_GET['page'])
                 target: "/system/init?page=3&setup_key=$setup_key",
             );
         }
-        catch (PDOException $e) {
+        catch(PDOException $e)
+        {
             InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=2&setup_key=$setup_key",
@@ -120,30 +116,33 @@ switch($_GET['page'])
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/03.Deegraph.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "3.1":
         $creds31 = new CredentialManagement();
-        $creds31->OverwriteVariable(key: 'INSTANCE_UUID',                       value: $variables['deegraph-rootNode']);
-        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_HOST',        value: $variables['deegraph-host']);
-        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_PORT',        value: $variables['deegraph-port']);
-        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_LOGIN_NODE',  value: $variables['deegraph-loginNode']);
-        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_TOKEN',       value: $variables['deegraph-token']);
-        $creds31->OverwriteVariable(key: 'ACCEPT_SELF_SIGNED_CERTIFICATES',     value: $variables['deegraph-allowSelfSignedCerts'] === "on");
+        $creds31->OverwriteVariable(key: 'INSTANCE_UUID', value: $variables['deegraph-rootNode']);
+        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_HOST', value: $variables['deegraph-host']);
+        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_PORT', value: $variables['deegraph-port']);
+        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_LOGIN_NODE', value: $variables['deegraph-loginNode']);
+        $creds31->OverwriteVariable(key: 'INSTANCE_CREDENTIAL_DDS_TOKEN', value: $variables['deegraph-token']);
+        $creds31->OverwriteVariable(key: 'ACCEPT_SELF_SIGNED_CERTIFICATES', value: $variables['deegraph-allowSelfSignedCerts'] === "on");
         $creds31->Write();
 
-        try {
+        try
+        {
             $actorID = new UUID($variables['deegraph-loginNode']);
         }
-        catch(InvalidUUIDFormatException $e) {
+        catch(InvalidUUIDFormatException $e)
+        {
             InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=3&setup_key=$setup_key",
             );
         }
-        try {
+        try
+        {
             $t = DeegraphServerConnection::GetConnection()->serverInfo($actorID);
 
             InitUtilities::AddVariable("error", null);
@@ -151,7 +150,8 @@ switch($_GET['page'])
                 target: "/system/init?page=4&setup_key=$setup_key",
             );
         }
-        catch (Exception $e) {
+        catch(Exception $e)
+        {
             InitUtilities::AddVariable("error", $e->getMessage());
             NavigationUtilities::Redirect(
                 target: "/system/init?page=3&setup_key=$setup_key",
@@ -161,16 +161,16 @@ switch($_GET['page'])
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/04.RootAccount.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "5":
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/05.Summary.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
     case "5.1":
@@ -225,7 +225,7 @@ switch($_GET['page'])
 
 
         $creds51 = new CredentialManagement();
-        $creds51->OverwriteVariable(key: 'INSTANCE_DOMAIN_NAME',    value: $variables['instance-domain']);
+        $creds51->OverwriteVariable(key: 'INSTANCE_DOMAIN_NAME', value: $variables['instance-domain']);
         $creds51->Write();
 
 
@@ -238,8 +238,8 @@ switch($_GET['page'])
         PageBuilder::Render(
             template : "Pages/system/~InitSteps/06.Completed.html.twig",
             variables: [
-                "Variables"=>$variables,
-                "SetupKey"=>$setup_key,
+                "Variables" => $variables,
+                "SetupKey" => $setup_key,
             ]
         );
 }

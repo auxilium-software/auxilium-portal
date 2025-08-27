@@ -19,11 +19,11 @@ class UUIDUtilities
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
         return sprintf('%08x-%04x-%04x-%04x-%012x',
-            unpack('N', substr($data, 0, 4))[1],
-            unpack('n', substr($data, 4, 2))[1],
-            unpack('n', substr($data, 6, 2))[1],
-            unpack('n', substr($data, 8, 2))[1],
-            unpack('N', substr($data, 10, 4))[1] << 16 | unpack('n', substr($data, 14, 2))[1]
+                       unpack('N', substr($data, 0, 4))[1],
+                       unpack('n', substr($data, 4, 2))[1],
+                       unpack('n', substr($data, 6, 2))[1],
+                       unpack('n', substr($data, 8, 2))[1],
+                       unpack('N', substr($data, 10, 4))[1] << 16 | unpack('n', substr($data, 14, 2))[1]
         );
     }
 }

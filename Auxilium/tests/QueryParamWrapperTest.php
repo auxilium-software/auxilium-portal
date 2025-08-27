@@ -21,7 +21,7 @@ class QueryParamWrapperTest extends TestCase
 
         $this->assertEquals(
             expected: 'en',
-            actual: QueryParamWrapper::Get($key, $defaultVal),
+            actual  : QueryParamWrapper::Get($key, $defaultVal),
         );
     }
 
@@ -34,7 +34,7 @@ class QueryParamWrapperTest extends TestCase
 
         $this->assertEquals(
             expected: $defaultVal,
-            actual: QueryParamWrapper::Get($key, $defaultVal),
+            actual  : QueryParamWrapper::Get($key, $defaultVal),
         );
     }
 }

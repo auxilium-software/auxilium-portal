@@ -21,31 +21,36 @@ if(!CacheUtilities::DoesFormExistYet(formInstanceID: $formInstanceID))
 $formData = CacheUtilities::GetFormData($formInstanceID);
 $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpecID']);
 
-function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1) {
+function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1)
+{
     $pages = $formSpec['pages']['page'];
     $totalPages = count($pages);
     $nextPage = $currentPage + $direction;
 
-    while ($nextPage >= 0 && $nextPage < $totalPages) {
+    while($nextPage >= 0 && $nextPage < $totalPages)
+    {
         $page = $pages[$nextPage];
         $renderIf = $page['renderIf'] ?? 'true';
 
         $vars = [
             'formData' => $formData['Data'] ?? [],
         ];
-        
-        if (AuxiliumScript::evaluate_expression($renderIf, $vars)) {
+
+        if(AuxiliumScript::evaluate_expression($renderIf, $vars))
+        {
             return $nextPage;
         }
         $nextPage += $direction;
     }
 
-    return -1; 
+    return -1;
 }
 
 
-function getVisibleReviewComponents($formSpec, $formData) {
-    if (!isset($formSpec['reviewPage']['components']['component'])) {
+function getVisibleReviewComponents($formSpec, $formData)
+{
+    if(!isset($formSpec['reviewPage']['components']['component']))
+    {
         return [];
     }
 
@@ -55,29 +60,36 @@ function getVisibleReviewComponents($formSpec, $formData) {
     ];
     $visibleComponents = [];
 
-    foreach ($components as $component) {
+    foreach($components as $component)
+    {
         $condition = $component['if'] ?? 'true';
-        if (AuxiliumScript::evaluate_expression($condition, $vars)) {
+        if(AuxiliumScript::evaluate_expression($condition, $vars))
+        {
             $processedComponent = $component;
 
-            if (isset($component['value']) && str_contains($component['value'], '$')) {
+            if(isset($component['value']) && str_contains($component['value'], '$'))
+            {
                 $processedComponent['value'] = AuxiliumScript::evaluate_expression($component['value'], $vars);
             }
 
-            if ($component['type'] === 'DESCRIPTION_LIST' && isset($component['dictionary']['item'])) {
+            if($component['type'] === 'DESCRIPTION_LIST' && isset($component['dictionary']['item']))
+            {
                 $items = $component['dictionary']['item'];
                 $processedComponent['dictionary']['item'] = [];
 
-                if (is_array($items)) {
-                    
-                    if (isset($items['key'], $items['value'])) {
-                        
+                if(is_array($items))
+                {
+
+                    if(isset($items['key'], $items['value']))
+                    {
+
                         $key = $items['key'];
                         $value = $items['value'];
 
-                        
-                        if (str_contains($value, '$')) {
-                            
+
+                        if(str_contains($value, '$'))
+                        {
+
                             $value = str_replace(['$formData["', '"]'], ['$formData[\'', '\']'], $value);
                             $value = AuxiliumScript::evaluate_expression($value, $vars);
                         }
@@ -87,14 +99,19 @@ function getVisibleReviewComponents($formSpec, $formData) {
                             'value' => $value
                         ];
                     }
-                    else if (isset($items[0])) {
-                        if (is_array($items[0])) {
-                            foreach ($items as $item) {
-                                if (isset($item['key'], $item['value'])) {
+                    else if(isset($items[0]))
+                    {
+                        if(is_array($items[0]))
+                        {
+                            foreach($items as $item)
+                            {
+                                if(isset($item['key'], $item['value']))
+                                {
                                     $key = $item['key'];
                                     $value = $item['value'];
 
-                                    if (str_contains($value, '$')) {
+                                    if(str_contains($value, '$'))
+                                    {
                                         $value = str_replace(['$formData["', '"]'], ['$formData[\'', '\']'], $value);
                                         $value = AuxiliumScript::evaluate_expression($value, $vars);
                                     }
@@ -106,13 +123,17 @@ function getVisibleReviewComponents($formSpec, $formData) {
                                 }
                             }
                         }
-                        else if (is_string($items[0])) {
-                            for ($i = 0, $iMax = count($items); $i < $iMax; $i += 2) {
-                                if (isset($items[$i + 1])) {
+                        else if(is_string($items[0]))
+                        {
+                            for($i = 0, $iMax = count($items); $i < $iMax; $i += 2)
+                            {
+                                if(isset($items[$i + 1]))
+                                {
                                     $key = $items[$i];
                                     $value = $items[$i + 1];
 
-                                    if (str_contains($value, '$')) {
+                                    if(str_contains($value, '$'))
+                                    {
                                         $value = str_replace(['$formData["', '"]'], ['$formData[\'', '\']'], $value);
                                         $value = AuxiliumScript::evaluate_expression($value, $vars);
                                     }
@@ -140,8 +161,9 @@ $storedPageIndex = $formData['CurrentPageIndex'] ?? 0;
 $isReviewPage = ($storedPageIndex === 'review');
 
 $visiblePages = [];
-$pageIndexMap = []; 
-for ($i = 0, $iMax = count($formSpec['pages']['page']); $i < $iMax; $i++) {
+$pageIndexMap = [];
+for($i = 0, $iMax = count($formSpec['pages']['page']); $i < $iMax; $i++)
+{
     $page = $formSpec['pages']['page'][$i];
     $renderIf = $page['renderIf'] ?? 'true';
 
@@ -149,19 +171,23 @@ for ($i = 0, $iMax = count($formSpec['pages']['page']); $i < $iMax; $i++) {
         'formData' => $formData['Data'] ?? [],
     ];
 
-    if (AuxiliumScript::evaluate_expression($renderIf, $vars)) {
+    if(AuxiliumScript::evaluate_expression($renderIf, $vars))
+    {
         $visiblePages[] = $page;
         $pageIndexMap[] = $i;
     }
 }
 
 $currentVisiblePageIndex = 0;
-if (!$isReviewPage) {
+if(!$isReviewPage)
+{
     $currentVisiblePageIndex = array_search($storedPageIndex, $pageIndexMap);
-    if ($currentVisiblePageIndex === false) {
-        
+    if($currentVisiblePageIndex === false)
+    {
+
         $currentVisiblePageIndex = 0;
-        if (!empty($pageIndexMap)) {
+        if(!empty($pageIndexMap))
+        {
             $storedPageIndex = $pageIndexMap[0];
         }
     }
@@ -169,15 +195,19 @@ if (!$isReviewPage) {
 
 $totalVisiblePages = count($visiblePages);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if($_SERVER['REQUEST_METHOD'] === 'POST')
+{
     $action = $_POST['action'] ?? 'continue';
 
-    
-    if (isset($_POST['jumpToPage'])) {
+
+    if(isset($_POST['jumpToPage']))
+    {
         $targetPageId = $_POST['jumpToPage'];
-        
-        for ($i = 0, $iMax = count($formSpec['pages']['page']); $i < $iMax; $i++) {
-            if ($formSpec['pages']['page'][$i]['id'] === $targetPageId) {
+
+        for($i = 0, $iMax = count($formSpec['pages']['page']); $i < $iMax; $i++)
+        {
+            if($formSpec['pages']['page'][$i]['id'] === $targetPageId)
+            {
                 CacheUtilities::SetCurrentPageIndex($formInstanceID, $i);
                 NavigationUtilities::Redirect(target: "/form/$formInstanceID");
                 break;
@@ -185,22 +215,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if ($action !== 'back') {
+    if($action !== 'back')
+    {
         CacheUtilities::UpdateFormData($formInstanceID, $_POST);
         $formData = CacheUtilities::GetFormData($formInstanceID);
     }
-    
-    switch ($action) {
+
+    switch($action)
+    {
         case 'back':
-            if ($isReviewPage) {
-                if (!empty($pageIndexMap)) {
+            if($isReviewPage)
+            {
+                if(!empty($pageIndexMap))
+                {
                     $lastPageIndex = end($pageIndexMap);
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, $lastPageIndex);
                 }
-            } else {
-                
+            }
+            else
+            {
+
                 $prevPageIndex = findNextVisiblePage($formSpec, $formData, $storedPageIndex, -1);
-                if ($prevPageIndex >= 0) {
+                if($prevPageIndex >= 0)
+                {
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, $prevPageIndex);
                 }
             }
@@ -208,16 +245,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'continue':
         case 'next':
-            if ($isReviewPage) {
+            if($isReviewPage)
+            {
                 CacheUtilities::MarkFormAsComplete($formInstanceID);
                 NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
-            } else {
-                
+            }
+            else
+            {
+
                 $nextPageIndex = findNextVisiblePage($formSpec, $formData, $storedPageIndex, 1);
-                if ($nextPageIndex >= 0) {
+                if($nextPageIndex >= 0)
+                {
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, $nextPageIndex);
-                } else {
-                    
+                }
+                else
+                {
+
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, 'review');
                 }
             }
@@ -232,15 +275,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
             break;
     }
-    
+
     NavigationUtilities::Redirect(target: "/form/$formInstanceID");
 }
 
-if ($totalVisiblePages === 0 && !$isReviewPage) {
+if($totalVisiblePages === 0 && !$isReviewPage)
+{
     NavigationUtilities::Redirect(target: '/');
 }
 
-if ($isReviewPage) {
+if($isReviewPage)
+{
     $reviewComponents = getVisibleReviewComponents($formSpec, $formData);
     $variables = [
         "FormInstanceID" => $formInstanceID,
@@ -253,14 +298,16 @@ if ($isReviewPage) {
     ];
 
     PageBuilder::Render(
-        template: '/VirtualPages/FormReviewPage.html.twig',
+        template : '/VirtualPages/FormReviewPage.html.twig',
         variables: $variables,
     );
-} else {
-    
+}
+else
+{
+
     $currentPage = $visiblePages[$currentVisiblePageIndex];
     $actualPageIndex = $pageIndexMap[$currentVisiblePageIndex];
-    
+
     $hasPreviousPage = findNextVisiblePage($formSpec, $formData, $actualPageIndex, -1) >= 0;
     $hasNextPage = findNextVisiblePage($formSpec, $formData, $actualPageIndex, 1) >= 0;
     $isLastPage = $currentVisiblePageIndex === $totalVisiblePages - 1;
@@ -282,7 +329,7 @@ if ($isReviewPage) {
     ];
 
     PageBuilder::Render(
-        template: '/VirtualPages/FormPage.html.twig',
+        template : '/VirtualPages/FormPage.html.twig',
         variables: $variables,
     );
 }

@@ -65,11 +65,6 @@ class InitUtilities
         return $setup_key;
     }
 
-    public static function GetVariables(): array
-    {
-        return json_decode(file_get_contents(LOCAL_STORAGE_DIRECTORY . "/setup.vars"), true, 512, JSON_THROW_ON_ERROR);
-    }
-
     public static function AddVariable(string $key, string|int|null|bool $value): void
     {
         $variables = self::GetVariables();
@@ -80,6 +75,10 @@ class InitUtilities
         fclose($variableFile);
     }
 
+    public static function GetVariables(): array
+    {
+        return json_decode(file_get_contents(LOCAL_STORAGE_DIRECTORY . "/setup.vars"), true, 512, JSON_THROW_ON_ERROR);
+    }
 
     /**
      * @throws InvalidUUIDFormatException
@@ -113,8 +112,7 @@ class InitUtilities
             ->set(col: 'password', value: ':__password__')
             ->bindValue('__email_address__', $rootUserEmailAddress)
             ->bindValue('__user_uuid__', $user_node->getId())
-            ->bindValue('__password__', $hashed_password)
-            ;
+            ->bindValue('__password__', $hashed_password);
         $db->RunInsert($queryBuilder);
 
 

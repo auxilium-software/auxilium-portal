@@ -13,7 +13,7 @@ try
     {
         APIInteractions::Post(
             endpoint: '/authentication/register',
-            payload: [
+            payload : [
 
             ],
         );
