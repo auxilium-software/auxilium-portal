@@ -56,10 +56,20 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID) {
         $results[] = $result;
 
         if (!$result['success']) {
+            return [
+                'success' => false,
+                'message' => $result['message'],
+                'results' => $results
+            ];
         }
     }
     die();
 
+    return [
+        'success' => true,
+        'message' => 'All submission actions completed successfully',
+        'results' => $results
+    ];
 }
 
 
