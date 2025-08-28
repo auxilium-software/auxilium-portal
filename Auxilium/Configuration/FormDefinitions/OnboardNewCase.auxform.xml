@@ -317,7 +317,7 @@
                     <primaryLabel>Email Address</primaryLabel>
                 </component>
                 <component>
-                    <id>password</id>
+                    <id>raw_password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
                     <primaryLabel>Password</primaryLabel>
@@ -467,7 +467,7 @@
                     "date_of_birth": "$formData["date_of_birth"]",
                     "how_did_you_find_out_about_our_service": "$formData["how_did_you_find_out_about_our_service"]",
                     "email_address": "$formData["email_address"]",
-                    "raw_password": "$formData["password"]",
+                    "raw_password": "$formData["raw_password"]",
                     "case_description": "$formData["case_description"]"
                 }
             </payload>
