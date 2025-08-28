@@ -3,6 +3,7 @@
     <id>OnboardNewCase</id>
     <title>Onboard a New Case</title>
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
+    <useReCAPTCHA>true</useReCAPTCHA>
     <pages>
         <page>
             <id>who_is_case_about</id>
@@ -452,22 +453,22 @@
 
     <submissionActions>
         <apiRequest>
-            <endpoint>/register</endpoint>
+            <endpoint>/authentication/register</endpoint>
             <method>POST</method>
             <payload>
                 {
-                    "who_is_case_about": $formData["who_is_case_about"],
-                    "consent_given": $formData["data_processing_consent"],
-                    "full_name": $formData["full_name"],
-                    "telephone_number": $formData["telephone_number],
-                    "full_address": $formData["full_address"],
-                    "gender": $formData["gender"],
-                    "ethnic_group": $formData["ethnic_group"],
-                    "date_of_birth": $formData["date_of_birth"],
-                    "how_did_you_find_out_about_our_service": $formData["how_did_you_find_out_about_our_service"],
-                    "email_address": $formData["email_address"],
-                    "password": $formData["password"],
-                    "case_description": $formData["case_description"]
+                    "who_is_case_about": "$formData["who_is_case_about"]",
+                    "consent_given": "$formData["data_processing_consent"]",
+                    "full_name": "$formData["full_name"]",
+                    "telephone_number": "$formData["telephone_number]",
+                    "full_address": "$formData["full_address"]",
+                    "gender": "$formData["gender"]",
+                    "ethnic_group": "$formData["ethnic_group"]",
+                    "date_of_birth": "$formData["date_of_birth"]",
+                    "how_did_you_find_out_about_our_service": "$formData["how_did_you_find_out_about_our_service"]",
+                    "email_address": "$formData["email_address"]",
+                    "raw_password": "$formData["password"]",
+                    "case_description": "$formData["case_description"]"
                 }
             </payload>
         </apiRequest>

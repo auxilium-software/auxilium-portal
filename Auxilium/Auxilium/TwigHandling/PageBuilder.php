@@ -48,6 +48,8 @@ class PageBuilder
         $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME', INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME);
         $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL', INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL);
         $this->twig->addGlobal('INSTANCE_UUID', INSTANCE_UUID);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY', INSTANCE_RECAPTCHA_SITE_KEY);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY', INSTANCE_RECAPTCHA_SECRET_KEY);
 
 
         $this->twig->addExtension(new CommonFilters());

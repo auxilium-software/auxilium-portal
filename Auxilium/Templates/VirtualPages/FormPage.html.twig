@@ -142,20 +142,34 @@
             {# Navigation buttons #}
             <div class="form-navigation">
                 {% if ShowBackButton %}
-                    <input type="submit" value="Back" onclick="submitFormWithAction('back')" />
+                    <input type="button" value="Back" onclick="submitFormWithAction('back')" />
                 {% endif %}
 
                 {% if ShowReviewButton %}
-                    <input type="submit" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
+                    <input type="button" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
                 {% elseif ShowNextButton %}
                     <input type="submit" value="Continue" />
                 {% endif %}
             </div>
+
+            {% if FormSpec.useReCAPTCHA %}
+                <div class="recaptcha-info">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                </div>
+                <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
+            {% endif %}
         </form>
     </div>
 
+    {% if FormSpec.useReCAPTCHA %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}"></script>
+    {% endif %}
+
     <script>
-        function submitFormWithAction(action) {
+        async function submitFormWithAction(action)
+        {
             const actionInput = document.getElementById('action');
             const form = document.querySelector('form');
 
@@ -168,6 +182,9 @@
                 });
             }
 
+            {% if FormSpec.useReCAPTCHA %}
+                document.getElementById('ReCAPTCHAToken').value = await grecaptcha.execute('{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}', {action: 'register'});
+            {% endif %}
             form.submit();
         }
     </script>

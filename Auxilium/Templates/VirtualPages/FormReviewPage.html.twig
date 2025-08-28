@@ -49,21 +49,42 @@
             {# Navigation buttons #}
             <div class="form-navigation review-navigation">
                 {% if ShowBackButton %}
-                    <input type="submit" value="Back to Edit" onclick="submitFormWithAction('back')" class="back-button" />
+                    <input type="button" value="Back to Edit" onclick="submitFormWithAction('back')" class="back-button" />
                 {% endif %}
 
                 <div class="review-actions">
-                    <input type="submit" value="Submit Application" onclick="submitFormWithAction('submit')" class="submit-button primary" />
+                    <input type="button" value="Submit Application" onclick="submitFormWithAction('submit')" class="submit-button primary" />
                 </div>
             </div>
+
+            {% if FormSpec.useReCAPTCHA %}
+                <div class="recaptcha-info">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                </div>
+                <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
+            {% endif %}
         </form>
     </div>
 
+    {% if FormSpec.useReCAPTCHA %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}"></script>
+    {% endif %}
+
     <script>
-        function submitFormWithAction(action) {
+        async function submitFormWithAction(action) {
             const actionInput = document.getElementById('action');
             actionInput.value = action;
+
+            {% if FormSpec.useReCAPTCHA %}
+                const token = await grecaptcha.execute('{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}', {
+                    action: action === 'submit' ? 'submit' : 'form_interaction'
+                });
+                document.getElementById('ReCAPTCHAToken').value = token;
+            {% endif %}
             document.querySelector('form').submit();
+
         }
     </script>
 

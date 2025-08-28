@@ -1,6 +1,7 @@
 <?php
 
 use Auxilium\Auxilium\AuxiliumScript;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\CacheUtilities;
 use Auxilium\Utilities\ConfigurationUtilities;
@@ -20,6 +21,50 @@ if(!CacheUtilities::DoesFormExistYet(formInstanceID: $formInstanceID))
 
 $formData = CacheUtilities::GetFormData($formInstanceID);
 $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpecID']);
+
+
+
+
+
+function executeSubmissionActions($formSpec, $formData, $formInstanceID) {
+    if (!isset($formSpec['submissionActions']))
+    {
+        return ['success' => true, 'message' => 'No submission actions defined'];
+    }
+
+    $results = [];
+    $vars = $formData['Data'] ?? [];
+    if($formSpec['useReCAPTCHA'])
+    {
+        $vars['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
+    }
+
+
+    $apiRequests = $formSpec['submissionActions']['apiRequest'];
+
+    if (!isset($apiRequests[0]))
+    {
+        $apiRequests = [$apiRequests];
+    }
+
+    foreach ($apiRequests as $apiRequest)
+    {
+        $result = APIInteractions::Post(
+            endpoint: $apiRequest['endpoint'],
+            payload: $vars
+        );
+        $results[] = $result;
+
+        if (!$result['success']) {
+        }
+    }
+    die();
+
+}
+
+
+
+
 
 function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1)
 {
@@ -245,10 +290,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
 
         case 'continue':
         case 'next':
-            if($isReviewPage)
+            if ($isReviewPage)
             {
-                CacheUtilities::MarkFormAsComplete($formInstanceID);
-                NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+                // Execute submission actions before marking as complete
+                $submissionResult = executeSubmissionActions($formSpec, $formData, $formInstanceID);
+
+                if ($submissionResult['success'])
+                {
+                    CacheUtilities::StoreSubmissionResult($formInstanceID, $submissionResult);
+                    CacheUtilities::MarkFormAsComplete($formInstanceID);
+                    NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+                }
+                else
+                {
+                    $_SESSION['submission_error'] = $submissionResult['message'];
+                    NavigationUtilities::Redirect(target: "/form/$formInstanceID");
+                }
             }
             else
             {
@@ -271,8 +328,20 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             break;
 
         case 'submit':
-            CacheUtilities::MarkFormAsComplete($formInstanceID);
-            NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+            // Execute submission actions before marking as complete
+            $submissionResult = executeSubmissionActions($formSpec, $formData, $formInstanceID);
+
+            if ($submissionResult['success'])
+            {
+                CacheUtilities::StoreSubmissionResult($formInstanceID, $submissionResult);
+                CacheUtilities::MarkFormAsComplete($formInstanceID);
+                NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+            }
+            else
+            {
+                $_SESSION['submission_error'] = $submissionResult['message'];
+                NavigationUtilities::Redirect(target: "/form/$formInstanceID");
+            }
             break;
     }
 
@@ -284,8 +353,7 @@ if($totalVisiblePages === 0 && !$isReviewPage)
     NavigationUtilities::Redirect(target: '/');
 }
 
-if($isReviewPage)
-{
+if ($isReviewPage) {
     $reviewComponents = getVisibleReviewComponents($formSpec, $formData);
     $variables = [
         "FormInstanceID" => $formInstanceID,
@@ -295,10 +363,14 @@ if($isReviewPage)
         "ReviewComponents" => $reviewComponents,
         "ShowBackButton" => true,
         "ShowSubmitButton" => true,
+        "SubmissionError" => $_SESSION['submission_error'] ?? null, // Add this line
     ];
 
+    // Clear the error after displaying
+    unset($_SESSION['submission_error']);
+
     PageBuilder::Render(
-        template : '/VirtualPages/FormReviewPage.html.twig',
+        template: '/VirtualPages/FormReviewPage.html.twig',
         variables: $variables,
     );
 }

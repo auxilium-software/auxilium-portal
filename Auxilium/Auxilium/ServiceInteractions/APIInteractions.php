@@ -122,6 +122,8 @@ class APIInteractions
             throw new Exception("cURL request failed: " . $error);
         }
 
+        error_log(json_encode($response));
+
         $statusCode = curl_getinfo($this->CurlHandler, CURLINFO_HTTP_CODE);
         curl_close($this->CurlHandler);
 
