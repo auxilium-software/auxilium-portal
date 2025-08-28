@@ -1,5 +1,6 @@
 
 # Dev Files
+/.idea
 Auxilium/.idea/
 Auxilium/composer.phar
 Auxilium/vendor
