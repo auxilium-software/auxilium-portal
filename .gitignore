@@ -1,32 +1,31 @@
 
 # Dev Files
 /.idea
-Auxilium/.idea/
-Auxilium/composer.phar
-Auxilium/vendor
+composer.phar
+vendor
 
 # Dev (Testing) Files
-Auxilium/.phpunit.result.cache
+.phpunit.result.cache
 
 # Dev (Documentation) Files
-Auxilium/.phpdoc
-Auxilium/.phpdoc-export
-Auxilium/phpunit.phar
-Auxilium/phpDocumentor.phar
+.phpdoc
+.phpdoc-export
+phpunit.phar
+phpDocumentor.phar
 
 # Dev (Misc) Files
 *.jar
 nohup.out
 
 # Config Files
-Auxilium/Configuration/Configuration/Credentials.php
-Auxilium/Configuration/Configuration/Environment.php
-Auxilium/Configuration/Configuration/Credentials.dev.php
-Auxilium/Configuration/Configuration/Environment.dev.php
-Auxilium/Configuration/Configuration/msft-access-token-primary.json
+Configuration/Configuration/Credentials.php
+Configuration/Configuration/Environment.php
+Configuration/Configuration/Credentials.dev.php
+Configuration/Configuration/Environment.dev.php
+Configuration/Configuration/msft-access-token-primary.json
 
 # Local Storage Files
-!Auxilium/LocalStorage/.gitkeep
-!Auxilium/LocalStorage/**/.gitkeep
-Auxilium/LocalStorage
-Auxilium/Public/test.php
+!LocalStorage/.gitkeep
+!LocalStorage/**/.gitkeep
+LocalStorage
+Public/test.php
