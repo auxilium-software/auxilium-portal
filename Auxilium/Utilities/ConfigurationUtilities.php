@@ -2,16 +2,46 @@
 
 namespace Auxilium\Utilities;
 
+use Auxilium\Enumerators\EnvironmentVariable;
+use Exception;
 use SimpleXMLElement;
+use Symfony\Component\Yaml\Yaml;
 
 class ConfigurationUtilities
 {
-    public static string $ConfigurationDirectory = __DIR__ . "/../../Configuration";
+    public static array $Configuration;
+
+    
+    public static function GetLanguagePack(string $language): array
+    {
+        $temp = file_get_contents(__DIR__ . "/../../Configuration/LanguagePacks/$language.json");
+        $temp = json_decode($temp, true);
+        return $temp;
+    }
+
+    public static function GetConfiguration(): array
+    {
+        if(self::$Configuration !== null)
+        {
+            return self::$Configuration;
+        }
+        if(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value) !== false)
+        {
+            if(file_exists(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value)))
+            {
+                $temp = file_get_contents(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value));
+                self::$Configuration = Yaml::parse($temp);
+                return self::$Configuration;
+            }
+            throw new Exception("Configuration file not found");
+        }
+        throw new Exception("Configuration file not specified");
+    }
 
 
     public static function GetFormDefinition(string $target): array
     {
-        $temp = file_get_contents(self::$ConfigurationDirectory . "/FormDefinitions/" . $target . ".auxform.xml");
+        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".auxform.xml");
         $temp = new SimpleXMLElement($temp);
         $temp = json_decode(json_encode($temp), true);
 
