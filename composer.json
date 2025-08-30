@@ -30,7 +30,6 @@
         "ext-openssl": "*",
         "ext-dom": "*",
         "ext-sodium": "*",
-        "ext-pdo": "*",
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
 
@@ -55,13 +54,6 @@
         "aws/aws-sdk-php": "^3.277",
 
         "ezyang/htmlpurifier": "^4.14",
-
-        "aura/sqlquery": "3.0.0",
-
-        "darksparrow/deegraph-interactions": "dev-dev",
-        "darksparrow/auxilium-schema-builder": "v0.1",
-
-        "geerlingguy/ping": "1.2.1",
 
         "phpfui/icalendar": "1.1.0",
 
