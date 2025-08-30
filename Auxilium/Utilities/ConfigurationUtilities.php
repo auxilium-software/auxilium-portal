@@ -11,7 +11,7 @@ class ConfigurationUtilities
 {
     public static array $Configuration;
 
-    
+
     public static function GetLanguagePack(string $language): array
     {
         $temp = file_get_contents(__DIR__ . "/../../Configuration/LanguagePacks/$language.json");
@@ -21,19 +21,23 @@ class ConfigurationUtilities
 
     public static function GetConfiguration(): array
     {
-        if(self::$Configuration !== null)
+        if(isset(self::$Configuration))
         {
             return self::$Configuration;
         }
-        if(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value) !== false)
+
+        $filePath = getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value);
+
+        if($filePath !== false)
         {
-            if(file_exists(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value)))
+            $filePath = str_replace(search: '"', replace: '', subject: $filePath);
+            if(file_exists($filePath))
             {
-                $temp = file_get_contents(getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value));
+                $temp = file_get_contents($filePath);
                 self::$Configuration = Yaml::parse($temp);
                 return self::$Configuration;
             }
-            throw new Exception("Configuration file not found");
+            throw new Exception("Configuration file not found at " . $filePath);
         }
         throw new Exception("Configuration file not specified");
     }

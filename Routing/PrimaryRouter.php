@@ -11,12 +11,9 @@ function requireComponents(): void
 {
     if(
         file_exists(__DIR__ . '/../vendor/autoload.php')
-        && file_exists(__DIR__ . '/../Configuration/Configuration/Environment.php')
-        && file_exists(__DIR__ . '/../Configuration/Configuration/Credentials.php')
     )
     {
         require_once __DIR__ . '/../vendor/autoload.php';
-        require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
         return;
     }
 
@@ -35,17 +32,6 @@ function requireComponents(): void
     );
     $twig->addExtension(new CommonFilters());
     $twig->addExtension(new CommonFunctions());
-
-    if(!file_exists(__DIR__ . '/../Configuration/Configuration/Environment.php'))
-    {
-        echo $twig->render('/VirtualPages/MissingEnvironmentFile.html.twig', []);
-        die();
-    }
-    if(!file_exists(__DIR__ . '/../Configuration/Configuration/Credentials.php'))
-    {
-        echo $twig->render('/VirtualPages/MissingCredentialsFile.html.twig', []);
-        die();
-    }
 }
 
 

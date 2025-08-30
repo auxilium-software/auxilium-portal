@@ -8,7 +8,6 @@ use Auxilium\Utilities\SecurityUtilities;
 use Auxilium\Wrappers\ICMPWrapper;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
 
 try
 {

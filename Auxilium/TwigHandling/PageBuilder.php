@@ -6,6 +6,7 @@ use Auxilium\Exceptions\DatabaseConnectionException;
 use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
+use Auxilium\Utilities\ConfigurationUtilities;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
@@ -33,23 +34,23 @@ class PageBuilder
 
         $this->twig->addGlobal('style_options', []);
 
-        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO', INSTANCE_BRANDING_LOGO);
-        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR', INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR);
-        $this->twig->addGlobal('INSTANCE_BRANDING_NAME', INSTANCE_BRANDING_NAME);
-        $this->twig->addGlobal('INSTANCE_BRANDING_DOMAIN_NAME', INSTANCE_BRANDING_DOMAIN_NAME);
-        $this->twig->addGlobal('INSTANCE_DOMAIN_NAME', INSTANCE_DOMAIN_NAME);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_EMAIL', INSTANCE_INFO_MAIN_EMAIL);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE', INSTANCE_INFO_MAIN_PHONE);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE_OPENING_HOURS', INSTANCE_INFO_MAIN_PHONE_OPENING_HOURS);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT', INSTANCE_INFO_MAIN_TEXT);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT_OPENING_HOURS', INSTANCE_INFO_MAIN_TEXT_OPENING_HOURS);
-        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_NAME', INSTANCE_INFO_MAINTAINER_NAME);
-        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_EMAIL', INSTANCE_INFO_MAINTAINER_EMAIL);
-        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME', INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME);
-        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL', INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL);
-        $this->twig->addGlobal('INSTANCE_UUID', INSTANCE_UUID);
-        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY', INSTANCE_RECAPTCHA_SITE_KEY);
-        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY', INSTANCE_RECAPTCHA_SECRET_KEY);
+        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO',                        ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['Logo']);
+        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR',   ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['LogoContrast']);
+        $this->twig->addGlobal('INSTANCE_BRANDING_NAME',                        ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['Name']);
+        //$this->twig->addGlobal('INSTANCE_BRANDING_DOMAIN_NAME',                 ConfigurationUtilities::GetConfiguration()["Instance"]);
+        //$this->twig->addGlobal('INSTANCE_DOMAIN_NAME',                          ConfigurationUtilities::GetConfiguration()["Instance"]);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_EMAIL',                      ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['EmailAddress']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE',                      ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Phone']['Number']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE_OPENING_HOURS',        ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Phone']['OpeningHours']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT',                       ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Text']['Number']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT_OPENING_HOURS',         ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Text']['OpeningHours']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_NAME',                 ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Maintainer']['Name']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_EMAIL',                ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Maintainer']['EmailAddress']);
+        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME',  ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['Name']);
+        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL', ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['EmailAddress']);
+        //$this->twig->addGlobal('INSTANCE_UUID',                                 ConfigurationUtilities::GetConfiguration()["Instance"]);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY',                   ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SiteKey']);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SecretKey']);
 
 
         $this->twig->addExtension(new CommonFilters());
