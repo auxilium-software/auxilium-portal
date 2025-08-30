@@ -8,7 +8,6 @@ use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\NavigationUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../Configuration/Configuration/Environment.php';
 
 $formInstanceID = explode(separator: '/', string: $_SERVER['REQUEST_URI'])[2];
 
