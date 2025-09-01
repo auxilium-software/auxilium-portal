@@ -42,8 +42,8 @@ class LoginFormHandler {
 
             if(response !== false)
             {
-                CookieUtilities.setCookie('access_token', response['access_token'], 7);
-                CookieUtilities.setCookie('refresh_token', response['refresh_token'], 0.0208333);
+                CookieUtilities.setCookie('access_token', response['access_token'], 0.0208333);
+                CookieUtilities.setCookie('refresh_token', response['refresh_token'], 7);
                 this.showSuccessMessage(Localisation.translate('Login successful! Redirecting...'));
 
                 setTimeout(() => {

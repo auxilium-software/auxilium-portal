@@ -233,12 +233,7 @@ class APIInteractions
         return $apiWrapper->executeRequest();
     }
 
-
-
-
-
-
-    public static function GetRequest(string $endpoint, array $parameters = []): array
+    public static function Get(string $endpoint, array $parameters = []): APIResponsePayload
     {
         $queryString = "";
         if(!empty($parameters))

@@ -3,7 +3,9 @@
 namespace Auxilium\Utilities;
 
 use Auxilium\DataClasses\JWTPayload;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Exception;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 
 
@@ -25,11 +27,22 @@ class JWTUtilities
                 allowed_algs: [ConfigurationUtilities::GetConfiguration()['JWT']['Algorithm']],
             );
         }
+        catch(ExpiredException $ex)
+        {
+            var_dump($_COOKIE);
+            die();
+            APIInteractions::Post(
+                endpoint: "/authentication/refresh",
+                payload: [],
+                requireAuth: false,
+            );
+        }
         catch(Exception $ex)
         {
             header("Location: /logout");
             die();
         }
+
         $decodedJWTAssocArray = json_decode(json_encode($decodedJWTObject), true);
         return new JWTPayload(
             rawJWT: $_COOKIE["access_token"],
