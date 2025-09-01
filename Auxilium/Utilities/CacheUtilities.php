@@ -119,17 +119,7 @@ class CacheUtilities
 
     public static function MarkFormAsComplete(string $formInstanceID): void
     {
-        $formData = self::GetFormData($formInstanceID);
-        $formData['CompletedAt'] = date('Y-m-d H:i:s');
-        $formData['Status'] = 'completed';
-
-        file_put_contents(
-            filename: self::$CacheDirectory . "/FormData/$formInstanceID.json",
-            data    : json_encode(
-                          $formData,
-                          JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
-                      ),
-        );
+        unlink(filename: self::$CacheDirectory . "/FormData/$formInstanceID.json");
     }
 
     public static function CreateNewForm(string $formSpecName): string

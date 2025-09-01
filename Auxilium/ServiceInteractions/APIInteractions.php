@@ -4,6 +4,7 @@ namespace Auxilium\ServiceInteractions;
 
 use App\Wrappers\APIWrapper;
 use App\Wrappers\CookieWrapper;
+use Auxilium\DataClasses\APIResponsePayload;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\Utilities\NavigationUtilities;
@@ -71,16 +72,6 @@ class APIInteractions
 
         NavigationUtilities::Redirect(target: '/login');
     }
-
-    public static function Post(string $endpoint, array $payload): array
-    {
-        $apiWrapper = new APIInteractions(true);
-        $apiWrapper->SetTarget($endpoint);
-        $apiWrapper->SetMethod('POST');
-        $apiWrapper->SetPayload($payload);
-        return $apiWrapper->executeRequest();
-    }
-
     private function setTarget(string $endpoint): void
     {
         $this->lastEndpoint = $endpoint;
@@ -111,7 +102,7 @@ class APIInteractions
         }
     }
 
-    public function executeRequest(): array
+    public function executeRequest(): APIResponsePayload
     {
         $response = curl_exec($this->CurlHandler);
 
@@ -156,7 +147,10 @@ class APIInteractions
             throw new Exception("Invalid JSON response from API");
         }
 
-        return $responsePayload ?? [];
+        $temp = new APIResponsePayload();
+        $temp->StatusCode = $statusCode;
+        $temp->Payload = $responsePayload;
+        return $temp;
     }
 
     private static function attemptTokenRefresh(): bool
@@ -197,7 +191,23 @@ class APIInteractions
         }
     }
 
-    public static function Patch(string $endpoint, array $payload): array
+
+
+
+
+
+
+
+    public static function Post(string $endpoint, array $payload, bool $requireAuth = true): APIResponsePayload
+    {
+        $apiWrapper = new APIInteractions($requireAuth);
+        $apiWrapper->SetTarget($endpoint);
+        $apiWrapper->SetMethod('POST');
+        $apiWrapper->SetPayload($payload);
+        return $apiWrapper->executeRequest();
+    }
+
+    public static function Patch(string $endpoint, array $payload): APIResponsePayload
     {
         $apiWrapper = new APIInteractions(true);
         $apiWrapper->SetTarget($endpoint);
@@ -206,7 +216,7 @@ class APIInteractions
         return $apiWrapper->executeRequest();
     }
 
-    public static function Put(string $endpoint, array $payload): array
+    public static function Put(string $endpoint, array $payload): APIResponsePayload
     {
         $apiWrapper = new APIInteractions(true);
         $apiWrapper->SetTarget($endpoint);
@@ -215,13 +225,18 @@ class APIInteractions
         return $apiWrapper->executeRequest();
     }
 
-    public static function Delete(string $endpoint): array
+    public static function Delete(string $endpoint): APIResponsePayload
     {
         $apiWrapper = new APIInteractions(true);
         $apiWrapper->SetTarget($endpoint);
         $apiWrapper->SetMethod('DELETE');
         return $apiWrapper->executeRequest();
     }
+
+
+
+
+
 
     public static function GetRequest(string $endpoint, array $parameters = []): array
     {

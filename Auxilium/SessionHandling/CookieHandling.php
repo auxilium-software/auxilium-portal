@@ -4,6 +4,7 @@ namespace Auxilium\SessionHandling;
 
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\Enumerators\Language;
+use Auxilium\Utilities\ConfigurationUtilities;
 
 class CookieHandling
 {
@@ -47,7 +48,7 @@ class CookieHandling
             "", // value
             time() - (3600 * 48), // ttl
             "/", //
-            INSTANCE_DOMAIN_NAME, // domain
+            ConfigurationUtilities::GetConfiguration()['Instance']['QualifiedDNS'], // domain
             true, //
             true //
         );
@@ -65,7 +66,7 @@ class CookieHandling
             $value,
             time() + self::GetCookieTTL($targetCookie),
             "/",
-            INSTANCE_DOMAIN_NAME,
+            ConfigurationUtilities::GetConfiguration()['Instance']['QualifiedDNS'],
             true,
             true
         );

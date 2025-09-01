@@ -74,7 +74,11 @@ class ConfigurationUtilities
         // sorts out the options
         foreach($temp["pages"]["page"] as $iValue)
         {
-            if(array_key_exists("components", $iValue) && is_array($iValue["components"]["component"]))
+            if(
+                array_key_exists("components", $iValue)
+                && array_key_exists("component", $iValue['components'])
+                && is_array($iValue["components"]["component"])
+            )
             {
                 for($ii = 0, $iiMax = count($iValue["components"]["component"]); $ii < $iiMax; $ii++)
                 {

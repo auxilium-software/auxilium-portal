@@ -25,7 +25,8 @@ $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpe
 
 
 
-function executeSubmissionActions($formSpec, $formData, $formInstanceID) {
+function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
+{
     if (!isset($formSpec['submissionActions']))
     {
         return ['success' => true, 'message' => 'No submission actions defined'];
@@ -38,7 +39,6 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID) {
         $vars['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
     }
 
-
     $apiRequests = $formSpec['submissionActions']['apiRequest'];
 
     if (!isset($apiRequests[0]))
@@ -50,19 +50,20 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID) {
     {
         $result = APIInteractions::Post(
             endpoint: $apiRequest['endpoint'],
-            payload: $vars
+            payload: $vars,
+            requireAuth: false,
         );
         $results[] = $result;
 
-        if (!$result['success']) {
+        if ($result->StatusCode >= 400)
+        {
             return [
                 'success' => false,
-                'message' => $result['message'],
-                'results' => $results
+                'message' => $result->Payload['message'] ?? 'An error occurred while executing the submission action',
+                'results' => $results,
             ];
         }
     }
-    die();
 
     return [
         'success' => true,
@@ -306,9 +307,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
 
                 if ($submissionResult['success'])
                 {
-                    CacheUtilities::StoreSubmissionResult($formInstanceID, $submissionResult);
                     CacheUtilities::MarkFormAsComplete($formInstanceID);
-                    NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+                    NavigationUtilities::Redirect(target: $formSpec['afterSubmissionRedirect']['target']);
                 }
                 else
                 {
@@ -342,9 +342,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
 
             if ($submissionResult['success'])
             {
-                CacheUtilities::StoreSubmissionResult($formInstanceID, $submissionResult);
                 CacheUtilities::MarkFormAsComplete($formInstanceID);
-                NavigationUtilities::Redirect(target: '/form-complete/' . $formInstanceID);
+                NavigationUtilities::Redirect(target: $formSpec['afterSubmissionRedirect']['target']);
             }
             else
             {

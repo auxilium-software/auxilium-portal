@@ -4,6 +4,11 @@
     <title>Onboard a New Case</title>
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
+
+
+
+
+
     <pages>
         <page>
             <id>who_is_case_about</id>
@@ -473,4 +478,7 @@
             </payload>
         </apiRequest>
     </submissionActions>
+    <afterSubmissionRedirect>
+        <target>/login</target>
+    </afterSubmissionRedirect>
 </auxForm>

@@ -1,10 +1,9 @@
 <?php
 
-use Auxilium\API\V2\APIMaster;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 
 function requireComponents(): void
