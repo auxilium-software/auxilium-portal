@@ -20,45 +20,39 @@
         <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
         <script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
         <script src="/Static/JS/ThirdParty/JSZip.min.js"></script>
-        
+
         <script src="/Static/JS/General/Utils.js"></script>
 
+        <script src="/Static/JS/Classes/APIInteractions.js"></script>
+        <script src="/Static/JS/General/Localisation.js"></script>
         <script src="/Static/JS/Classes/ToastNotification.js"></script>
-        <script src="/Static/JS/Classes/SearchEngine.js"></script>
-        <script src="/Static/JS/Classes/LanguagePack.js"></script>
-        <script src="/Static/JS/Classes/MicroTemplate.js"></script>
-        <script src="/Static/JS/Classes/TemplateString.js"></script>
-        <script src="/Static/JS/Classes/Schema.js"></script>
         <script src="/Static/JS/General/PopupUI.js"></script>
+        <script src="/Static/JS/General/CookieUtilities.js"></script>
 
         <script src="/Static/JS/ThirdParty/iCal.js"></script>
 
-        <script src="/Static/JS/Classes/MessageView.js"></script>
-        <script src="/Static/JS/Classes/MessageDraft.js"></script>
-        <script src="/Static/JS/Classes/InlineNodeView.js"></script>
-        <script src="/Static/JS/Classes/PathNameView.js"></script>
-        <script src="/Static/JS/Classes/PropertyList.js"></script>
-        <script src="/Static/JS/Classes/InfiniteScroller.js"></script>
-        <script src="/Static/JS/Classes/NewPropertyPopup.js"></script>
         <script src="/Static/JS/General/RFC822Parser.js"></script>
 
-        <script src="/Static/JS/Classes/AuxiliumClient.js"></script>
-        <script src="/Static/JS/Classes/AuxiliumNode.js"></script>
+        <script src="/Static/JS/APIControllers/AuthenticationController.js"></script>
+
+        <script>
+            const INSTANCE_RECAPTCHA_SITE_KEY = '{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}';
+            const API_KEY = '';
+        </script>
     </head>
     
     <body>
         <span id="auxilium_instance_uuid" style="display: none;">{{ INSTANCE_UUID }}</span>
         <span id="auxilium_instance_fqdn" style="display: none;">{{ INSTANCE_DOMAIN_NAME }}</span>
-        <script>let default_auxilium_client = new AuxiliumClient(null, "{{ current_user.uuid }}");</script>
 
         {% if header_warning %}
-        <div>
-            <div class="inner-content">
-                <h2>{{ header_warning_title }}</h2>
-                <p>{{ header_warning_content }}</p>
-                <div class="spacer"></div>
+            <div>
+                <div class="inner-content">
+                    <h2>{{ header_warning_title }}</h2>
+                    <p>{{ header_warning_content }}</p>
+                    <div class="spacer"></div>
+                </div>
             </div>
-        </div>
         {% endif %}
         
         <nav>

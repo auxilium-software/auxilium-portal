@@ -86,7 +86,7 @@ class PageBuilder
 
         try
         {
-            $this->twig->addGlobal('current_user', Session::get_current()->getUser());
+            // $this->twig->addGlobal('current_user', Session::get_current()->getUser());
         }
         catch(Exception $e)
         {

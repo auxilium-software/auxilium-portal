@@ -1,8 +1,9 @@
 {
-    "name": "auxilium-software/auxilium2",
+    "name": "auxilium-software/auxilium-portal",
     "description": "CRM and Case Management Portal",
     "type": "project",
     "license": "Apache-2.0",
+    "version": "v2-alpha-20250818",
 
     "authors": [
         {
@@ -48,8 +49,8 @@
         "phpmailer/phpmailer": "^6.6",
         "webklex/php-imap": "^6.1",
 
-        "lcobucci/jwt": "^5.4.2",
-        "web-token/jwt-core": "^3.4.6",
+        "firebase/php-jwt": "~5.5.1",
+        "lcobucci/jwt": "^3.4.6 || ^4.0.4",
 
         "aws/aws-sdk-php": "^3.277",
 
