@@ -1,0 +1,35 @@
+
+{% if not max_inline_node_text_length %}
+    {% set max_inline_node_text_length = 200 %}
+{% endif %}
+
+{% if (_data | length) > max_inline_node_text_length %}
+    {% set ltid = [] %}
+    {% for i in 1..16 %}
+        {% set randomCharacter = random("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567") %}
+        {% set ltid = ltid | merge([randomCharacter]) %}
+    {% endfor %}
+    {% set ltid = ltid | join %}
+    <span id="large_text_{{ ltid }}_preview" style="display: none;" title="Show full text">
+        {{ _data | slice(0, max_inline_node_text_length) | nl2br }}
+        <a href="javascript:expand_large_text('{{ ltid }}');" class="inline-icon more-icon">
+
+        </a>
+    </span>
+    <span id="large_text_{{ ltid }}_full">{{ _data | nl2br }}
+        <a href="javascript:hide_large_text('{{ ltid }}');" class="inline-icon close-fullscreen-icon" title="Hide full text">
+
+        </a>
+    </span>
+    {% if not hide_edit_button %}
+        <a class="edit-icon inline-icon" title="Edit" href="{{ _data_path }}/@edit?{{ url_metadata.copy().setPath(_data_path | slice(7)) }}"{% if _data_new_tab %} target="_blank"{% endif %}>
+        </a>
+    {% endif %}
+    <script>hide_large_text("{{ ltid }}")</script>
+{% else %}
+    <span>{{ _data | nl2br }}</span>
+    {% if not hide_edit_button %}
+        <a class="edit-icon inline-icon" title="Edit" href="{{ _data_path }}/@edit?{{ url_metadata.copy().setPath(_data_path | slice(7)) }}"{% if _data_new_tab %} target="_blank"{% endif %}>
+        </a>
+    {% endif %}
+{% endif %}

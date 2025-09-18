@@ -46,12 +46,14 @@ $routedDir = __DIR__ . "/../RoutedPages";
 
 // Map routes to corresponding files
 $routes = [
+    "/form"             => "$routedDir/form.php",
+    "/case"             => "$routedDir/case-overview.php",
+    "/user"             => "$routedDir/user-overview.php",
+
     "/new"              => "$routedDir/new.php",
     "/graph"            => "$routedDir/graph.php",
-    "/form"             => "$routedDir/form.php",
     "/chats/drafts"     => "$routedDir/chats/draft.php",
     "/message-centre"   => "$routedDir/message-centre.php",
-    "/users"            => "$routedDir/user.php",
 
     "/assets/language-packs"    => "$routedDir/assets/get-language-pack.php",
 

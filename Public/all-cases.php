@@ -8,7 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 try
 {
-    PageBuilder::AutoRenderUnsafe();
+    PageBuilder::AutoRender();
 }
 catch(Exception $e)
 {

@@ -1,0 +1,36 @@
+
+{% if _data.detail == 'User not found' %}
+    <h3 class="low-margin-heading">
+        <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
+        </span>
+        <em>{{ "Deleted User"|translate }}</em>
+    </h3>
+{% else %}
+    {% if inline_node_expanded %}
+        <h3 class="low-margin-heading">
+        <a {% if inline_node_new_tab %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/users/{{ _data.id }}">
+            <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
+            </span>
+            {% if _data.full_name %}
+                {{ _data.full_name }}
+            {% else %}
+                {{ "{" ~ _data.id ~ "}" }}
+            {% endif %}
+        </a>
+    </h3>
+        <div class="small-spacer"></div>
+        <dl>
+    </dl>
+    {% else %}
+        <a {% if inline_node_new_tab %}class="navigational-link-new-tab" target="_blank"{% else %}class="navigational-link"{% endif %}class="navigational-link" href="/users/{{ _data.id }}">
+        <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
+        </span>
+            {% if _data.full_name %}
+                {{ _data.full_name }}
+            {% else %}
+                {{ "{" ~ _data.id ~ "}" }}
+            {% endif %}
+    </a>
+    {% endif %}
+{% endif %}
+

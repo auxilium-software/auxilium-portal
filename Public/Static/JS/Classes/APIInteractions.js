@@ -53,4 +53,20 @@ class APIInteractions
     async API_DELETE(target, useAuth = true) {
         return await this.#apiRequest('DELETE', target, useAuth);
     }
+    async API_FILE_UPLOAD(target, file, useAuth=true)
+    {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`http://localhost:1983${target}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + API_KEY,
+            },
+            body: formData,
+            credentials: 'include'
+        });
+
+        return [response.status, await response.json()];
+    }
 }
