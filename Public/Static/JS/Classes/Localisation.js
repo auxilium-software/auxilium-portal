@@ -1,7 +1,7 @@
-
 class Localisation
 {
-    static translate(text) {
+    static translate(text)
+    {
         return text;
     }
 }

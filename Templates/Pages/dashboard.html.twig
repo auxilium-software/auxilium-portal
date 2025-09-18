@@ -17,9 +17,9 @@
             {% endfor %}
 
             <a href="/graph/~{{ current_user.id }}" class="navigational-link">{{ "manage_my_account" | translate | ndsentence }}</a><br />
-            <a href="/form/8c5b68fb-b79d-4b5f-b3bb-984ee3214891" class="navigational-link">{{ "open_new_case" | translate | ndsentence }}</a><br />
+            <a href="/form/NewCase" class="navigational-link">{{ "open_new_case" | translate | ndsentence }}</a><br />
             <a href="#" onclick="let se = new SearchEngine('global', 8); let fp = se.fullPage(); this.after(fp); fp.showModal(); se.onSelect((path) => {window.location.href = '/graph/' + deegraphPathToLink(path)}); se.focus();" class="action-link action-link-search">{{ "search_the_portal" | translate | ndsentence }}</a><br />
-            {% if is_admin %}
+            {% if _IS_ADMIN_ %}
                 <a href="/console" class="navigational-link">{{ "auxilium_console" | translate | ndsentence }}</a><br />
                 <a href="/system" class="navigational-link">{{ "system_settings" | translate | ndsentence }}</a><br />
                 <a href="/all-cases" class="navigational-link">{{ "all_cases" | translate | ndsentence }}</a><br />

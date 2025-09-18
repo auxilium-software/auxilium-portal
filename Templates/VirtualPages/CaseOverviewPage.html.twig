@@ -1,0 +1,98 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "case overview" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/case/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
+            </div>
+
+            <h1>{{ "Case Overview" | translate }}</h1>
+
+            <div class="separator"></div>
+
+            <div>
+
+                <div id="main-content" class="reference-element"></div>
+
+                <div class="left-preferential-box">
+                    <div class="marked-section">
+                        <h2>{{ "Case Description" | translate }}</h2>
+                        <br>
+                        {% if progressive_load %}
+                        {% else %}
+                            {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description} %}
+                        {% endif %}
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "ToDo List" | translate }}
+                            <a
+                                href="javascript:{let win = new NewPropertyPopup('ICALENDAR_TODO', '{{ "{" ~ node.id ~ "}" }}/todos/#', true);document.getElementById('main-content').after(win.render());};"
+                                class="inline-icon add-icon"
+                                title="{{ "Add Entry" | translate }}"
+                            ></a>
+                        </h2>
+                        <ul class="collection-list">
+                        {% if progressive_load %}
+                        {% else %}
+                            {% for prop_name, prop in node.properties.todos.properties %}
+                            {% else %}
+                                <li><em>List empty</em></li>
+                            {% endfor %}
+                        {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="right-preferential-box">
+                    <div class="marked-section">
+                        <h2>{{ "Clients" | translate }} <a href="javascript:attachToObject('{{ ("{" ~ node.id ~ "}/clients/#") | raw }}', 'users');" class="inline-icon group-add-icon" title="{{ "Add Person" | translate }}"></a></h2><br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% if progressive_load %}
+                            {% else %}
+                                {% for clientDetails in CaseDetails.clients %}
+                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': clientDetails} %}
+                                {% else %}
+                                    <li><em>Client list empty</em></li>
+                                {% endfor %}
+                            {% endif %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+                    <div class="marked-section">
+                        <h2>{{ "Case Workers" | translate }} <a href="javascript:attachToObject('{{ ("{" ~ node.id ~ "}/workers/#") | raw }}', 'users_and_groups');" class="inline-icon group-add-icon" title="{{ "Add Person" | translate }}"></a></h2><br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% if progressive_load %}
+                            {% else %}
+                                {% for workerDetails in CaseDetails.workers %}
+                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': workerDetails} %}
+                                {% else %}
+                                    <li><em>Client list empty</em></li>
+                                {% endfor %}
+                            {% endif %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>{{ "Case Management" | translate }}</h2><br />
+                        {% if "DELETE" in node.permissions %}
+                            <a class="action-link action-link-delete" href="/graph/{{ primary_string_path | raw }}/@delete_confirm?{{ url_metadata }}">{{ "Delete Case" | translate }}</a><br />
+                        {% endif %}
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@references?{{ url_metadata }}">{{ "See References" | translate }}</a>
+                        <br>
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

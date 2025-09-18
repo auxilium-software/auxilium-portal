@@ -7,6 +7,8 @@ use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
 use Auxilium\Utilities\ConfigurationUtilities;
+use Auxilium\Utilities\JWTUtilities;
+use Auxilium\Utilities\SecurityUtilities;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
@@ -22,7 +24,7 @@ class PageBuilder
     public FilesystemLoader $loader;
     public Environment $twig;
 
-    public function __construct()
+    public function __construct(bool $useAuth)
     {
         $this->loader = new FilesystemLoader(__DIR__ . "/../../Templates/");
         $this->twig = new Environment($this->loader, [
@@ -52,6 +54,17 @@ class PageBuilder
         $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY',                   ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SiteKey']);
         $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SecretKey']);
 
+        if($useAuth)
+        {
+            SecurityUtilities::RequireLogin();
+            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",  value: true);
+            $this->twig->addGlobal(name: "_IS_ADMIN_",      value: SecurityUtilities::IsAdmin());
+        }
+        else
+        {
+            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",  value: false);
+        }
+
 
         $this->twig->addExtension(new CommonFilters());
         $this->twig->addExtension(new CommonFunctions());
@@ -63,17 +76,17 @@ class PageBuilder
             switch($_COOKIE["lang"])
             {
                 case "cy":
-                    $this->twig->addGlobal('selected_lang', "cy");
+                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "cy-GB");
                     break;
                 case "zh": // For testing only, this language pack is shoddy at best
-                    $this->twig->addGlobal('selected_lang', "zh");
+                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "zh");
                     break;
                 case "ar": // For testing only, this language pack is shoddy at best
-                    $this->twig->addGlobal('selected_lang', "ar");
+                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "ar");
                     break;
                 case "en":
                 default:
-                    $this->twig->addGlobal('selected_lang', "en");
+                $this->twig->addGlobal('_SELECTED_LANGUAGE_', "en-GB");
                     break;
             }
         }
@@ -83,35 +96,27 @@ class PageBuilder
         {
             $this->twig->addGlobal('head_asset_options', explode(" ", $_COOKIE["style"]));
         }
-
-        try
-        {
-            // $this->twig->addGlobal('current_user', Session::get_current()->getUser());
-        }
-        catch(Exception $e)
-        {
-            $this->twig->addGlobal('current_user', null);
-        }
-
-
     }
 
-    /**
-     * Will figure out which twig template to render, and render it.
-     * You can also pass through variables.
-     *
-     * @param array $variables Any variables you want to pass through to the template.
-     * @return void
-     */
     #[NoReturn] public static function AutoRender(array $variables = []): void
     {
         PageBuilder::Render(
             template : PageBuilder::GuessTargetTwigFile(),
             variables: $variables,
+            useAuth: true,
         );
     }
 
-    #[NoReturn] public static function Render(string $template, array $variables = []): void
+    #[NoReturn] public static function AutoRenderUnsafe(array $variables = []): void
+    {
+        PageBuilder::Render(
+            template : PageBuilder::GuessTargetTwigFile(),
+            variables: $variables,
+            useAuth: false,
+        );
+    }
+
+    #[NoReturn] public static function Render(string $template, array $variables = [], bool $useAuth = true): void
     {
 
         foreach(self::$AdditionalVariables as $key => $value)
@@ -121,7 +126,7 @@ class PageBuilder
 
         try
         {
-            echo (new PageBuilder())->twig->render($template, $variables);
+            echo (new PageBuilder($useAuth))->twig->render($template, $variables);
             exit();
         }
         catch(RuntimeError $e)
