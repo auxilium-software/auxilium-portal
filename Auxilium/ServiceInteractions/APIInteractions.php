@@ -129,7 +129,7 @@ class APIInteractions
                 }
                 $this->redirectToLogin();
             }
-            elseif($statusCode === 403)
+            elseif($statusCode === 401)
             {
                 $this->redirectToLogin();
             }

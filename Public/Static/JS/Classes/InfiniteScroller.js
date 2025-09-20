@@ -7,6 +7,7 @@ class InfiniteScroller
     #hasMoreData = true;
     #endpoint;
     #params;
+    #compact;
     #renderFunction;
     #totalItems = 0;
     #apiClient;

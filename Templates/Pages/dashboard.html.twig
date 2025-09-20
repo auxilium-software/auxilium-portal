@@ -18,7 +18,7 @@
 
             <a href="/graph/~{{ current_user.id }}" class="navigational-link">{{ "manage_my_account" | translate | ndsentence }}</a><br />
             <a href="/form/NewCase" class="navigational-link">{{ "open_new_case" | translate | ndsentence }}</a><br />
-            <a href="#" onclick="let se = new SearchEngine('global', 8); let fp = se.fullPage(); this.after(fp); fp.showModal(); se.onSelect((path) => {window.location.href = '/graph/' + deegraphPathToLink(path)}); se.focus();" class="action-link action-link-search">{{ "search_the_portal" | translate | ndsentence }}</a><br />
+            <a href="/serach" class="action-link action-link-search">{{ "search_the_portal" | translate | ndsentence }}</a><br />
             {% if _IS_ADMIN_ %}
                 <a href="/console" class="navigational-link">{{ "auxilium_console" | translate | ndsentence }}</a><br />
                 <a href="/system" class="navigational-link">{{ "system_settings" | translate | ndsentence }}</a><br />
@@ -40,9 +40,6 @@
                     <h2 class="heading-of-hideable-content">{{ "my_cases" | translate }} <a href="javascript:toggle_hidden_box('{{ ltid }}');"><span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;"></span></a></h2>
                     <div id="hidden_box_{{ ltid }}" class="logical-box">
                         {% if progressive_load %}
-                            <div class="logical-box" id="cases_container">
-
-                            </div>
                         {% else %}
                             <ul class="collection-list">
                                 {% if current_user.properties.cases %}
