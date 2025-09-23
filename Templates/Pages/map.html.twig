@@ -1,0 +1,98 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "Map" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/map">{{ "Map" | translate }}</a>
+            </div>
+
+            <h1>{{ "Map" | translate }}</h1>
+
+            <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+            <link href="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet" />
+            <style>
+                #graph {
+                    width: 100%;
+                    height: 90vh;
+                    border: 1px solid lightgray;
+                }
+            </style>
+
+            <div id="graph"></div>
+
+            <script>
+                const api = new APIInteractions();
+                const caseController = new CaseController();
+                const userController = new UserController();
+
+                document.addEventListener('DOMContentLoaded', async function() {
+                    const allCases = await caseController.GetAllCases_DontDoThisLol();
+                    const allUsers = await userController.GetAllUsers_DontDoThisLol();
+
+                    let nodeBuilder = [];
+                    let edgeBuilder = [];
+
+
+                    for (const temp of allCases)
+                    {
+                        nodeBuilder.push(
+                            {
+                                id: temp.id,
+                                label: temp.status,
+                                group: 'case'
+                            }
+                        );
+                    }
+                    for (const temp of allUsers)
+                    {
+                        nodeBuilder.push(
+                            {
+                                id: temp.id,
+                                label: temp.full_name,
+                                group: 'person'
+                            }
+                        );
+                    }
+
+                    const nodes = new vis.DataSet(nodeBuilder);
+                    const edges = new vis.DataSet([]);
+
+                    const container = document.getElementById('graph');
+                    const data = { nodes, edges };
+                    const options = {
+                        nodes: {
+                            shape: 'dot',
+                            size: 16,
+                            font: { size: 14 }
+                        },
+                        edges: {
+                            arrows: 'to',
+                            font: { align: 'middle' }
+                        },
+                        physics: {
+                            enabled: true,
+                            solver: 'forceAtlas2Based'
+                        },
+                        groups: {
+                            case: { color: { background: '#FFD700' }, shape: 'box' },
+                            person: { color: { background: '#87CEEB' } }
+                        }
+                    };
+
+                    const network = new vis.Network(container, data, options);
+
+                    network.on("click", function (params) {
+                        if (params.nodes.length) {
+                            window.location = "/graph/~" + nodes.get(params.nodes[0]).id.replace("{", "").replace("}", "");
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}

@@ -12,6 +12,7 @@ use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\Utilities\EncodingUtilities;
 use Auxilium\Utilities\LocalisationUtilities;
 use Auxilium\Utilities\Security;
+use Auxilium\Utilities\UUIDUtilities;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -28,6 +29,7 @@ class CommonFilters extends AbstractExtension
             new TwigFilter('un_b64_url_safe',       [$this, 'un_b64_url_safe']),
             new TwigFilter('format_as_sentence',    [$this, 'format_as_sentence']),
             new TwigFilter('human_filesize',        [$this, 'human_filesize']),
+            new TwigFilter('is_uuid',               [$this, 'is_uuid']),
             new TwigFilter('ndtitle',               [$this, 'ndtitle']),
             new TwigFilter('ndsentence',            [$this, 'ndsentence']),
         ];
@@ -77,6 +79,15 @@ class CommonFilters extends AbstractExtension
         {
             return substr($size / (1024 ** 4), 0, 3) . " TiB";
         }
+    }
+
+    public function is_uuid(string|array $string): string
+    {
+        if(gettype($string) === "string")
+        {
+            return UUIDUtilities::IsValid($string);
+        }
+        return false;
     }
 
     public function ndtitle($string): string

@@ -14,6 +14,7 @@
 @import url("/Static/CSS/Elements/MessageCenter.css");
 @import url("/Static/CSS/Elements/Navigation.css");
 @import url("/Static/CSS/Elements/Notes.css");
+@import url("/Static/CSS/Elements/ToDos.css");
 
 @font-face {
     font-family: "Atkinson Hyperlegible";

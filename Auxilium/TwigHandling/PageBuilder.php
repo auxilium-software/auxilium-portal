@@ -54,6 +54,9 @@ class PageBuilder
         $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY',                   ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SiteKey']);
         $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SecretKey']);
 
+        $this->twig->addGlobal('_INLINE_NODE_EXPANDED_',                        false);
+        $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_',                         false);
+
         if($useAuth)
         {
             SecurityUtilities::RequireLogin();
