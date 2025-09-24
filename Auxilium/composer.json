@@ -68,7 +68,7 @@
 
         "phpfui/icalendar": "1.1.0",
 
-        "zircote/swagger-php": "~4.8.7",
+        "zircote/swagger-php": "~5.4.0",
 
         "unional/jsonc": "~1.0.1"
     },
