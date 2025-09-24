@@ -1,55 +1,43 @@
 <?php
 
-use Auxilium\TwigHandling\Extensions\CommonFilters;
-use Auxilium\TwigHandling\Extensions\CommonFunctions;
+use Auxilium\Utilities\UUIDUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Get path without query string
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$publicDir = __DIR__ . '/../Public';
 
-function requireComponents(): void
+// 1. Serve root index
+if ($path === '/')
 {
-    if(
-        file_exists(__DIR__ . '/../vendor/autoload.php')
-    )
-    {
-        require_once __DIR__ . '/../vendor/autoload.php';
-        return;
-    }
-
-    if(!file_exists(__DIR__ . '/../vendor/autoload.php'))
-    {
-        echo "pls install composer";
-        die();
-    }
-
-    require_once __DIR__ . '/../vendor/autoload.php';
-    $loader = new FilesystemLoader(__DIR__ . "/../Templates/");
-    $twig = new Environment($loader, [
-            "debug" => true,
-            "cache" => false,
-        ]
-    );
-    $twig->addExtension(new CommonFilters());
-    $twig->addExtension(new CommonFunctions());
+    require_once "$publicDir/index.php";
+    return true;
 }
 
+// 2. Serve public PHP files like /about → /Public/about.php
+$phpFile = "$publicDir$path.php";
+if (is_file($phpFile))
+{
+    require_once $phpFile;
+    return true;
+}
 
-// Get the requested URI
-$requestUri = $_SERVER['REQUEST_URI'];
+// 3. Serve static files directly (e.g., CSS, JS, images)
+$rawFile = "$publicDir$path";
+if (is_file($rawFile))
+{
+    return false; // Let the web server serve this
+}
 
-// Remove query string if present
-$path = parse_url($requestUri, PHP_URL_PATH);
-
-// Base directory for your public files
-$publicDir = __DIR__ . "/../Public";
-$routedDir = __DIR__ . "/../RoutedPages";
-
-// Map routes to corresponding files
+// 4. Custom regex routes
 $routes = [
-    "/form"             => "$routedDir/form.php",
-    "/case"             => "$routedDir/case-overview.php",
-    "/user"             => "$routedDir/user-overview.php",
+    "#^/form$#"                                                                     => __DIR__ . '/../RoutedPages/form.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'  => __DIR__ . '/../RoutedPages/todo-overview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/case-overview.php',
+    "#^/user$#"                                                                     => __DIR__ . '/../RoutedPages/user-overview.php',
 
+    /*
     "/new"              => "$routedDir/new.php",
     "/graph"            => "$routedDir/graph.php",
     "/chats/drafts"     => "$routedDir/chats/draft.php",
@@ -58,71 +46,18 @@ $routes = [
     "/assets/language-packs"    => "$routedDir/assets/get-language-pack.php",
 
     "/email-link"   => "$routedDir/email-link.php",
+    */
 ];
 
-// check for an api endpoint
-if(str_starts_with($path, "/api/v1"))
+foreach ($routes as $pattern => $file)
 {
-    http_response_code(299);
-    echo "404";
-    die();
-}
-if(str_starts_with($path, "/api/v2"))
-{
-    $originalLimit = ini_get('memory_limit');
-    $originalTimeLimit = ini_get('max_execution_time');
-    ini_set('memory_limit', -1);
-    ini_set('max_execution_time', 0);
-
-    requireComponents();
-    $apiResponse = APIMaster::Go();
-    echo json_encode($apiResponse, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-
-    ini_set('memory_limit', $originalLimit);
-    ini_set('max_execution_time', $originalTimeLimit);
-
-    die();
-}
-
-// handle index page
-if($path === "/")
-{
-    requireComponents();
-    require_once "$routedDir/index.php";
-    return true;
-}
-
-// Check if the request matches a predefined route
-foreach($routes as $route => $file)
-{
-    if(str_starts_with($path, $route))
+    if (preg_match($pattern, $path))
     {
-        requireComponents();
         require_once $file;
         return true;
     }
 }
 
-// Check if the requested file exists with a `.php` extension
-$file = $publicDir . $path . '.php';
-if(file_exists($file))
-{
-    if($path !== "/system/init")
-    {
-        requireComponents();
-    }
-    require_once $file;
-    return true;
-}
 
-// Check if the requested file exists without an extension
-$file = $publicDir . $path;
-if(file_exists($file))
-{
-    return false;
-}
-
-// Return a 404 response for unmatched routes
-http_response_code(404);
-echo "404 - could not route";
+echo 404;
 die();
