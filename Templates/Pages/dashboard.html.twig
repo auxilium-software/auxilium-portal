@@ -16,17 +16,16 @@
                 <div class="todo-box"><h4>{{ paa.action.short_description }}</h4><p><a href="{{ paa.accept_link }}">{{ "accept" | translate }}<span class="inline-icon internal-link-marker-icon"></span></a><br /><a href="{{ paa.deny_link }}">{{ "deny" | translate }}<span class="inline-icon internal-link-marker-icon"></span></a></p></div>
             {% endfor %}
 
-            <a href="/graph/~{{ current_user.id }}" class="navigational-link">{{ "manage_my_account" | translate | ndsentence }}</a><br />
-            <a href="/form/NewCase" class="navigational-link">{{ "open_new_case" | translate | ndsentence }}</a><br />
-            <a href="/serach" class="action-link action-link-search">{{ "search_the_portal" | translate | ndsentence }}</a><br />
+            <a href="/me" class="navigational-link">{{ "Manage my Account" | translate | ndsentence }}</a><br />
+            <a href="/form/NewCase" class="navigational-link">{{ "Open a New Case" | translate | ndsentence }}</a><br />
+            <a href="/search" class="action-link action-link-search">{{ "Search the Portal" | translate | ndsentence }}</a><br />
             {% if _IS_ADMIN_ %}
-                <a href="/console" class="navigational-link">{{ "auxilium_console" | translate | ndsentence }}</a><br />
-                <a href="/system" class="navigational-link">{{ "system_settings" | translate | ndsentence }}</a><br />
-                <a href="/all-cases" class="navigational-link">{{ "all_cases" | translate | ndsentence }}</a><br />
+                <a href="/system" class="navigational-link">{{ "System Settings" | translate | ndsentence }}</a><br />
+                <a href="/all-cases" class="navigational-link">{{ "All Cases" | translate | ndsentence }}</a><br />
+                <a href="/map" class="navigational-link">{{ "Map" | translate | ndsentence }}</a><br />
             {% endif %}
-            <a href="/map" class="navigational-link">{{ "map" | translate | ndsentence }}</a><br />
-            <a href="/message-centre" class="navigational-link">{{ "message center" | translate | ndsentence }}</a><br />
-            <a href="/chats/new-message" class="navigational-link">{{ "send_a_message" | translate | ndsentence }}</a><br />
+            <a href="/message-centre" class="navigational-link">{{ "Message Center" | translate | ndsentence }}</a><br />
+            <a href="/chats/new-message" class="navigational-link">{{ "Send a Message" | translate | ndsentence }}</a><br />
 
             <div class="large-spacer"></div>
             <div class="separator"></div>
