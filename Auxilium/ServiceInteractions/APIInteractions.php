@@ -136,7 +136,7 @@ class APIInteractions
             else
             {
                 // Other errors - show error page
-                $this->showErrorPage($statusCode, $response);
+                // $this->showErrorPage($statusCode, $response);
             }
         }
 
@@ -170,13 +170,13 @@ class APIInteractions
             $refreshWrapper->SetPayload(['refresh_token' => $refreshToken]);
             $response = $refreshWrapper->executeRequest();
 
-            if(isset($response['access_token']))
+            if(isset($response->Payload['access_token']))
             {
-                CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response['access_token']);
+                CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response->Payload['access_token']);
 
-                if(isset($response['refresh_token']))
+                if(isset($response->Payload['refresh_token']))
                 {
-                    CookieHandling::SetCookie(CookieKey::REFRESH_TOKEN, $response['refresh_token']);
+                    CookieHandling::SetCookie(CookieKey::REFRESH_TOKEN, $response->Payload['refresh_token']);
                 }
 
                 return true;
