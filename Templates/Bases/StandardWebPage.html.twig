@@ -81,11 +81,16 @@
         <nav>
             <div class="inner-content">
                 <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
-                <a id="navigation-logo" href="/"><img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />{{ GetUserConfiguration("Instance", "Branding", "Name") }}<sup> BETA</sup></a>
-                <a id="navigation-logo-ultra-small" href="/"><img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" /></a>
+                <a id="navigation-logo" href="/">
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />
+                    {{ GetUserConfiguration("Instance", "Branding", "Name") }}<sup> BETA</sup>
+                </a>
+                <a id="navigation-logo-ultra-small" href="/">
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />
+                </a>
                 <div id="navigation-buttons">
-                    {% if ABOUT_PAGE_URL %}
-                        <a href="{{ ABOUT_PAGE_URL }}">{{ "About"|translate }}</a>
+                    {% if GetUserConfiguration("Instance", "Navigation", "About") %}
+                        <a href="{{ GetUserConfiguration("Instance", "Navigation", "About") }}">{{ "About"|translate }}</a>
                     {% endif %}
                     {% if _IS_LOGGED_IN_ %}
                         <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
@@ -108,21 +113,21 @@
                     <span id="burger-bun-bottom"></span>
                     <div id="navigation-menu">
                         <div class="inner-content">
-                        {% if ABOUT_PAGE_URL %}
-                            <a href="{{ ABOUT_PAGE_URL }}">{{ "About"|translate }}</a>
-                        {% endif %}
-                        {% if _IS_LOGGED_IN_ %}
-                            <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
-                            <a href="/dashboard">{{ "Case Portal"|translate }}</a>
-                        {% else %}
-                            <a href="/onboard-new-case">{{ "New Clients"|translate|title }}</a>
-                            <a href="/dashboard">{{ "Login"|translate|title }}</a>
-                        {% endif %}
-                        {% if _SELECTED_LANGUAGE_ == "en-GB" %}
-                            <a href="/lang?switch=cy-GB" class="language-swap" lang="cy-GB" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
-                        {% else %}
-                            <a href="/lang?switch=en-GB" class="language-swap" lang="en-GB" title="Switch language to English"><strong>English</strong></a>
-                        {% endif %}
+                            {% if GetUserConfiguration("Instance", "Navigation", "About") %}
+                                <a href="{{ GetUserConfiguration("Instance", "Navigation", "About") }}">{{ "About"|translate }}</a>
+                            {% endif %}
+                            {% if _IS_LOGGED_IN_ %}
+                                <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
+                                <a href="/dashboard">{{ "Case Portal"|translate }}</a>
+                            {% else %}
+                                <a href="/onboard-new-case">{{ "New Clients"|translate|title }}</a>
+                                <a href="/dashboard">{{ "Login"|translate|title }}</a>
+                            {% endif %}
+                            {% if _SELECTED_LANGUAGE_ == "en-GB" %}
+                                <a href="/lang?switch=cy-GB" class="language-swap" lang="cy-GB" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
+                            {% else %}
+                                <a href="/lang?switch=en-GB" class="language-swap" lang="en-GB" title="Switch language to English"><strong>English</strong></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -166,9 +171,17 @@
 
         <footer>
             <div class="inner-content">
-                <p><strong>{{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ GetUserConfiguration("Instance", "Branding", "Name") }}</strong></p>
-                {% if OPERATOR_NAME %}
-                    <p>{{ GetUserConfiguration("Instance", "Branding", "Name") }} is owned and operated by {{ OPERATOR_NAME }}.</p>
+                <p>
+                    <strong>
+                        {{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                    </strong>
+                </p>
+                {% if GetUserConfiguration("Instance", "Contacts", "Operator") %}
+                    <p>
+                        {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                        is owned and operated by
+                        <a href="mailto:{{ GetUserConfiguration("Instance", "Contacts", "Operator", "EmailAddress") }}">{{ GetUserConfiguration("Instance", "Contacts", "Operator", "Name") }}</a>.
+                    </p>
                 {% endif %}
             </div>
         </footer>
