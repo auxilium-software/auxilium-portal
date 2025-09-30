@@ -8,7 +8,7 @@
     border-radius:15mm;
     background-color: var(--background-color);
     border: var(--outline-width) solid var(--foreground-color);
-    box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);
+    /*box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);*/
     display: inline-block;
     transition: transform .15s ease-in-out;
     width: auto;
