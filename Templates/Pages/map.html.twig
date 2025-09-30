@@ -42,17 +42,37 @@
                     {
                         nodeBuilder.push(
                             {
-                                id: temp.id,
-                                label: temp.status,
+                                id: "CASE@" + temp.id,
+                                label: temp.title,
                                 group: 'case'
                             }
                         );
+                        for (const temp2 of temp.workers)
+                        {
+                            edgeBuilder.push({
+                                from: "PERSON@" + temp2,
+                                to: "CASE@" + temp.id,
+                                color: "rgb(113,0,154)",
+                                label: "Worker",
+                                font: { face: "Monospace", align: "middle" },
+                            });
+                        }
+                        for (const temp2 of temp.clients)
+                        {
+                            edgeBuilder.push({
+                                from: "PERSON@" + temp2,
+                                to: "CASE@" + temp.id,
+                                color: "rgb(0,154,67)",
+                                label: "Client",
+                                font: { face: "Monospace", align: "middle" },
+                            });
+                        }
                     }
                     for (const temp of allUsers)
                     {
                         nodeBuilder.push(
                             {
-                                id: temp.id,
+                                id: "PERSON@" + temp.id,
                                 label: temp.full_name,
                                 group: 'person'
                             }
@@ -60,7 +80,7 @@
                     }
 
                     const nodes = new vis.DataSet(nodeBuilder);
-                    const edges = new vis.DataSet([]);
+                    const edges = new vis.DataSet(edgeBuilder);
 
                     const container = document.getElementById('graph');
                     const data = { nodes, edges };
@@ -71,7 +91,7 @@
                             font: { size: 14 }
                         },
                         edges: {
-                            arrows: 'to',
+                            // arrows: 'none',
                             font: { align: 'middle' }
                         },
                         physics: {
@@ -87,8 +107,16 @@
                     const network = new vis.Network(container, data, options);
 
                     network.on("click", function (params) {
-                        if (params.nodes.length) {
-                            window.location = "/graph/~" + nodes.get(params.nodes[0]).id.replace("{", "").replace("}", "");
+                        if (params.nodes.length)
+                        {
+                            if(params.nodes[0].startsWith("CASE@"))
+                            {
+                                window.location = "/cases/" + params.nodes[0].replace("CASE@", "");
+                            }
+                            else if(params.nodes[0].startsWith("PERSON@"))
+                            {
+                                window.location = "/users/" + params.nodes[0].replace("PERSON@", "");
+                            }
                         }
                     });
                 });
