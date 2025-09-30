@@ -45,6 +45,7 @@
 
         <script>
             const API_KEY = getCookie('access_token');
+            const RECAPTCHA_SITE_KEY = "{{ GetUserConfiguration("ReCAPTCHA", "SiteKey") }}";
 
             function getCookie(cname) {
                 let name = cname + "=";
