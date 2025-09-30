@@ -48,7 +48,7 @@ class CookieHandling
             "", // value
             time() - (3600 * 48), // ttl
             "/", //
-            ConfigurationUtilities::GetConfiguration()['Instance']['QualifiedDNS'], // domain
+            ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'], // domain
             true, //
             true //
         );
@@ -66,7 +66,7 @@ class CookieHandling
             $value,
             time() + self::GetCookieTTL($targetCookie),
             "/",
-            ConfigurationUtilities::GetConfiguration()['Instance']['QualifiedDNS'],
+            ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
             true,
             true
         );

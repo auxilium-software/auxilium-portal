@@ -5,6 +5,7 @@ namespace Auxilium\TwigHandling\Extensions;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\MicroTemplate;
 use Auxilium\SessionHandling\CookieHandling;
+use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\Security;
 use Auxilium\Utilities\SecurityUtilities;
 use Twig\Extension\AbstractExtension;
@@ -17,6 +18,8 @@ class CommonFunctions extends AbstractExtension
         return [
             new TwigFunction('GeneratePseudoRandomBytes',       [$this, 'generatePseudoRandomBytes'],       ['is_safe' => ['html']]),
             new TwigFunction('GeneratePseudoRandomCharacters',  [$this, 'generatePseudoRandomCharacters'],  ['is_safe' => ['html']]),
+            new TwigFunction('GetSystemConfiguration',          [$this, 'getSystemConfiguration'],          ['is_safe' => ['html']]),
+            new TwigFunction('GetUserConfiguration',            [$this, 'getUserConfiguration'],            ['is_safe' => ['html']]),
         ];
     }
 
@@ -37,5 +40,23 @@ class CommonFunctions extends AbstractExtension
         }
 
         return $stringBuilder;
+    }
+    public function getSystemConfiguration(string ...$path)
+    {
+        $temp = ConfigurationUtilities::GetSystemConfiguration();
+        foreach($path as $p)
+        {
+            $temp = $temp[$p];
+        }
+        return $temp;
+    }
+    public function getUserConfiguration(string ...$path)
+    {
+        $temp = ConfigurationUtilities::GetUserConfiguration();
+        foreach($path as $p)
+        {
+            $temp = $temp[$p];
+        }
+        return $temp;
     }
 }

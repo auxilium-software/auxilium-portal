@@ -36,23 +36,28 @@ class PageBuilder
 
         $this->twig->addGlobal('style_options', []);
 
-        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO',                        ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['Logo']);
-        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR',   ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['LogoContrast']);
-        $this->twig->addGlobal('INSTANCE_BRANDING_NAME',                        ConfigurationUtilities::GetConfiguration()["Instance"]['Branding']['Name']);
-        //$this->twig->addGlobal('INSTANCE_BRANDING_DOMAIN_NAME',                 ConfigurationUtilities::GetConfiguration()["Instance"]);
-        //$this->twig->addGlobal('INSTANCE_DOMAIN_NAME',                          ConfigurationUtilities::GetConfiguration()["Instance"]);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_EMAIL',                      ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['EmailAddress']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE',                      ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Phone']['Number']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE_OPENING_HOURS',        ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Phone']['OpeningHours']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT',                       ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Text']['Number']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT_OPENING_HOURS',         ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Primary']['Text']['OpeningHours']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_NAME',                 ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Maintainer']['Name']);
-        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_EMAIL',                ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['Maintainer']['EmailAddress']);
-        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME',  ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['Name']);
-        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL', ConfigurationUtilities::GetConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['EmailAddress']);
+        /*
+        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO',                        ConfigurationUtilities::GetUserConfiguration()["Instance"]['Branding']['Logo']);
+        $this->twig->addGlobal('INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR',   ConfigurationUtilities::GetUserConfiguration()["Instance"]['Branding']['LogoContrast']);
+        $this->twig->addGlobal('INSTANCE_BRANDING_NAME',                        ConfigurationUtilities::GetUserConfiguration()["Instance"]['Branding']['Name']);
+        $this->twig->addGlobal('INSTANCE_BRANDING_DOMAIN_NAME',                 ConfigurationUtilities::GetConfiguration()["Instance"]);
+        $this->twig->addGlobal('INSTANCE_DOMAIN_NAME',                          ConfigurationUtilities::GetConfiguration()["Instance"]);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_EMAIL',                      ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Primary']['EmailAddress']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE',                      ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Primary']['Phone']['Number']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_PHONE_OPENING_HOURS',        ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Primary']['Phone']['OpeningHours']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT',                       ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Primary']['Text']['Number']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAIN_TEXT_OPENING_HOURS',         ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Primary']['Text']['OpeningHours']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_NAME',                 ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Maintainer']['Name']);
+        $this->twig->addGlobal('INSTANCE_INFO_MAINTAINER_EMAIL',                ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['Maintainer']['EmailAddress']);
+        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_NAME',  ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['Name']);
+        $this->twig->addGlobal('INSTANCE_INFO_GENERAL_ENQUIRIES_CONTACT_EMAIL', ConfigurationUtilities::GetUserConfiguration()["Instance"]['Contacts']['GeneralEnquiries']['EmailAddress']);
+        */
         //$this->twig->addGlobal('INSTANCE_UUID',                                 ConfigurationUtilities::GetConfiguration()["Instance"]);
-        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY',                   ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SiteKey']);
-        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetConfiguration()["ReCAPTCHA"]['SecretKey']);
+        /*
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SITE_KEY',                   ConfigurationUtilities::GetUserConfiguration()["ReCAPTCHA"]['SiteKey']);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetUserConfiguration()["ReCAPTCHA"]['SecretKey']);
+        $this->twig->addGlobal('INSTANCE_RECAPTCHA_SECRET_KEY',                 ConfigurationUtilities::GetUserConfiguration()["ReCAPTCHA"]['SecretKey']);
+        */
 
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_',                        false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_',                         false);

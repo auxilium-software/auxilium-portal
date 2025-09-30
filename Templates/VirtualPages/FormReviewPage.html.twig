@@ -69,7 +69,7 @@
     </div>
 
     {% if FormSpec.useReCAPTCHA %}
-        <script src="https://www.google.com/recaptcha/api.js?render={{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
     {% endif %}
 
     <script>
@@ -78,7 +78,7 @@
             actionInput.value = action;
 
             {% if FormSpec.useReCAPTCHA %}
-                const token = await grecaptcha.execute('{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}', {
+                const token = await grecaptcha.execute('{{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}', {
                     action: action === 'submit' ? 'submit' : 'form_interaction'
                 });
                 document.getElementById('ReCAPTCHAToken').value = token;

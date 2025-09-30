@@ -79,7 +79,7 @@
         }
     </script>
     <script src="/Static/JS/Handlers/LoginFormHandler.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render={{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             new LoginFormHandler();

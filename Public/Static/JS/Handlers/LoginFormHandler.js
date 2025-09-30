@@ -117,7 +117,7 @@ class LoginFormHandler {
                 throw new Error('reCAPTCHA not loaded');
             }
 
-            const token = await grecaptcha.execute(INSTANCE_RECAPTCHA_SITE_KEY, {
+            const token = await grecaptcha.execute(GetUserConfiguration("ReCAPTCHA", "SiteKey"), {
                 action: 'login'
             });
 

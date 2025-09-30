@@ -164,7 +164,7 @@
     </div>
 
     {% if FormSpec.useReCAPTCHA %}
-        <script src="https://www.google.com/recaptcha/api.js?render={{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
     {% endif %}
 
     <script>
@@ -183,7 +183,7 @@
             }
 
             {% if FormSpec.useReCAPTCHA %}
-                document.getElementById('ReCAPTCHAToken').value = await grecaptcha.execute('{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}', {action: 'register'});
+                document.getElementById('ReCAPTCHAToken').value = await grecaptcha.execute('{{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}', {action: 'register'});
             {% endif %}
             form.submit();
         }

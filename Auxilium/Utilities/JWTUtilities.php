@@ -38,8 +38,8 @@ class JWTUtilities
 
                 $decodedJWTObject = JWT::decode(
                     jwt: $temp->Payload['access_token'],
-                    keyOrKeyArray: ConfigurationUtilities::GetConfiguration()['JWT']['SecretKey'],
-                    allowed_algs: [ConfigurationUtilities::GetConfiguration()['JWT']['Algorithm']],
+                    keyOrKeyArray: ConfigurationUtilities::GetUserConfiguration()['JWT']['SecretKey'],
+                    allowed_algs: [ConfigurationUtilities::GetUserConfiguration()['JWT']['Algorithm']],
                 );
                 $decodedJWTAssocArray = json_decode(json_encode($decodedJWTObject), true);
                 return new JWTPayload(
@@ -54,8 +54,8 @@ class JWTUtilities
         {
             $decodedJWTObject = JWT::decode(
                 jwt: $_COOKIE["access_token"],
-                keyOrKeyArray: ConfigurationUtilities::GetConfiguration()['JWT']['SecretKey'],
-                allowed_algs: [ConfigurationUtilities::GetConfiguration()['JWT']['Algorithm']],
+                keyOrKeyArray: ConfigurationUtilities::GetUserConfiguration()['JWT']['SecretKey'],
+                allowed_algs: [ConfigurationUtilities::GetUserConfiguration()['JWT']['Algorithm']],
             );
         }
         /*

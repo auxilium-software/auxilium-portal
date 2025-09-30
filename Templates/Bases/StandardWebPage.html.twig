@@ -15,7 +15,7 @@
                 <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
             {% endif %}
         {% endblock %}
-        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ INSTANCE_BRANDING_NAME }}</title>
+        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
         
         <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
         <script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
@@ -24,10 +24,12 @@
         <script src="/Static/JS/General/Utils.js"></script>
 
         <script src="/Static/JS/Classes/APIInteractions.js"></script>
+        <script src="/Static/JS/Classes/CaseManager.js"></script>
         <script src="/Static/JS/Classes/InfiniteScroller.js"></script>
         <script src="/Static/JS/Classes/NewPropertyPopup.js"></script>
         <script src="/Static/JS/Classes/PropertyManager.js"></script>
         <script src="/Static/JS/Classes/ToastNotification.js"></script>
+        <script src="/Static/JS/Classes/TodoManager.js"></script>
 
         <script src="/Static/JS/Classes/Localisation.js"></script>
         <script src="/Static/JS/General/PopupUI.js"></script>
@@ -38,9 +40,11 @@
         <script src="/Static/JS/General/RFC822Parser.js"></script>
 
         <script src="/Static/JS/APIControllers/AuthenticationController.js"></script>
+        <script src="/Static/JS/APIControllers/CaseController.js"></script>
+        <script src="/Static/JS/APIControllers/UserController.js"></script>
 
         <script>
-            const INSTANCE_RECAPTCHA_SITE_KEY = '{{ INSTANCE_RECAPTCHA_SITE_KEY|raw }}';
+            const API_KEY = getCookie('access_token');
 
             function getCookie(cname) {
                 let name = cname + "=";
@@ -57,8 +61,6 @@
                 }
                 return "";
             }
-
-            const API_KEY = getCookie('access_token');
         </script>
     </head>
     
@@ -79,8 +81,8 @@
         <nav>
             <div class="inner-content">
                 <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
-                <a id="navigation-logo" href="/"><img alt="{{ INSTANCE_BRANDING_NAME }} Logo" src="/Static/Images/Logos/{{ INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR }}" />{{ INSTANCE_BRANDING_NAME }}<sup> BETA</sup></a>
-                <a id="navigation-logo-ultra-small" href="/"><img alt="{{ INSTANCE_BRANDING_NAME }} Logo" src="/Static/Images/Logos/{{ INSTANCE_BRANDING_LOGO_CONTRAST_BRAND_COLOR }}" /></a>
+                <a id="navigation-logo" href="/"><img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />{{ GetUserConfiguration("Instance", "Branding", "Name") }}<sup> BETA</sup></a>
+                <a id="navigation-logo-ultra-small" href="/"><img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" /></a>
                 <div id="navigation-buttons">
                     {% if ABOUT_PAGE_URL %}
                         <a href="{{ ABOUT_PAGE_URL }}">{{ "About"|translate }}</a>
@@ -88,7 +90,6 @@
                     {% if _IS_LOGGED_IN_ %}
                         <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
                         <a href="/dashboard">{{ "Case Portal"|translate }}</a>
-                        <a href="/logout">{{ "Logout"|translate|title }}</a>
                     {% else %}
                         <a href="/onboard-new-case">{{ "New Clients"|translate }}</a>
                         <a href="/dashboard">{{ "Login"|translate }}</a>
@@ -113,7 +114,6 @@
                         {% if _IS_LOGGED_IN_ %}
                             <a href="/onboard-new-case">{{ "New Case"|translate }}</a>
                             <a href="/dashboard">{{ "Case Portal"|translate }}</a>
-                            <a href="/logout">{{ "Logout"|translate|title }}</a>
                         {% else %}
                             <a href="/onboard-new-case">{{ "New Clients"|translate|title }}</a>
                             <a href="/dashboard">{{ "Login"|translate|title }}</a>
@@ -152,6 +152,7 @@
 
             <div id="portal-authenticated-user-bar">
                 <div class="inner-content">
+                    <p>{{ "Logged in as"|translate }}</p>
                     <a href="/logout" class="button">{{ "Logout"|translate|title }}</a>
                 </div>
             </div>
@@ -162,12 +163,12 @@
         {% block content %}{% endblock %}
         
         <div class="spacer"></div>
-    
+
         <footer>
             <div class="inner-content">
-                <p><strong>{{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ INSTANCE_BRANDING_NAME }}</strong></p>
+                <p><strong>{{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ GetUserConfiguration("Instance", "Branding", "Name") }}</strong></p>
                 {% if OPERATOR_NAME %}
-                    <p>{{ INSTANCE_BRANDING_NAME }} is owned and operated by {{ OPERATOR_NAME }}.</p>
+                    <p>{{ GetUserConfiguration("Instance", "Branding", "Name") }} is owned and operated by {{ OPERATOR_NAME }}.</p>
                 {% endif %}
             </div>
         </footer>
@@ -207,7 +208,7 @@
                     <li><a href="/style?switch=large-fonts">{{ "Toggle Large Fonts"|translate|ndsentence }}</a></li>
                 </ul>
                 <div class="spacer"></div>
-                <span>Auxilium v2.0-RC1</span>
+                <span>{{ GetSystemConfiguration("Development", "CurrentVersion") }}</span>
                 <div class="spacer"></div>
             </div>
         </footer>
