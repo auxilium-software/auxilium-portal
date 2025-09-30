@@ -10,7 +10,7 @@ class UserController {
         let allUsers = [];
 
         let pageNumber = 1;
-        const perPage = 100;
+        const perPage = 1000;
 
         while (true)
         {
