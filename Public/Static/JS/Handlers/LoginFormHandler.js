@@ -44,7 +44,7 @@ class LoginFormHandler {
             {
                 CookieUtilities.setCookie('access_token', response['access_token'], 0.0208333);
                 CookieUtilities.setCookie('refresh_token', response['refresh_token'], 7);
-                this.showSuccessMessage(Localisation.translate('Login successful! Redirecting...'));
+                new ToastNotification(Localisation.translate('Login successful! Redirecting...'), 'check-circle', 'success');
 
                 setTimeout(() => {
                     window.location.href = '/dashboard';
@@ -117,7 +117,7 @@ class LoginFormHandler {
                 throw new Error('reCAPTCHA not loaded');
             }
 
-            const token = await grecaptcha.execute(GetUserConfiguration("ReCAPTCHA", "SiteKey"), {
+            const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, {
                 action: 'login'
             });
 
@@ -132,14 +132,19 @@ class LoginFormHandler {
     handleLoginError(error) {
         console.error('Login error:', error);
 
-        if (error.fieldErrors) {
+        if (error.fieldErrors)
+        {
             Object.keys(error.fieldErrors).forEach(field => {
                 this.showFieldError(field, error.fieldErrors[field]);
             });
-        } else if (error.message) {
-            this.showGlobalError(error.message);
-        } else {
-            this.showGlobalError(Localisation.translate('An unexpected error occurred. Please try again.'));
+        }
+        else if (error.message)
+        {
+            new ToastNotification(error.message, 'alert-circle', 'error');
+        }
+        else
+        {
+            new ToastNotification(Localisation.translate('An unexpected error occurred. Please try again.'), 'alert-circle', 'error');
         }
 
         this.resetReCaptcha();
@@ -189,32 +194,6 @@ class LoginFormHandler {
         if (inputElement) {
             inputElement.classList.remove('error');
             inputElement.removeAttribute('aria-invalid');
-        }
-    }
-
-    showGlobalError(message) {
-        const errorContainer = document.getElementById('GlobalErrorMessage');
-        const errorText = document.getElementById('GlobalErrorText');
-
-        if (errorContainer && errorText) {
-            errorText.textContent = message;
-            errorContainer.style.display = 'block';
-            errorContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-            this.autoHideTimer = setTimeout(() => {
-                hideGlobalError();
-            }, 10000);
-        }
-    }
-
-    showSuccessMessage(message) {
-        const successContainer = document.getElementById('SuccessMessage');
-        const successText = document.getElementById('SuccessText');
-
-        if (successContainer && successText) {
-            successText.textContent = message;
-            successContainer.style.display = 'block';
-            successContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
