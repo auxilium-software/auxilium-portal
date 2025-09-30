@@ -81,9 +81,9 @@ class CommonFilters extends AbstractExtension
         }
     }
 
-    public function is_uuid(string|array $string): string
+    public function is_uuid(string|array|null $string): string
     {
-        if(gettype($string) === "string")
+        if(is_string($string))
         {
             return UUIDUtilities::IsValid($string);
         }
