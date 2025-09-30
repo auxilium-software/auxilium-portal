@@ -46,7 +46,14 @@ class CommonFunctions extends AbstractExtension
         $temp = ConfigurationUtilities::GetSystemConfiguration();
         foreach($path as $p)
         {
-            $temp = $temp[$p];
+            if(array_key_exists($p, $temp))
+            {
+                $temp = $temp[$p];
+            }
+            else
+            {
+                return null;
+            }
         }
         return $temp;
     }
@@ -55,7 +62,14 @@ class CommonFunctions extends AbstractExtension
         $temp = ConfigurationUtilities::GetUserConfiguration();
         foreach($path as $p)
         {
-            $temp = $temp[$p];
+            if(array_key_exists($p, $temp))
+            {
+                $temp = $temp[$p];
+            }
+            else
+            {
+                return null;
+            }
         }
         return $temp;
     }
