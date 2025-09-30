@@ -1,0 +1,26 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "ToDo Overview" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/cases/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/cases/{{ CaseID }}/todos/{{ ToDoID }}">{{ "To Do Overview" | translate }}</a>
+            </div>
+
+            <h1>{{ "ToDo Overview" | translate }}</h1>
+
+            <div class="separator"></div>
+
+            <div>
+
+                <div id="main-content" class="reference-element"></div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
