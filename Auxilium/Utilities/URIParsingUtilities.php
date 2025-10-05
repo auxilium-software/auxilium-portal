@@ -2,9 +2,9 @@
 
 namespace Auxilium\Utilities;
 
-class URLParsingUtilities
+class URIParsingUtilities
 {
-    public static function GetUUIDFromURL(int $index = 0): ?string
+    public static function GetUUIDFromURI(int $index = 0): ?string
     {
         $url = $_SERVER['REQUEST_URI'];
         $urlComponents = explode("/", $url);

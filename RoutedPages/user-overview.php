@@ -5,7 +5,7 @@ use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\SecurityUtilities;
-use Auxilium\Utilities\URLParsingUtilities;
+use Auxilium\Utilities\URIParsingUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -17,7 +17,7 @@ try
     if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
     {
         $userData = APIInteractions::Get(
-            endpoint: '/users/' . URLParsingUtilities::GetUUIDFromURL(index: 0),
+            endpoint: '/users/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
         )->Payload;
     }
 

@@ -5,7 +5,7 @@ use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\SecurityUtilities;
-use Auxilium\Utilities\URLParsingUtilities;
+use Auxilium\Utilities\URIParsingUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -17,7 +17,7 @@ try
     if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
     {
         $caseData = APIInteractions::Get(
-            endpoint: '/cases/' . URLParsingUtilities::GetUUIDFromURL(index: 0),
+            endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
         )->Payload;
 
         foreach($caseData['clients'] as &$clientID)
@@ -43,7 +43,7 @@ try
         variables: [
             "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
             "is_admin" => SecurityUtilities::IsAdmin(),
-            "CaseID" => URLParsingUtilities::GetUUIDFromURL(index: 0),
+            "CaseID" => URIParsingUtilities::GetUUIDFromURI(index: 0),
             "CaseDetails" => $caseData,
         ]
     );
