@@ -13,38 +13,22 @@ try
 {
     SecurityUtilities::RequireLogin();
 
-    $caseData = [];
+    $toDoData = [];
     if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
     {
-        $caseData = APIInteractions::Get(
-            endpoint: '/cases/' . URLParsingUtilities::GetUUIDFromURL(index: 0),
+        $toDoData = APIInteractions::Get(
+            endpoint: '/cases/' . URLParsingUtilities::GetUUIDFromURL(index: 0) . '/todos/' . URLParsingUtilities::GetUUIDFromURL(index: 0),
         )->Payload;
-
-        foreach($caseData['clients'] as &$clientID)
-        {
-            $workerDetails = APIInteractions::Get(
-                endpoint: '/users/' . $clientID,
-            );
-            $clientID = $workerDetails->Payload;
-        }
-        unset($clientID);
-        foreach($caseData['workers'] as &$workerID)
-        {
-            $workerDetails = APIInteractions::Get(
-                endpoint: '/users/' . $workerID,
-            );
-            $workerID = $workerDetails->Payload;
-        }
-        unset($workerID);
     }
 
     PageBuilder::Render(
-        template: '/VirtualPages/CaseOverviewPage.html.twig',
+        template: '/VirtualPages/ToDoOverviewPage.html.twig',
         variables: [
             "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
             "is_admin" => SecurityUtilities::IsAdmin(),
             "CaseID" => URLParsingUtilities::GetUUIDFromURL(index: 0),
-            "CaseDetails" => $caseData,
+            "ToDoID" => URLParsingUtilities::GetUUIDFromURL(index: 1),
+            "ToDoDetails" => $toDoData,
         ]
     );
 }
