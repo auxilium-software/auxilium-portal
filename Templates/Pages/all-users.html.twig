@@ -1,0 +1,83 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "all users" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/all-users">{{ "all users" | translate }}</a>
+            </div>
+
+            <h1>{{ "all users" | translate }}</h1>
+
+            <div class="separator"></div>
+
+            <div class="filters-container logical-box" style="margin-bottom: 20px;">
+                <input type="text" id="UserFilter-Search" placeholder="{{ 'search users' | translate }}" class="search-input">
+
+                <button id="apply-filters" class="button">{{ 'apply filters' | translate }}</button>
+            </div>
+
+            <div class="logical-box" id="AllUsersContainer">
+                {# users load here #}
+            </div>
+
+            <script>
+                const infiniteScroller = new InfiniteScroller({
+                    endpoint: '/api/v3/users',
+                    params: {
+                        sort: 'created_at',
+                        order: 'desc'
+                    },
+                    target: document.getElementById('AllUsersContainer'),
+                    pageSize: 8,
+                    compact: false,
+
+                    renderItem: (userItem) => {
+                        const userDiv = document.createElement('div');
+                        userDiv.classList.add('user-item', 'logical-box');
+                        userDiv.style.marginBottom = '15px';
+                        userDiv.style.padding = '15px';
+
+                        let statusClass = 'status-' + (userItem.status || 'unknown').toLowerCase();
+
+                        userDiv.innerHTML = `
+                            <div class="case-header">
+                                <h3 class="case-title">
+                                    <a href="/users/${userItem.id || userItem.user_id}">
+                                        ${userItem.full_name || 'User #' + userItem.id}
+                                    </a>
+                                </h3>
+                            </div>
+                            <div class="case-actions">
+                                <a href="/users/${userItem.id}" class="btn-primary btn-small">
+                                    {{ 'view details' | translate }}
+                                </a>
+                            </div>
+                        `;
+
+                        return userDiv;
+                    },
+                });
+
+                document.getElementById('apply-filters').addEventListener('click', () => {
+                    const searchTerm = document.getElementById('UserFilter-Search').value;
+                    const status = document.getElementById('UserFilter-Status').value;
+
+                    const newParams = {};
+                    if (searchTerm) {
+                        newParams.search = searchTerm;
+                    }
+                    if (status) {
+                        newParams.status = status;
+                    }
+
+                    infiniteScroller.updateParams(newParams);
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}

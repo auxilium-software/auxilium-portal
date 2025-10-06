@@ -15,7 +15,7 @@ class CaseController {
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/cases/all?page=${pageNumber}&per_page=${perPage}`,
+                `/api/v3/cases?page=${pageNumber}&per_page=${perPage}`,
                 true,
             );
             if(statusCode === 200)
