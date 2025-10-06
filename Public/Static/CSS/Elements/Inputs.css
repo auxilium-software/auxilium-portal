@@ -34,6 +34,7 @@ input[type=date],
 input[type=datetime-local],
 input[type=password],
 input[type=email],
+input[type=file],
 textarea,
 select {
     display: block;
@@ -94,6 +95,7 @@ fieldset > input[type=date],
 fieldset > input[type=datetime-local],
 fieldset > input[type=password],
 fieldset > input[type=email],
+fieldset > input[type=file],
 fieldset > textarea,
 fieldset > select {
     width: var(--form-max-width-small-fieldset);

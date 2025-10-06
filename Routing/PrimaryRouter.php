@@ -33,6 +33,7 @@ if (is_file($rawFile))
 // 4. Custom regex routes
 $routes = [
     "#^/form/"  . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/form.php',
+    "#^/files/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/file-overview.php',
     "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'  => __DIR__ . '/../RoutedPages/todo-overview.php',
     "#^/cases/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/case-overview.php',
     "#^/users/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/user-overview.php',

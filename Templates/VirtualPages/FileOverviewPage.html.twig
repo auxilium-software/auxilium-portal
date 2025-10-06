@@ -1,0 +1,60 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "file overview" | translate }}{% endblock %}
+
+{% block content %}
+    <code>
+        {{ FileDetails|json_encode }}
+    </code>
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/file/{{ CaseID }}">{{ "File Overview" | translate }}</a>
+            </div>
+
+            <h1>
+                <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="{{ "File details" | translate }}"></span>
+                {{ "File Overview" | translate }}
+            </h1>
+
+            <div class="separator"></div>
+
+            <div>
+                <div id="main-content" class="reference-element"></div>
+
+                <div class="left-preferential-box">
+                    {% if FileDetails.content_type starts with 'image' %}
+                        <img src="data:{{ FileDetails.content_type }};base64,{{ FileDetails.contents|hex2bin|base64_encode }}"
+                             alt="{{ FileDetails.filename }}"
+                             style="max-width: 100%; height: auto;" />
+                    {% else %}
+                        <p>{{ "Preview not available for this file type" | translate }}</p>
+                        <p>{{ "File type" | translate }}: {{ FileDetails.content_type }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="right-preferential-box">
+                    <h3>{{ "File Information" | translate }}</h3>
+                    <dl>
+                        <dt>{{ "Filename" | translate }}:</dt>
+                        <dd>{{ FileDetails.filename }}</dd>
+
+                        <dt>{{ "File size" | translate }}:</dt>
+                        <dd>{{ (FileDetails.size / 1024)|round(2) }} KB</dd>
+
+                        <dt>{{ "Content type" | translate }}:</dt>
+                        <dd>{{ FileDetails.content_type }}</dd>
+
+                        <dt>{{ "Uploaded at" | translate }}:</dt>
+                        <dd>{{ FileDetails.uploaded_at|date('Y-m-d H:i:s') }}</dd>
+
+                        <dt>{{ "Uploaded by" | translate }}:</dt>
+                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.uploaded_by} %}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

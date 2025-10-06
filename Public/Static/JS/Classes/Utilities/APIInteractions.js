@@ -60,10 +60,11 @@ class APIInteractions
         return await this.#apiRequest('DELETE', target, useAuth);
     }
 
-    async API_FILE_UPLOAD(target, file, useAuth = true)
+    async API_FILE_UPLOAD(target, file, description=null, useAuth = true)
     {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('description', description);
 
         const response = await fetch(`http://localhost:1983${target}`, {
             method: 'POST',

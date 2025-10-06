@@ -1,11 +1,11 @@
 
-{% if _data|is_uuid %}
+{% if _data|is_auxlfs_url %}
     {% set _fieldID = GeneratePseudoRandomCharacters(16) %}
 
     {% if _INLINE_NODE_EXPANDED_ %}
         <h3 class="low-margin-heading">
-            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/users/{{ _data }}">
-                <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
+            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/files/{{ _data|extract_file_id_from_auxlfs_url }}">
+                <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
                 </span>
                 <span id="{{ _fieldID }}-A"></span>
             </a>
@@ -14,8 +14,8 @@
         <dl>
         </dl>
     {% else %}
-        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/users/{{ _data }}">
-            <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
+        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/files/{{ _data|extract_file_id_from_auxlfs_url }}">
+            <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
             </span>
             <span id="{{ _fieldID }}-B"></span>
         </a>
@@ -24,20 +24,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}').textContent
-                    = (await (new UserController()).GetSingleUser('{{ _data }}'))['full_name'];
+                    = (await (new FileController()).GetSingleFileFromAuxLFSURL('{{ _data }}'))['filename'];
         });
     </script>
-
-
-
-
-
-{% elseif _data.detail == 'User not found' %}
-    <h3 class="low-margin-heading">
-        <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
-        </span>
-        <em>{{ "Deleted User"|translate }}</em>
-    </h3>
 
 
 

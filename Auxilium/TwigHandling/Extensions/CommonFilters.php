@@ -24,14 +24,19 @@ class CommonFilters extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('translate',             [$this, 'translate']),
-            new TwigFilter('b64_url_safe',          [$this, 'b64_url_safe']),
-            new TwigFilter('un_b64_url_safe',       [$this, 'un_b64_url_safe']),
-            new TwigFilter('format_as_sentence',    [$this, 'format_as_sentence']),
-            new TwigFilter('human_filesize',        [$this, 'human_filesize']),
-            new TwigFilter('is_uuid',               [$this, 'is_uuid']),
-            new TwigFilter('ndtitle',               [$this, 'ndtitle']),
-            new TwigFilter('ndsentence',            [$this, 'ndsentence']),
+            new TwigFilter('translate',                         [$this, 'translate']),
+            new TwigFilter('b64_url_safe',                      [$this, 'b64_url_safe']),
+            new TwigFilter('un_b64_url_safe',                   [$this, 'un_b64_url_safe']),
+            new TwigFilter('format_as_sentence',                [$this, 'format_as_sentence']),
+            new TwigFilter('human_filesize',                    [$this, 'human_filesize']),
+            new TwigFilter('is_uuid',                           [$this, 'is_uuid']),
+            new TwigFilter('is_auxlfs_url',                     [$this, 'is_auxlfs_url']),
+            new TwigFilter('extract_file_id_from_auxlfs_url',   [$this, 'extract_file_id_from_auxlfs_url']),
+            new TwigFilter('ndtitle',                           [$this, 'ndtitle']),
+            new TwigFilter('ndsentence',                        [$this, 'ndsentence']),
+            new TwigFilter('base64_encode',                     [$this, 'base64_encode']),
+            new TwigFilter('base64_decode',                     [$this, 'base64_decode']),
+            new TwigFilter('hex2bin',                           [$this, 'hex2bin']),
         ];
     }
 
@@ -90,6 +95,25 @@ class CommonFilters extends AbstractExtension
         return false;
     }
 
+    public function is_auxlfs_url(string $string): string
+    {
+        // auxlfs://%%couchdb%%/ - literal prefix
+        // [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} - UUID format
+        // \?size=\d+ - size parameter with digits
+        // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
+
+        $pattern = '/^auxlfs:\/\/%%couchdb%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]{40}$/';
+
+        return preg_match($pattern, $string) === 1;
+    }
+
+    public function extract_file_id_from_auxlfs_url(string $string): string
+    {
+        $pattern = '/^auxlfs:\/\/%%couchdb%%\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]{40}$/';
+        preg_match($pattern, $string, $matches);
+        return $matches[1] ?? '';
+    }
+
     public function ndtitle($string): string
     {
         $pcs = mb_split(" ", $string);
@@ -103,5 +127,18 @@ class CommonFilters extends AbstractExtension
     public function ndsentence($string): string
     {
         return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+    }
+
+    public function base64_encode($string): string
+    {
+        return base64_encode($string);
+    }
+    public function base64_decode($string): string
+    {
+        return base64_decode($string);
+    }
+    public function hex2bin($string): string
+    {
+        return hex2bin($string);
     }
 }
