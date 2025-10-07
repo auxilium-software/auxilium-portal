@@ -7,6 +7,7 @@ use App\Wrappers\CookieWrapper;
 use Auxilium\DataClasses\APIResponsePayload;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\SessionHandling\CookieHandling;
+use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\NavigationUtilities;
 use CurlHandle;
 use Exception;
@@ -144,7 +145,13 @@ class APIInteractions
 
         if(json_last_error() !== JSON_ERROR_NONE)
         {
-            throw new Exception("Invalid JSON response from API");
+            PageBuilder::Render(
+                template: '/ErrorPages/APIError.html.twig',
+                variables: [
+                    "ErrorMessage" => json_last_error_msg(),
+                ],
+                useAuth: false,
+            );
         }
 
         $temp = new APIResponsePayload();
