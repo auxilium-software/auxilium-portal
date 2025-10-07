@@ -5,110 +5,104 @@
 {% block content %}
 
     <div>
-    <div class="inner-content">
-        <div class="navigation-breadcrumb-container">
-            <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | translate }}</a>
-            <a class="navigation-breadcrumb" href="/all-cases">{{ "all cases" | translate }}</a>
-        </div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/all-cases">{{ "all cases" | translate }}</a>
+            </div>
 
-        <h1>{{ "all cases" | translate }}</h1>
+            <h1>{{ "all cases" | translate }}</h1>
 
-        <div class="separator"></div>
+            <div class="separator"></div>
 
-        <div class="filters-container logical-box" style="margin-bottom: 20px;">
-            <input type="text" id="CaseFilter-Search" placeholder="{{ 'search cases' | translate }}" class="search-input">
-            <select id="CaseFilter-Status" class="status-select">
-                <option value="">{{ 'All cases' | translate }}</option>
-                <option value="OPEN">{{ 'Open cases only' | translate }}</option>
-                <option value="CLOSED">{{ 'Closed cases only' | translate }}</option>
-                <option value="PENDING">{{ 'Pending cases only' | translate }}</option>
-            </select>
-            <button id="apply-filters" class="button">{{ 'apply filters' | translate }}</button>
-        </div>
+            <div class="filters-container logical-box" style="margin-bottom: 20px;">
+                <input type="text" id="CaseFilter-Search" placeholder="{{ 'search cases' | translate }}" class="search-input">
+                <select id="CaseFilter-Status" class="status-select">
+                    <option value="">{{ 'All cases' | translate }}</option>
+                    <option value="OPEN">{{ 'Open cases only' | translate }}</option>
+                    <option value="CLOSED">{{ 'Closed cases only' | translate }}</option>
+                    <option value="PENDING">{{ 'Pending cases only' | translate }}</option>
+                </select>
+                <button id="apply-filters" class="button">{{ 'apply filters' | translate }}</button>
+            </div>
 
-        <div class="logical-box" id="AllCasesContainer">
-            {# cases load here #}
-        </div>
+            <div class="logical-box" id="AllCasesContainer">
+                {# cases load here #}
+            </div>
 
-        <script>
-            const infiniteScroller = new InfiniteScroller({
-                endpoint: '/api/v3/cases/all',
-                params: {
-                    sort: 'created_at',
-                    order: 'desc'
-                },
-                target: document.getElementById('AllCasesContainer'),
-                pageSize: 8,
-                compact: false,
+            <script>
+                const infiniteScroller = new InfiniteScroller({
+                    endpoint: '/api/v3/cases',
+                    params: {
+                        sort: 'created_at',
+                        order: 'desc'
+                    },
+                    target: document.getElementById('AllCasesContainer'),
+                    pageSize: 8,
+                    compact: false,
 
-                renderItem: (caseItem) => {
-                    const caseDiv = document.createElement('div');
-                    caseDiv.classList.add('case-item', 'logical-box');
-                    caseDiv.style.marginBottom = '15px';
-                    caseDiv.style.padding = '15px';
+                    renderItem: (caseItem) => {
+                        const caseDiv = document.createElement('div');
+                        caseDiv.classList.add('case-item', 'logical-box');
+                        caseDiv.style.marginBottom = '15px';
+                        caseDiv.style.padding = '15px';
 
-                    let statusClass = 'status-' + (caseItem.status || 'unknown').toLowerCase();
+                        let statusClass = 'status-' + (caseItem.status || 'unknown').toLowerCase();
 
-                    caseDiv.innerHTML = `
-                        <div class="case-header">
-                            <h3 class="case-title">
-                                <a href="/cases/${caseItem.id || caseItem.case_id}">
-                                    ${caseItem.title || caseItem.name || 'Case #' + caseItem.id}
-                                </a>
-                            </h3>
-                            <span class="case-status ${statusClass}">
-                                ${caseItem.status || 'Unknown'}
-                            </span>
-                        </div>
-                        <div class="case-body">
-                            <p class="case-description">
-                                ${caseItem.description || caseItem.summary || 'No description available'}
-                            </p>
-                            <div class="case-meta">
-                                <span class="case-date">
-                                    <strong>{{ 'created' | translate }}:</strong>
-                                    ${new Date(caseItem.created_at || caseItem.date_created).toLocaleDateString()}
+                        caseDiv.innerHTML = `
+                            <div class="case-header">
+                                <h3 class="case-title">
+                                    <a href="/cases/${caseItem.id}">
+                                        ${caseItem.title || 'Case #' + caseItem.id}
+                                    </a>
+                                </h3>
+                                <span class="case-status ${statusClass}">
+                                    ${caseItem.status || 'Unknown'}
                                 </span>
-                                ${caseItem.assigned_to ? `
-                                    <span class="case-assignee">
-                                        <strong>{{ 'assigned to' | translate }}:</strong>
-                                        ${caseItem.assigned_to}
-                                    </span>
-                                ` : ''}
-                                ${caseItem.priority ? `
-                                    <span class="case-priority priority-${caseItem.priority.toLowerCase()}">
-                                        <strong>{{ 'priority' | translate }}:</strong>
-                                        ${caseItem.priority}
-                                    </span>
-                                ` : ''}
                             </div>
-                        </div>
-                        <div class="case-actions">
-                            <a href="/cases/${caseItem.id}" class="btn-primary btn-small">
-                                {{ 'view details' | translate }}
-                            </a>
-                        </div>
-                    `;
+                            <div class="case-body">
+                                <p class="case-description">
+                                    ${caseItem.description  || 'No description available'}
+                                </p>
+                                <div class="case-meta">
+                                    <span class="case-date">
+                                        <strong>{{ 'created' | translate }}:</strong>
+                                        ${new Date(caseItem.created_at).toLocaleDateString()}
+                                    </span>
+                                    ${caseItem.priority ? `
+                                        <span class="case-priority priority-${caseItem.priority.toLowerCase()}">
+                                            <strong>{{ 'priority' | translate }}:</strong>
+                                            ${caseItem.priority}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="case-actions">
+                                <a href="/cases/${caseItem.id}" class="btn-primary btn-small">
+                                    {{ 'view details' | translate }}
+                                </a>
+                            </div>
+                        `;
 
-                    return caseDiv;
-                },
-            });
+                        return caseDiv;
+                    },
+                });
 
-            document.getElementById('apply-filters').addEventListener('click', () => {
-                const searchTerm = document.getElementById('CaseFilter-Search').value;
-                const status = document.getElementById('CaseFilter-Status').value;
+                document.getElementById('apply-filters').addEventListener('click', () => {
+                    const searchTerm = document.getElementById('CaseFilter-Search').value;
+                    const status = document.getElementById('CaseFilter-Status').value;
 
-                const newParams = {};
-                if (searchTerm) {
-                    newParams.search = searchTerm;
-                }
-                if (status) {
-                    newParams.status = status;
-                }
+                    const newParams = {};
+                    if (searchTerm) {
+                        newParams.search = searchTerm;
+                    }
+                    if (status) {
+                        newParams.status = status;
+                    }
 
-                infiniteScroller.updateParams(newParams);
-            });
-        </script>
+                    infiniteScroller.updateParams(newParams);
+                });
+            </script>
+        </div>
     </div>
-</div>
 {% endblock %}
