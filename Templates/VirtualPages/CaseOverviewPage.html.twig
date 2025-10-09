@@ -3,6 +3,9 @@
 {% block title %}{{ "case overview" | translate }}{% endblock %}
 
 {% block content %}
+    <code>
+        {{ CaseDetails|json_encode }}
+    </code>
 
     <div>
         <div class="inner-content">
@@ -11,15 +14,18 @@
                 <a class="navigation-breadcrumb" href="/case/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
             </div>
 
-            <h1>{{ "Case Overview" | translate }}</h1>
+            <h1>
+                <span class="inline-icon-shift-left inline-icon-low-margin cases-icon" title="User account"></span>
+                {{ "Case Overview" | translate }}
+            </h1>
 
             <div class="separator"></div>
 
             <div>
-
                 <div id="main-content" class="reference-element"></div>
 
                 <div class="left-preferential-box">
+
                     <div class="marked-section">
                         <h2>{{ "Case Description" | translate }}</h2>
                         <br>
@@ -32,33 +38,87 @@
                     <div class="marked-section">
                         <h2>
                             {{ "ToDo List" | translate }}
-                            <a
-                                href="javascript:{let win = new NewPropertyPopup('ICALENDAR_TODO', '{{ "{" ~ node.id ~ "}" }}/todos/#', true);document.getElementById('main-content').after(win.render());};"
-                                class="inline-icon add-icon"
-                                title="{{ "Add Entry" | translate }}"
+                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add Entry" | translate }}"
                             ></a>
                         </h2>
-                        <ul class="collection-list">
-                        {% if progressive_load %}
-                        {% else %}
-                            {% for prop_name, prop in node.properties.todos.properties %}
+                        <ul class="collection-list todo-list">
+                            {% if progressive_load %}
                             {% else %}
-                                <li><em>List empty</em></li>
-                            {% endfor %}
-                        {% endif %}
+                                {% for toDoID, toDoItemDetails in CaseDetails.todos %}
+                                    <li class="todo-item status-{{ toDoItemDetails.status|lower }}">
+                                        <div class="todo-header">
+                                            <span class="todo-summary">{{ toDoItemDetails.summary }}</span>
+                                            {% if toDoItemDetails.priority %}
+                                                <span class="todo-priority priority-{{ toDoItemDetails.priority|lower }}">{{ toDoItemDetails.priority|capitalize }}</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <div>
+                                            {% if toDoItemDetails.due_date %}
+                                                <span>
+                                                    {{ "Due" | translate }}: {{ toDoItemDetails.due_date|date("Y-m-d H:i") }}
+                                                </span>
+                                            {% endif %}
+                                            <br>
+                                            {% if toDoItemDetails.created_at %}
+                                                <span>
+                                                    {{ "Created" | translate }}: {{ toDoItemDetails.created_at|date("Y-m-d H:i") }}
+                                                    by
+                                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.created_by} %}
+                                                </span>
+                                            {% endif %}
+                                            <br>
+                                            {% if toDoItemDetails.assigned_to %}
+                                                <span>
+                                                    {{ "Assigned To" | translate }}:
+                                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.assigned_to} %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if toDoItemDetails.description %}
+                                            <div>
+                                                {{ toDoItemDetails.description }}
+                                            </div>
+                                        {% endif %}
+
+                                        <div>
+                                            {% if toDoItemDetails.status == "NEEDS-ACTION" %}
+                                                <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.updateStatus('{{ toDoID }}', 'COMPLETE').then(() => window.location.reload());}"
+                                                   class="action-link action-link-complete">{{ "Mark Complete" | translate }}</a>
+                                                <br>
+                                            {% endif %}
+                                            <a href="/cases/{{ CaseDetails.id }}/todos/{{ toDoID }}"
+                                               class="action-link action-link-edit">{{ "Edit" | translate }}</a>
+                                            <br>
+                                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.deleteTodo('{{ toDoID }}').then(() => window.location.reload());}"
+                                               class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <li><em>{{ "No ToDo entries" | translate }}</em></li>
+                                {% endfor %}
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
 
                 <div class="right-preferential-box">
                     <div class="marked-section">
-                        <h2>{{ "Clients" | translate }} <a href="javascript:attachToObject('{{ ("{" ~ node.id ~ "}/clients/#") | raw }}', 'users');" class="inline-icon group-add-icon" title="{{ "Add Person" | translate }}"></a></h2><br />
+                        <h2>{{ "Clients" | translate }}
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddClientModal();}"
+                               class="inline-icon group-add-icon"
+                               title="{{ "Add Client" | translate }}"></a>
+                        </h2>
+                        <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% if progressive_load %}
                             {% else %}
                                 {% for clientDetails in CaseDetails.clients %}
-                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': clientDetails} %}
+                                    {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} only %}
                                 {% else %}
                                     <li><em>Client list empty</em></li>
                                 {% endfor %}
@@ -67,13 +127,18 @@
                         </ul>
                     </div>
                     <div class="marked-section">
-                        <h2>{{ "Case Workers" | translate }} <a href="javascript:attachToObject('{{ ("{" ~ node.id ~ "}/workers/#") | raw }}', 'users_and_groups');" class="inline-icon group-add-icon" title="{{ "Add Person" | translate }}"></a></h2><br />
+                        <h2>{{ "Case Workers" | translate }}
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddWorkerModal();}"
+                               class="inline-icon group-add-icon"
+                               title="{{ "Add Case Worker" | translate }}"></a>
+                        </h2>
+                        <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% if progressive_load %}
                             {% else %}
                                 {% for workerDetails in CaseDetails.workers %}
-                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': workerDetails} %}
+                                    {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
                                 {% else %}
                                     <li><em>Client list empty</em></li>
                                 {% endfor %}
