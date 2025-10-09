@@ -223,7 +223,7 @@ class InfiniteScroller
         const items = this.#target.querySelectorAll('.item-container, .path-name-view, .inline-node-view, .case-item, .error-message');
         items.forEach(item => item.remove());
 
-        // Reset state
+        // reset state
         this.#currentPage = 1;
         this.#hasMoreData = true;
         this.#totalItems = 0;
