@@ -94,11 +94,11 @@ class TodoManager extends BaseManager
                 <div class="user-assignment-container">
                     <label>
                         Assign To 
-                        <span class="assign-to-me-link" id="assign-to-me">
+                        <span class="assign-to-me-link" id="assign-to-me" style="cursor: pointer; color: #0066cc; text-decoration: underline;">
                             ${typeof Localisation !== 'undefined' ? Localisation.translate("Assign to me") : "Assign to me"}
                         </span>
                     </label>
-                    <div>
+                    <div style="position: relative;">
                         <input type="text" id="todo-assigned-to" placeholder="Search for a user..." autocomplete="off">
                         <input type="hidden" id="todo-assigned-to-id">
                         <div id="user-dropdown" class="user-dropdown" style="display: none;">

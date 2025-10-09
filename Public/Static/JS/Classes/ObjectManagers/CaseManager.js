@@ -69,7 +69,7 @@ class CaseManager extends BaseManager {
         modal.innerHTML = `
             <div class="ToDoCreatorModal-Header">
                 <h2>${title}</h2>
-                <p>${description}</p>
+                <p style="font-size: 0.9em; color: #666; margin-top: 0.5em;">${description}</p>
             </div>
             
             <form id="add-person-form" class="ToDoCreatorModal-Body">
@@ -77,26 +77,26 @@ class CaseManager extends BaseManager {
                     <label>
                         Search User <span class="required">*</span>
                     </label>
-                    <div>
+                    <div style="position: relative;">
                         <input type="text" 
                                id="person-search" 
                                placeholder="Type to search by name or email..." 
                                autocomplete="off"
                                required>
                         <input type="hidden" id="selected-person-id">
-                        <div id="user-dropdown" class="user-dropdown">
+                        <div id="user-dropdown" class="user-dropdown" style="display: none;">
                             <div class="loading-users">Loading users...</div>
                         </div>
                     </div>
                 </div>
 
-                <div id="selected-user-preview" >
+                <div id="selected-user-preview" style="display: none; margin-top: 1em; padding: 1em; background: #f5f5f5; border-radius: 4px;">
                     <strong>Selected:</strong>
-                    <div>
+                    <div style="display: flex; align-items: center; margin-top: 0.5em;">
                         <div class="user-avatar" id="preview-avatar"></div>
-                        <div>
-                            <div id="preview-name"></div>
-                            <div id="preview-email"></div>
+                        <div style="margin-left: 0.75em;">
+                            <div id="preview-name" style="font-weight: 500;"></div>
+                            <div id="preview-email" style="font-size: 0.85em; color: #666;"></div>
                         </div>
                     </div>
                 </div>

@@ -63,13 +63,13 @@ class FileManager extends BaseManager {
 
         const acceptAttr = allowedExtensions ? `accept="${allowedExtensions.join(',')}"` : '';
         const extensionHint = allowedExtensions
-            ? `<small>Allowed: ${allowedExtensions.join(', ')}</small>`
+            ? `<small style="color: #666;">Allowed: ${allowedExtensions.join(', ')}</small>`
             : '';
 
         modal.innerHTML = `
             <div class="ToDoCreatorModal-Header">
                 <h2>${title}</h2>
-                ${description ? `<p>${description}</p>` : ''}
+                ${description ? `<p style="font-size: 0.9em; color: #666; margin-top: 0.5em;">${description}</p>` : ''}
             </div>
             
             <form id="file-upload-form" class="ToDoCreatorModal-Body">
@@ -82,7 +82,7 @@ class FileManager extends BaseManager {
                            required
                            ${acceptAttr}>
                     ${extensionHint}
-                    <small>
+                    <small style="color: #666; display: block; margin-top: 0.25em;">
                         Max size: ${maxFileSizeMB}MB
                     </small>
                 </div>
@@ -96,11 +96,11 @@ class FileManager extends BaseManager {
                 </div>
                 ` : ''}
 
-                <div id="file-preview">
+                <div id="file-preview" style="display: none; margin-top: 1em; padding: 1em; background: #f5f5f5; border-radius: 4px;">
                     <strong>Selected file:</strong>
-                    <div>
-                        <div id="preview-filename"></div>
-                        <div id="preview-filesize"></div>
+                    <div style="margin-top: 0.5em;">
+                        <div id="preview-filename" style="font-weight: 500;"></div>
+                        <div id="preview-filesize" style="font-size: 0.85em; color: #666;"></div>
                     </div>
                 </div>
 
