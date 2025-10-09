@@ -1,13 +1,17 @@
-class PropertyManager {
-    constructor(userId) {
+class PropertyManager
+{
+    constructor(userId)
+    {
         this.apiClient = new APIInteractions();
         this.basePath = `/api/v3/users/${userId}/additional_properties`;
     }
 
-    async editProperty(propertyKey, currentContent) {
+    async editProperty(propertyKey, currentContent)
+    {
         const newContent = prompt(`Edit property "${propertyKey}":`, currentContent);
 
-        if (newContent === null || newContent === currentContent) {
+        if (newContent === null || newContent === currentContent)
+        {
             return;
         }
 
@@ -25,7 +29,9 @@ class PropertyManager {
             }
 
             window.location.reload();
-        } catch (error) {
+        }
+        catch (error)
+        {
             console.error('Failed to update property:', error);
             new ToastNotification(
                 `Failed to update property: ${error.message}`,
@@ -35,23 +41,29 @@ class PropertyManager {
         }
     }
 
-    async deleteProperty(propertyKey, displayName) {
+    async deleteProperty(propertyKey, displayName)
+    {
         const confirmMessage = `Are you sure you want to delete the property "${displayName}"?\n\nThis action cannot be undone.`;
 
-        if (!confirm(confirmMessage)) {
+        if (!confirm(confirmMessage))
+        {
             return;
         }
 
-        try {
+        try
+        {
             const apiPath = `${this.basePath}/${encodeURIComponent(propertyKey)}`;
             const [status, response] = await this.apiClient.API_DELETE(apiPath);
 
-            if (status === null || status >= 400) {
+            if (status === null || status >= 400)
+            {
                 throw new Error(response?.message || response || 'Failed to delete property');
             }
 
             window.location.reload();
-        } catch (error) {
+        }
+        catch (error)
+        {
             console.error('Failed to delete property:', error);
             new ToastNotification(
                 `Failed to delete property: ${error.message}`,
@@ -61,12 +73,14 @@ class PropertyManager {
         }
     }
 
-    static async editProperty(userId, propertyKey, currentContent) {
+    static async editProperty(userId, propertyKey, currentContent)
+    {
         const manager = new PropertyManager(userId);
         return manager.editProperty(propertyKey, currentContent);
     }
 
-    static async deleteProperty(userId, propertyKey, displayName) {
+    static async deleteProperty(userId, propertyKey, displayName)
+    {
         const manager = new PropertyManager(userId);
         return manager.deleteProperty(propertyKey, displayName);
     }
