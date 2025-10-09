@@ -3,8 +3,9 @@
 {% block title %}{{ "user overview" | translate }}{% endblock %}
 
 {% block content %}
-
-    {{ UserDetails|json_encode }}
+    <code>
+        {{ UserDetails|json_encode }}
+    </code>
 
     <div>
         <div class="inner-content">
@@ -26,7 +27,6 @@
             <div class="separator"></div>
 
             <div>
-
                 <div id="main-content" class="reference-element"></div>
 
                 <div class="left-preferential-box">
@@ -87,6 +87,36 @@
                 </div>
 
                 <div class="right-preferential-box">
+                    <div class="marked-section">
+                        <h2>{{ "Files" | translate }}
+                            <a href="javascript:{const cm = new FileManager('USER', '{{ UserDetails.id }}'); cm.showUploadModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add File" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% if progressive_load %}
+                            {% else %}
+                                {% for fileDetails in UserDetails.files %}
+                                    {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
+                                {% else %}
+                                    <li><em>File list empty</em></li>
+                                {% endfor %}
+                            {% endif %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>{{ "User Management" | translate }}</h2><br />
+                        {% if "DELETE" in node.permissions %}
+                            <a class="action-link action-link-delete" href="/graph/{{ primary_string_path | raw }}/@delete_confirm?{{ url_metadata }}">{{ "Delete Case" | translate }}</a><br />
+                        {% endif %}
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@references?{{ url_metadata }}">{{ "See References" | translate }}</a>
+                        <br>
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
+                    </div>
                 </div>
             </div>
         </div>
