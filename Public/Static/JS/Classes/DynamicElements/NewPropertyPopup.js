@@ -500,7 +500,7 @@ class NewPropertyPopup
         const lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//Your Organization//Your Product//EN',
+            'PRODID:-//Auxilium Software//Auxilium Portal//EN',
             `BEGIN:${type}`,
             `UID:${this.#generateId(48)}`,
             `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}Z`
