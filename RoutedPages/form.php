@@ -326,7 +326,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
                 }
                 else
                 {
-
+                    // no more visible pages, go to the review page
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, 'review');
                 }
             }
@@ -388,6 +388,9 @@ else
     $currentPage = $visiblePages[$currentVisiblePageIndex];
     $actualPageIndex = $pageIndexMap[$currentVisiblePageIndex];
 
+    $shouldUserBeLoggedIn = isset($formSpec['requireAuthentication']) && $formSpec['requireAuthentication'] === 'true';
+
+    $isAbandonPage = isset($currentPage['abandonForm']) && $currentPage['abandonForm'] === 'true';
     $hasPreviousPage = findNextVisiblePage($formSpec, $formData, $actualPageIndex, -1) >= 0;
     $hasNextPage = findNextVisiblePage($formSpec, $formData, $actualPageIndex, 1) >= 0;
     $isLastPage = $currentVisiblePageIndex === $totalVisiblePages - 1;
@@ -403,13 +406,15 @@ else
         "IsFirstPage" => ($currentVisiblePageIndex === 0),
         "IsLastPage" => $isLastPage,
         "IsReviewPage" => false,
-        "ShowBackButton" => $hasPreviousPage,
-        "ShowNextButton" => $hasNextPage,
-        "ShowReviewButton" => $isLastPage,
+        "IsAbandonPage" => $isAbandonPage,
+        "ShowBackButton" => $hasPreviousPage && !$isAbandonPage,
+        "ShowNextButton" => !$isAbandonPage,
+        "ShowReviewButton" => false,
     ];
 
     PageBuilder::Render(
         template : '/VirtualPages/FormPage.html.twig',
         variables: $variables,
+        useAuth: $shouldUserBeLoggedIn,
     );
 }
