@@ -4,6 +4,7 @@
     <title>Onboard a New Case</title>
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
+    <requireAuthentication>false</requireAuthentication>
 
 
 
@@ -122,6 +123,7 @@
                 Data consent is required, sorry lol.
             </description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
+            <abandonForm>true</abandonForm>
             <components>
             </components>
         </page>
