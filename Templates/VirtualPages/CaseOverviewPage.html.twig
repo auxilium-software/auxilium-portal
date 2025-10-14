@@ -129,7 +129,7 @@
                             {% for workerDetails in CaseDetails.workers %}
                                 {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
                             {% else %}
-                                <li><em>Client list empty</em></li>
+                                <li><em>Case Worker list empty</em></li>
                             {% endfor %}
                             {% set inline_node_expanded = false %}
                         </ul>
