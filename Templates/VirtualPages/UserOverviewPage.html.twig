@@ -40,32 +40,26 @@
                             ></a>
                         </h2>
                         <br />
-                        {% if progressive_load %}
-                            <script>
-                                (new ToastNotification("Progressive load should not be enabled just yet! ;)", "cloud-off", "error"))
-                            </script>
-                        {% else %}
-                            <dl id="properties-list">
-                                {% for property_name, property_data in UserDetails.additional_properties %}
-                                    {% if not (property_name in hidden_props) %}
-                                        <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name)|translate }}</dt>
-                                        <dd data-property-key="{{ property_name }}">
-                                            <span class="property-content">{{ property_data.content }}</span>
-                                            <a class="edit-icon inline-icon"
-                                               title="Remove property"
-                                               href="javascript:void(0)"
-                                               onclick="PropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
-                                            </a>
-                                            <a class="delete-icon inline-icon"
-                                               title="Remove property"
-                                               href="javascript:void(0)"
-                                               onclick="PropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
-                                            </a>
-                                        </dd>
-                                    {% endif %}
-                                {% endfor %}
-                            </dl>
-                        {% endif %}
+                        <dl id="properties-list">
+                            {% for property_name, property_data in UserDetails.additional_properties %}
+                                {% if not (property_name in hidden_props) %}
+                                    <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name)|translate }}</dt>
+                                    <dd data-property-key="{{ property_name }}">
+                                        <span class="property-content">{{ property_data.content }}</span>
+                                        <a class="edit-icon inline-icon"
+                                           title="Remove property"
+                                           href="javascript:void(0)"
+                                           onclick="PropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
+                                        </a>
+                                        <a class="delete-icon inline-icon"
+                                           title="Remove property"
+                                           href="javascript:void(0)"
+                                           onclick="PropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
+                                        </a>
+                                    </dd>
+                                {% endif %}
+                            {% endfor %}
+                        </dl>
 
                         <a href="javascript:toggle_hidden_box('ext_props');"><strong>{{ "Extended Properties" | translate }}</strong><span id="hidden_box_ext_props_toggle_button" class="inline-icon-low-margin inline-icon-shift-right expand-more-icon" style="display: none;"></span></a>
                         <div class="small-spacer"></div>
@@ -96,14 +90,11 @@
                         <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
-                            {% if progressive_load %}
+                            {% for fileDetails in UserDetails.files %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
                             {% else %}
-                                {% for fileDetails in UserDetails.files %}
-                                    {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
-                                {% else %}
-                                    <li><em>File list empty</em></li>
-                                {% endfor %}
-                            {% endif %}
+                                <li><em>File list empty</em></li>
+                            {% endfor %}
                             {% set inline_node_expanded = false %}
                         </ul>
                     </div>

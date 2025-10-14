@@ -24,7 +24,6 @@ try
     PageBuilder::Render(
         template: '/VirtualPages/FileOverviewPage.html.twig',
         variables: [
-            "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
             "is_admin" => SecurityUtilities::IsAdmin(),
             "FileDetails" => $fileData,
         ]

@@ -39,23 +39,19 @@
                     {% set ltid = "CASES_BOX" %}
                     <h2 class="heading-of-hideable-content">{{ "my_cases" | translate }} <a href="javascript:toggle_hidden_box('{{ ltid }}');"><span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;"></span></a></h2>
                     <div id="hidden_box_{{ ltid }}" class="logical-box">
-                        {% if progressive_load %}
-                        {% else %}
-                            <ul class="collection-list">
-                                {% if current_user.properties.cases %}
-                                    {% for prop_name, prop in current_user.properties.cases.properties %}
-                                        {% set inline_node = prop %}
-                                        {% set inline_node_path = "/graph/~" ~ prop.id %}
-                                        <li>{{ include("Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</li>
-                                    {% else %}
-                                        <li><em>No cases</em></li>
-                                    {% endfor %}
+                        <ul class="collection-list">
+                            {% if current_user.properties.cases %}
+                                {% for prop_name, prop in current_user.properties.cases.properties %}
+                                    {% set inline_node = prop %}
+                                    {% set inline_node_path = "/graph/~" ~ prop.id %}
+                                    <li>{{ include("Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</li>
                                 {% else %}
                                     <li><em>No cases</em></li>
-                                {% endif %}
-                            </ul>
-                        {% endif %}
-
+                                {% endfor %}
+                            {% else %}
+                                <li><em>No cases</em></li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -79,25 +75,19 @@
                         </a>
                     </h2>
                     <div id="hidden_box_{{ ltid }}" class="logical-box">
-                        {% if progressive_load %}
-                            <div class="logical-box" id="messages_container">
-
-                            </div>
-                        {% else %}
-                            <ul class="collection-list">
-                                {% if current_user.properties.messages %}
-                                    {% for prop_name, prop in current_user.properties.messages.properties %}
-                                        {% set inline_node = prop %}
-                                        {% set inline_node_path = "/graph/~" ~ current_user.id ~ "/messages/" ~ (prop_name | url_encode) %}
-                                        <li>{{ include("Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</li>
-                                    {% else %}
-                                        <li><em>No messages</em></li>
-                                    {% endfor %}
+                        <ul class="collection-list">
+                            {% if current_user.properties.messages %}
+                                {% for prop_name, prop in current_user.properties.messages.properties %}
+                                    {% set inline_node = prop %}
+                                    {% set inline_node_path = "/graph/~" ~ current_user.id ~ "/messages/" ~ (prop_name | url_encode) %}
+                                    <li>{{ include("Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</li>
                                 {% else %}
                                     <li><em>No messages</em></li>
-                                {% endif %}
-                            </ul>
-                        {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <li><em>No messages</em></li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             </div>

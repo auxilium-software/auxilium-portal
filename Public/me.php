@@ -14,7 +14,6 @@ try
     SecurityUtilities::RequireLogin();
 
     PageBuilder::AutoRender(variables: [
-        "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
         "is_admin" => SecurityUtilities::IsAdmin(),
     ]
     );

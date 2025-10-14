@@ -29,10 +29,7 @@
                     <div class="marked-section">
                         <h2>{{ "Case Description" | translate }}</h2>
                         <br>
-                        {% if progressive_load %}
-                        {% else %}
-                            {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description} %}
-                        {% endif %}
+                        {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description} %}
                     </div>
 
                     <div class="marked-section">
@@ -44,63 +41,60 @@
                             ></a>
                         </h2>
                         <ul class="collection-list todo-list">
-                            {% if progressive_load %}
-                            {% else %}
-                                {% for toDoID, toDoItemDetails in CaseDetails.todos %}
-                                    <li class="todo-item status-{{ toDoItemDetails.status|lower }}">
-                                        <div class="todo-header">
-                                            <span class="todo-summary">{{ toDoItemDetails.summary }}</span>
-                                            {% if toDoItemDetails.priority %}
-                                                <span class="todo-priority priority-{{ toDoItemDetails.priority|lower }}">{{ toDoItemDetails.priority|capitalize }}</span>
-                                            {% endif %}
-                                        </div>
-
-                                        <div>
-                                            {% if toDoItemDetails.due_date %}
-                                                <span>
-                                                    {{ "Due" | translate }}: {{ toDoItemDetails.due_date|date("Y-m-d H:i") }}
-                                                </span>
-                                            {% endif %}
-                                            <br>
-                                            {% if toDoItemDetails.created_at %}
-                                                <span>
-                                                    {{ "Created" | translate }}: {{ toDoItemDetails.created_at|date("Y-m-d H:i") }}
-                                                    by
-                                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.created_by} %}
-                                                </span>
-                                            {% endif %}
-                                            <br>
-                                            {% if toDoItemDetails.assigned_to %}
-                                                <span>
-                                                    {{ "Assigned To" | translate }}:
-                                                    {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.assigned_to} %}
-                                                </span>
-                                            {% endif %}
-                                        </div>
-
-                                        {% if toDoItemDetails.description %}
-                                            <div>
-                                                {{ toDoItemDetails.description }}
-                                            </div>
+                            {% for toDoID, toDoItemDetails in CaseDetails.todos %}
+                                <li class="todo-item status-{{ toDoItemDetails.status|lower }}">
+                                    <div class="todo-header">
+                                        <span class="todo-summary">{{ toDoItemDetails.summary }}</span>
+                                        {% if toDoItemDetails.priority %}
+                                            <span class="todo-priority priority-{{ toDoItemDetails.priority|lower }}">{{ toDoItemDetails.priority|capitalize }}</span>
                                         {% endif %}
+                                    </div>
 
+                                    <div>
+                                        {% if toDoItemDetails.due_date %}
+                                            <span>
+                                                {{ "Due" | translate }}: {{ toDoItemDetails.due_date|date("Y-m-d H:i") }}
+                                            </span>
+                                        {% endif %}
+                                        <br>
+                                        {% if toDoItemDetails.created_at %}
+                                            <span>
+                                                {{ "Created" | translate }}: {{ toDoItemDetails.created_at|date("Y-m-d H:i") }}
+                                                by
+                                                {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.created_by} %}
+                                            </span>
+                                        {% endif %}
+                                        <br>
+                                        {% if toDoItemDetails.assigned_to %}
+                                            <span>
+                                                {{ "Assigned To" | translate }}:
+                                                {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.assigned_to} %}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if toDoItemDetails.description %}
                                         <div>
-                                            {% if toDoItemDetails.status == "NEEDS-ACTION" %}
-                                                <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.updateStatus('{{ toDoID }}', 'COMPLETE').then(() => window.location.reload());}"
-                                                   class="action-link action-link-complete">{{ "Mark Complete" | translate }}</a>
-                                                <br>
-                                            {% endif %}
-                                            <a href="/cases/{{ CaseDetails.id }}/todos/{{ toDoID }}"
-                                               class="action-link action-link-edit">{{ "Edit" | translate }}</a>
-                                            <br>
-                                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.deleteTodo('{{ toDoID }}').then(() => window.location.reload());}"
-                                               class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                            {{ toDoItemDetails.description }}
                                         </div>
-                                    </li>
-                                {% else %}
-                                    <li><em>{{ "No ToDo entries" | translate }}</em></li>
-                                {% endfor %}
-                            {% endif %}
+                                    {% endif %}
+
+                                    <div>
+                                        {% if toDoItemDetails.status == "NEEDS-ACTION" %}
+                                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.updateStatus('{{ toDoID }}', 'COMPLETE').then(() => window.location.reload());}"
+                                               class="action-link action-link-complete">{{ "Mark Complete" | translate }}</a>
+                                            <br>
+                                        {% endif %}
+                                        <a href="/cases/{{ CaseDetails.id }}/todos/{{ toDoID }}"
+                                           class="action-link action-link-edit">{{ "Edit" | translate }}</a>
+                                        <br>
+                                        <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.deleteTodo('{{ toDoID }}').then(() => window.location.reload());}"
+                                           class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li><em>{{ "No ToDo entries" | translate }}</em></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -115,14 +109,11 @@
                         <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
-                            {% if progressive_load %}
+                            {% for clientDetails in CaseDetails.clients %}
+                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} only %}
                             {% else %}
-                                {% for clientDetails in CaseDetails.clients %}
-                                    {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} only %}
-                                {% else %}
-                                    <li><em>Client list empty</em></li>
-                                {% endfor %}
-                            {% endif %}
+                                <li><em>Client list empty</em></li>
+                            {% endfor %}
                             {% set inline_node_expanded = false %}
                         </ul>
                     </div>
@@ -135,14 +126,11 @@
                         <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
-                            {% if progressive_load %}
+                            {% for workerDetails in CaseDetails.workers %}
+                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
                             {% else %}
-                                {% for workerDetails in CaseDetails.workers %}
-                                    {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
-                                {% else %}
-                                    <li><em>Client list empty</em></li>
-                                {% endfor %}
-                            {% endif %}
+                                <li><em>Client list empty</em></li>
+                            {% endfor %}
                             {% set inline_node_expanded = false %}
                         </ul>
                     </div>

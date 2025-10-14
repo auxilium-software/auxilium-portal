@@ -24,7 +24,6 @@ try
     PageBuilder::Render(
         template: '/VirtualPages/ToDoOverviewPage.html.twig',
         variables: [
-            "progressive_load" => CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false),
             "is_admin" => SecurityUtilities::IsAdmin(),
             "CaseID" => URIParsingUtilities::GetUUIDFromURI(index: 0),
             "ToDoID" => URIParsingUtilities::GetUUIDFromURI(index: 1),
