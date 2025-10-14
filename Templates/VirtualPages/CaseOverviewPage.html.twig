@@ -110,7 +110,7 @@
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% for clientDetails in CaseDetails.clients %}
-                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} only %}
+                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} %}
                             {% else %}
                                 <li><em>Client list empty</em></li>
                             {% endfor %}

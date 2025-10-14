@@ -69,9 +69,11 @@
                 {{ "{" ~ _data.id ~ "}" }}
             {% endif %}
         </a>
-        <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); {% if _personType == 'CLIENT' %}await cm.removeClient('{{ _data.id }}', true);{% else %}await cm.removeWorker('{{ _data.id }}', true);{% endif %}}"
+        <a href="#"
            class="inline-icon link-off-icon"
-           title="{{ "Add Case Worker" | translate }}"></a>
+           title="{{ "Add Case Worker" | translate }}"
+           onclick="{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.remove{% if _personType == 'CLIENT' %}Client{% else %}Worker{% endif %}('{{ _data.id }}', true).then(() => {window.location.reload();});}"
+        ></a>
     {% endif %}
 {% endif %}
 
