@@ -13,13 +13,9 @@ try
 {
     SecurityUtilities::RequireLogin();
 
-    $userData = [];
-    if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
-    {
-        $userData = APIInteractions::Get(
-            endpoint: '/users/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
-        )->Payload;
-    }
+    $userData = APIInteractions::Get(
+        endpoint: '/users/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+    )->Payload;
 
     PageBuilder::Render(
         template: '/VirtualPages/UserOverviewPage.html.twig',

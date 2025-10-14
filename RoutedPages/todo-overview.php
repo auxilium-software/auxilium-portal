@@ -13,13 +13,9 @@ try
 {
     SecurityUtilities::RequireLogin();
 
-    $toDoData = [];
-    if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
-    {
-        $toDoData = APIInteractions::Get(
-            endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/todos/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
-        )->Payload;
-    }
+    $toDoData = APIInteractions::Get(
+        endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/todos/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+    )->Payload;
 
     PageBuilder::Render(
         template: '/VirtualPages/ToDoOverviewPage.html.twig',
