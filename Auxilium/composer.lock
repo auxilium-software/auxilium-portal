@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1c588a5c642d18842cad39a8d4b0455f",
+    "content-hash": "b7935f20647dd529a37862011cf711e3",
     "packages": [
         {
             "name": "aura/sqlquery",
@@ -2649,82 +2649,17 @@
             "time": "2019-10-31T00:00:00+00:00"
         },
         {
-            "name": "phpfui/icalendar",
-            "version": "V1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpfui/icalendar.git",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpfui/icalendar/zipball/1642b0c200ba83912685940a7b76946fc158723f",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4 <8.5"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.3",
-                "phpfui/phpunit-syntax-coverage": "dev-master",
-                "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "<12.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ICalendarOrg\\": "src/ICalendarOrg/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Bruce Wells",
-                    "email": "brucekwells@gmail.com"
-                }
-            ],
-            "description": "A modern fork of the icalendar.org PHP implementation of rfc5545, management of iCal formatted files",
-            "homepage": "https://icalendar.org/php-library.html",
-            "keywords": [
-                "calendar",
-                "daylight",
-                "file",
-                "iCalendar",
-                "management",
-                "rfc2445",
-                "rfc5545",
-                "rfc6321",
-                "standard",
-                "vCalendar",
-                "valarm",
-                "vevent",
-                "vfreebusy",
-                "vjournal",
-                "vtimezone",
-                "vtodo"
-            ],
-            "support": {
-                "issues": "https://github.com/phpfui/icalendar/issues",
-                "source": "https://github.com/phpfui/icalendar/tree/V1.1.0"
-            },
-            "time": "2019-10-31T00:00:00+00:00"
-        },
-        {
             "name": "phpmailer/phpmailer",
-            "version": "v6.10.0",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144"
+                "reference": "c7111310c6116ba508a6a170a89eaaed2129bd42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144",
-                "reference": "bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/c7111310c6116ba508a6a170a89eaaed2129bd42",
+                "reference": "c7111310c6116ba508a6a170a89eaaed2129bd42",
                 "shasum": ""
             },
             "require": {
@@ -2745,6 +2680,7 @@
             },
             "suggest": {
                 "decomplexity/SendOauth2": "Adapter for using XOAUTH2 authentication",
+                "ext-imap": "Needed to support advanced email address parsing according to RFC822",
                 "ext-mbstring": "Needed to send email in multibyte encoding charset or decode encoded addresses",
                 "ext-openssl": "Needed for secure SMTP sending and DKIM signing",
                 "greew/oauth2-azure-provider": "Needed for Microsoft Azure XOAUTH2 authentication",
@@ -2784,7 +2720,7 @@
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
             "support": {
                 "issues": "https://github.com/PHPMailer/PHPMailer/issues",
-                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.10.0"
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v7.0.0"
             },
             "funding": [
                 {
@@ -2792,7 +2728,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-24T15:19:31+00:00"
+            "time": "2025-10-15T16:40:02+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
