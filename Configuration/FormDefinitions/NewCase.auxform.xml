@@ -4,7 +4,7 @@
     <title>Onboard a New Case</title>
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
-    <requireAuthentication>false</requireAuthentication>
+    <requireAuthentication>true</requireAuthentication>
 
 
 
@@ -133,37 +133,6 @@
 
 
         <page>
-            <id>contact_details</id>
-            <title>Your contact details</title>
-            <renderIf>
-                and(
-                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
-                    equals($formData["on_behalf_of"],"MYSELF")
-                )
-            </renderIf>
-            <components>
-                <component>
-                    <id>full_name</id>
-                    <type>TEXT_FIELD</type>
-                    <required>true</required>
-                    <primaryLabel>Full Name</primaryLabel>
-                </component>
-                <component>
-                    <id>telephone_number</id>
-                    <type>TEXT_FIELD</type>
-                    <required>true</required>
-                    <primaryLabel>Telephone Number</primaryLabel>
-                </component>
-                <component>
-                    <id>full_address</id>
-                    <type>LARGE_TEXT_FIELD</type>
-                    <rows>5</rows>
-                    <required>true</required>
-                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
-                </component>
-            </components>
-        </page>
-        <page>
             <id>contact_details_for_individual_applying_behalf_of</id>
             <title>Contact details for individual you are applying on behalf of</title>
             <description>Please enter as the contact details for the person you are applying on behalf of.</description>
@@ -203,56 +172,6 @@
 
 
 
-        <page>
-            <id>about_you</id>
-            <title>About You</title>
-            <renderIf>
-                and(
-                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
-                    equals($formData["on_behalf_of"],"MYSELF")
-                )
-            </renderIf>
-            <components>
-                <component>
-                    <id>gender</id>
-                    <type>CHOICE_FIELD</type>
-                    <required>true</required>
-                    <options>
-                        <option>
-                            <primaryLabel>Female</primaryLabel>
-                            <value>female</value>
-                        </option>
-                        <option>
-                            <primaryLabel>Male</primaryLabel>
-                            <value>male</value>
-                        </option>
-                        <option>
-                            <primaryLabel>Other</primaryLabel>
-                            <value>other</value>
-                        </option>
-                    </options>
-                </component>
-                <component>
-                    <id>ethnic_group</id>
-                    <type>TEXT_FIELD</type>
-                    <required>true</required>
-                    <primaryLabel>Ethnic group</primaryLabel>
-                </component>
-                <component>
-                    <id>date_of_birth</id>
-                    <type>DATE_FIELD</type>
-                    <required>true</required>
-                    <primaryLabel>Date of birth</primaryLabel>
-                </component>
-                <component>
-                    <id>how_did_you_find_out_about_our_service</id>
-                    <type>LARGE_TEXT_FIELD</type>
-                    <rows>4</rows>
-                    <required>true</required>
-                    <primaryLabel>How did you find out about our service?</primaryLabel>
-                </component>
-            </components>
-        </page>
         <page>
             <id>about_individual_applying_behalf_of</id>
             <title>About individual you are applying on behalf of</title>
@@ -315,7 +234,15 @@
         <page>
             <id>login_details</id>
             <title>Login details</title>
-            <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
+            <renderIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    or(
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                    )
+                )
+            </renderIf>
             <components>
                 <component>
                     <id>email_address</id>
@@ -466,24 +393,45 @@
 
     <submissionActions>
         <apiRequest>
-            <executeIf>true</executeIf>
+            <executeIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    equals($formData["on_behalf_of"],"MYSELF")
+                )
+            </executeIf>
+            <endpoint>/cases</endpoint>
+            <method>POST</method>
+            <payload>
+                <title>$formData["case_title"]</title>
+                <description>$formData["description"]</description>
+            </payload>
+        </apiRequest>
+        <apiRequest>
+            <executeIf>
+                and(
+                    equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
+                    or(
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                        equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                    )
+                )
+            </executeIf>
             <endpoint>/authentication/register</endpoint>
             <method>POST</method>
             <payload>
-                {
-                    "who_is_case_about": "$formData["who_is_case_about"]",
-                    "consent_given": "$formData["data_processing_consent"]",
-                    "full_name": "$formData["full_name"]",
-                    "telephone_number": "$formData["telephone_number]",
-                    "full_address": "$formData["full_address"]",
-                    "gender": "$formData["gender"]",
-                    "ethnic_group": "$formData["ethnic_group"]",
-                    "date_of_birth": "$formData["date_of_birth"]",
-                    "how_did_you_find_out_about_our_service": "$formData["how_did_you_find_out_about_our_service"]",
-                    "email_address": "$formData["email_address"]",
-                    "raw_password": "$formData["raw_password"]",
-                    "case_description": "$formData["case_description"]"
-                }
+                <who_is_case_about>$formData["who_is_case_about"]</who_is_case_about>
+                <consent_given>$formData["data_processing_consent"]</consent_given>
+                <full_name>$formData["full_name"]</full_name>
+                <telephone_number>$formData["telephone_number"]</telephone_number>
+                <full_address>$formData["full_address"]</full_address>
+                <gender>$formData["gender"]</gender>
+                <ethnic_group>$formData["ethnic_group"]</ethnic_group>
+                <date_of_birth>$formData["date_of_birth"]</date_of_birth>
+                <how_did_you_find_out_about_our_service>$formData["how_did_you_find_out_about_our_service"]</how_did_you_find_out_about_our_service>
+                <email_address>$formData["email_address"]</email_address>
+                <raw_password>$formData["raw_password"]</raw_password>
+                <title>$formData["case_title"]</title>
+                <description>$formData["case_description"]</description>
             </payload>
         </apiRequest>
     </submissionActions>
