@@ -21,9 +21,59 @@ if(!CacheUtilities::DoesFormExistYet(formInstanceID: $formInstanceID))
 $formData = CacheUtilities::GetFormData($formInstanceID);
 $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpecID']);
 
+function processPayload($payload, array $vars): mixed
+{
+    if (is_string($payload)) {
+        if (str_contains($payload, '$')) {
+            return AuxiliumScript::evaluate_expression($payload, $vars);
+        }
+        return $payload;
+    }
 
+    if (is_array($payload)) {
+        $result = [];
+        foreach ($payload as $key => $value) {
+            $processedKey = is_string($key) && str_contains($key, '$')
+                ? AuxiliumScript::evaluate_expression($key, $vars)
+                : $key;
 
+            $result[$processedKey] = processPayload($value, $vars);
+        }
+        return $result;
+    }
 
+    return $payload;
+}
+
+function parsePayloadFromXML($payloadNode): mixed
+{
+    if (!$payloadNode) {
+        return [];
+    }
+
+    if (is_string($payloadNode)) {
+        $decoded = json_decode($payloadNode, true, 512, JSON_THROW_ON_ERROR);
+        return $decoded ?? $payloadNode;
+    }
+
+    if (is_object($payloadNode)) {
+        $result = [];
+        foreach ($payloadNode as $key => $value) {
+            if ($value instanceof SimpleXMLElement) {
+                if (count($value->children()) > 0) {
+                    $result[$key] = parsePayloadFromXML($value);
+                } else {
+                    $result[$key] = (string)$value;
+                }
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    return $payloadNode;
+}
 
 function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
 {
@@ -33,7 +83,10 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
     }
 
     $results = [];
-    $vars = $formData['Data'] ?? [];
+    $vars = [
+        'formData' => $formData['Data'] ?? [],
+    ];
+
     if($formSpec['useReCAPTCHA'])
     {
         $vars['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
@@ -48,9 +101,19 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
 
     foreach ($apiRequests as $apiRequest)
     {
+        $executeIf = $apiRequest['executeIf'] ?? 'true';
+
+        if(!AuxiliumScript::evaluate_expression($executeIf, $vars))
+        {
+            continue;
+        }
+
+        $payloadDefinition = $apiRequest['payload'] ?? [];
+        $payloadToSend = processPayload(parsePayloadFromXML($payloadDefinition), $vars);
+
         $result = APIInteractions::Post(
             endpoint: $apiRequest['endpoint'],
-            payload: $vars,
+            payload: $payloadToSend,
             requireAuth: false,
         );
         $results[] = $result;
@@ -71,10 +134,6 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
         'results' => $results
     ];
 }
-
-
-
-
 
 function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1)
 {
@@ -100,7 +159,6 @@ function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1)
 
     return -1;
 }
-
 
 function getVisibleReviewComponents($formSpec, $formData)
 {
@@ -134,17 +192,13 @@ function getVisibleReviewComponents($formSpec, $formData)
 
                 if(is_array($items))
                 {
-
                     if(isset($items['key'], $items['value']))
                     {
-
                         $key = $items['key'];
                         $value = $items['value'];
 
-
                         if(str_contains($value, '$'))
                         {
-
                             $value = str_replace(['$formData["', '"]'], ['$formData[\'', '\']'], $value);
                             $value = AuxiliumScript::evaluate_expression($value, $vars);
                         }
@@ -212,7 +266,6 @@ function getVisibleReviewComponents($formSpec, $formData)
 }
 
 $storedPageIndex = $formData['CurrentPageIndex'] ?? 0;
-
 $isReviewPage = ($storedPageIndex === 'review');
 
 $visiblePages = [];
@@ -239,7 +292,6 @@ if(!$isReviewPage)
     $currentVisiblePageIndex = array_search($storedPageIndex, $pageIndexMap);
     if($currentVisiblePageIndex === false)
     {
-
         $currentVisiblePageIndex = 0;
         if(!empty($pageIndexMap))
         {
@@ -253,7 +305,6 @@ $totalVisiblePages = count($visiblePages);
 if($_SERVER['REQUEST_METHOD'] === 'POST')
 {
     $action = $_POST['action'] ?? 'continue';
-
 
     if(isset($_POST['jumpToPage']))
     {
@@ -289,7 +340,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             }
             else
             {
-
                 $prevPageIndex = findNextVisiblePage($formSpec, $formData, $storedPageIndex, -1);
                 if($prevPageIndex >= 0)
                 {
@@ -302,7 +352,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
         case 'next':
             if ($isReviewPage)
             {
-                // Execute submission actions before marking as complete
                 $submissionResult = executeSubmissionActions($formSpec, $formData, $formInstanceID);
 
                 if ($submissionResult['success'])
@@ -318,7 +367,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             }
             else
             {
-
                 $nextPageIndex = findNextVisiblePage($formSpec, $formData, $storedPageIndex, 1);
                 if($nextPageIndex >= 0)
                 {
@@ -326,7 +374,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
                 }
                 else
                 {
-                    // no more visible pages, go to the review page
                     CacheUtilities::SetCurrentPageIndex($formInstanceID, 'review');
                 }
             }
@@ -337,7 +384,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             break;
 
         case 'submit':
-            // Execute submission actions before marking as complete
             $submissionResult = executeSubmissionActions($formSpec, $formData, $formInstanceID);
 
             if ($submissionResult['success'])
@@ -371,10 +417,9 @@ if ($isReviewPage) {
         "ReviewComponents" => $reviewComponents,
         "ShowBackButton" => true,
         "ShowSubmitButton" => true,
-        "SubmissionError" => $_SESSION['submission_error'] ?? null, // Add this line
+        "SubmissionError" => $_SESSION['submission_error'] ?? null,
     ];
 
-    // Clear the error after displaying
     unset($_SESSION['submission_error']);
 
     PageBuilder::Render(
@@ -384,7 +429,6 @@ if ($isReviewPage) {
 }
 else
 {
-
     $currentPage = $visiblePages[$currentVisiblePageIndex];
     $actualPageIndex = $pageIndexMap[$currentVisiblePageIndex];
 
