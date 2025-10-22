@@ -471,7 +471,7 @@
             <method>POST</method>
             <payload>
                 <who_is_case_about>$formData["who_is_case_about"]</who_is_case_about>
-                <consent_given>$formData["data_processing_consent"]</consent_given>
+                <data_processing_consent>$formData["data_processing_consent"]</data_processing_consent>
                 <full_name>$formData["full_name"]</full_name>
                 <telephone_number>$formData["telephone_number"]</telephone_number>
                 <full_address>$formData["full_address"]</full_address>
@@ -479,6 +479,7 @@
                 <ethnic_group>$formData["ethnic_group"]</ethnic_group>
                 <date_of_birth>$formData["date_of_birth"]</date_of_birth>
                 <how_did_you_find_out_about_our_service>$formData["how_did_you_find_out_about_our_service"]</how_did_you_find_out_about_our_service>
+                <on_behalf_of>$formData["on_behalf_of"]</on_behalf_of>
                 <email_address>$formData["email_address"]</email_address>
                 <raw_password>$formData["raw_password"]</raw_password>
                 <title>$formData["case_title"]</title>

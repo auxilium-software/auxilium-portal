@@ -87,10 +87,6 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
         'formData' => $formData['Data'] ?? [],
     ];
 
-    if($formSpec['useReCAPTCHA'])
-    {
-        $vars['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
-    }
 
     $apiRequests = $formSpec['submissionActions']['apiRequest'];
 
@@ -110,6 +106,11 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
 
         $payloadDefinition = $apiRequest['payload'] ?? [];
         $payloadToSend = processPayload(parsePayloadFromXML($payloadDefinition), $vars);
+
+        if($formSpec['useReCAPTCHA'])
+        {
+            $payloadToSend['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
+        }
 
         $result = APIInteractions::Post(
             endpoint: $apiRequest['endpoint'],
@@ -407,7 +408,10 @@ if($totalVisiblePages === 0 && !$isReviewPage)
     NavigationUtilities::Redirect(target: '/');
 }
 
-if ($isReviewPage) {
+if ($isReviewPage)
+{
+    $shouldUserBeLoggedIn = isset($formSpec['requireAuthentication']) && $formSpec['requireAuthentication'] === 'true';
+
     $reviewComponents = getVisibleReviewComponents($formSpec, $formData);
     $variables = [
         "FormInstanceID" => $formInstanceID,
@@ -425,6 +429,7 @@ if ($isReviewPage) {
     PageBuilder::Render(
         template: '/VirtualPages/FormReviewPage.html.twig',
         variables: $variables,
+        useAuth: $shouldUserBeLoggedIn,
     );
 }
 else
