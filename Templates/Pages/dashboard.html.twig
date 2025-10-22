@@ -37,20 +37,16 @@
             <div class="right-preferential-box">
                 <div class="marked-section">
                     {% set ltid = "CASES_BOX" %}
-                    <h2 class="heading-of-hideable-content">{{ "my_cases" | translate }} <a href="javascript:toggle_hidden_box('{{ ltid }}');"><span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;"></span></a></h2>
+                    <h2 class="heading-of-hideable-content">
+                        {{ "my_cases" | translate }}
+                        <a href="javascript:toggle_hidden_box('{{ ltid }}');">
+                            <span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;">
+                            </span>
+                        </a>
+                    </h2>
                     <div id="hidden_box_{{ ltid }}" class="logical-box">
-                        <ul class="collection-list">
-                            {% if current_user.properties.cases %}
-                                {% for prop_name, prop in current_user.properties.cases.properties %}
-                                    {% set inline_node = prop %}
-                                    {% set inline_node_path = "/graph/~" ~ prop.id %}
-                                    <li>{{ include("Partials/NodeViews/Utilities/InlineNodeView.html.twig") }}</li>
-                                {% else %}
-                                    <li><em>No cases</em></li>
-                                {% endfor %}
-                            {% else %}
-                                <li><em>No cases</em></li>
-                            {% endif %}
+                        <ul class="collection-list" id="cases-list-container">
+                            <li><em>{{ "Loading cases..."|translate }}</em></li>
                         </ul>
                     </div>
                 </div>
@@ -74,6 +70,7 @@
                         </span>
                         </a>
                     </h2>
+
                     <div id="hidden_box_{{ ltid }}" class="logical-box">
                         <ul class="collection-list">
                             {% if current_user.properties.messages %}
@@ -95,4 +92,44 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const caseController = new CaseController();
+            const casesListContainer = document.getElementById('cases-list-container');
+
+            try {
+                const allMyCases = await caseController.GetAllMyCases_DontDoThisLol();
+
+                if (allMyCases && allMyCases.length > 0) {
+                    casesListContainer.innerHTML = '';
+
+                    allMyCases.forEach(caseItem => {
+                        const li = document.createElement('li');
+                        const link = document.createElement('a');
+
+                        link.className = 'navigational-link';
+                        link.href = `/cases/${caseItem.id}`;
+
+                        const icon = document.createElement('span');
+                        icon.className = 'inline-icon-shift-left inline-icon-low-margin cases-icon';
+                        icon.title = '{{ "Case"|translate }}';
+
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = caseItem.title || `Case #${caseItem.id}`;
+
+                        link.appendChild(icon);
+                        link.appendChild(textSpan);
+                        li.appendChild(link);
+                        casesListContainer.appendChild(li);
+                    });
+                } else {
+                    casesListContainer.innerHTML = '<li><em>{{ "No cases found"|translate }}</em></li>';
+                }
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                casesListContainer.innerHTML = '<li><em>{{ "Error loading cases"|translate }}</em></li>';
+            }
+        });
+    </script>
 {% endblock %}
