@@ -31,6 +31,7 @@ class CommonFilters extends AbstractExtension
             new TwigFilter('human_filesize',                    [$this, 'human_filesize']),
             new TwigFilter('is_uuid',                           [$this, 'is_uuid']),
             new TwigFilter('is_auxlfs_url',                     [$this, 'is_auxlfs_url']),
+            new TwigFilter('is_auxmsg_url',                     [$this, 'is_auxmsg_url']),
             new TwigFilter('extract_file_id_from_auxlfs_url',   [$this, 'extract_file_id_from_auxlfs_url']),
             new TwigFilter('ndtitle',                           [$this, 'ndtitle']),
             new TwigFilter('ndsentence',                        [$this, 'ndsentence']),
@@ -103,6 +104,16 @@ class CommonFilters extends AbstractExtension
         // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
 
         $pattern = '/^auxlfs:\/\/%%couchdb%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]{40}$/';
+
+        return preg_match($pattern, $string) === 1;
+    }
+
+    public function is_auxmsg_url(string $string): string
+    {
+        // auxmsg://%%couchdb%%/ - literal prefix
+        // [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} - UUID format
+
+        $pattern = '/^auxmsg:\/\/%%couchdb%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
     }

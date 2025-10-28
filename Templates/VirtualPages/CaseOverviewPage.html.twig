@@ -144,6 +144,23 @@
                         <br>
                         <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
                     </div>
+
+                    <div class="marked-section">
+                        <h2>{{ "Messages" | translate }}
+                            <a href="javascript:{const mm = new MessageManager('{{ CaseDetails.id }}'); mm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Compose Message" | translate }}"></a>
+                        </h2>
+                        <div id="messages-container">
+                            <ul class="collection-list message-list">
+                                {% for messageURL in CaseDetails.messages %}
+                                    {% include '/Partials/MessageField.html.twig' with {'_data': messageURL} %}
+                                {% else %}
+                                    <li><em>{{ "No messages" | translate }}</em></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

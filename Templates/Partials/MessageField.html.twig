@@ -1,0 +1,79 @@
+{% if _data|is_auxmsg_url %}
+    {% set _fieldID = GeneratePseudoRandomCharacters(16) %}
+
+    <div id="MessageContainer-{{ _fieldID }}"></div>
+
+    <script>
+        const {{ _fieldID }}_msgURL = '{{ _data }}';
+        const {{ _fieldID }}_msgContainer = document.getElementById('MessageContainer-{{ _fieldID }}');
+
+        document.addEventListener('DOMContentLoaded', async function()
+        {
+            const messageData = await (new MessageController()).GetSingleMessageFromAuxMSGURL('{{ _data }}');
+            const senderFieldID = '{{ _fieldID }}_sender_' + Math.random().toString(36).substring(7);
+
+            // Create message HTML
+            const messageHTML = `
+                <div class="message-item ${messageData.is_urgent ? 'urgent' : ''} ${!messageData.is_read ? 'unread' : ''}">
+                    <div class="message-header">
+                        <div class="message-sender">
+                            <div class="user-avatar" id="${senderFieldID}_avatar">
+                                U
+                            </div>
+                            <div class="message-sender-info">
+                                <span class="sender-name">
+                                    <a class="navigational-link" href="/users/${messageData.sender_id}">
+                                        <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account"></span>
+                                        <span id="${senderFieldID}_name">Loading...</span>
+                                    </a>
+                                </span>
+                                <span class="message-date">${new Date(messageData.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div>
+                            ${messageData.is_urgent ? '<span class="urgent-badge">URGENT</span>' : ''}
+                            ${!messageData.is_read ? '<span class="unread-badge">NEW</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="message-subject">
+                        <strong>${messageData.subject}</strong>
+                    </div>
+
+                    <div class="message-content">
+                        ${messageData.content}
+                    </div>
+
+                    <div class="message-meta">
+                        Message ID: ${messageData.id}
+                        ${messageData.read_by && Object.keys(messageData.read_by).length > 0
+                ? `<br>Read by: ${Object.keys(messageData.read_by).length} user(s)`
+                : ''}
+                    </div>
+                </div>
+            `;
+
+            {{ _fieldID }}_msgContainer.innerHTML = messageHTML;
+
+            // Load sender information
+            try {
+                const senderData = await (new UserController()).GetSingleUser(messageData.sender_id);
+                const senderNameElement = document.getElementById(`${senderFieldID}_name`);
+                const senderAvatarElement = document.getElementById(`${senderFieldID}_avatar`);
+
+                if (senderData && senderData.full_name) {
+                    senderNameElement.textContent = senderData.full_name;
+                    senderAvatarElement.textContent = senderData.full_name.charAt(0).toUpperCase();
+                } else if (senderData && senderData.detail === 'User not found') {
+                    senderNameElement.innerHTML = '<em>Deleted User</em>';
+                    senderAvatarElement.textContent = '?';
+                } else {
+                    senderNameElement.textContent = `{${messageData.sender_id}}`;
+                }
+            } catch (error) {
+                console.error('Failed to load sender information:', error);
+                document.getElementById(`${senderFieldID}_name`).textContent = 'Unknown User';
+            }
+        });
+    </script>
+{% endif %}
