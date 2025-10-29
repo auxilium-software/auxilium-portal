@@ -17,23 +17,6 @@ try
         endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
-    foreach($caseData['clients'] as &$clientID)
-    {
-        $workerDetails = APIInteractions::Get(
-            endpoint: '/users/' . $clientID,
-        );
-        $clientID = $workerDetails->Payload;
-    }
-    unset($clientID);
-    foreach($caseData['workers'] as &$workerID)
-    {
-        $workerDetails = APIInteractions::Get(
-            endpoint: '/users/' . $workerID,
-        );
-        $workerID = $workerDetails->Payload;
-    }
-    unset($workerID);
-
     PageBuilder::Render(
         template: '/VirtualPages/CaseOverviewPage.html.twig',
         variables: [
