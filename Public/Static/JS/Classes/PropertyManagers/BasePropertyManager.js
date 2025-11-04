@@ -1,9 +1,9 @@
-class PropertyManager
+class BasePropertyManager
 {
-    constructor(userId)
+    constructor(basePath)
     {
         this.apiClient = new APIInteractions();
-        this.basePath = `/api/v3/users/${userId}/additional_properties`;
+        this.basePath = basePath;
     }
 
     async editProperty(propertyKey, currentContent)
@@ -71,17 +71,5 @@ class PropertyManager
                 "error"
             );
         }
-    }
-
-    static async editProperty(userId, propertyKey, currentContent)
-    {
-        const manager = new PropertyManager(userId);
-        return manager.editProperty(propertyKey, currentContent);
-    }
-
-    static async deleteProperty(userId, propertyKey, displayName)
-    {
-        const manager = new PropertyManager(userId);
-        return manager.deleteProperty(propertyKey, displayName);
     }
 }

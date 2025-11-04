@@ -9,6 +9,7 @@
                 </span>
                 <span id="{{ _fieldID }}-A"></span>
             </a>
+        <span id="{{ _fieldID }}-A-RemoveButton"></span>
         </h3>
         <div class="small-spacer"></div>
         <dl>
@@ -19,12 +20,21 @@
             </span>
             <span id="{{ _fieldID }}-B"></span>
         </a>
+        <span id="{{ _fieldID }}-B-RemoveButton"></span>
     {% endif %}
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}').textContent
                     = (await (new UserController()).GetSingleUser('{{ _data }}'))['full_name'];
+
+            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
+                <a href="#"
+                    class="inline-icon link-off-icon"
+                    title="{{ "Remove Person" | translate }}"
+                    onclick="{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.remove{% if _personType == 'CLIENT' %}Client{% else %}Worker{% endif %}('{{ _data }}', true).then(() => {window.location.reload();});}"
+                ></a>
+            `;
         });
     </script>
 
@@ -71,7 +81,7 @@
         </a>
         <a href="#"
            class="inline-icon link-off-icon"
-           title="{{ "Add Case Worker" | translate }}"
+           title="{{ "Remove Person" | translate }}"
            onclick="{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.remove{% if _personType == 'CLIENT' %}Client{% else %}Worker{% endif %}('{{ _data.id }}', true).then(() => {window.location.reload();});}"
         ></a>
     {% endif %}

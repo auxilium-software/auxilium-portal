@@ -25,8 +25,6 @@
                 <a href="/all-users" class="navigational-link">{{ "All Users" | translate | ndsentence }}</a><br />
                 <a href="/map" class="navigational-link">{{ "Map" | translate | ndsentence }}</a><br />
             {% endif %}
-            <a href="/message-centre" class="navigational-link">{{ "Message Center" | translate | ndsentence }}</a><br />
-            <a href="/chats/new-message" class="navigational-link">{{ "Send a Message" | translate | ndsentence }}</a><br />
 
             <div class="large-spacer"></div>
             <div class="separator"></div>
@@ -38,7 +36,7 @@
                 <div class="marked-section">
                     {% set ltid = "CASES_BOX" %}
                     <h2 class="heading-of-hideable-content">
-                        {{ "my_cases" | translate }}
+                        {{ "My Cases" | translate }}
                         <a href="javascript:toggle_hidden_box('{{ ltid }}');">
                             <span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;">
                             </span>
@@ -60,10 +58,7 @@
                 <div class="marked-section">
                     {% set latest_comms = current_user.getLatestCommunications(3) %}
                     <h2 class="heading-of-hideable-content">
-                        {{ "my_messages" | translate }}
-                        <a href="/chats/new-message" class="inline-icon add-comment-icon" title="{{ "new_message" | translate | ndsentence }}">
-
-                        </a>
+                        {{ "My Messages" | translate }}
                         <a href="javascript:toggle_hidden_box('{{ ltid }}');">
                         <span id="hidden_box_{{ ltid }}_toggle_button" class="inline-icon-low-margin expand-more-icon" style="display: none;">
 
