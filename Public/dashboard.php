@@ -18,15 +18,14 @@ try
         endpoint: '/cases/mine',
     )->Payload;
     $messages = APIInteractions::Get(
-        endpoint: '/messages/',
+        endpoint: '/messages',
     )->Payload;
 
     PageBuilder::AutoRender(variables: [
         "is_admin" => SecurityUtilities::IsAdmin(),
         "MyCases" => $cases,
         "MyMessages" => $messages,
-    ]
-    );
+    ]);
 }
 catch(Exception $e)
 {
