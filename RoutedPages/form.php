@@ -115,7 +115,7 @@ function executeSubmissionActions($formSpec, $formData, $formInstanceID): array
         $result = APIInteractions::Post(
             endpoint: $apiRequest['endpoint'],
             payload: $payloadToSend,
-            requireAuth: false,
+            requireAuth: $formSpec['requireAuthentication'],
         );
         $results[] = $result;
 
