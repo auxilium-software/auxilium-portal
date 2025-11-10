@@ -10,65 +10,47 @@ class CookieHandling
 {
     public static function GetBooleanCookie(CookieKey $targetCookie, bool $default = false): bool
     {
-        $cookieValue = self::GetCookieValue($targetCookie, "false");
+        $cookieValue = self::GetCookieValue($targetCookie);
 
-        if(!$cookieValue)
-        {
+        if ($cookieValue === '') {
             return $default;
         }
-        if($cookieValue === "true")
-        {
-            return true;
-        }
-        return false;
+
+        return $cookieValue === 'true';
     }
 
-    public static function GetCookieValue(CookieKey $targetCookie, string $default = ""): bool|string
+    public static function GetCookieValue(CookieKey $targetCookie, string $default = ''): string
     {
-        if(!isset($_COOKIE[$targetCookie->value]))
-        {
-            /*
-            switch($targetCookie)
-            {
-                case CookieKey::LANGUAGE:
-                    return "en";
-                case CookieKey::PROGRESSIVE_LOAD:
-                    return "true";
-            }
-            */
-            return $default;
-        }
-        return $_COOKIE[$targetCookie->value];
+        return $_COOKIE[$targetCookie->value] ?? $default;
     }
 
     public static function DeleteCookie(CookieKey $targetCookie): bool
     {
-        return setcookie(
-            $targetCookie->value, // name
-            "", // value
-            time() - (3600 * 48), // ttl
-            "/", //
-            ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'], // domain
-            true, //
-            true //
-        );
-    }
+        unset($_COOKIE[$targetCookie->value]);
 
-    public static function SetSessionKey(string $sessionKey): void
-    {
-        self::SetCookie(CookieKey::SESSION_KEY, $sessionKey);
+        return setcookie(
+            name: $targetCookie->value,
+            value: '',
+            expires_or_options: time() - 86400 * 2,
+            path: '/',
+            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
+            secure: true,
+            httponly: true
+        );
     }
 
     public static function SetCookie(CookieKey $targetCookie, string $value): bool
     {
+        $_COOKIE[$targetCookie->value] = $value;
+
         return setcookie(
-            $targetCookie->value,
-            $value,
-            time() + self::GetCookieTTL($targetCookie),
-            "/",
-            ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
-            true,
-            true
+            name: $targetCookie->value,
+            value: $value,
+            expires_or_options: time() + self::GetCookieTTL($targetCookie),
+            path: '/',
+            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
+            secure: true,
+            httponly: true
         );
     }
 
@@ -88,8 +70,8 @@ class CookieHandling
 
     public static function SetProgressiveLoad(bool $progressiveLoad): void
     {
-        if($progressiveLoad) self::SetCookie(CookieKey::SESSION_KEY, "true");
-        self::SetCookie(CookieKey::SESSION_KEY, "false");
+        $value = $progressiveLoad ? 'true' : 'false';
+        self::SetCookie(CookieKey::PROGRESSIVE_LOAD, $value);
     }
 
     public static function SetLanguage(Language $language): void
@@ -97,8 +79,8 @@ class CookieHandling
         self::SetCookie(CookieKey::LANGUAGE, $language->value);
     }
 
-    public static function SetStyle(Language $language): void
+    public static function SetStyle(string $style): void
     {
-        self::SetCookie(CookieKey::LANGUAGE, $language->value);
+        self::SetCookie(CookieKey::STYLE, $style);
     }
 }
