@@ -2,9 +2,6 @@
 
 namespace Auxilium\Auxilium;
 
-use Auxilium\DatabaseInteractions\Deegraph\DeegraphNode;
-use Auxilium\DatabaseInteractions\GraphDatabaseConnection;
-
 class AuxiliumScript
 {
     public static function evaluate_expression(string $string, array $vars)
