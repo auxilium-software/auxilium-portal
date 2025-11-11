@@ -16,6 +16,10 @@
             {% endif %}
         {% endblock %}
         <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
+
+        <script>
+            const API_BASE_URL = "http://localhost:1983";
+        </script>
         
         <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
         <script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
@@ -55,7 +59,7 @@
         <script src="/Static/JS/APIControllers/UserController.js"></script>
 
         <script>
-            const API_KEY = getCookie('access_token');
+            let API_KEY = getCookie('access_token');
             const RECAPTCHA_SITE_KEY = "{{ GetUserConfiguration("ReCAPTCHA", "SiteKey") }}";
 
             function getCookie(cname) {
