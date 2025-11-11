@@ -15,6 +15,12 @@ use JetBrains\PhpStorm\NoReturn;
 
 class APIInteractions
 {
+    public static function GetBaseURL(): string
+    {
+        return "http://localhost:1983/api/v3";
+    }
+
+
     private static bool $hasAttemptedRefresh = false;
     public CurlHandle $CurlHandler;
     private string $lastEndpoint = '';
@@ -77,11 +83,6 @@ class APIInteractions
     {
         $this->lastEndpoint = $endpoint;
         curl_setopt($this->CurlHandler, CURLOPT_URL, self::GetBaseURL() . $endpoint);
-    }
-
-    public static function GetBaseURL(): string
-    {
-        return "http://localhost:1983/api/v3";
     }
 
     private function SetMethod(string $method): void

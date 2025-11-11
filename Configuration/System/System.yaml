@@ -1,3 +1,6 @@
 
 Development:
   CurrentVersion: Auxilium v3.0-dev
+
+Security:
+  UserDetailsCacheTTL: 60  # seconds
