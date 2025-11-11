@@ -151,26 +151,6 @@
         </nav>
 
         {% if _IS_LOGGED_IN_ %}
-            <!-- Make sure to only send this javascript to logged in users, as it requires cookie consent -->
-            <script>
-                let cookies = document.cookie.split(";");
-                let currentProgressiveLoadValue = true;
-                let hasCookie = false;
-                for(let i = 0; i < cookies.length; i++) {
-                    let pair = cookies[i].split("=");
-                    if (pair[0].trim() == "progressiveload") {
-                        currentProgressiveLoadValue = (decodeURIComponent(pair[1]) == "true");
-                        hasCookie = true;
-                        break;
-                    }
-                }
-                if (currentProgressiveLoadValue) { // If the user explicitly sets it to false, honour it
-                    if (!hasCookie) {
-                        document.cookie = "progressiveload=true; path=/; SameSite=None; Secure;";
-                    }
-                }
-            </script>
-
             <div id="portal-authenticated-user-bar">
                 <div class="inner-content">
                     <p>{{ "Logged in as"|translate }}</p>

@@ -13,13 +13,9 @@ try
 {
     SecurityUtilities::RequireLogin();
 
-    $fileData = [];
-    if(!CookieHandling::GetBooleanCookie(CookieKey::PROGRESSIVE_LOAD, false))
-    {
-        $fileData = APIInteractions::Get(
-            endpoint: '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
-        )->Payload;
-    }
+    $fileData = APIInteractions::Get(
+        endpoint: '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+    )->Payload;
 
     PageBuilder::Render(
         template: '/VirtualPages/FileOverviewPage.html.twig',

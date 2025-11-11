@@ -60,18 +60,11 @@ class CookieHandling
         {
             CookieKey::SESSION_KEY  => (3600 * 48),
 
-            CookieKey::PROGRESSIVE_LOAD,
             CookieKey::STYLE,
             CookieKey::LANGUAGE     => (3600 * 24 * 30),
 
             default                 => 0,
         };
-    }
-
-    public static function SetProgressiveLoad(bool $progressiveLoad): void
-    {
-        $value = $progressiveLoad ? 'true' : 'false';
-        self::SetCookie(CookieKey::PROGRESSIVE_LOAD, $value);
     }
 
     public static function SetLanguage(Language $language): void
