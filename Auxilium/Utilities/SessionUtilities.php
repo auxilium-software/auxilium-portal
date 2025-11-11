@@ -4,17 +4,33 @@ namespace Auxilium\Utilities;
 
 use Auxilium\Enumerators\SessionKey;
 
+/**
+ * Utilities to help with interacting with $_SESSION.
+ */
 class SessionUtilities
 {
-    public static function Get(SessionKey $key, $default = null)
+    /**
+     * Gets an object from $_SESSION, if that object doesn't exist, it'll return the value of \$default.
+     *
+     * @param SessionKey $key Which object to retrieve.
+     * @param mixed $default What data to return as a fallback
+     *
+     * @return mixed Will either return back the object at the given id in \$_SESSION or return back the value of \$default.
+     */
+    public static function Get(SessionKey $key, mixed $default = null): mixed
     {
-        if(isset($_SESSION[$key->value]))
-        {
-            return $_SESSION[$key->value];
-        }
-        return $default;
+        return $_SESSION[$key->value] ?? $default;
     }
-    public static function Set(SessionKey $key, $value): void
+
+    /**
+     * Used for setting an element in \$_SESSION.
+     *
+     * @param SessionKey $key What element to set.
+     * @param mixed $value The data to store.
+     *
+     * @return void Won't return anything.
+     */
+    public static function Set(SessionKey $key, mixed $value): void
     {
         $_SESSION[$key->value] = $value;
     }
