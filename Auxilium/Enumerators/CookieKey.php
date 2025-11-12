@@ -7,7 +7,7 @@ namespace Auxilium\Enumerators;
  */
 enum CookieKey: string
 {
-    case LANGUAGE = "lang";
+    case LANGUAGE = "language";
     case SESSION_KEY = "session_key";
     case STYLE = "style";
 
