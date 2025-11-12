@@ -161,7 +161,7 @@ function findNextVisiblePage($formSpec, $formData, $currentPage, $direction = 1)
     return -1;
 }
 
-function getVisibleReviewComponents($formSpec, $formData)
+function getVisibleReviewComponents($formSpec, $formData): array
 {
     if(!isset($formSpec['reviewPage']['components']['component']))
     {
@@ -317,7 +317,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST')
             {
                 CacheUtilities::SetCurrentPageIndex($formInstanceID, $i);
                 NavigationUtilities::Redirect(target: "/form/$formInstanceID");
-                break;
             }
         }
     }

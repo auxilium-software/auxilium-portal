@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<auxForm>
+    <id>Survey-ScreeningUnmetLegalNeedsInVeterans-ProfessionalsAndCaseworkers</id>
+    <title>Screening Unmet Legal Needs in Veterans - Professionals and Caseworkers</title>
+    <subtitle>This screening tool is meant to explore whether a veteran has unmet legal issues, whether they realise it or not. You should submit the form whether you or the veteran need help or not. </subtitle>
+    <useReCAPTCHA>true</useReCAPTCHA>
+    <requireAuthentication>false</requireAuthentication>
+
+
+
+
+
+    <pages>
+        <page>
+            <id>organisation_details</id>
+            <title>Organisation Details</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>name_of_organisation_referring</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Name of organisation referring</primaryLabel>
+                </component>
+                <component>
+                    <id>when_did_you_first_start_to_have_help_from_referring_organisation</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>When did you first start to have help from the referring organisation?</primaryLabel>
+                </component>
+                <component>
+                    <id>are_you_completing_this_form_as_part_of_a_drop_in</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>5</rows>
+                    <required>true</required>
+                    <primaryLabel>Are you completing this form as part of a drop in?</primaryLabel>
+                    <secondaryLabel>If so, please tell us where your drop in is located.</secondaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
+            <id>your_details</id>
+            <title>Your Details</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>your_year_of_birth</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Your year of birth.</primaryLabel>
+                </component>
+                <component>
+                    <id>your_gender</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Your gender</primaryLabel>
+                </component>
+                <component>
+                    <id>are_you_employed</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Are you employed?</primaryLabel>
+                    <options>
+                        <option>
+                            <primaryLabel>Yes</primaryLabel>
+                            <value>YES</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No</primaryLabel>
+                            <value>NO</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No answer</primaryLabel>
+                            <value>NO_ANSWER</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
+            <id>do_any_of_the_below_apply_to_you</id>
+            <title>Do any of the below apply to you?</title>
+            <subtitle>You can click more than one answer</subtitle>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>do_any_of_the_below_apply_to_you</id>
+                    <type>CHECKBOX_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Do any of the below apply to you?</primaryLabel>
+                    <haveOtherOption>true</haveOtherOption>
+                    <options>
+                        <option>
+                            <primaryLabel>I have been injured in the armed forces</primaryLabel>
+                            <value>I have been injured in the armed forces</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I am being stopped from having a relationship with my child or children who are under 16</primaryLabel>
+                            <value>I am being stopped from having a relationship with my child or children who are under 16</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I have to go to court soon</primaryLabel>
+                            <value>I have to go to court soon</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I have experienced domestic violence or have been accused of domestic violence</primaryLabel>
+                            <value>I have experienced domestic violence or have been accused of domestic violence</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I am separating from my partner or spouse, or am afraid this might happen soon</primaryLabel>
+                            <value>I am separating from my partner or spouse, or am afraid this might happen soon</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I have been arrested or accused of something and I am afraid of what might happen</primaryLabel>
+                            <value>I have been arrested or accused of something and I am afraid of what might happen</value>
+                        </option>
+                        <option>
+                            <primaryLabel>A company is sending me threatening letters and I don't know what to do</primaryLabel>
+                            <value>A company is sending me threatening letters and I don't know what to do</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I might become homeless or am being made homeless</primaryLabel>
+                            <value>I might become homeless or am being made homeless</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I have made a complaint about someone or something</primaryLabel>
+                            <value>I have made a complaint about someone or something</value>
+                        </option>
+                        <option>
+                            <primaryLabel>I have another problem</primaryLabel>
+                            <value>I have another problem</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No, I do not believe I currently have any issues that I need help with </primaryLabel>
+                            <value>No, I do not believe I currently have any issues that I need help with </value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
+            <id>issue_details</id>
+            <title>Issue Details</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>when_did_the_issues_start</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>When did the issue / the issues start?</primaryLabel>
+                </component>
+                <component>
+                    <id>have_you_had_legal_advice_on_the_issue</id>
+                    <type>TEXT_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Have you had legal advice on the issue?</primaryLabel>
+                    <secondaryLabel>If multiple please include all you have gotten legal advice for.</secondaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
+            <id>did_you_know</id>
+            <title>Did you know?</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Did you know that all of these are considered legal issues you could get legal advice for?</primaryLabel>
+                    <options>
+                        <option>
+                            <primaryLabel>Yes</primaryLabel>
+                            <value>YES</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No</primaryLabel>
+                            <value>NO</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No answer</primaryLabel>
+                            <value>NO_ANSWER</value>
+                        </option>
+                    </options>
+                </component>
+                <component>
+                    <id>if_you_said_no_which_ones_didnt_you_know_counted_as_potential_legal_issues</id>
+                    <type>TEXT_FIELD</type>
+                    <required>false</required>
+                    <primaryLabel>If you said no, which ones didn't you know counted as potential legal issues?</primaryLabel>
+                    <secondaryLabel></secondaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+        <page>
+            <id>issue_details</id>
+            <title>Issue Details</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>would_you_like_to_talk_in_confidence_with_a_legal_charity_about_it_free_of_charge</id>
+                    <type>CHOICE_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Would you like to talk in confidence with a legal charity about it, free of charge?</primaryLabel>
+                    <options>
+                        <option>
+                            <primaryLabel>Yes</primaryLabel>
+                            <value>YES</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No - I don't think I need this service</primaryLabel>
+                            <value>NO_DONT_NEED_SERVICE</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No - I don't think I need this service, but I think it would help other veterans</primaryLabel>
+                            <value>NO_DONT_NEED_SERVICE_BUT_MIGHT_HELP_OTHERS</value>
+                        </option>
+                        <option>
+                            <primaryLabel>No answer</primaryLabel>
+                            <value>NO_ANSWER</value>
+                        </option>
+                    </options>
+                </component>
+            </components>
+        </page>
+
+
+    </pages>
+
+
+
+
+
+
+
+
+
+
+    <reviewPage>
+        <components>
+            <component>
+                <type>SUBHEADING</type>
+                <value>Organisation Details</value>
+                <jumpToPage>organisation_details</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Name of organisation referring</key>
+                        <value>$formData["name_of_organisation_referring"]</value>
+                    </item>
+                    <item>
+                        <key>When did you first start to have help from the referring organisation?</key>
+                        <value>$formData["when_did_you_first_start_to_have_help_from_referring_organisation"]</value>
+                    </item>
+                    <item>
+                        <key>Are you completing this form as part of a drop in?</key>
+                        <value>$formData["are_you_completing_this_form_as_part_of_a_drop_in"]</value>
+                    </item>
+                </dictionary>
+            </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Your Details</value>
+                <jumpToPage>your_details</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Your year of birth</key>
+                        <value>$formData["your_year_of_birth"]</value>
+                    </item>
+                    <item>
+                        <key>Your gender</key>
+                        <value>$formData["your_gender"]</value>
+                    </item>
+                    <item>
+                        <key>Are you employed?</key>
+                        <value>$formData["are_you_employed"]</value>
+                    </item>
+                </dictionary>
+            </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Do any of the below apply you you?</value>
+                <jumpToPage>do_any_of_the_below_apply_to_you</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                </dictionary>
+            </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Issue Details</value>
+                <jumpToPage>issue_details</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>When did the issue / the issues start?</key>
+                        <value>$formData["when_did_the_issues_start"]</value>
+                    </item>
+                    <item>
+                        <key>Have you had legal advice on the issue?</key>
+                        <value>$formData["have_you_had_legal_advice_on_the_issue"]</value>
+                    </item>
+                </dictionary>
+            </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Did you know that these are all considered legal issues you could get legal advice for?</value>
+                <jumpToPage>did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Did you know?</key>
+                        <value>$formData["did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for"]</value>
+                    </item>
+                    <item>
+                        <key>If you said no, which ones didn't you know counted as potential legal issues?</key>
+                        <value>$formData["if_you_said_no_which_ones_didnt_you_know_counted_as_potential_legal_issues"]</value>
+                    </item>
+                </dictionary>
+            </component>
+
+
+
+
+
+            <component>
+                <type>SUBHEADING</type>
+                <value>Issue Details</value>
+                <jumpToPage>issue_details</jumpToPage>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Would you like to talk in confidence with a legal charity about it free of charge?</key>
+                        <value>$formData["would_you_like_to_talk_in_confidence_with_a_legal_charity_about_it_free_of_charge"]</value>
+                    </item>
+                </dictionary>
+            </component>
+        </components>
+    </reviewPage>
+
+
+
+
+
+
+
+
+
+
+    <submissionActions>
+        <apiRequest>
+            <executeIf>true</executeIf>
+            <endpoint>/surveys/screening-unmet-legal-needs-in-veterans-for-professionals-and-caseworkers</endpoint>
+            <method>POST</method>
+            <payload>
+            </payload>
+        </apiRequest>
+    </submissionActions>
+    <afterSubmissionRedirect>
+        <target>/</target>
+    </afterSubmissionRedirect>
+</auxForm>

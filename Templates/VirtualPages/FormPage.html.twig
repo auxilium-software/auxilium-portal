@@ -21,7 +21,7 @@
                             name="{{ componentDetails.id }}"
                             type="text"
                             value="{{ FormData.Data[componentDetails.id]|default('') }}"
-                            {% if componentDetails.required %}required{% endif %}
+                            {% if componentDetails.required and componentDetails.required == "true" %}required{% endif %}
                     >
 
                 {% elseif componentDetails.type == 'EMAIL_FIELD' %}
@@ -74,7 +74,7 @@
                     >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
 
                 {% elseif componentDetails.type == 'CHOICE_FIELD' %}
-                    <label>{{ componentDetails.label }}</label>
+                    <label>{{ componentDetails.primaryLabel }}</label>
                     {% for optionDetails in componentDetails.options.option %}
                         <div class="radio-button-holder">
                             <input
@@ -97,16 +97,40 @@
                 {% elseif componentDetails.type == 'CHECKBOX_FIELD' %}
                     <div class="form-group">
                         <div class="checkbox-holder">
-                            <input
-                                    type="checkbox"
-                                    id="{{ componentDetails.id }}"
-                                    name="{{ componentDetails.id }}"
-                                    value="true"
-                                    {% if FormData.Data[componentDetails.id] == 'true' %}checked{% endif %}
-                            >
-                            <label for="{{ componentDetails.id }}">
-                                {{ componentDetails.label }}
-                            </label>
+                            {% for optionDetails in componentDetails.options.option %}
+                                <input
+                                        type="checkbox"
+                                        id="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                        name="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                        value="{{ optionDetails.value }}"
+                                >
+                                <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
+                                    <p>
+                                        {% if optionDetails.primaryLabel %}<strong>{{ optionDetails.primaryLabel }}</strong><br/>{% endif %}
+                                        {% if optionDetails.secondaryLabel %}<span>{{ optionDetails.secondaryLabel }}</span>{% endif %}
+                                    </p>
+                                </label>
+                            {% endfor %}
+                            {% if componentDetails.haveOtherOption == "true" %}
+                                <input
+                                        type="checkbox"
+                                        id="{{ componentDetails.id }}-other"
+                                        name="{{ componentDetails.id }}-other"
+                                        value="TRUE"
+                                >
+                                <label for="{{ componentDetails.id }}-other" class="long-form-label-for-radio-button">
+                                    <p>
+                                        <strong>{{ "Other"|translate }}</strong><br/>
+                                        <span>{{ "Please specify"|translate }}</span>
+                                    </p>
+                                </label>
+                                <input
+                                        type="text"
+                                        id="{{ componentDetails.id }}-other-text"
+                                        name="{{ componentDetails.id }}-other-text"
+                                        class="other-text-input"
+                                >
+                            {% endif %}
                         </div>
                     </div>
 
