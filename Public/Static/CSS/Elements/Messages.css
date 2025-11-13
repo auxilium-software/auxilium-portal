@@ -1,5 +1,4 @@
 
-
 .message-list {
     list-style: none;
     padding: 0;
@@ -33,33 +32,9 @@
     margin-bottom: 0.75em;
 }
 
-.message-sender {
-    display: flex;
-    align-items: center;
-    gap: 0.75em;
-}
-
-.user-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #0066cc;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.9em;
-}
-
 .message-sender-info {
     display: flex;
     flex-direction: column;
-}
-
-.sender-name {
-    font-weight: 500;
-    color: #333;
 }
 
 .message-date {
