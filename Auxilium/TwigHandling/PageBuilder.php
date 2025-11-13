@@ -2,7 +2,9 @@
 
 namespace Auxilium\TwigHandling;
 
+use Auxilium\Enumerators\CookieKey;
 use Auxilium\Exceptions\DatabaseConnectionException;
+use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
@@ -32,10 +34,12 @@ class PageBuilder
                 "cache" => false,
             ]
         );
-        
+
+
         $this->twig->addGlobal('style_options', []);
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
+        $this->twig->addGlobal(name: "_SELECTED_LANGUAGE_",  value: CookieHandling::GetCookieValue(targetCookie: CookieKey::LANGUAGE));
 
         if($useAuth)
         {
@@ -52,27 +56,6 @@ class PageBuilder
         $this->twig->addExtension(new CommonFilters());
         $this->twig->addExtension(new CommonFunctions());
 
-
-        // Serve the correct language *if* the cookie is set
-        if(isset($_COOKIE["lang"]))
-        {
-            switch($_COOKIE["lang"])
-            {
-                case "cy":
-                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "cy-GB");
-                    break;
-                case "zh": // For testing only, this language pack is shoddy at best
-                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "zh");
-                    break;
-                case "ar": // For testing only, this language pack is shoddy at best
-                    $this->twig->addGlobal('_SELECTED_LANGUAGE_', "ar");
-                    break;
-                case "en":
-                default:
-                $this->twig->addGlobal('_SELECTED_LANGUAGE_', "en-GB");
-                    break;
-            }
-        }
 
         // Grab style options if present
         if(isset($_COOKIE["style"]))

@@ -34,10 +34,28 @@
                     <div class="marked-section">
                         <h2>
                             {{ "Properties" | translate }}
-                            <a href="javascript:{let win = new NewPropertyPopup('PLAIN_TEXT', '/api/v3/users/{{ UserDetails.id }}/additional_properties/*' ,true);document.getElementById('main-content').after(win.render());win.focus();win.onSuccess(() => {window.location.reload()})}"
-                               class="inline-icon add-icon"
+                            <a href="javascript:void(0)"
+                               class="inline-icon add-icon add-property-trigger"
+                               data-type="PLAIN_TEXT"
+                               data-resource="/api/v3/users/{{ UserDetails.id }}/additional_properties/*"
                                title="{{ "Add Entry" | translate }}"
                             ></a>
+                            <script>
+                                document.addEventListener('click', async (e) => {
+                                    const trigger = e.target.closest('.add-property-trigger');
+                                    if (!trigger) return;
+
+                                    e.preventDefault();
+
+                                    const type = trigger.dataset.type;
+                                    const resource = trigger.dataset.resource;
+
+                                    const win = await NewPropertyPopup.create(type, resource, true);
+                                    document.getElementById('main-content').after(win.render());
+                                    win.focus();
+                                    win.onSuccess(() => window.location.reload());
+                                });
+                            </script>
                         </h2>
                         <br />
                         <dl id="properties-list">

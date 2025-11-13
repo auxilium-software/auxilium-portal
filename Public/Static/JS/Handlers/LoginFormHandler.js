@@ -24,7 +24,7 @@ class LoginFormHandler {
 
         this.clearAllErrors();
 
-        if (!this.validateForm()) {
+        if (!await this.validateForm()) {
             return;
         }
 
@@ -44,7 +44,7 @@ class LoginFormHandler {
             {
                 CookieUtilities.setCookie('access_token', response['access_token'], 0.0208333);
                 CookieUtilities.setCookie('refresh_token', response['refresh_token'], 7);
-                new ToastNotification(Localisation.translate('Login successful! Redirecting...'), 'check-circle', 'success');
+                new ToastNotification(await Localisation.translate('Login successful! Redirecting...'), 'check-circle', 'success');
 
                 setTimeout(() => {
                     window.location.href = '/dashboard';
@@ -63,10 +63,10 @@ class LoginFormHandler {
         }
     }
 
-    validateForm() {
+    async validateForm() {
         let isValid = true;
 
-        if (!this.validateEmail()) {
+        if (!await this.validateEmail()) {
             isValid = false;
         }
 
@@ -77,16 +77,16 @@ class LoginFormHandler {
         return isValid;
     }
 
-    validateEmail() {
+    async validateEmail() {
         const email = this.emailField.value.trim();
 
         if (!email) {
-            this.showFieldError('EmailAddress', Localisation.translate('Email address is required'));
+            this.showFieldError('EmailAddress', await Localisation.translate('Email address is required'));
             return false;
         }
 
         if (!this.isValidEmail(email)) {
-            this.showFieldError('EmailAddress', Localisation.translate('Please enter a valid email address'));
+            this.showFieldError('EmailAddress', await Localisation.translate('Please enter a valid email address'));
             return false;
         }
 

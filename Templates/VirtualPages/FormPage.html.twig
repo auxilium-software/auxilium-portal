@@ -170,8 +170,8 @@
                 {% endif %}
 
                 {% if IsAbandonPage %}
-                    <p class="abandon-message">You cannot progress further in the form.</p>
-                    <a href="/" class="button">Return to Home</a>
+                    <p class="abandon-message">{{ "You cannot progress further in the form."|translate }}</p>
+                    <a href="/" class="button">{{ "Return to Home"|translate }}</a>
                 {% elseif ShowReviewButton %}
                     <input type="button" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
                 {% elseif ShowNextButton %}
@@ -181,9 +181,10 @@
 
             {% if FormSpec.useReCAPTCHA %}
                 <div class="recaptcha-info">
-                    This site is protected by reCAPTCHA and the Google
-                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                    }) }}
                 </div>
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             {% endif %}

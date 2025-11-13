@@ -24,7 +24,7 @@ class CommonFilters extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('translate',                         [$this, 'translate']),
+            new TwigFilter('translate',                         [$this, 'translate'],                           ['is_safe' => ['html']]),
             new TwigFilter('b64_url_safe',                      [$this, 'b64_url_safe']),
             new TwigFilter('un_b64_url_safe',                   [$this, 'un_b64_url_safe']),
             new TwigFilter('format_as_sentence',                [$this, 'format_as_sentence']),
@@ -42,9 +42,9 @@ class CommonFilters extends AbstractExtension
     }
 
 
-    public function translate($string): string
+    public function translate(string $string, array $substitutions = []): string
     {
-        return LocalisationUtilities::translate($string);
+        return LocalisationUtilities::Translate($string, $substitutions);
     }
 
     public function b64_url_safe($string): string

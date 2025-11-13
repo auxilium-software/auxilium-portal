@@ -1,3 +1,4 @@
+
 class NewPropertyPopup
 {
     #rootContainer = null;
@@ -43,9 +44,19 @@ class NewPropertyPopup
         }
 
         this.#types = this.#normalizeTypes(types);
+    }
 
-        this.#initializeContainer();
-        this.#buildInterface();
+    static async create(types = null, resourcePath = null, floating = false, userId = 'me')
+    {
+        const instance = new NewPropertyPopup(types, resourcePath, floating, userId);
+        await instance.#initialize();
+        return instance;
+    }
+
+    async #initialize()
+    {
+        await this.#initializeContainer();
+        await this.#buildInterface();
     }
 
     #normalizeTypes(types)
@@ -57,7 +68,7 @@ class NewPropertyPopup
         return Array.isArray(types) ? types : [types];
     }
 
-    #initializeContainer()
+    async #initializeContainer()
     {
         this.#rootContainer = document.createElement('div');
 
@@ -68,7 +79,7 @@ class NewPropertyPopup
 
             const closeButton = document.createElement('a');
             closeButton.classList.add('action-link', 'action-link-delete');
-            closeButton.innerText = this.#capitalize(Localisation.translate('Cancel'));
+            closeButton.innerText = this.#capitalize(await Localisation.translate('Cancel'));
             closeButton.addEventListener('click', (e) =>
             {
                 e.preventDefault();
@@ -91,9 +102,9 @@ class NewPropertyPopup
         }
     }
 
-    #buildInterface()
+    async #buildInterface()
     {
-        const header = this.#createHeader();
+        const header = await this.#createHeader();
         if (header)
         {
             this.#innerContainer.appendChild(header.element);
@@ -105,7 +116,7 @@ class NewPropertyPopup
 
         this.#okButton = document.createElement('input');
         this.#okButton.type = 'submit';
-        this.#okButton.value = this.#capitalize(Localisation.translate('Save data'));
+        this.#okButton.value = this.#capitalize(await Localisation.translate('Save data'));
 
         const spacer = document.createElement('div');
         spacer.classList.add('small-spacer');
@@ -113,15 +124,15 @@ class NewPropertyPopup
 
         if (this.#types.length === 1)
         {
-            this.#buildSingleTypeInterface(this.#types[0]);
+            await this.#buildSingleTypeInterface(this.#types[0]);
         }
         else
         {
-            this.#buildMultiTypeInterface();
+            await this.#buildMultiTypeInterface();
         }
     }
 
-    #createHeader()
+    async #createHeader()
     {
         const result = {element: null, focusElement: null};
 
@@ -130,12 +141,14 @@ class NewPropertyPopup
             const container = document.createElement('div');
 
             const label = document.createElement('span');
-            label.innerText = `Adding property to: ${this.#getDisplayPath()}`;
+            label.innerText = await Localisation.translate('Adding property to: {path}', {
+                '{path}': this.#getDisplayPath()
+            });
             container.appendChild(label);
 
             const input = document.createElement('input');
             input.type = 'text';
-            input.placeholder = 'property_name';
+            input.placeholder = await Localisation.translate('property_name');
             input.classList.add('property-name-input');
             container.appendChild(input);
 
@@ -145,13 +158,17 @@ class NewPropertyPopup
         else if (this.#mode === 'array')
         {
             const label = document.createElement('span');
-            label.innerText = `Adding item to array: ${this.#getDisplayPath()}`;
+            label.innerText = await Localisation.translate('Adding item to array: {path}', {
+                '{path}': this.#getDisplayPath()
+            });
             result.element = label;
         }
         else
         {
             const label = document.createElement('span');
-            label.innerText = `Saving to: ${this.#resourcePath || 'user properties'}`;
+            label.innerText = await Localisation.translate('Saving to: {path}', {
+                '{path}': this.#resourcePath || await Localisation.translate('user properties')
+            });
             result.element = label;
         }
 
@@ -164,7 +181,7 @@ class NewPropertyPopup
         return this.#resourcePath.replace(/[\*#]$/, '');
     }
 
-    #buildSingleTypeInterface(type)
+    async #buildSingleTypeInterface(type)
     {
         const handlers = {
             'PLAIN_TEXT': () => this.#setupPlainText(),
@@ -177,31 +194,31 @@ class NewPropertyPopup
         const handler = handlers[type];
         if (handler)
         {
-            handler();
+            await handler();
         }
     }
 
-    #buildMultiTypeInterface()
+    async #buildMultiTypeInterface()
     {
         const pageOne = document.createElement('div');
         pageOne.classList.add('logical-box');
 
         const typeHandlers = {
-            'PLAIN_TEXT': {label: 'New text property', handler: () => this.#setupPlainText(pageOne)},
-            'FILE_UPLOAD': {label: 'Upload a file', handler: () => this.#setupFileUpload(pageOne)},
-            'ICALENDAR_TODO': {label: 'New todo note', handler: () => this.#setupICalTodo(pageOne)},
-            'ICALENDAR_JOURNAL': {label: 'New timeline note', handler: () => this.#setupICalJournal(pageOne)},
-            'ICALENDAR_EVENT': {label: 'New calendar event', handler: () => this.#setupICalEvent(pageOne)}
+            'PLAIN_TEXT': {key: 'New text property', handler: () => this.#setupPlainText(pageOne)},
+            'FILE_UPLOAD': {key: 'Upload a file', handler: () => this.#setupFileUpload(pageOne)},
+            'ICALENDAR_TODO': {key: 'New todo note', handler: () => this.#setupICalTodo(pageOne)},
+            'ICALENDAR_JOURNAL': {key: 'New timeline note', handler: () => this.#setupICalJournal(pageOne)},
+            'ICALENDAR_EVENT': {key: 'New calendar event', handler: () => this.#setupICalEvent(pageOne)}
         };
 
-        this.#types.forEach(type =>
+        for (const type of this.#types)
         {
             const config = typeHandlers[type];
             if (config)
             {
                 const link = document.createElement('a');
                 link.classList.add('navigational-link');
-                link.innerText = config.label;
+                link.innerText = await Localisation.translate(config.key);
                 link.href = 'javascript:;';
                 link.addEventListener('click', (e) =>
                 {
@@ -211,17 +228,17 @@ class NewPropertyPopup
                 pageOne.appendChild(link);
                 pageOne.appendChild(document.createElement('br'));
             }
-        });
+        }
 
         this.#innerContainer.appendChild(pageOne);
     }
 
-    #setupPlainText(pageToRemove = null)
+    async #setupPlainText(pageToRemove = null)
     {
         if (pageToRemove) pageToRemove.remove();
 
         const textArea = document.createElement('textarea');
-        textArea.placeholder = 'Enter your text here...';
+        textArea.placeholder = await Localisation.translate('Enter your text here...');
         textArea.classList.add('property-textarea');
         this.#innerContainer.appendChild(textArea);
         textArea.focus();
@@ -242,14 +259,14 @@ class NewPropertyPopup
         this.#innerContainer.appendChild(this.#okButton);
     }
 
-    #setupFileUpload(pageToRemove = null)
+    async #setupFileUpload(pageToRemove = null)
     {
         if (pageToRemove) pageToRemove.remove();
 
         const inputId = 'file_upload_' + this.#generateId(16);
 
         const label = document.createElement('label');
-        label.innerText = 'Choose a file';
+        label.innerText = await Localisation.translate('Choose a file');
         label.classList.add('button');
         label.htmlFor = inputId;
 
@@ -286,7 +303,8 @@ class NewPropertyPopup
 
                 if (files.length > 1)
                 {
-                    this.#handleSuccess({message: 'All files uploaded successfully'});
+                    const message = await Localisation.translate('All files uploaded successfully');
+                    this.#handleSuccess({message: message});
                 }
             } catch (error)
             {
@@ -314,12 +332,12 @@ class NewPropertyPopup
         setTimeout(() => input.click(), 100);
     }
 
-    #setupICalTodo(pageToRemove = null)
+    async #setupICalTodo(pageToRemove = null)
     {
         if (pageToRemove) pageToRemove.remove();
 
         const textArea = document.createElement('textarea');
-        textArea.placeholder = 'Enter todo description...';
+        textArea.placeholder = await Localisation.translate('Enter todo description...');
         textArea.classList.add('property-textarea');
         this.#innerContainer.appendChild(textArea);
         textArea.focus();
@@ -344,17 +362,17 @@ class NewPropertyPopup
         this.#innerContainer.appendChild(this.#okButton);
     }
 
-    #setupICalJournal(pageToRemove = null)
+    async #setupICalJournal(pageToRemove = null)
     {
         if (pageToRemove) pageToRemove.remove();
 
         const summaryInput = document.createElement('input');
         summaryInput.type = 'text';
-        summaryInput.placeholder = 'Journal title...';
+        summaryInput.placeholder = await Localisation.translate('Journal title...');
         summaryInput.classList.add('property-input');
 
         const descriptionArea = document.createElement('textarea');
-        descriptionArea.placeholder = 'Journal content...';
+        descriptionArea.placeholder = await Localisation.translate('Journal content...');
         descriptionArea.classList.add('property-textarea');
 
         this.#innerContainer.appendChild(summaryInput);
@@ -381,13 +399,13 @@ class NewPropertyPopup
         this.#innerContainer.appendChild(this.#okButton);
     }
 
-    #setupICalEvent(pageToRemove = null)
+    async #setupICalEvent(pageToRemove = null)
     {
         if (pageToRemove) pageToRemove.remove();
 
         const summaryInput = document.createElement('input');
         summaryInput.type = 'text';
-        summaryInput.placeholder = 'Event title...';
+        summaryInput.placeholder = await Localisation.translate('Event title...');
         summaryInput.classList.add('property-input');
 
         const startInput = document.createElement('input');
@@ -399,7 +417,7 @@ class NewPropertyPopup
         endInput.classList.add('property-input');
 
         const descriptionArea = document.createElement('textarea');
-        descriptionArea.placeholder = 'Event description...';
+        descriptionArea.placeholder = await Localisation.translate('Event description...');
         descriptionArea.classList.add('property-textarea');
 
         this.#innerContainer.appendChild(summaryInput);
@@ -576,15 +594,12 @@ class NewPropertyPopup
         this.close();
     }
 
-    #handleError(error)
+    async #handleError(error)
     {
         console.error('Operation failed:', error);
-        new ToastNotification(error.message, "cloud-off", "error")
+        const errorMessage = await Localisation.translate('Operation failed');
+        new ToastNotification(errorMessage + ': ' + error.message, "cloud-off", "error");
     }
-
-
-
-
 
     render()
     {

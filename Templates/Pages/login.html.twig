@@ -37,16 +37,17 @@
                         {{ ("Login with"|translate~openIDConfig.display_name)|format_as_sentence }}
                     </a>
                 {% endfor %}
-                <a href="/sign-up" class="button">{{ "Create a new account"|translate }}</a>
+                <a href="/onboard-new-case" class="button">{{ "Create a new account"|translate }}</a>
 
                 <div class="separator"></div>
                 <a href="/forgot-password">{{ "I've forgotten my password"|translate }}</a>
 
 
                 <div class="recaptcha-info">
-                    {{ "This site is protected by reCAPTCHA and the Google"|translate }}
-                    <a href="https://policies.google.com/privacy">{{ "Privacy Policy"|translate }}</a> {{ "and"|translate }}
-                    <a href="https://policies.google.com/terms">{{ "Terms of Service"|translate }}</a> {{ "apply"|translate }}.
+                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                    }) }}
                 </div>
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             </form>
