@@ -22,9 +22,9 @@
     left: 50%;
     transform: translate(-50%, 100mm);
     border-radius:15mm;
-    color: var(--error-color-contrast);
-    background-color: var(--error-color);
-    border: var(--outline-width) solid var(--error-color);
+    color: var(--positive-badge-color-contrast);
+    background-color: var(--positive-badge-color);
+    border: var(--outline-width) solid var(--positive-badge-color);
     /*box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);*/
     display: inline-block;
     transition: transform .15s ease-in-out;
