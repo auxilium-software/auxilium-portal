@@ -5,7 +5,9 @@ use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\CacheUtilities;
 use Auxilium\Utilities\ConfigurationUtilities;
+use Auxilium\Utilities\JWTUtilities;
 use Auxilium\Utilities\NavigationUtilities;
+use Auxilium\Utilities\SecurityUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -20,6 +22,18 @@ if(!CacheUtilities::DoesFormExistYet(formInstanceID: $formInstanceID))
 
 $formData = CacheUtilities::GetFormData($formInstanceID);
 $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpecID']);
+
+// make sure only authorised people access the form:
+if($formSpec['requireAuthentication'])
+{
+    SecurityUtilities::RequireLogin();
+    $targetUserID = $formData['UserID'];
+    $currentUserID = JWTUtilities::GetJwtInfo()->ID;
+    if ($targetUserID !== $currentUserID)
+    {
+        NavigationUtilities::Redirect(target: '/');
+    }
+}
 
 function processPayload($payload, array $vars): mixed
 {

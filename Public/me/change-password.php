@@ -5,7 +5,7 @@ use Auxilium\Utilities\NavigationUtilities;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$formInstanceID = CacheUtilities::CreateNewForm('ChangeMyPassword');
+$formInstanceID = CacheUtilities::CreateNewForm('ChangeMyPassword', true);
 NavigationUtilities::Redirect(
     target: "/form/$formInstanceID",
 );

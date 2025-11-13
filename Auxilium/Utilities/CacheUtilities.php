@@ -122,11 +122,19 @@ class CacheUtilities
         unlink(filename: self::$CacheDirectory . "/FormData/$formInstanceID.json");
     }
 
-    public static function CreateNewForm(string $formSpecName): string
+    public static function CreateNewForm(string $formSpecName, bool $requireAuth): string
     {
+        $userID = "*";
+        if($requireAuth)
+        {
+            SecurityUtilities::RequireLogin();
+            $userID = JWTUtilities::GetJwtInfo()->ID;
+        }
+
+
         $formDataTemplate = [
             "FormSpecID" => $formSpecName,
-            "UserID" => "*",
+            "UserID" => $userID,
             "Data" => [],
             "CurrentPageIndex" => 0,  // Track actual page index
             "Status" => "in_progress",
