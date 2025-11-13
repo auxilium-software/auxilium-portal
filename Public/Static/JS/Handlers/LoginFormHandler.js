@@ -53,11 +53,11 @@ class LoginFormHandler {
             }
             else
             {
-                this.handleLoginError('Unknown login error. Please try again.');
+                await this.handleLoginError('Unknown login error. Please try again.');
             }
 
         } catch (error) {
-            this.handleLoginError(error);
+            await this.handleLoginError(error);
         } finally {
             this.setLoadingState(false);
         }
@@ -70,7 +70,7 @@ class LoginFormHandler {
             isValid = false;
         }
 
-        if (!this.validatePassword()) {
+        if (!await this.validatePassword()) {
             isValid = false;
         }
 
@@ -94,11 +94,11 @@ class LoginFormHandler {
         return true;
     }
 
-    validatePassword() {
+    async validatePassword() {
         const password = this.passwordField.value;
 
         if (!password) {
-            this.showFieldError('Password', Localisation.translate('Password is required'));
+            this.showFieldError('Password', await Localisation.translate('Password is required'));
             return false;
         }
 
@@ -125,11 +125,11 @@ class LoginFormHandler {
             return token;
         } catch (error) {
             console.error('reCAPTCHA error:', error);
-            throw new Error(Localisation.translate('Security verification failed. Please refresh the page and try again.'));
+            throw new Error(await Localisation.translate('Security verification failed. Please refresh the page and try again.'));
         }
     }
 
-    handleLoginError(error) {
+    async handleLoginError(error) {
         console.error('Login error:', error);
 
         if (error.fieldErrors)
@@ -144,7 +144,7 @@ class LoginFormHandler {
         }
         else
         {
-            new ToastNotification(Localisation.translate('An unexpected error occurred. Please try again.'), 'alert-circle', 'error');
+            new ToastNotification(await Localisation.translate('An unexpected error occurred. Please try again.'), 'alert-circle', 'error');
         }
 
         this.resetReCaptcha();

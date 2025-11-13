@@ -33,34 +33,5 @@
 
 
 {% else %}
-    {% if _INLINE_NODE_EXPANDED_ %}
-        <h3 class="low-margin-heading">
-            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/users/{{ _data.id }}">
-                <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
-                </span>
-                {% if _data.full_name %}
-                    {{ _data.full_name }}
-                {% else %}
-                    {{ "{" ~ _data.id ~ "}" }}
-                {% endif %}
-            </a>
-        </h3>
-        <div class="small-spacer"></div>
-        <dl>
-        </dl>
-    {% else %}
-        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/users/{{ _data.id }}">
-            <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account">
-            </span>
-            {% if _data.full_name %}
-                {{ _data.full_name }}
-            {% else %}
-                {{ "{" ~ _data.id ~ "}" }}
-            {% endif %}
-        </a>
-        <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); {% if _personType == 'CLIENT' %}await cm.removeClient('{{ _data.id }}', true);{% else %}await cm.removeWorker('{{ _data.id }}', true);{% endif %}}"
-           class="inline-icon link-off-icon"
-           title="{{ "Add Case Worker" | translate }}"></a>
-    {% endif %}
 {% endif %}
 

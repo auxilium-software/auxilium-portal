@@ -10,7 +10,12 @@
                 <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | translate }}</a>
             </div>
 
-            <h1>{{ "Good afternoon, Cerys"|translate }}</h1>
+            <h1>
+                {{ "Good {time_period}, {username}"|translate({
+                    '{time_period}': "afternoon"|translate,
+                    '{username}': "Cerys",
+                })|raw }}
+            </h1>
 
             {% for paa in paa_output %}
                 <div class="todo-box"><h4>{{ paa.action.short_description }}</h4><p><a href="{{ paa.accept_link }}">{{ "accept" | translate }}<span class="inline-icon internal-link-marker-icon"></span></a><br /><a href="{{ paa.deny_link }}">{{ "deny" | translate }}<span class="inline-icon internal-link-marker-icon"></span></a></p></div>

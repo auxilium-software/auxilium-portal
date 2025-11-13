@@ -103,7 +103,7 @@ class CommonFilters extends AbstractExtension
         // \?size=\d+ - size parameter with digits
         // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
 
-        $pattern = '/^auxlfs:\/\/%%couchdb%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]{40}$/';
+        $pattern = '/^auxlfs:\/\/%%default%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]{40}$/';
 
         return preg_match($pattern, $string) === 1;
     }
@@ -113,14 +113,14 @@ class CommonFilters extends AbstractExtension
         // auxmsg://%%couchdb%%/ - literal prefix
         // [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} - UUID format
 
-        $pattern = '/^auxmsg:\/\/%%couchdb%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
+        $pattern = '/^auxmsg:\/\/%%default%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
     }
 
     public function extract_file_id_from_auxlfs_url(string $string): string
     {
-        $pattern = '/^auxlfs:\/\/%%couchdb%%\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]{40}$/';
+        $pattern = '/^auxlfs:\/\/%%default%%\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]{40}$/';
         preg_match($pattern, $string, $matches);
         return $matches[1] ?? '';
     }

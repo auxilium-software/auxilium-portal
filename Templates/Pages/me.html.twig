@@ -13,8 +13,10 @@
 
             <h1>{{ "Account Management" | translate }}</h1>
 
-            <script>
-            </script>
+            <a href="/me/change-password" class="navigational-link">{{ "Change my Password" | translate | ndsentence }}</a><br />
+            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a><br />
+            {% if _IS_ADMIN_ %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}
