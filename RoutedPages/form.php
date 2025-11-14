@@ -24,16 +24,7 @@ $formData = CacheUtilities::GetFormData($formInstanceID);
 $formSpec = ConfigurationUtilities::GetFormDefinition(target: $formData['FormSpecID']);
 
 // make sure only authorised people access the form:
-if($formSpec['requireAuthentication'])
-{
-    SecurityUtilities::RequireLogin();
-    $targetUserID = $formData['UserID'];
-    $currentUserID = JWTUtilities::GetJwtInfo()->ID;
-    if ($targetUserID !== $currentUserID)
-    {
-        NavigationUtilities::Redirect(target: '/');
-    }
-}
+
 
 function processPayload($payload, array $vars): mixed
 {

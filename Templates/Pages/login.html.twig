@@ -43,23 +43,22 @@
                 <a href="/forgot-password">{{ "I've forgotten my password"|translate }}</a>
 
 
-                <div class="recaptcha-info">
+                <h2>{{ "Security Notice"|translate }}</h2>
+                <p>
                     {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
                         '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
                         '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
                     }) }}
-                </div>
+                </p>
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             </form>
 
-            <h2>{{ "__cookieNotice"|translate }}</h2>
+            <h2>{{ "Cookie Notice"|translate }}</h2>
             <p>
-                {{ "cookie_notice_blurb_start"|translate }}
-                <a href="/privacy-policy" target="_blank">
-                    {{ "Privacy Policy"|translate }}
-                </a>
-                ({{ "Opens in a new tab"|translate }}).
-                {{ "__cookieNoticeBlurbEnd"|translate }}
+                {{ "We only use cookies to record your choices, and allow access to our web portal. For more information please see our {privacy_policy} (opens in new tab).  We only place these cookies on your browser after you sign up or log in. If you don't consent to our use of these functional cookies, please do not sign up or log in."|translate({
+                    '{privacy_policy}': '<a href="/privacy-policy">' ~ "Privacy Policy"|translate ~ '</a>',
+                    '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                }) }}
             </p>
         </div>
     </div>

@@ -42,8 +42,12 @@ class CommonFilters extends AbstractExtension
     }
 
 
-    public function translate(string $string, array $substitutions = []): string
+    public function translate(?string $string, array $substitutions = []): ?string
     {
+        if($string === null)
+        {
+            return null;
+        }
         return LocalisationUtilities::Translate($string, $substitutions);
     }
 

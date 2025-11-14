@@ -47,15 +47,13 @@
         <page>
             <id>consent</id>
             <title>Data processing consent</title>
-            <description>
-                By completing these questions you consent to us processing your data,
-                opening a case and considering the information that you have provided.
+            <description>By completing these questions you consent to us processing your data,
+opening a case and considering the information that you have provided.
 
-                Please confirm that you are happy for your data to be used for these purposes,
-                and that you consent to us contacting you once your form has been received.
+Please confirm that you are happy for your data to be used for these purposes,
+and that you consent to us contacting you once your form has been received.
 
-                Alternatively, confirm that your service user or beneficiary consents to the above.
-            </description>
+Alternatively, confirm that your service user or beneficiary consents to the above.</description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
                 <component>
@@ -119,9 +117,7 @@
         <page>
             <id>consent_not_given</id>
             <title>Data processing consent is required</title>
-            <description>
-                Data consent is required, sorry lol.
-            </description>
+            <description>Data consent is required.</description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
             <abandonForm>true</abandonForm>
             <components>

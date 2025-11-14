@@ -41,7 +41,7 @@
 
                 {% else %}
                     <div class="alert alert-warning">
-                        <strong>Unknown review component type:</strong> {{ component.type }}
+                        <strong>{{ "Unknown review component type:"|translate }}</strong> {{ component.type }}
                     </div>
                 {% endif %}
             {% endfor %}
@@ -49,19 +49,20 @@
             {# Navigation buttons #}
             <div class="form-navigation review-navigation">
                 {% if ShowBackButton %}
-                    <input type="button" value="Back to Edit" onclick="submitFormWithAction('back')" class="back-button" />
+                    <input type="button" value="{{ "Back to Edit"|translate }}" onclick="submitFormWithAction('back')" class="back-button" />
                 {% endif %}
 
                 <div class="review-actions">
-                    <input type="button" value="Submit Application" onclick="submitFormWithAction('submit')" class="submit-button primary" />
+                    <input type="button" value="{{ "Submit Application"|translate }}" onclick="submitFormWithAction('submit')" class="submit-button primary" />
                 </div>
             </div>
 
             {% if FormSpec.useReCAPTCHA %}
                 <div class="recaptcha-info">
-                    This site is protected by reCAPTCHA and the Google
-                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                    }) }}
                 </div>
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             {% endif %}
