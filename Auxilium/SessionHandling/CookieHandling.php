@@ -35,7 +35,7 @@ class CookieHandling
             path: '/',
             domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
             secure: true,
-            httponly: true
+            httponly: false,
         );
     }
 
@@ -50,7 +50,7 @@ class CookieHandling
             path: '/',
             domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
             secure: true,
-            httponly: true
+            httponly: false,
         );
     }
 
@@ -58,10 +58,16 @@ class CookieHandling
     {
         return match ($targetCookie)
         {
+            // 30 minutes
+            CookieKey::ACCESS_TOKEN  => (3600 / 2),
+
+            // 48 hours
             CookieKey::SESSION_KEY  => (3600 * 48),
 
+            // 30 days
             CookieKey::STYLE,
-            CookieKey::LANGUAGE     => (3600 * 24 * 30),
+            CookieKey::LANGUAGE,
+            CookieKey::REFRESH_TOKEN  => (3600 * 24 * 30),
 
             default                 => 0,
         };

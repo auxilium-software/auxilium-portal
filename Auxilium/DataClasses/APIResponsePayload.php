@@ -16,4 +16,10 @@ class APIResponsePayload
      * @var array The response payload as an array.
      */
     public array $Payload;
+
+    public function __construct(int $StatusCode, array $Payload)
+    {
+        $this->StatusCode = $StatusCode;
+        $this->Payload = $Payload;
+    }
 }

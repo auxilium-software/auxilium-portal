@@ -2,12 +2,11 @@
 
 namespace Auxilium\ServiceInteractions;
 
-use App\Wrappers\APIWrapper;
-use App\Wrappers\CookieWrapper;
 use Auxilium\DataClasses\APIResponsePayload;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
+use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\NavigationUtilities;
 use CurlHandle;
 use Exception;
@@ -15,243 +14,267 @@ use JetBrains\PhpStorm\NoReturn;
 
 class APIInteractions
 {
-    public static function GetBaseURL(): string
-    {
-        return "http://localhost:1983/api/v3";
-    }
-
-
     private static bool $hasAttemptedRefresh = false;
-    public CurlHandle $CurlHandler;
+
+    private CurlHandle $CurlHandler;
     private string $lastEndpoint = '';
     private array $lastPayload = [];
     private string $lastMethod = 'GET';
+    private bool $requiresAuth;
 
-    function __construct(bool $requiresAuth = true)
+    public static function GetBaseURL(): string
     {
+        return ConfigurationUtilities::GetUserConfiguration()['API']['URL'] . '/api/v3';
+    }
+
+    private function __construct(bool $requiresAuth = true)
+    {
+        $this->requiresAuth = $requiresAuth;
         $this->CurlHandler = curl_init();
+
+        if ($this->CurlHandler === false) {
+            throw new Exception('Failed to initialize cURL');
+        }
 
         curl_setopt($this->CurlHandler, CURLOPT_HEADER, 0);
         curl_setopt($this->CurlHandler, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->CurlHandler, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($this->CurlHandler, CURLOPT_TIMEOUT, 30);
 
-        /*
-        if (Configuration::GetConfig("Development", "DevelopmentMode"))
-        {
-            curl_setopt($this->CurlHandler, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($this->CurlHandler, CURLOPT_SSL_VERIFYHOST, 0);
-        }
-        */
+        $this->setHeaders();
+    }
 
-        $headers = ["Content-Type: application/json"];
+    private function setHeaders(): void
+    {
+        $headers = ['Content-Type: application/json'];
 
-        if($requiresAuth)
-        {
+        if ($this->requiresAuth) {
             $accessToken = CookieHandling::GetCookieValue(CookieKey::ACCESS_TOKEN);
-            if($accessToken)
-            {
-                $headers[] = "Authorization: Bearer " . $accessToken;
-            }
-            if(!$accessToken)
-            {
+
+            if (!$accessToken) {
                 $this->redirectToLogin();
             }
+
+            $headers[] = 'Authorization: Bearer ' . $accessToken;
+        }
+
+        $cookieHeader = $this->buildCookieHeader();
+        if ($cookieHeader) {
+            $headers[] = $cookieHeader;
         }
 
         curl_setopt($this->CurlHandler, CURLOPT_HTTPHEADER, $headers);
-
-        if($this->CurlHandler === false)
-        {
-            throw new Exception("Failed to initialize cURL");
-        }
     }
 
-    #[NoReturn] private function redirectToLogin(): void
+    private function buildCookieHeader(): string
+    {
+        $cookies = [];
+
+        if (isset($_COOKIE[CookieKey::ACCESS_TOKEN->value])) {
+            $cookies[] = CookieKey::ACCESS_TOKEN->value . '=' . $_COOKIE[CookieKey::ACCESS_TOKEN->value];
+        }
+
+        if (isset($_COOKIE[CookieKey::REFRESH_TOKEN->value])) {
+            $cookies[] = CookieKey::REFRESH_TOKEN->value . '=' . $_COOKIE[CookieKey::REFRESH_TOKEN->value];
+        }
+
+        return !empty($cookies) ? 'Cookie: ' . implode('; ', $cookies) : '';
+    }
+
+    #[NoReturn]
+    private function redirectToLogin(): void
     {
         CookieHandling::DeleteCookie(CookieKey::ACCESS_TOKEN);
         CookieHandling::DeleteCookie(CookieKey::REFRESH_TOKEN);
 
-        if(session_status() === PHP_SESSION_ACTIVE)
-        {
-            unset($_SESSION);
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
         }
 
         NavigationUtilities::Redirect(target: '/login');
     }
+
     private function setTarget(string $endpoint): void
     {
         $this->lastEndpoint = $endpoint;
         curl_setopt($this->CurlHandler, CURLOPT_URL, self::GetBaseURL() . $endpoint);
     }
 
-    private function SetMethod(string $method): void
+    private function setMethod(string $method): void
     {
         $this->lastMethod = $method;
-        if($method !== 'GET' && $method !== 'POST')
-        {
-            curl_setopt($this->CurlHandler, CURLOPT_CUSTOMREQUEST, $method);
+
+        switch ($method) {
+            case 'POST':
+                curl_setopt($this->CurlHandler, CURLOPT_POST, 1);
+                break;
+            case 'GET':
+                // GET is default, no action needed
+                break;
+            default:
+                curl_setopt($this->CurlHandler, CURLOPT_CUSTOMREQUEST, $method);
+                break;
         }
     }
 
-    private function SetPayload(array $payload): void
+    private function setPayload(array $payload): void
     {
         $this->lastPayload = $payload;
-        if(!empty($payload))
-        {
-            curl_setopt($this->CurlHandler, CURLOPT_POST, 1);
+
+        if (!empty($payload)) {
             curl_setopt($this->CurlHandler, CURLOPT_POSTFIELDS, json_encode($payload, JSON_THROW_ON_ERROR));
         }
     }
 
-    public function executeRequest(): APIResponsePayload
+    private function executeRequest(): APIResponsePayload
     {
         $response = curl_exec($this->CurlHandler);
 
-        if($response === false)
-        {
+        if ($response === false) {
             $error = curl_error($this->CurlHandler);
             curl_close($this->CurlHandler);
-            throw new Exception("cURL request failed: " . $error);
+            throw new Exception('cURL request failed: ' . $error);
         }
-
-        error_log(json_encode($response));
 
         $statusCode = curl_getinfo($this->CurlHandler, CURLINFO_HTTP_CODE);
         curl_close($this->CurlHandler);
 
-        if($statusCode >= 400)
-        {
-            if($statusCode === 401 && !self::$hasAttemptedRefresh)
-            {
-                // Token expired or invalid - try to refresh
-                if(self::attemptTokenRefresh())
-                {
-                    $this->executeRequest();
-                }
-                $this->redirectToLogin();
+        // Handle 401 Unauthorized - attempt token refresh
+        if ($statusCode === 401 && $this->requiresAuth && !self::$hasAttemptedRefresh) {
+            if (self::attemptTokenRefresh()) {
+                // Reset the flag and retry with new token
+                self::$hasAttemptedRefresh = false;
+                return $this->retryRequest();
             }
-            elseif($statusCode === 401)
-            {
-                $this->redirectToLogin();
-            }
-            else
-            {
-                // Other errors - show error page
-                // $this->showErrorPage($statusCode, $response);
-            }
+
+            $this->redirectToLogin();
+        }
+
+        if ($statusCode === 401) {
+            $this->redirectToLogin();
+        }
+
+        if ($statusCode >= 400) {
+            error_log("API Error: Status $statusCode, Response: $response");
         }
 
         $responsePayload = json_decode($response, true);
 
-        if(json_last_error() !== JSON_ERROR_NONE)
-        {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             PageBuilder::Render(
                 template: '/ErrorPages/APIError.html.twig',
                 variables: [
-                    "ErrorMessage" => json_last_error_msg(),
+                    'ErrorMessage' => json_last_error_msg(),
                 ],
                 useAuth: false,
             );
+            exit;
         }
 
-        $temp = new APIResponsePayload();
-        $temp->StatusCode = $statusCode;
-        $temp->Payload = $responsePayload;
-        return $temp;
+        return new APIResponsePayload(
+            StatusCode: $statusCode,
+            Payload: $responsePayload ?? []
+        );
+    }
+
+    private function retryRequest(): APIResponsePayload
+    {
+        $retry = new self($this->requiresAuth);
+        $retry->setTarget($this->lastEndpoint);
+        $retry->setMethod($this->lastMethod);
+        $retry->setPayload($this->lastPayload);
+
+        return $retry->executeRequest();
     }
 
     private static function attemptTokenRefresh(): bool
     {
-        self::$hasAttemptedRefresh = true; // Prevent infinite loops
+        self::$hasAttemptedRefresh = true;
 
-        try
-        {
+        try {
             $refreshToken = CookieHandling::GetCookieValue(CookieKey::REFRESH_TOKEN);
-            if(!$refreshToken)
-            {
+
+            if (!$refreshToken) {
                 return false;
             }
 
-            $refreshWrapper = new APIInteractions(false); // No auth required for refresh
-            $refreshWrapper->SetTarget('/authentication/refresh');
-            $refreshWrapper->SetPayload(['refresh_token' => $refreshToken]);
-            $response = $refreshWrapper->executeRequest();
+            $response = self::Post(
+                endpoint: '/authentication/refresh',
+                payload: ['refresh_token' => $refreshToken],
+                requireAuth: false
+            );
 
-            if(isset($response->Payload['access_token']))
-            {
-                CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response->Payload['access_token']);
+            if ($response->StatusCode === 200 && isset($response->Payload['access_token'])) {
+                CookieHandling::SetCookie(
+                    CookieKey::ACCESS_TOKEN,
+                    $response->Payload['access_token']
+                );
 
-                if(isset($response->Payload['refresh_token']))
-                {
-                    CookieHandling::SetCookie(CookieKey::REFRESH_TOKEN, $response->Payload['refresh_token']);
+                if (isset($response->Payload['refresh_token'])) {
+                    CookieHandling::SetCookie(
+                        CookieKey::REFRESH_TOKEN,
+                        $response->Payload['refresh_token']
+                    );
                 }
 
                 return true;
             }
 
             return false;
-        }
-        catch(Exception $e)
-        {
-            error_log("Token refresh failed: " . $e->getMessage());
+        } catch (Exception $e) {
+            error_log('Token refresh failed: ' . $e->getMessage());
             return false;
         }
     }
 
-
-
-
-
-
-
+    // Static factory methods
 
     public static function Post(string $endpoint, array $payload, bool $requireAuth = true): APIResponsePayload
     {
-        $apiWrapper = new APIInteractions($requireAuth);
-        $apiWrapper->SetTarget($endpoint);
-        $apiWrapper->SetMethod('POST');
-        $apiWrapper->SetPayload($payload);
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint);
+        $apiWrapper->setMethod('POST');
+        $apiWrapper->setPayload($payload);
         return $apiWrapper->executeRequest();
     }
 
-    public static function Patch(string $endpoint, array $payload): APIResponsePayload
+    public static function Patch(string $endpoint, array $payload, bool $requireAuth = true): APIResponsePayload
     {
-        $apiWrapper = new APIInteractions(true);
-        $apiWrapper->SetTarget($endpoint);
-        $apiWrapper->SetMethod('PATCH');
-        $apiWrapper->SetPayload($payload);
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint);
+        $apiWrapper->setMethod('PATCH');
+        $apiWrapper->setPayload($payload);
         return $apiWrapper->executeRequest();
     }
 
-    public static function Put(string $endpoint, array $payload): APIResponsePayload
+    public static function Put(string $endpoint, array $payload, bool $requireAuth = true): APIResponsePayload
     {
-        $apiWrapper = new APIInteractions(true);
-        $apiWrapper->SetTarget($endpoint);
-        $apiWrapper->SetMethod('PUT');
-        $apiWrapper->SetPayload($payload);
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint);
+        $apiWrapper->setMethod('PUT');
+        $apiWrapper->setPayload($payload);
         return $apiWrapper->executeRequest();
     }
 
-    public static function Delete(string $endpoint): APIResponsePayload
+    public static function Delete(string $endpoint, bool $requireAuth = true): APIResponsePayload
     {
-        $apiWrapper = new APIInteractions(true);
-        $apiWrapper->SetTarget($endpoint);
-        $apiWrapper->SetMethod('DELETE');
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint);
+        $apiWrapper->setMethod('DELETE');
         return $apiWrapper->executeRequest();
     }
 
-    public static function Get(string $endpoint, array $parameters = []): APIResponsePayload
+    public static function Get(string $endpoint, array $parameters = [], bool $requireAuth = true): APIResponsePayload
     {
-        $queryString = "";
-        if(!empty($parameters))
-        {
-            $queryString = "?" . http_build_query($parameters);
+        $queryString = '';
+
+        if (!empty($parameters)) {
+            $queryString = '?' . http_build_query($parameters);
         }
 
-        $apiWrapper = new APIInteractions(true);
-        $apiWrapper->SetTarget($endpoint . $queryString);
-        $apiWrapper->SetMethod('GET');
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint . $queryString);
+        $apiWrapper->setMethod('GET');
         return $apiWrapper->executeRequest();
     }
 }

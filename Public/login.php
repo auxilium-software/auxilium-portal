@@ -1,6 +1,5 @@
 <?php
 
-
 use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\TwigHandling\PageBuilder;
 
