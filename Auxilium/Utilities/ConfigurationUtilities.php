@@ -13,13 +13,6 @@ class ConfigurationUtilities
     public static array $UserConfiguration;
 
 
-    public static function GetLanguagePack(string $language): array
-    {
-        $temp = file_get_contents(__DIR__ . "/../../Configuration/LanguagePacks/$language.json");
-        $temp = json_decode($temp, true);
-        return $temp;
-    }
-
     public static function GetSystemConfiguration(): array
     {
         if(isset(self::$SystemConfiguration))

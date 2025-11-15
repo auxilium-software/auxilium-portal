@@ -11,24 +11,33 @@ use Firebase\JWT\JWT;
 
 class JWTUtilities
 {
+    /**
+     * Used for getting information from the JWT in the `access_token` cookie.
+     * If that cookie doesn't exist, along with no refresh token, the user will be redirected to the login page.
+     * If that cookie doesn't exist but the refresh token does, the refresh token will be used to request a new access token from the API.
+     *
+     * @return JWTPayload Decoded JWT data.
+     */
     public static function GetJwtInfo(): JWTPayload
     {
-        self::ensureTokensExist();
+        if (!isset($_COOKIE['access_token']) && !isset($_COOKIE['refresh_token']))
+        {
+            NavigationUtilities::Redirect(target: '/login');
+        }
 
-        if (!isset($_COOKIE['access_token'])) {
+        if (!isset($_COOKIE['access_token']))
+        {
             return self::refreshAccessToken();
         }
 
         return self::decodeAccessToken($_COOKIE['access_token']);
     }
 
-    private static function ensureTokensExist(): void
-    {
-        if (!isset($_COOKIE['access_token']) && !isset($_COOKIE['refresh_token'])) {
-            self::redirectToLogin();
-        }
-    }
-
+    /**
+     * Used for getting new access and refresh tokens from the API and storing them in cookies.
+     *
+     * @return JWTPayload Decoded JWT data.
+     */
     private static function refreshAccessToken(): JWTPayload
     {
         $response = APIInteractions::Post(
@@ -38,7 +47,7 @@ class JWTUtilities
         );
 
         if ($response->StatusCode !== 200) {
-            self::redirectToLogin();
+            NavigationUtilities::Redirect(target: '/login');
         }
 
         CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response->Payload['access_token']);
@@ -47,15 +56,24 @@ class JWTUtilities
         return self::decodeAccessToken($response->Payload['access_token']);
     }
 
+    /**
+     * Takes in a JWT string, grabs the data itself out of it, and turns it into a dataclass.
+     *
+     * @param string $token The JWT string to operate on.
+     * @return JWTPayload The data stored within the JWT.
+     */
     private static function decodeAccessToken(string $token): JWTPayload
     {
-        try {
+        try
+        {
             $config = ConfigurationUtilities::GetUserConfiguration()['JWT'];
 
             $decodedObject = JWT::decode(
                 jwt: $token,
                 keyOrKeyArray: $config['SecretKey'],
-                allowed_algs: [$config['Algorithm']]
+                allowed_algs: [
+                    $config['Algorithm'],
+                ]
             );
 
             $decodedArray = json_decode(
@@ -69,20 +87,10 @@ class JWTUtilities
                 rawJWT: $token,
                 assocArray: $decodedArray
             );
-        } catch (Exception $ex) {
-            self::redirectToLogout();
         }
-    }
-
-    private static function redirectToLogin(): never
-    {
-        header('Location: /login');
-        die();
-    }
-
-    private static function redirectToLogout(): never
-    {
-        header('Location: /logout');
-        die();
+        catch (Exception $ex)
+        {
+            NavigationUtilities::Redirect(target: '/logout');
+        }
     }
 }

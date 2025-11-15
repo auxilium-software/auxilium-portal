@@ -3,27 +3,30 @@
 namespace Auxilium\SessionHandling;
 
 use Auxilium\Enumerators\CookieKey;
-use Auxilium\Enumerators\Language;
 use Auxilium\Utilities\ConfigurationUtilities;
+use Exception;
 
 class CookieHandling
 {
-    public static function GetBooleanCookie(CookieKey $targetCookie, bool $default = false): bool
-    {
-        $cookieValue = self::GetCookieValue($targetCookie);
-
-        if ($cookieValue === '') {
-            return $default;
-        }
-
-        return $cookieValue === 'true';
-    }
-
+    /**
+     * Used for getting a cookie from the client with an optional fallback value.
+     *
+     * @param CookieKey $targetCookie Which cookie to get.
+     * @param string $default A fallback value, this will be returned if the cookie does not exist.
+     * @return string Either the cookie's value, or the fallback value.
+     */
     public static function GetCookieValue(CookieKey $targetCookie, string $default = ''): string
     {
         return $_COOKIE[$targetCookie->value] ?? $default;
     }
 
+    /**
+     * Used for deleting a cookie from the client.
+     *
+     * @param CookieKey $targetCookie Which cookie to delete.
+     * @return bool Whether it was successful.
+     * @throws Exception Will be thrown if there was an issue with the config file.
+     */
     public static function DeleteCookie(CookieKey $targetCookie): bool
     {
         unset($_COOKIE[$targetCookie->value]);
@@ -39,6 +42,14 @@ class CookieHandling
         );
     }
 
+    /**
+     * Used for creating or updating the value of a cookie.
+     *
+     * @param CookieKey $targetCookie What cookie to create/update.
+     * @param string $value The data to store within the cookie.
+     * @return bool Whether it was successful.
+     * @throws Exception Will be thrown if there was an issue with the config file.
+     */
     public static function SetCookie(CookieKey $targetCookie, string $value): bool
     {
         $_COOKIE[$targetCookie->value] = $value;
@@ -54,6 +65,12 @@ class CookieHandling
         );
     }
 
+    /**
+     * An abstraction function used for grabbing the TTL of a cookie.
+     *
+     * @param CookieKey $targetCookie Which cookie we're querying about.
+     * @return int What that specific cookie's TTL should be.
+     */
     private static function GetCookieTTL(CookieKey $targetCookie): int
     {
         return match ($targetCookie)
@@ -71,15 +88,5 @@ class CookieHandling
 
             default                     => 0,
         };
-    }
-
-    public static function SetLanguage(Language $language): void
-    {
-        self::SetCookie(CookieKey::LANGUAGE, $language->value);
-    }
-
-    public static function SetStyle(string $style): void
-    {
-        self::SetCookie(CookieKey::STYLE, $style);
     }
 }
