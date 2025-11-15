@@ -3,6 +3,7 @@
 namespace Auxilium\FormHandling;
 
 use Auxilium\Auxilium\AuxiliumScript;
+use Auxilium\Enumerators\SessionKey;
 use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\CacheUtilities;
@@ -10,6 +11,7 @@ use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\JWTUtilities;
 use Auxilium\Utilities\NavigationUtilities;
 use Auxilium\Utilities\SecurityUtilities;
+use Auxilium\Utilities\SessionUtilities;
 use JetBrains\PhpStorm\NoReturn;
 use JsonException;
 use SimpleXMLElement;
@@ -65,19 +67,21 @@ class FormHandler
      */
     private function validateAuthentication(): void
     {
-        if($this->formSpec['requireAuthentication'])
+        if(!$this->formSpec['requireAuthentication'])
         {
-            SecurityUtilities::RequireLogin();
-            $targetUserID = $this->formData['UserID'];
+            return;
+        }
 
-            // if form is assigned to a specific user, verify that the current user is that user
-            if($targetUserID !== "*")
+        SecurityUtilities::RequireLogin();
+        $targetUserID = $this->formData['UserID'];
+
+        // if form is assigned to a specific user, verify that the current user is that user
+        if($targetUserID !== "*")
+        {
+            $currentUserID = JWTUtilities::GetJwtInfo()->ID;
+            if($targetUserID !== $currentUserID)
             {
-                $currentUserID = JWTUtilities::GetJwtInfo()->ID;
-                if($targetUserID !== $currentUserID)
-                {
-                    NavigationUtilities::Redirect(target: '/');
-                }
+                NavigationUtilities::Redirect(target: '/');
             }
         }
     }
@@ -90,16 +94,13 @@ class FormHandler
         $this->visiblePages = [];
         $this->pageIndexMap = [];
 
+        $vars = $this->getExpressionVariables();
+
         foreach($this->formSpec['pages']['page'] as $i => $page)
         {
             $renderIf = $page['renderIf'] ?? 'true'; // if there's no renderIf, assume that the page SHOULD be seen
 
-            if(AuxiliumScript::evaluate_expression(
-                $renderIf,
-                [
-                    'formData' => $this->formData['Data'] ?? [],
-                ]
-            ))
+            if(AuxiliumScript::evaluate_expression($renderIf, $vars))
             {
                 $this->visiblePages[] = $page;
                 $this->pageIndexMap[] = $i;
@@ -109,8 +110,10 @@ class FormHandler
 
     /**
      * Processes a POST request (form submission or navigation)
+     *
      * @throws JsonException thrown if there's an issue encoding the form data as JSON.
      */
+    #[NoReturn]
     public function handlePostRequest(): void
     {
         $action = $_POST['action'] ?? 'continue';
@@ -119,7 +122,6 @@ class FormHandler
         if(isset($_POST['jumpToPage']))
         {
             $this->handlePageJump($_POST['jumpToPage']);
-            return;
         }
 
         // update form data for all actions except "back"
@@ -130,24 +132,14 @@ class FormHandler
         }
 
         // this bit handles the main navigation essentially
-        switch($action)
+        match ($action)
         {
-            case 'back':
-                $this->handleBackAction();
-                break;
-
-            case 'continue':
-            case 'next':
-                $this->handleNextAction();
-                break;
-
-            case 'review':
-                $this->handleReviewAction();
-                break;
-
-            case 'submit':
-                $this->handleSubmitAction();
-        }
+            'back' => $this->handleBackAction(),
+            'continue', 'next' => $this->handleNextAction(),
+            'review' => $this->handleReviewAction(),
+            'submit' => $this->handleSubmitAction(),
+            default => null, // unknown action, do nothing
+        };
 
         // reload the page
         NavigationUtilities::Redirect(target: "/form/$this->formInstanceID");
@@ -156,6 +148,7 @@ class FormHandler
     /**
      * Handles jumping directly to a specific page by ID
      */
+    #[NoReturn]
     private function handlePageJump(string $targetPageId): void
     {
         foreach($this->formSpec['pages']['page'] as $i => $page)
@@ -166,6 +159,9 @@ class FormHandler
                 NavigationUtilities::Redirect(target: "/form/$this->formInstanceID");
             }
         }
+
+        // If we reach here, page ID wasn't found - just reload current page
+        NavigationUtilities::Redirect(target: "/form/$this->formInstanceID");
     }
 
     /**
@@ -181,16 +177,25 @@ class FormHandler
                 $lastPageIndex = end($this->pageIndexMap);
                 CacheUtilities::SetCurrentPageIndex($this->formInstanceID, $lastPageIndex);
             }
+            return;
         }
-        else
+
+        // find previous visible page
+        $prevPageIndex = $this->findNextVisiblePage($this->storedPageIndex, -1);
+        if($prevPageIndex >= 0)
         {
-            // find previous visible page
-            $prevPageIndex = $this->findNextVisiblePage($this->storedPageIndex, -1);
-            if($prevPageIndex >= 0)
-            {
-                CacheUtilities::SetCurrentPageIndex($this->formInstanceID, $prevPageIndex);
-            }
+            CacheUtilities::SetCurrentPageIndex($this->formInstanceID, $prevPageIndex);
         }
+    }
+
+    /**
+     * Gets the standard variables array used for AuxiliumScript expression evaluation
+     *
+     * @return array Variables containing form data
+     */
+    private function getExpressionVariables(): array
+    {
+        return ['formData' => $this->formData['Data'] ?? []];
     }
 
     /**
@@ -206,7 +211,7 @@ class FormHandler
         $totalPages = count($pages);
         $nextPage = $currentPage + $direction;
 
-        $vars = ['formData' => $this->formData['Data'] ?? []];
+        $vars = $this->getExpressionVariables();
 
         while($nextPage >= 0 && $nextPage < $totalPages)
         {
@@ -232,41 +237,40 @@ class FormHandler
         if($this->isReviewPage)
         {
             $this->submitForm();
+            return;
         }
-        // for any other page...
+
+        // for any other page, navigate to the next visible page/review page
+        $nextPageIndex = $this->findNextVisiblePage($this->storedPageIndex, 1);
+        if($nextPageIndex >= 0)
+        {
+            CacheUtilities::SetCurrentPageIndex($this->formInstanceID, $nextPageIndex);
+        }
         else
         {
-            // navigate to the next visible page/review page
-            $nextPageIndex = $this->findNextVisiblePage($this->storedPageIndex, 1);
-            if($nextPageIndex >= 0)
-            {
-                CacheUtilities::SetCurrentPageIndex($this->formInstanceID, $nextPageIndex);
-            }
-            else
-            {
-                // there are no more pages, therefore, go to review
-                CacheUtilities::SetCurrentPageIndex($this->formInstanceID, 'review');
-            }
+            // there are no more pages, therefore, go to review
+            CacheUtilities::SetCurrentPageIndex($this->formInstanceID, 'review');
         }
     }
 
     /**
      * Executes submission actions and redirects appropriately
+     *
+     * @throws JsonException
      */
-    #[NoReturn] private function submitForm(): void
+    #[NoReturn]
+    private function submitForm(): void
     {
         $submissionResult = $this->executeSubmissionActions();
 
-        if($submissionResult['success'])
+        if($submissionResult->Success)
         {
             CacheUtilities::MarkFormAsComplete($this->formInstanceID);
             NavigationUtilities::Redirect(target: $this->formSpec['afterSubmissionRedirect']['target']);
         }
-        else
-        {
-            $_SESSION['submission_error'] = $submissionResult['message'];
-            NavigationUtilities::Redirect(target: "/form/$this->formInstanceID");
-        }
+
+        SessionUtilities::Set(key: SessionKey::FORM_SUBMISSION_ERROR, value: $submissionResult->Message);
+        NavigationUtilities::Redirect(target: "/form/$this->formInstanceID");
     }
 
     /**
@@ -275,31 +279,28 @@ class FormHandler
      * @return array Result array with 'success' status, 'message', and 'results'
      * @throws JsonException
      */
-    private function executeSubmissionActions(): array
+    private function executeSubmissionActions(): FormSubmissionActionResultWrapper
     {
         if(!isset($this->formSpec['submissionActions']))
         {
-            return [
-                'success' => true,
-                'message' => 'No submission actions defined',
-            ];
+            return new FormSubmissionActionResultWrapper(
+                success: true,
+                message: "No submission actions are defined.",
+            );
         }
 
         $results = [];
-        $vars = ['formData' => $this->formData['Data'] ?? []];
+        $vars = $this->getExpressionVariables();
 
         // because of the way the xml parser works, if there's only one element in the list, it won't be an array,
         // so here we're just converting it to always be an array
-        $apiRequests = $this->formSpec['submissionActions']['apiRequest'];
-        if(!isset($apiRequests[0]))
-        {
-            $apiRequests = [$apiRequests];
-        }
+        $apiRequests = $this->normalizeToArray($this->formSpec['submissionActions']['apiRequest']);
 
         // execute each api request
         foreach($apiRequests as $apiRequest)
         {
-            $executeIf = $apiRequest['executeIf'] ?? 'true';  // if there's no executeIf, assume that it should be executed
+            // if there's no executeIf, assume that it should be executed
+            $executeIf = $apiRequest['executeIf'] ?? 'true';
 
             if(!AuxiliumScript::evaluate_expression($executeIf, $vars))
             {
@@ -328,19 +329,38 @@ class FormHandler
             // cancel on the first error (don't execute any more actions)
             if($result->StatusCode >= 400)
             {
-                return [
-                    'success' => false,
-                    'message' => $result->Payload['message'] ?? 'An error occurred while executing the submission action',
-                    'results' => $results,
-                ];
+                return new FormSubmissionActionResultWrapper(
+                    success: false,
+                    message: $result->Payload['message'] ?? 'An error occurred while executing the submission action',
+                    results: $results
+                );
             }
         }
 
-        return [
-            'success' => true,
-            'message' => 'All submission actions completed successfully',
-            'results' => $results
-        ];
+        return new FormSubmissionActionResultWrapper(
+            success: true,
+            message: 'All submission actions completed successfully',
+            results: $results
+        );
+    }
+
+    /**
+     * Normalizes XML parser output to always return an array
+     * (XML parser returns single items as non-array values)
+     *
+     * @param mixed $value The value to normalize
+     * @return array The normalized array
+     */
+    private function normalizeToArray(mixed $value): array
+    {
+        // If it's already an indexed array, return as-is
+        if(is_array($value) && isset($value[0]))
+        {
+            return $value;
+        }
+
+        // Otherwise wrap in an array
+        return [$value];
     }
 
     /**
@@ -405,14 +425,9 @@ class FormHandler
             {
                 if($value instanceof SimpleXMLElement)
                 {
-                    if(count($value->children()) > 0)
-                    {
-                        $result[$key] = $this->parsePayloadFromXML($value);
-                    }
-                    else
-                    {
-                        $result[$key] = (string)$value;
-                    }
+                    $result[$key] = count($value->children()) > 0
+                        ? $this->parsePayloadFromXML($value)
+                        : (string)$value;
                 }
                 else
                 {
@@ -427,8 +442,6 @@ class FormHandler
 
     /**
      * Handles jumping directly to the review page
-     *
-     * @throws JsonException Will get thrown if for some reason the form data can't be encoded as JSON
      */
     private function handleReviewAction(): void
     {
@@ -437,8 +450,11 @@ class FormHandler
 
     /**
      * Handles form submission
+     *
+     * @throws JsonException
      */
-    #[NoReturn] private function handleSubmitAction(): void
+    #[NoReturn]
+    private function handleSubmitAction(): void
     {
         $this->submitForm();
     }
@@ -446,7 +462,8 @@ class FormHandler
     /**
      * Renders the current page (either a form page or review page)
      */
-    #[NoReturn] public function render(): void
+    #[NoReturn]
+    public function render(): void
     {
         // if there's no visible pages, and we're not on the review page, redirect to `/`
         if(empty($this->visiblePages) && !$this->isReviewPage)
@@ -467,7 +484,8 @@ class FormHandler
     /**
      * Renders the review page showing submitted data
      */
-    #[NoReturn] private function renderReviewPage(): void
+    #[NoReturn]
+    private function renderReviewPage(): void
     {
         $shouldUserBeLoggedIn = $this->formSpec['requireAuthentication'] === 'true';
         $reviewComponents = $this->getVisibleReviewComponents();
@@ -480,10 +498,10 @@ class FormHandler
             "ReviewComponents" => $reviewComponents,
             "ShowBackButton" => true,
             "ShowSubmitButton" => true,
-            "SubmissionError" => $_SESSION['submission_error'] ?? null,
+            "SubmissionError" => SessionUtilities::Get(key: SessionKey::FORM_SUBMISSION_ERROR, default: null),
         ];
-
-        unset($_SESSION['submission_error']);
+        
+        SessionUtilities::Delete(key: SessionKey::FORM_SUBMISSION_ERROR);
 
         PageBuilder::Render(
             template : '/VirtualPages/FormReviewPage.html.twig',
@@ -505,34 +523,36 @@ class FormHandler
         }
 
         $components = $this->formSpec['reviewPage']['components']['component'];
-        $vars = ['formData' => $this->formData['Data'] ?? []];
+        $vars = $this->getExpressionVariables();
         $visibleComponents = [];
 
         foreach($components as $component)
         {
             $condition = $component['if'] ?? 'true';
 
-            if(AuxiliumScript::evaluate_expression($condition, $vars))
+            if(!AuxiliumScript::evaluate_expression($condition, $vars))
             {
-                $processedComponent = $component;
-
-                // evaluate dynamic values
-                if(isset($component['value']) && str_contains($component['value'], '$'))
-                {
-                    $processedComponent['value'] = AuxiliumScript::evaluate_expression($component['value'], $vars);
-                }
-
-                // handle description lists
-                if($component['type'] === 'DESCRIPTION_LIST' && isset($component['dictionary']['item']))
-                {
-                    $processedComponent['dictionary']['item'] = $this->processDescriptionListItems(
-                        $component['dictionary']['item'],
-                        $vars
-                    );
-                }
-
-                $visibleComponents[] = $processedComponent;
+                continue;
             }
+
+            $processedComponent = $component;
+
+            // evaluate dynamic values
+            if(isset($component['value']) && str_contains($component['value'], '$'))
+            {
+                $processedComponent['value'] = AuxiliumScript::evaluate_expression($component['value'], $vars);
+            }
+
+            // handle description lists
+            if($component['type'] === 'DESCRIPTION_LIST' && isset($component['dictionary']['item']))
+            {
+                $processedComponent['dictionary']['item'] = $this->processDescriptionListItems(
+                    $component['dictionary']['item'],
+                    $vars
+                );
+            }
+
+            $visibleComponents[] = $processedComponent;
         }
 
         return $visibleComponents;
@@ -547,50 +567,43 @@ class FormHandler
      */
     private function processDescriptionListItems(mixed $items, array $vars): array
     {
-        $processedItems = [];
-
         if(!is_array($items))
         {
-            return $processedItems;
+            return [];
         }
 
         // single key-value pair
         if(isset($items['key'], $items['value']))
         {
-            $processedItems[] = $this->processDescriptionListItem($items, $vars);
-        }
-        // array of items
-        else if(isset($items[0]))
-        {
-            // array of objects
-            if(is_array($items[0]))
-            {
-                foreach($items as $item)
-                {
-                    if(isset($item['key'], $item['value']))
-                    {
-                        $processedItems[] = $this->processDescriptionListItem($item, $vars);
-                    }
-                }
-            }
-            // flat array (alternating keys and values)
-            else if(is_string($items[0]))
-            {
-                for($i = 0, $iMax = count($items); $i < $iMax; $i += 2)
-                {
-                    if(isset($items[$i + 1]))
-                    {
-                        $processedItems[] = $this->processDescriptionListItem([
-                            'key' => $items[$i],
-                            'value' => $items[$i + 1]
-                        ], $vars
-                        );
-                    }
-                }
-            }
+            return [$this->processDescriptionListItem($items, $vars)];
         }
 
-        return $processedItems;
+        // array of items
+        if(!isset($items[0]))
+        {
+            return [];
+        }
+
+        // array of objects
+        if(is_array($items[0]))
+        {
+            return array_filter(
+                array_map(
+                    fn($item) => isset($item['key'], $item['value'])
+                        ? $this->processDescriptionListItem($item, $vars)
+                        : null,
+                    $items
+                )
+            );
+        }
+
+        // flat array (alternating keys and values)
+        if(is_string($items[0]))
+        {
+            return $this->processFlatArrayItems($items, $vars);
+        }
+
+        return [];
     }
 
     /**
@@ -615,9 +628,34 @@ class FormHandler
     }
 
     /**
+     * Processes flat array items (alternating keys and values)
+     *
+     * @param array $items Flat array of alternating keys and values
+     * @param array $vars Variables for expression evaluation
+     * @return array Processed items
+     */
+    private function processFlatArrayItems(array $items, array $vars): array
+    {
+        $processedItems = [];
+        for($i = 0, $iMax = count($items); $i < $iMax; $i += 2)
+        {
+            if(isset($items[$i + 1]))
+            {
+                $processedItems[] = $this->processDescriptionListItem([
+                    'key' => $items[$i],
+                    'value' => $items[$i + 1]
+                ], $vars
+                );
+            }
+        }
+        return $processedItems;
+    }
+
+    /**
      * Renders a regular form page
      */
-    #[NoReturn] private function renderFormPage(): void
+    #[NoReturn]
+    private function renderFormPage(): void
     {
         $currentVisiblePageIndex = $this->getCurrentVisiblePageIndex();
         $currentPage = $this->visiblePages[$currentVisiblePageIndex];

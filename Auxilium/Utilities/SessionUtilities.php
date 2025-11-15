@@ -25,7 +25,7 @@ class SessionUtilities
     /**
      * Used for setting an element in \$_SESSION.
      *
-     * @param SessionKey $key What element to set.
+     * @param SessionKey $key Which element to set.
      * @param mixed $value The data to store.
      *
      * @return void Won't return anything.
@@ -33,5 +33,17 @@ class SessionUtilities
     public static function Set(SessionKey $key, mixed $value): void
     {
         $_SESSION[$key->value] = $value;
+    }
+
+    /**
+     * Used for deleting or "unsetting" an element on \$_SESSION
+     *
+     * @param SessionKey $key Which element to delete
+     *
+     * @return void Won't return anything.
+     */
+    public static function Delete(SessionKey $key): void
+    {
+        unset($_SESSION[$key->value]);
     }
 }
