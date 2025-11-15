@@ -136,7 +136,11 @@
         {% if _IS_LOGGED_IN_ %}
             <div id="portal-authenticated-user-bar">
                 <div class="inner-content">
-                    <p>{{ "Logged in as"|translate }}</p>
+                    <p>
+                        {{ "Logged in as: {username}"|translate({
+                            '{username}': ''
+                        }) }}
+                    </p>
                     <a href="/logout" class="button">{{ "Logout"|translate|title }}</a>
                 </div>
             </div>
@@ -204,7 +208,5 @@
                 <div class="spacer"></div>
             </div>
         </footer>
-
-
     </body>
 </html>
