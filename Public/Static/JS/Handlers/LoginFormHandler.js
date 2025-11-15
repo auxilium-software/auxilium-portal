@@ -42,8 +42,8 @@ class LoginFormHandler {
 
             if(response !== false)
             {
-                CookieUtilities.setCookie('access_token', response['access_token'], 0.0208333);
-                CookieUtilities.setCookie('refresh_token', response['refresh_token'], 7);
+                CookieUtilities.setCookie('access_token', response['access_token'], 30);
+                CookieUtilities.setCookie('refresh_token', response['refresh_token'], 60 * 24 * 7);
                 new ToastNotification(await Localisation.translate('Login successful! Redirecting...'), 'check-circle', 'success');
 
                 setTimeout(() => {
