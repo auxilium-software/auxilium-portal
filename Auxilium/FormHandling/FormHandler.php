@@ -500,7 +500,7 @@ class FormHandler
             "ShowSubmitButton" => true,
             "SubmissionError" => SessionUtilities::Get(key: SessionKey::FORM_SUBMISSION_ERROR, default: null),
         ];
-        
+
         SessionUtilities::Delete(key: SessionKey::FORM_SUBMISSION_ERROR);
 
         PageBuilder::Render(
