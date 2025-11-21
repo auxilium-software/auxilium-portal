@@ -66,7 +66,25 @@ class PayloadProcessor
         {
             if(str_contains($payload, '$'))
             {
-                return AuxiliumScript::evaluate_expression($payload, $vars);
+                // special handling for collectCheckboxValues function calls
+                if(str_contains($payload, 'collectCheckboxValues'))
+                {
+                    return $this->handleCheckboxFunction($payload, $vars);
+                }
+
+                $result = AuxiliumScript::evaluate_expression($payload, $vars);
+
+                // if the result is null/empty, and it looks like a checkbox field, let's try to collect it
+                if(($result === null || $result === '') && $this->looksLikeCheckboxField($payload, $vars['formData']))
+                {
+                    // extract the field name from the expression like $formData["field_name"]
+                    if(preg_match('/\$formData\[(["\'])([^"\']+)\1\]/', $payload, $matches))
+                    {
+                        return FormDataHelpers::collectCheckboxValues($matches[2], $vars['formData']);
+                    }
+                }
+
+                return $result;
             }
             return $payload;
         }
@@ -89,6 +107,32 @@ class PayloadProcessor
     }
 
     /**
+     * Handles function calls like collectCheckboxValues("field_name")
+     *
+     * @param string $expression The expression containing the function call
+     * @param array $vars Variables for expression evaluation
+     * @return array The collected checkbox values
+     */
+    private function handleCheckboxFunction(string $expression, array $vars): array
+    {
+        // match -> `collectCheckboxValues("field_name")` // `collectCheckboxValues('field_name')`
+        if(preg_match('/collectCheckboxValues\(["\']([^"\']+)["\']\)/', $expression, $matches))
+        {
+            $fieldName = $matches[1];
+            return FormDataHelpers::collectCheckboxValues($fieldName, $vars['formData']);
+        }
+
+        // match -> `collectCheckboxValues($formData["field_name"])`
+        if(preg_match('/collectCheckboxValues\(\$formData\[(["\'])([^"\']+)\1\]\)/', $expression, $matches))
+        {
+            $fieldName = $matches[2];
+            return FormDataHelpers::collectCheckboxValues($fieldName, $vars['formData']);
+        }
+
+        return [];
+    }
+
+    /**
      * Normalizes XML parser output to always return an array
      * (XML parser returns single items as non-array values)
      *
@@ -97,13 +141,42 @@ class PayloadProcessor
      */
     public function normalizeToArray(mixed $value): array
     {
-        // If it's already an indexed array, return as-is
+        // if it's already an indexed array, return without modification
         if(is_array($value) && isset($value[0]))
         {
             return $value;
         }
 
-        // Otherwise wrap in an array
+        // otherwise, turn it into an array
         return [$value];
+    }
+
+    /**
+     * Heuristic to detect if a field name refers to a checkbox field
+     *
+     * @param string $expression The expression to check
+     * @param array $formData The form data
+     * @return bool True if this looks like a checkbox field
+     */
+    private function looksLikeCheckboxField(string $expression, array $formData): bool
+    {
+        // extract the field name from the `$formData["field_name"]` pattern
+        if(preg_match('/\$formData\[(["\'])([^"\']+)\1\]/', $expression, $matches))
+        {
+            $fieldName = $matches[2];
+            $prefix = $fieldName . '-';
+            $matchCount = 0;
+
+            foreach(array_keys($formData) as $key)
+            {
+                if(str_starts_with($key, $prefix))
+                {
+                    $matchCount++;
+                    if($matchCount >= 2) return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

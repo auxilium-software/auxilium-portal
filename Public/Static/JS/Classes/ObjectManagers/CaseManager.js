@@ -313,4 +313,15 @@ class CaseManager extends BaseManager {
             return false;
         }
     }
+
+
+    async deleteCase(confirmFirst = true)
+    {
+        this.showError(`Not yet implemented - speak to the team about this one`);
+    }
+
+    async requestCloseCase(confirmFirst = true)
+    {
+        this.showError(`Not yet implemented - speak to the team about this one`);
+    }
 }

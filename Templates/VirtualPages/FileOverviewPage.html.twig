@@ -27,6 +27,7 @@
                 <div class="left-preferential-box">
                     {% if FileDetails.content_type starts with 'image' %}
                         <img src="data:{{ FileDetails.content_type }};base64,{{ FileDetails.contents|hex2bin|base64_encode }}"
+                        {# <img src="/files/{{ FileDetails.id }}/render" #}
                              alt="{{ FileDetails.filename }}"
                              style="max-width: 100%; height: auto;" />
                     {% else %}

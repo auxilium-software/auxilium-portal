@@ -1,0 +1,35 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "all cases" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/system">{{ "System" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/system/test-email">{{ "Test Email" | translate }}</a>
+            </div>
+
+            <h1>{{ "Test Email" | translate }}</h1>
+
+            <div class="separator"></div>
+
+            <div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', async function() {
+                        const api = new APIInteractions();
+                        api.API_POST(
+                            '/api/v3/tests/test-email',
+                            {
+
+                            },
+                            true
+                        );
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+{% endblock %}

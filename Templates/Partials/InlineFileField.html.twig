@@ -9,6 +9,7 @@
                 </span>
                 <span id="{{ _fieldID }}-A"></span>
             </a>
+            <span id="{{ _fieldID }}-A-RemoveButton"></span>
         </h3>
         <div class="small-spacer"></div>
         <dl>
@@ -19,12 +20,23 @@
             </span>
             <span id="{{ _fieldID }}-B"></span>
         </a>
+        <span id="{{ _fieldID }}-B-RemoveButton"></span>
     {% endif %}
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
+            const fileController = new FileController();
+
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}').textContent
-                    = (await (new FileController()).GetSingleFileFromAuxLFSURL('{{ _data }}'))['filename'];
+                    = (await fileController.GetSingleFileFromAuxLFSURL('{{ _data }}'))['filename'];
+
+            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
+                <a href="#"
+                    class="inline-icon link-off-icon"
+                    title="{{ "Delete File" | translate }}"
+                    onclick="{const fm = new FileManager('CASE', '{{ CaseDetails.id }}'); fm.removeFile('{{ _data }}', true).then(() => {window.location.reload();});}"
+                ></a>
+            `;
         });
     </script>
 

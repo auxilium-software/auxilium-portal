@@ -32,7 +32,7 @@
                 <a href="#"
                     class="inline-icon link-off-icon"
                     title="{{ "Remove Person" | translate }}"
-                    onclick="{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.remove{% if _personType == 'CLIENT' %}Client{% else %}Worker{% endif %}('{{ _data }}', true).then(() => {window.location.reload();});}"
+                    onclick="{const cm = new CaseManager({{ CaseDetails.id }}'); cm.remove{% if _personType == 'CLIENT' %}Client{% else %}Worker{% endif %}('{{ _data }}', true).then(() => {window.location.reload();});}"
                 ></a>
             `;
         });

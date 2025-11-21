@@ -3,6 +3,7 @@
 namespace Auxilium\TwigHandling;
 
 use Auxilium\Enumerators\CookieKey;
+use Auxilium\Enumerators\SessionKey;
 use Auxilium\Exceptions\DatabaseConnectionException;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\SessionHandling\Session;
@@ -11,6 +12,7 @@ use Auxilium\TwigHandling\Extensions\CommonFunctions;
 use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\JWTUtilities;
 use Auxilium\Utilities\SecurityUtilities;
+use Auxilium\Utilities\SessionUtilities;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
@@ -44,8 +46,9 @@ class PageBuilder
         if($useAuth)
         {
             SecurityUtilities::RequireLogin();
-            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",  value: true);
-            $this->twig->addGlobal(name: "_IS_ADMIN_",      value: SecurityUtilities::IsAdmin());
+            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",                          value: true);
+            $this->twig->addGlobal(name: "_IS_ADMIN_",                              value: SecurityUtilities::IsAdmin());
+            $this->twig->addGlobal(name: "_CURRENTLY_LOGGED_IN_USER_FULL_NAME_",    value: SessionUtilities::Get(key: SessionKey::USER_DETAILS)['FullName']);
         }
         else
         {

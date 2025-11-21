@@ -135,8 +135,8 @@
                             <value>I have another problem</value>
                         </option>
                         <option>
-                            <primaryLabel>No, I do not believe I currently have any issues that I need help with </primaryLabel>
-                            <value>No, I do not believe I currently have any issues that I need help with </value>
+                            <primaryLabel>No, I do not believe I currently have any issues that I need help with</primaryLabel>
+                            <value>No, I do not believe I currently have any issues that I need help with</value>
                         </option>
                     </options>
                 </component>
@@ -273,10 +273,6 @@
                 </dictionary>
             </component>
 
-
-
-
-
             <component>
                 <type>SUBHEADING</type>
                 <value>Your Details</value>
@@ -302,13 +298,9 @@
                 </dictionary>
             </component>
 
-
-
-
-
             <component>
                 <type>SUBHEADING</type>
-                <value>Do any of the below apply you you?</value>
+                <value>Issues That Apply</value>
                 <jumpToPage>do_any_of_the_below_apply_to_you</jumpToPage>
                 <if>true</if>
             </component>
@@ -316,12 +308,12 @@
                 <type>DESCRIPTION_LIST</type>
                 <if>true</if>
                 <dictionary>
+                    <item>
+                        <key>Do any of the below apply to you?</key>
+                        <value>do_any_of_the_below_apply_to_you</value>
+                    </item>
                 </dictionary>
             </component>
-
-
-
-
 
             <component>
                 <type>SUBHEADING</type>
@@ -344,14 +336,10 @@
                 </dictionary>
             </component>
 
-
-
-
-
             <component>
                 <type>SUBHEADING</type>
-                <value>Did you know that these are all considered legal issues you could get legal advice for?</value>
-                <jumpToPage>did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for</jumpToPage>
+                <value>Awareness</value>
+                <jumpToPage>did_you_know</jumpToPage>
                 <if>true</if>
             </component>
             <component>
@@ -359,7 +347,7 @@
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>Did you know?</key>
+                        <key>Did you know that all of these are considered legal issues you could get legal advice for?</key>
                         <value>$formData["did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for"]</value>
                     </item>
                     <item>
@@ -369,13 +357,9 @@
                 </dictionary>
             </component>
 
-
-
-
-
             <component>
                 <type>SUBHEADING</type>
-                <value>Issue Details</value>
+                <value>Next Steps</value>
                 <jumpToPage>issue_details</jumpToPage>
                 <if>true</if>
             </component>
@@ -400,13 +384,29 @@
 
 
 
-
     <submissionActions>
         <apiRequest>
             <executeIf>true</executeIf>
             <endpoint>/surveys/screening-unmet-legal-needs-in-veterans-for-professionals-and-caseworkers</endpoint>
             <method>POST</method>
             <payload>
+                <name_of_organisation>$formData["name_of_organisation_referring"]</name_of_organisation>
+                <start_date>$formData["when_did_you_first_start_to_have_help_from_referring_organisation"]</start_date>
+                <drop_in_location>$formData["are_you_completing_this_form_as_part_of_a_drop_in"]</drop_in_location>
+
+                <year_of_birth>$formData["your_year_of_birth"]</year_of_birth>
+                <gender>$formData["your_gender"]</gender>
+                <employed>$formData["are_you_employed"]</employed>
+
+                <issues_that_apply>$formData["do_any_of_the_below_apply_to_you"]</issues_that_apply>
+
+                <when_issues_started>$formData["when_did_the_issues_start"]</when_issues_started>
+                <had_legal_advice>$formData["have_you_had_legal_advice_on_the_issue"]</had_legal_advice>
+
+                <knew_about_legal_issues>$formData["did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for"]</knew_about_legal_issues>
+                <which_didnt_know>$formData["if_you_said_no_which_ones_didnt_you_know_counted_as_potential_legal_issues"]</which_didnt_know>
+
+                <wants_legal_charity_help>$formData["would_you_like_to_talk_in_confidence_with_a_legal_charity_about_it_free_of_charge"]</wants_legal_charity_help>
             </payload>
         </apiRequest>
     </submissionActions>
