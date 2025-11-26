@@ -1,20 +1,16 @@
 <?php
 
+use Symfony\Component\Yaml\Yaml;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 
 echo("reading...");
-$allTranslations = json_decode(
-    json: file_get_contents(
-              filename: __DIR__ . '/../Configuration/Localisation/AllTranslations.json'
-          ),
-    associative: true
-);
+$allTranslations = Yaml::parse(file_get_contents(__DIR__ . '/../Configuration/Localisation/AllTranslations.yaml'));
 
 echo("building...");
 $languagePacks = [
     "cy-GB",
-    "zh"
 ];
 
 $builder = [];
