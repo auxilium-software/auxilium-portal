@@ -30,11 +30,13 @@
                             <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
+                        <!--
                         <option>
                             <primaryLabel>I am referring someone.</primaryLabel>
                             <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
+                        -->
                     </options>
                 </component>
             </components>
@@ -403,7 +405,7 @@
             <method>POST</method>
             <payload>
                 <title>$formData["case_title"]</title>
-                <description>$formData["description"]</description>
+                <description>$formData["case_description"]</description>
             </payload>
         </apiRequest>
         <apiRequest>

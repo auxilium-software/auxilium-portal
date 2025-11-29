@@ -30,11 +30,13 @@
                             <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
+                        <!--
                         <option>
                             <primaryLabel>I am referring someone.</primaryLabel>
                             <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
+                        -->
                     </options>
                 </component>
             </components>
@@ -310,7 +312,7 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>login_details</id>
-            <title>Login details</title>
+            <title>Create your Login details</title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
@@ -320,11 +322,46 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <primaryLabel>Email Address</primaryLabel>
                 </component>
                 <component>
+                    <id>email_address_confirm</id>
+                    <type>EMAIL_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Confirm Email Address</primaryLabel>
+                </component>
+                <component>
                     <id>raw_password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
                     <primaryLabel>Password</primaryLabel>
                 </component>
+                <component>
+                    <id>raw_password_confirm</id>
+                    <type>PASSWORD_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Confirm Password</primaryLabel>
+                </component>
+            </components>
+        </page>
+
+
+
+
+
+        <page>
+            <id>email_addresses_not_equal</id>
+            <title>Email addresses do not match.</title>
+            <description>Please ensure you enter the same email address into both fields.</description>
+            <renderIf>not(equals($formData["email_address"],$formData["email_address_confirm"]))</renderIf>
+            <abandonForm>true</abandonForm>
+            <components>
+            </components>
+        </page>
+        <page>
+            <id>passwords_not_equal</id>
+            <title>Passwords do not match.</title>
+            <description>Please ensure you enter the same password into both fields.</description>
+            <renderIf>not(equals($formData["raw_password"],$formData["raw_password_confirm"]))</renderIf>
+            <abandonForm>true</abandonForm>
+            <components>
             </components>
         </page>
 

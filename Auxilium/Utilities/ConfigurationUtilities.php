@@ -61,7 +61,7 @@ class ConfigurationUtilities
 
     public static function GetFormDefinition(string $target): array
     {
-        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".auxform.xml");
+        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
         $temp = new SimpleXMLElement($temp);
         $temp = json_decode(json_encode($temp), true);
 
