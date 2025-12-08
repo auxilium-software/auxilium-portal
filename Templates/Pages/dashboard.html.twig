@@ -11,8 +11,8 @@
             </div>
 
             <h1>
-                {{ "Good {time_period}, {username}"|translate({
-                    '{time_period}': "afternoon"|translate,
+                {{ "{greeting}, {username}"|translate({
+                    '{greeting}': ("Good "~TimePeriod)|translate,
                     '{username}': "Cerys",
                 })|raw }}
             </h1>
