@@ -12,8 +12,22 @@ try
 {
     SecurityUtilities::RequireLogin();
 
+    $hour = (int)date('H');
+    if ($hour >= 0 && $hour < 12)
+    {
+        $timePeriod = "morning";
+    }
+    elseif ($hour >= 12 && $hour < 17)
+    {
+        $timePeriod = "afternoon";
+    }
+    else
+    {
+        $timePeriod = "evening";
+    }
+
     PageBuilder::AutoRender(variables: [
-        "is_admin" => SecurityUtilities::IsAdmin(),
+        "TimePeriod" => $timePeriod,
     ]);
 }
 catch(Exception $e)
