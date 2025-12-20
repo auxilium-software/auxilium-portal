@@ -25,14 +25,18 @@
                 <div id="main-content" class="reference-element"></div>
 
                 <div class="left-preferential-box">
-                    {% if FileDetails.content_type starts with 'image' %}
-                        <img src="data:{{ FileDetails.content_type }};base64,{{ FileDetails.contents|hex2bin|base64_encode }}"
-                        {# <img src="/files/{{ FileDetails.id }}/render" #}
+                    {% if FileDetails.contentType starts with 'image' %}
+                        <img src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render"
                              alt="{{ FileDetails.filename }}"
                              style="max-width: 100%; height: auto;" />
+                    {% elseif FileDetails.contentType starts with 'video' %}
+                        <video width="auto" height="500" controls>
+                            <source src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render">
+                            Your browser does not support the video tag.
+                        </video>
                     {% else %}
                         <p>{{ "Preview not available for this file type" | translate }}</p>
-                        <p>{{ "File type" | translate }}: {{ FileDetails.content_type }}</p>
+                        <p>{{ "File type" | translate }}: {{ FileDetails.contentType }}</p>
                     {% endif %}
                 </div>
 
@@ -46,10 +50,10 @@
                         <dd>{{ (FileDetails.size / 1024)|round(2) }} KB</dd>
 
                         <dt>{{ "Content type" | translate }}:</dt>
-                        <dd>{{ FileDetails.content_type }}</dd>
+                        <dd>{{ FileDetails.contentType }}</dd>
 
                         <dt>{{ "Uploaded at" | translate }}:</dt>
-                        <dd>{{ FileDetails.uploaded_at|date('Y-m-d H:i:s') }}</dd>
+                        <dd>{{ FileDetails.createdAt|date('Y-m-d H:i:s') }}</dd>
 
                         <dt>{{ "Uploaded by" | translate }}:</dt>
                         <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.uploaded_by} %}</dd>

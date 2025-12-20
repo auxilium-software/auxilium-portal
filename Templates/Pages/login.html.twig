@@ -16,12 +16,12 @@
             </div>
 
             <form method="POST" id="LoginForm">
-                <label for="email_address">{{ "Email Address"|translate }} <span class="asterisk-hidden-text">({{ "required"|translate }})</span></label>
+                <label for="email_address">{{ "Email Address"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
                 <input type="text" name="email_address" placeholder="{{ "Email Address"|translate }}" id="email_address" />
                 <p id="ErrorReadout-EmailAddress" class="error-toast" style="display:none;">
                 </p>
 
-                <label for="raw_password">{{ "Password"|translate }} <span class="asterisk-hidden-text">({{ "required"|translate }})</span></label>
+                <label for="raw_password">{{ "Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
                 <input type="password" name="raw_password" placeholder="{{ "Password"|translate }}" id="raw_password" />
                 <p id="ErrorReadout-Password" class="error-toast" style="display:none;">
                 </p>

@@ -16,7 +16,7 @@
 
             <h1>
                 <span class="inline-icon-shift-left inline-icon-low-margin cases-icon" title="User account"></span>
-                {{ "Case Overview" | translate }}
+                {{ CaseDetails.title }}
             </h1>
 
             <div class="separator"></div>
@@ -29,22 +29,40 @@
                     <div class="marked-section">
                         <h2>{{ "Case Description" | translate }}</h2>
                         <br>
-                        {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description} %}
+                        {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description, '_editJS': '{const cm = new CaseManager("' ~ CaseDetails.id ~'"); cm.modifyCaseDescription();}' } %}
                     </div>
 
-                     <div class="marked-section">
+                    <div class="marked-section">
                         <h2>
                             {{ "Properties" | translate }}
-                            <a href="javascript:{let win = new NewPropertyPopup('PLAIN_TEXT', '/api/v3/cases/{{ CaseDetails.id }}/additional_properties/*' ,true);document.getElementById('main-content').after(win.render());win.focus();win.onSuccess(() => {window.location.reload()})}"
-                               class="inline-icon add-icon"
+                            <a href="javascript:void(0)"
+                               class="inline-icon add-icon add-property-trigger"
+                               data-type="PLAIN_TEXT"
+                               data-resource="/api/v3/cases/{{ CaseDetails.id }}/additional_properties/*"
                                title="{{ "Add Entry" | translate }}"
                             ></a>
+                            <script>
+                                document.addEventListener('click', async (e) => {
+                                    const trigger = e.target.closest('.add-property-trigger');
+                                    if (!trigger) return;
+
+                                    e.preventDefault();
+
+                                    const type = trigger.dataset.type;
+                                    const resource = trigger.dataset.resource;
+
+                                    const win = await NewPropertyPopup.create(type, resource, true);
+                                    document.getElementById('main-content').after(win.render());
+                                    win.focus();
+                                    win.onSuccess(() => window.location.reload());
+                                });
+                            </script>
                         </h2>
                         <br />
                         <dl id="properties-list">
                             {% for property_name, property_data in CaseDetails.additional_properties %}
                                 {% if not (property_name in hidden_props) %}
-                                    <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name)|translate }}</dt>
+                                    <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name) }}</dt>
                                     <dd data-property-key="{{ property_name }}">
                                         <span class="property-content">{{ property_data.content }}</span>
                                         <a class="edit-icon inline-icon"
@@ -177,7 +195,7 @@
                             {% for workerDetails in CaseDetails.workers %}
                                 {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
                             {% else %}
-                                <li><em>Case Worker list empty</em></li>
+                                <li><em>{{ "Case Worker list empty"|translate }}</em></li>
                             {% endfor %}
                             {% set inline_node_expanded = false %}
                         </ul>
@@ -185,12 +203,34 @@
 
                     <div class="marked-section">
                         <h2>{{ "Case Management" | translate }}</h2><br />
-                        {% if "DELETE" in node.permissions %}
-                            <a class="action-link action-link-delete" href="/graph/{{ primary_string_path | raw }}/@delete_confirm?{{ url_metadata }}">{{ "Delete Case" | translate }}</a><br />
+                        {% if _IS_ADMIN_ %}
+
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.deleteCase();}" class="action-link action-link-delete">
+                                {{ "Delete Case" | translate }}
+                            </a>
+                            <br />
                         {% endif %}
-                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@references?{{ url_metadata }}">{{ "See References" | translate }}</a>
+                        <a class="navigational-link" href="/map?document-type=CASE&document-id={{ CaseDetails.id }}">{{ "See References" | translate }}</a>
                         <br>
-                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
+                        <a class="navigational-link" href="/cases/{{ CaseDetails.id }}/pdf">{{ "Generate PDF" | translate }}</a>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>{{ "Files" | translate }}
+                            <a href="javascript:{const cm = new FileManager('CASE', '{{ CaseDetails.id }}'); cm.showUploadModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add File" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% for fileDetails in CaseDetails.files %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
+                            {% else %}
+                                <li><em>{{ "File list empty"|translate }}</em></li>
+                            {% endfor %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
                     </div>
 
                     <div class="marked-section">
