@@ -1,11 +1,11 @@
 
 class CookieUtilities
 {
-    static setCookie(name, value, days)
+    static setCookie(name, value, minutes)
     {
         try {
             const expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (days * 24 * 60 * 60 * 1000));
+            expirationDate.setTime(expirationDate.getTime() + (minutes * 60 * 1000));
 
             const cookieAttributes = [
                 `${name}=${encodeURIComponent(value)}`,
