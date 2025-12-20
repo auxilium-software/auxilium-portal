@@ -6,11 +6,11 @@ class FileManager extends BaseManager {
 
         if (this.documentType === "CASE")
         {
-            this.basePath = `/api/v3/cases/${this.documentID}/upload`;
+            this.basePath = `/api/v3/cases/${this.documentID}/files`;
         }
         else if (this.documentType === "USER")
         {
-            this.basePath = `/api/v3/users/${this.documentID}/upload`;
+            this.basePath = `/api/v3/users/${this.documentID}/files`;
         }
         else
         {
@@ -220,7 +220,7 @@ class FileManager extends BaseManager {
             }
             else
             {
-                setTimeout(() => window.location.reload(), 500);
+                window.location.reload();
             }
 
         }
@@ -234,7 +234,7 @@ class FileManager extends BaseManager {
         }
     }
 
-    async removeFile(fileId, confirmFirst = true)
+    async removeFile(auxLFSURL, confirmFirst = true)
     {
         if (confirmFirst && !confirm('Delete this file? This action cannot be undone.'))
         {
@@ -243,11 +243,13 @@ class FileManager extends BaseManager {
 
         try
         {
-            await this.makeRequest('DELETE', `${this.basePath}/${fileId}`);
+            const fileID = (new FileController()).ExtractFileIDFromAuxLFSURL(auxLFSURL);
+
+            await this.makeRequest('DELETE', `/files/${fileID}`);
             this.showSuccess('File deleted');
 
             // remove from local cache
-            this.files = this.files.filter(f => f.id !== fileId);
+            this.files = this.files.filter(f => f.id !== fileID);
 
             return true;
         }
@@ -258,11 +260,13 @@ class FileManager extends BaseManager {
         }
     }
 
-    async downloadFile(fileId, fileName)
+    async downloadFile(auxLFSURL, fileName)
     {
         try
         {
-            const downloadUrl = `${this.basePath}/${fileId}/download`;
+            const fileID = (new FileController()).ExtractFileIDFromAuxLFSURL(auxLFSURL);
+
+            const downloadUrl = `/files/${fileID}/download`;
 
             // create temp link and trigger download
             const link = document.createElement('a');
@@ -282,18 +286,20 @@ class FileManager extends BaseManager {
         }
     }
 
-    async updateFileDescription(fileId, newDescription)
+    async updateFileDescription(auxLFSURL, newDescription)
     {
         try
         {
-            const response = await this.makeRequest('PATCH', `${this.basePath}/${fileId}`, {
+            const fileID = (new FileController()).ExtractFileIDFromAuxLFSURL(auxLFSURL);
+
+            const response = await this.makeRequest('PATCH', `/files/${fileID}`, {
                 description: newDescription
             });
 
             this.showSuccess('File description updated');
 
             // update local cache
-            const file = this.files.find(f => f.id === fileId);
+            const file = this.files.find(f => f.id === fileID);
             if (file)
             {
                 file.description = newDescription;

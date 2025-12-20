@@ -4,7 +4,7 @@
 
     {% if _INLINE_NODE_EXPANDED_ %}
         <h3 class="low-margin-heading">
-            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/files/{{ _data|extract_file_id_from_auxlfs_url }}">
+            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/cases/{{ CaseDetails.id }}/files/{{ _data|extract_file_id_from_auxlfs_url }}">
                 <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
                 </span>
                 <span id="{{ _fieldID }}-A"></span>
@@ -15,7 +15,7 @@
         <dl>
         </dl>
     {% else %}
-        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/files/{{ _data|extract_file_id_from_auxlfs_url }}">
+        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/cases/{{ CaseDetails.id }}/files/{{ _data|extract_file_id_from_auxlfs_url }}">
             <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
             </span>
             <span id="{{ _fieldID }}-B"></span>
@@ -28,7 +28,7 @@
             const fileController = new FileController();
 
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}').textContent
-                    = (await fileController.GetSingleFileFromAuxLFSURL('{{ _data }}'))['filename'];
+                    = (await fileController.GetSingleFileFromAuxLFSURL('CASE', '{{ CaseDetails.id }}', '{{ _data }}'))['filename'];
 
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
                 <a href="#"

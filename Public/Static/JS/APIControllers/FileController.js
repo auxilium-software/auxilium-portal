@@ -17,12 +17,12 @@ class FileController {
         return uuidMatch[0];
     }
 
-    async GetSingleFileFromAuxLFSURL(auxLFSURL)
+    async GetSingleFileFromAuxLFSURL(parentType, parentId, auxLFSURL)
     {
         const fileID = this.ExtractFileIDFromAuxLFSURL(auxLFSURL);
 
         const [statusCode, payload] = await this.#APIInstance.API_GET(
-            `/api/v3/files/${fileID}`,
+            parentType === "CASE" ? `/api/v3/cases/${parentId}/files/${fileID}` : `/api/v3/users/${parentId}/files/${fileID}`,
             true,
         );
 

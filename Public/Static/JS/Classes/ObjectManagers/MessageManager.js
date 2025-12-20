@@ -78,7 +78,7 @@ class MessageManager extends BaseManager {
         const formData = {
             subject: document.getElementById('message-subject').value.trim(),
             content: document.getElementById('message-content').value.trim(),
-            is_urgent: document.getElementById('message-urgent').checked
+            isUrgent: document.getElementById('message-urgent').checked
         };
 
         if (!formData.subject)

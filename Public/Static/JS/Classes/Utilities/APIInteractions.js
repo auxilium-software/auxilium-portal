@@ -42,7 +42,7 @@ class APIInteractions
                 }
 
                 const data = await response.json();
-                CookieUtilities.setCookie("access_token", data.access_token, 30);
+                CookieUtilities.setCookie("access_token", data.accessToken, 30);
 
                 return true;
             }
@@ -120,7 +120,8 @@ class APIInteractions
         const response = await fetch(`${API_BASE_URL}${target}`, {
             method: 'POST',
             headers: {
-                "Authorization": "Bearer " + API_KEY,
+                "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),
+                "credentials": 'include',
             },
             body: formData,
             credentials: 'include'

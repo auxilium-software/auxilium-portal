@@ -13,14 +13,20 @@ try
 {
     SecurityUtilities::RequireLogin();
 
+    $parentType = explode("/", $_SERVER['REQUEST_URI'])[1];
+    $parentId = URIParsingUtilities::GetUUIDFromURI(index: 0);
+    $fileId = URIParsingUtilities::GetUUIDFromURI(index: 2);
+
     $fileData = APIInteractions::Get(
-        endpoint: '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+        endpoint: "/$parentType/" . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 1),
     )->Payload;
 
     PageBuilder::Render(
         template: '/VirtualPages/FileOverviewPage.html.twig',
         variables: [
             "is_admin" => SecurityUtilities::IsAdmin(),
+            "ParentType" => $parentType,
+            "ParentId" => $parentId,
             "FileDetails" => $fileData,
         ]
     );

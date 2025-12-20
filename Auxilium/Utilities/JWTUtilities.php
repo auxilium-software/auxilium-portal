@@ -20,17 +20,17 @@ class JWTUtilities
      */
     public static function GetJwtInfo(): JWTPayload
     {
-        if (!isset($_COOKIE['access_token']) && !isset($_COOKIE['refresh_token']))
+        if (!isset($_COOKIE[CookieKey::ACCESS_TOKEN->value]) && !isset($_COOKIE[CookieKey::REFRESH_TOKEN->value]))
         {
             NavigationUtilities::Redirect(target: '/login');
         }
 
-        if (!isset($_COOKIE['access_token']))
+        if (!isset($_COOKIE[CookieKey::ACCESS_TOKEN->value]))
         {
             return self::refreshAccessToken();
         }
 
-        return self::decodeAccessToken($_COOKIE['access_token']);
+        return self::decodeAccessToken($_COOKIE[CookieKey::ACCESS_TOKEN->value]);
     }
 
     /**
@@ -42,7 +42,7 @@ class JWTUtilities
     {
         $response = APIInteractions::Post(
             endpoint: '/authentication/refresh',
-            payload: ['refresh_token' => $_COOKIE['refresh_token']],
+            payload: ['refreshToken' => $_COOKIE[CookieKey::REFRESH_TOKEN->value]],
             requireAuth: false
         );
 
@@ -50,10 +50,10 @@ class JWTUtilities
             NavigationUtilities::Redirect(target: '/login');
         }
 
-        CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response->Payload['access_token']);
-        CookieHandling::SetCookie(CookieKey::REFRESH_TOKEN, $response->Payload['refresh_token']);
+        CookieHandling::SetCookie(CookieKey::ACCESS_TOKEN, $response->Payload['accessToken']);
+        CookieHandling::SetCookie(CookieKey::REFRESH_TOKEN, $response->Payload['refreshToken']);
 
-        return self::decodeAccessToken($response->Payload['access_token']);
+        return self::decodeAccessToken($response->Payload['accessToken']);
     }
 
     /**

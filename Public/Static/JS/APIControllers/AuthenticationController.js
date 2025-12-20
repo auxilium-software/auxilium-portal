@@ -10,14 +10,15 @@ class AuthenticationController {
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             "/api/v3/authentication/login",
             {
-                "email_address": emailAddress,
-                "raw_password": rawPassword,
-                "recaptcha_token": recaptchaToken
+                "emailAddress": emailAddress,
+                "rawPassword": rawPassword,
+                "recaptchaToken": recaptchaToken
             },
             false,
         );
-        if(statusCode == 200)
+        if(statusCode === 200)
         {
+            console.log(payload);
             return payload;
         }
         else

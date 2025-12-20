@@ -13,13 +13,19 @@ class APIResponsePayload
     public int $StatusCode;
 
     /**
-     * @var array The response payload as an array.
+     * @var array Any headers returned from the request.
      */
-    public array $Payload;
+    public array $Headers;
 
-    public function __construct(int $StatusCode, array $Payload)
+    /**
+     * @var array|string The response payload as an array.
+     */
+    public array|string $Payload;
+
+    public function __construct(int $statusCode, array $headers, array|string $payload)
     {
-        $this->StatusCode = $StatusCode;
-        $this->Payload = $Payload;
+        $this->StatusCode = $statusCode;
+        $this->Headers = $headers;
+        $this->Payload = $payload;
     }
 }

@@ -5,6 +5,7 @@ namespace Auxilium\Utilities;
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\ServiceInteractions\APIInteractions;
 use Exception;
+use phpDocumentor\Compiler\ApiDocumentation\Pass\VarTagModifier;
 use RuntimeException;
 
 /**
@@ -77,14 +78,14 @@ class SecurityUtilities
      */
     private static function fetchAndCacheUserDetails(): array
     {
-        $response = APIInteractions::Get(endpoint: '/users/me');
+        $response = APIInteractions::Get(endpoint: '/me');
 
         $userDetails = [
             'LastUpdatedAt' => time(),
             'UserID'        => $response->Payload['id'],
-            'EmailAddress'  => $response->Payload['email_address'],
-            'FullName'      => $response->Payload['full_name'],
-            'IsAdmin'       => $response->Payload['is_admin'],
+            'EmailAddress'  => $response->Payload['emailAddress'],
+            'FullName'      => $response->Payload['fullName'],
+            'IsAdmin'       => $response->Payload['isAdmin'],
         ];
 
         SessionUtilities::Set(SessionKey::USER_DETAILS, $userDetails);

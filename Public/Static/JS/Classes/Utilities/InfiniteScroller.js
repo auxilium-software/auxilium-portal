@@ -24,6 +24,7 @@ class InfiniteScroller
         this.#params = config.params || {};
         this.#renderFunction = config.renderItem || this.#defaultRenderItem.bind(this);
         this.pageSize = config.pageSize || 8;
+        this.dataField = config.dataField;
 
         this.#apiClient = new APIInteractions();
 
@@ -111,7 +112,8 @@ class InfiniteScroller
                 throw new Error(data || 'Request failed');
             }
 
-            const items = data.data;
+
+            const items = data[this.dataField];
             const totalPages = data.total_pages || data.pages || data.meta?.total_pages;
             const totalItems = data.total || data.meta?.total;
 

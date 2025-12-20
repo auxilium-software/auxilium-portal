@@ -58,6 +58,7 @@ class APIInteractions
             $headers[] = 'Authorization: Bearer ' . $accessToken;
         }
 
+        // Add cookie header to send cookies with the request
         $cookieHeader = $this->buildCookieHeader();
         if ($cookieHeader) {
             $headers[] = $cookieHeader;
@@ -126,17 +127,48 @@ class APIInteractions
         }
     }
 
-    private function executeRequest(): APIResponsePayload
+    private function executeRequest(bool $decodeAsJSON = true): APIResponsePayload
     {
+        // Enable header capture
+        curl_setopt($this->CurlHandler, CURLOPT_HEADER, true);
+
         $response = curl_exec($this->CurlHandler);
 
         if ($response === false) {
             $error = curl_error($this->CurlHandler);
             curl_close($this->CurlHandler);
-            throw new Exception('cURL request failed: ' . $error);
+
+            PageBuilder::RenderInternalSystemError(new Exception($error));
+
         }
 
         $statusCode = curl_getinfo($this->CurlHandler, CURLINFO_HTTP_CODE);
+        $headerSize = curl_getinfo($this->CurlHandler, CURLINFO_HEADER_SIZE);
+
+        // Split headers and body
+        $headerString = substr($response, 0, $headerSize);
+        $body = substr($response, $headerSize);
+
+        // Parse headers into array
+        $headers = [];
+        foreach (explode("\r\n", $headerString) as $line) {
+            if (strpos($line, ':') !== false) {
+                list($key, $value) = explode(':', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+
+                // Store multiple values for same header (rare but possible)
+                if (isset($headers[$key])) {
+                    if (!is_array($headers[$key])) {
+                        $headers[$key] = [$headers[$key]];
+                    }
+                    $headers[$key][] = $value;
+                } else {
+                    $headers[$key] = $value;
+                }
+            }
+        }
+
         curl_close($this->CurlHandler);
 
         // Handle 401 Unauthorized - attempt token refresh
@@ -150,35 +182,45 @@ class APIInteractions
             $this->redirectToLogin();
         }
 
+        // If we already tried refreshing, or it's a different error
         if ($statusCode === 401) {
             $this->redirectToLogin();
         }
 
+        // Handle other HTTP errors
         if ($statusCode >= 400) {
-            error_log("API Error: Status $statusCode, Response: $response");
+            error_log("API Error: Status $statusCode, Response: $body");
         }
 
-        $responsePayload = json_decode($response, true);
+        if($decodeAsJSON)
+        {
+            $responsePayload = json_decode($body, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            PageBuilder::Render(
-                template: '/ErrorPages/APIError.html.twig',
-                variables: [
-                    'ErrorMessage' => json_last_error_msg(),
-                ],
-                useAuth: false,
-            );
-            exit;
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                PageBuilder::Render(
+                    template: '/ErrorPages/APIError.html.twig',
+                    variables: [
+                        'ErrorMessage' => json_last_error_msg(),
+                    ],
+                    useAuth: false,
+                );
+            }
+        }
+        else
+        {
+            $responsePayload = $body;
         }
 
         return new APIResponsePayload(
-            StatusCode: $statusCode,
-            Payload: $responsePayload ?? []
+            statusCode: $statusCode,
+            headers: $headers,
+            payload: $responsePayload ?? ""
         );
     }
 
     private function retryRequest(): APIResponsePayload
     {
+        // Create a new instance with fresh auth headers
         $retry = new self($this->requiresAuth);
         $retry->setTarget($this->lastEndpoint);
         $retry->setMethod($this->lastMethod);
@@ -200,20 +242,20 @@ class APIInteractions
 
             $response = self::Post(
                 endpoint: '/authentication/refresh',
-                payload: ['refresh_token' => $refreshToken],
+                payload: ['refreshToken' => $refreshToken],
                 requireAuth: false
             );
 
-            if ($response->StatusCode === 200 && isset($response->Payload['access_token'])) {
+            if ($response->StatusCode === 200 && isset($response->Payload['accessToken'])) {
                 CookieHandling::SetCookie(
                     CookieKey::ACCESS_TOKEN,
-                    $response->Payload['access_token']
+                    $response->Payload['accessToken']
                 );
 
-                if (isset($response->Payload['refresh_token'])) {
+                if (isset($response->Payload['refreshToken'])) {
                     CookieHandling::SetCookie(
                         CookieKey::REFRESH_TOKEN,
-                        $response->Payload['refresh_token']
+                        $response->Payload['refreshToken']
                     );
                 }
 
@@ -276,5 +318,21 @@ class APIInteractions
         $apiWrapper->setTarget($endpoint . $queryString);
         $apiWrapper->setMethod('GET');
         return $apiWrapper->executeRequest();
+    }
+
+    public static function GetRaw(string $endpoint, array $parameters = [], bool $requireAuth = true): APIResponsePayload
+    {
+        $queryString = '';
+
+        if (!empty($parameters)) {
+            $queryString = '?' . http_build_query($parameters);
+        }
+
+        $apiWrapper = new self($requireAuth);
+        $apiWrapper->setTarget($endpoint . $queryString);
+        $apiWrapper->setMethod('GET');
+        return $apiWrapper->executeRequest(
+            decodeAsJSON: false,
+        );
     }
 }

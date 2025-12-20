@@ -1,8 +1,6 @@
 <?php
 
-use Auxilium\Enumerators\CookieKey;
 use Auxilium\ServiceInteractions\APIInteractions;
-use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\SecurityUtilities;
 use Auxilium\Utilities\URIParsingUtilities;
@@ -13,15 +11,36 @@ try
 {
     SecurityUtilities::RequireLogin();
 
-    $fileData = APIInteractions::Get(
-        endpoint: '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
-    )->Payload;
+    $parentType = explode("/", $_SERVER['REQUEST_URI'])[1];
+    $parentId = URIParsingUtilities::GetUUIDFromURI(index: 0);
+    $fileId = URIParsingUtilities::GetUUIDFromURI(index: 1);
 
-    $mimeType = $fileData['content_type'];
-    $blobData = $fileData['contents'];
+    $response = APIInteractions::GetRaw(
+        endpoint: "/{$parentType}/{$parentId}/files/{$fileId}/render",
+    );
 
-    header("Content-Type: $mimeType; charset=utf-8");
-    echo $blobData;
+    http_response_code($response->StatusCode);
+
+    $headersToForward = [
+        'content-type',
+        'content-length',
+        'content-disposition',
+        'cache-control',
+    ];
+
+    foreach ($headersToForward as $headerName)
+    {
+        if (isset($response->Headers[$headerName]))
+        {
+            $value = is_array($response->Headers[$headerName])
+                ? $response->Headers[$headerName][0]
+                : $response->Headers[$headerName];
+
+            header("{$headerName}: {$value}");
+        }
+    }
+
+    echo $response->Payload;
     die();
 }
 catch(Exception $e)

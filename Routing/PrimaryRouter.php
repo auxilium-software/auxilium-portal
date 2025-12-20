@@ -32,12 +32,16 @@ if (is_file($rawFile))
 
 // 4. Custom regex routes
 $routes = [
-    "#^/form/"  . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/form.php',
-    "#^/files/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/file-overview.php',
-    "#^/files/" . UUIDUtilities::$Regex . '/render$#'                               => __DIR__ . '/../RoutedPages/file-render.php',
-    "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'  => __DIR__ . '/../RoutedPages/todo-overview.php',
-    "#^/cases/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/case-overview.php',
-    "#^/users/" . UUIDUtilities::$Regex . '$#'                                      => __DIR__ . '/../RoutedPages/user-overview.php',
+    "#^/form/"  . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/form.php',
+
+    "#^/cases/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/case-overview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/todo-overview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/file-overview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/file-render.php',
+
+    "#^/users/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/user-overview.php',
+    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/file-overview.php',
+    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/file-render.php',
 
     /*
     "/new"              => "$routedDir/new.php",

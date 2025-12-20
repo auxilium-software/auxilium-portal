@@ -20,12 +20,12 @@ class UserController {
             );
             if(statusCode === 200)
             {
-                for (const temp of payload['data'])
+                for (const temp of payload['users'])
                 {
                     allUsers.push(temp);
                 }
                 pageNumber ++;
-                if(payload['has_more'] !== true)
+                if(payload['hasMore'] !== true)
                 {
                     break;
                 }

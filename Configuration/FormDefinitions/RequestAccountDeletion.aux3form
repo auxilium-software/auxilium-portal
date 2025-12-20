@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<auxForm>
+    <id>RequestAccountDeletion</id>
+    <title>Request Account Deletion</title>
+    <subtitle>This form will guide you through requesting the deletion of your account.</subtitle>
+    <useReCAPTCHA>true</useReCAPTCHA>
+    <requireAuthentication>true</requireAuthentication>
+
+
+
+
+
+    <pages>
+        <page>
+            <id>reason</id>
+            <title>Reason</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>reason</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>4</rows>
+                    <required>false</required>
+                    <primaryLabel>Reason (optional)</primaryLabel>
+                </component>
+            </components>
+        </page>
+    </pages>
+
+
+
+
+    <reviewPage>
+        <components>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>Old Password</key>
+                        <value>[REDACTED]</value>
+                    </item>
+                </dictionary>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>New Password</key>
+                        <value>[REDACTED]</value>
+                    </item>
+                </dictionary>
+            </component>
+        </components>
+    </reviewPage>
+
+
+
+
+
+
+
+
+
+
+    <submissionActions>
+        <apiRequest>
+            <executeIf>true</executeIf>
+            <endpoint>/me/request-account-deletion</endpoint>
+            <method>POST</method>
+            <payload>
+                <reason>$formData["reason"]</reason>
+            </payload>
+        </apiRequest>
+    </submissionActions>
+    <afterSubmissionRedirect>
+        <target>/me</target>
+    </afterSubmissionRedirect>
+</auxForm>

@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Provides custom Twig filters for handling various application-specific functionalities.
- */
 
 namespace Auxilium\TwigHandling\Extensions;
 
@@ -107,7 +104,7 @@ class CommonFilters extends AbstractExtension
         // \?size=\d+ - size parameter with digits
         // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
 
-        $pattern = '/^auxlfs:\/\/%%default%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]{40}$/';
+        $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]+$/';
 
         return preg_match($pattern, $string) === 1;
     }
@@ -117,14 +114,14 @@ class CommonFilters extends AbstractExtension
         // auxmsg://%%couchdb%%/ - literal prefix
         // [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12} - UUID format
 
-        $pattern = '/^auxmsg:\/\/%%default%%\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
+        $pattern = '/^auxmsg:\/\/localhost\/message\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
     }
 
     public function extract_file_id_from_auxlfs_url(string $string): string
     {
-        $pattern = '/^auxlfs:\/\/%%default%%\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]{40}$/';
+        $pattern = '/^auxlfs:\/\/localhost\/file\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]+$/';
         preg_match($pattern, $string, $matches);
         return $matches[1] ?? '';
     }

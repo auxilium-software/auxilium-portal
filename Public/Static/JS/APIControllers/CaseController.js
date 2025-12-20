@@ -20,12 +20,12 @@ class CaseController {
             );
             if(statusCode === 200)
             {
-                for (const temp of payload['data'])
+                for (const temp of payload['cases'])
                 {
                     allCases.push(temp);
                 }
                 pageNumber ++;
-                if(payload['has_more'] !== true)
+                if(payload['hasMore'] !== true)
                 {
                     break;
                 }
@@ -54,12 +54,12 @@ class CaseController {
             );
             if(statusCode === 200)
             {
-                for (const temp of payload['data'])
+                for (const temp of payload['cases'])
                 {
                     allCases.push(temp);
                 }
                 pageNumber ++;
-                if(payload['has_more'] !== true)
+                if(payload['hasMore'] !== true)
                 {
                     break;
                 }
@@ -88,12 +88,12 @@ class CaseController {
             );
             if(statusCode === 200)
             {
-                for (const temp of payload['data'])
+                for (const temp of payload['cases'])
                 {
                     allCases.push(temp);
                 }
                 pageNumber ++;
-                if(payload['has_more'] !== true)
+                if(payload['hasMore'] !== true)
                 {
                     break;
                 }

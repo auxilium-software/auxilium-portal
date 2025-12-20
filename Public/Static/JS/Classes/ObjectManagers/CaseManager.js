@@ -182,7 +182,7 @@ class CaseManager extends BaseManager {
 
         const filteredUsers = this.users.filter(user => {
             const search = searchTerm.toLowerCase();
-            return user.full_name.toLowerCase().includes(search) || user.email_address.toLowerCase().includes(search);
+            return user.fullName.toLowerCase().includes(search) || user.emailAddress.toLowerCase().includes(search);
         });
 
         if (filteredUsers.length === 0) {
@@ -192,10 +192,10 @@ class CaseManager extends BaseManager {
 
         dropdown.innerHTML = filteredUsers.map(user => `
             <div class="user-dropdown-item" data-user-id="${user.id}" tabindex="0">
-                <div class="user-avatar">${this.getInitials(user.full_name)}</div>
+                <div class="user-avatar">${this.getInitials(user.fullName)}</div>
                 <div class="user-info">
-                    <div class="user-name">${user.full_name}</div>
-                    <div class="user-email">${user.email_address}</div>
+                    <div class="user-name">${user.fullName}</div>
+                    <div class="user-email">${user.emailAddress}</div>
                 </div>
             </div>
         `).join('');
@@ -206,7 +206,7 @@ class CaseManager extends BaseManager {
                 const user = this.users.find(u => u.id === userId);
                 if (user) {
                     this.selectUser(user);
-                    document.getElementById('person-search').value = user.full_name;
+                    document.getElementById('person-search').value = user.fullName;
                     dropdown.style.display = 'none';
                     this.showUserPreview(user);
                 }
@@ -238,9 +238,9 @@ class CaseManager extends BaseManager {
 
     showUserPreview(user) {
         const preview = document.getElementById('selected-user-preview');
-        document.getElementById('preview-avatar').textContent = this.getInitials(user.full_name);
-        document.getElementById('preview-name').textContent = user.full_name;
-        document.getElementById('preview-email').textContent = user.email_address;
+        document.getElementById('preview-avatar').textContent = this.getInitials(user.fullName);
+        document.getElementById('preview-name').textContent = user.fullName;
+        document.getElementById('preview-email').textContent = user.emailAddress;
         preview.style.display = 'block';
     }
 
@@ -262,7 +262,7 @@ class CaseManager extends BaseManager {
         try {
             const endpoint = type === 'client' ? `${this.basePath}/clients` : `${this.basePath}/workers`;
 
-            const response = await this.makeRequest('POST', endpoint, { user_id: personId });
+            const response = await this.makeRequest('POST', endpoint, { userId: personId });
 
             const personType = type === 'client' ? 'Client' : 'Case worker';
             this.showSuccess(`${personType} added successfully`);
@@ -314,6 +314,104 @@ class CaseManager extends BaseManager {
         }
     }
 
+
+    async modifyCaseDescription()
+    {
+        try {
+            const caseData = await this.makeRequest('GET', this.basePath);
+            const currentDescription = caseData.description || '';
+
+            const overlay = document.createElement('div');
+            overlay.className = 'ToDoCreatorModal-Overlay';
+
+            const modal = document.createElement('div');
+            modal.className = 'ToDoCreatorModal';
+
+            modal.innerHTML = `
+            <div class="ToDoCreatorModal-Header">
+                <h2>${await Localisation.translate("Modify Case Description")}</h2>
+                <p style="font-size: 0.9em; color: #666; margin-top: 0.5em;">
+                    ${await Localisation.translate("Update the description for this case.")}
+                </p>
+            </div>
+            
+            <form id="modify-description-form" class="ToDoCreatorModal-Body">
+                <div>
+                    <label>
+                        ${await Localisation.translate('Case Description')} <span class="asterisk-hidden-text">(${await Localisation.translate('required')})</span>
+                    </label>
+                    <textarea 
+                        id="case-description" 
+                        placeholder="Enter case description..." 
+                        required
+                        rows="6"
+                        style="width: 100%; padding: 0.75em; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; resize: vertical;"
+                    >${this.escapeHtml(currentDescription)}</textarea>
+                </div>
+
+                <div class="todo-modal-buttons">
+                    <button type="button" id="cancel-btn" class="button todo-cancel-btn">
+                        ${await Localisation.translate('Cancel')}
+                    </button>
+                    <button type="submit" id="save-btn" class="button todo-save-btn">
+                        ${await Localisation.translate('Save Changes')}
+                    </button>
+                </div>
+            </form>
+        `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            this.modalElement = overlay;
+
+            document.getElementById('cancel-btn').onclick = () => this.closeModal();
+            document.getElementById('modify-description-form').onsubmit = async (e) => {
+                e.preventDefault();
+
+                const description = document.getElementById('case-description').value.trim();
+
+                if (!description) {
+                    this.showError(await Localisation.translate('Please enter a description'));
+                    return;
+                }
+
+                const submitBtn = document.getElementById('save-btn');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = await Localisation.translate('Saving...');
+
+                try {
+                    await this.makeRequest('PATCH', this.basePath, { description: description });
+
+                    this.showSuccess(await Localisation.translate('Case description updated successfully.'));
+                    this.closeModal();
+
+                    if (this.onSuccess) {
+                        this.onSuccess();
+                    } else {
+                        setTimeout(() => window.location.reload(), 500);
+                    }
+
+                }
+                catch (error) {
+                    this.showError(await Localisation.translate('Failed to update description: {error_message}', {
+                        'error_message': error.message,
+                    }));
+
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            };
+            overlay.onclick = (e) => {
+                if (e.target === overlay) this.closeModal();
+            };
+
+            document.getElementById('case-description').focus();
+        }
+        catch (error) {
+            this.showError(await Localisation.translate('Failed to load case description'));
+        }
+    }
 
     async deleteCase(confirmFirst = true)
     {

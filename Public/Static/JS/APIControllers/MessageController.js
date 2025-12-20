@@ -5,7 +5,7 @@ class MessageController {
         this.#APIInstance = new APIInteractions();
     }
 
-    async GetSingleMessageFromAuxMSGURL(auxMSGURL)
+    async GetSingleMessageFromAuxMSGURL(caseID, auxMSGURL)
     {
         const uuidMatch = auxMSGURL.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
 
@@ -17,7 +17,7 @@ class MessageController {
         const fileID = uuidMatch[0];
 
         const [statusCode, payload] = await this.#APIInstance.API_GET(
-            `/api/v3/messages/${fileID}`,
+            `/api/v3/cases/${caseID}/messages/${fileID}`,
             true,
         );
 
