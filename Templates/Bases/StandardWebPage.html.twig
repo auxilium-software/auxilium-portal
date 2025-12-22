@@ -19,7 +19,7 @@
         <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
 
         <script>
-            const API_BASE_URL = "http://localhost:1983";
+            const API_BASE_URL = "{{ GetUserConfiguration("API", "AvailableAt") }}";
         </script>
         
         <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
