@@ -41,6 +41,12 @@ class APIInteractions
         curl_setopt($this->CurlHandler, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($this->CurlHandler, CURLOPT_TIMEOUT, 30);
 
+        if(ConfigurationUtilities::GetUserConfiguration()["Development"]["PHPAcceptSelfSignedCertificatesForAPI"] === true)
+        {
+            curl_setopt($this->CurlHandler, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($this->CurlHandler, CURLOPT_SSL_VERIFYHOST, false);
+        }
+
         $this->setHeaders();
     }
 
