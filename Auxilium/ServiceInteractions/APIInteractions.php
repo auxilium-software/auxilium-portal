@@ -24,7 +24,7 @@ class APIInteractions
 
     public static function GetBaseURL(): string
     {
-        return ConfigurationUtilities::GetUserConfiguration()['API']['URL'] . '/api/v3';
+        return ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'] . '/api/v3';
     }
 
     private function __construct(bool $requiresAuth = true)
