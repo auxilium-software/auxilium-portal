@@ -29,7 +29,7 @@
                 const infiniteScroller = new InfiniteScroller({
                     endpoint: '/api/v3/users',
                     params: {
-                        sort: 'created_at',
+                        sort: 'createdAt',
                         order: 'desc'
                     },
                     target: document.getElementById('AllUsersContainer'),
@@ -46,8 +46,8 @@
                         userDiv.innerHTML = `
                             <div class="case-header">
                                 <h3 class="case-title">
-                                    <a href="/users/${userItem.id || userItem.user_id}">
-                                        ${userItem.full_name || 'User #' + userItem.id}
+                                    <a href="/users/${userItem.id}">
+                                        ${userItem.fullName || 'User #' + userItem.id}
                                     </a>
                                 </h3>
                             </div>
