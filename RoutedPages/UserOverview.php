@@ -20,7 +20,6 @@ try
     PageBuilder::Render(
         template: '/VirtualPages/UserOverviewPage.html.twig',
         variables: [
-            "is_admin" => SecurityUtilities::IsAdmin(),
             "UserDetails" => $userData,
         ]
     );
