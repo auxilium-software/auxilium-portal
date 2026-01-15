@@ -19,9 +19,10 @@
                 <input type="text" id="CaseFilter-Search" placeholder="{{ 'search cases' | translate }}" class="search-input">
                 <select id="CaseFilter-Status" class="status-select">
                     <option value="">{{ 'All cases' | translate }}</option>
-                    <option value="OPEN">{{ 'Open cases only' | translate }}</option>
-                    <option value="CLOSED">{{ 'Closed cases only' | translate }}</option>
-                    <option value="PENDING">{{ 'Pending cases only' | translate }}</option>
+                    <option value="open">{{ 'Open cases only' | translate }}</option>
+                    <option value="closed">{{ 'Closed cases only' | translate }}</option>
+                    <option value="staging">{{ 'Staging cases only' | translate }}</option>
+                    <option value="archived">{{ 'Archived cases only' | translate }}</option>
                 </select>
                 <button id="apply-filters" class="button">{{ 'apply filters' | translate }}</button>
             </div>
@@ -68,7 +69,7 @@
                                 <div class="case-meta">
                                     <span class="case-date">
                                         <strong>{{ 'created' | translate }}:</strong>
-                                        ${new Date(caseItem.created_at).toLocaleDateString()}
+                                        ${new Date(caseItem.createdAt).toLocaleDateString()}
                                     </span>
                                     ${caseItem.priority ? `
                                         <span class="case-priority priority-${caseItem.priority.toLowerCase()}">
