@@ -2,6 +2,7 @@
 
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\Exceptions\DatabaseConnectionException;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\SecurityUtilities;
@@ -14,7 +15,7 @@ try
     SecurityUtilities::RequireLogin();
 
     PageBuilder::AutoRender(variables: [
-        "is_admin" => SecurityUtilities::IsAdmin(),
+        "AboutMe" => APIInteractions::Get(endpoint: '/me')->Payload
     ]
     );
 }
