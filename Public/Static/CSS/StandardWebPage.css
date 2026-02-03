@@ -59,9 +59,10 @@
 
     --error-color: #cc2200;
     --error-color-contrast: #ffffff;
-
     --warning-color: #ffaa00;
     --warning-color-contrast: #000000;
+    --information-color: #007adc;
+    --information-color-contrast: #000000;
 
     --positive-badge-color: #336600;
     --positive-badge-color-contrast: #ffffff;
@@ -146,16 +147,21 @@
     text-decoration: underline;
 }
 
-.case-status {
+.case-status,
+.case-sensitivity {
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.9em;
     font-weight: 500;
 }
 
-.status-open { background: #d4edda; color: #155724; }
+.status-open, .status-staging { background: #d4edda; color: #155724; }
 .status-closed { background: #f8d7da; color: #721c24; }
 .status-pending { background: #fff3cd; color: #856404; }
+
+.sensitivity-public { background: #d4edda; color: #155724; }
+.sensitivity-internal { background: #fff3cd; color: #856404; }
+.sensitivity-confidential, .sensitivity-restricted { background: #f8d7da; color: #721c24; }
 
 .case-meta {
     margin-top: 10px;
