@@ -61,7 +61,9 @@
         "zircote/swagger-php": "~4.8.7",
 
         "unional/jsonc": "~1.0.1",
-        "symfony/yaml": "~6.3"
+        "symfony/yaml": "~6.3",
+
+        "chillerlan/php-qrcode": "~5.0.5"
     },
     "require-dev": {
         "phpdocumentor/shim": "*"
