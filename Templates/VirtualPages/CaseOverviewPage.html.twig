@@ -60,7 +60,7 @@
                         </h2>
                         <br />
                         <dl id="properties-list">
-                            {% for property_name, property_data in CaseDetails.additional_properties %}
+                            {% for property_name, property_data in CaseDetails.additionalProperties %}
                                 {% if not (property_name in hidden_props) %}
                                     <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name) }}</dt>
                                     <dd data-property-key="{{ property_name }}">
@@ -88,10 +88,13 @@
                                 <dd>{{ CaseDetails.id }}</dd>
 
                                 <dt>{{ "Created At" | translate }}</dt>
-                                <dd>{{ CaseDetails.created_at | date("jS F Y, g:ia T") }}</dd>
+                                <dd>{{ CaseDetails.createdAt | date("jS F Y, g:ia T") }}</dd>
 
                                 <dt>{{ "Last Updated At" | translate }}</dt>
-                                <dd>{{ CaseDetails.last_updated_at | date("jS F Y, g:ia T") }}</dd>
+                                <dd>{{ CaseDetails.lastUpdatedAt | date("jS F Y, g:ia T") }}</dd>
+
+                                <dt>{{ "Last Updated By" | translate }}</dt>
+                                <dd>{{ CaseDetails.lastUpdatedBy }}</dd>
                             </dl>
                         </div>
 
