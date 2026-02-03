@@ -32,16 +32,16 @@ if (is_file($rawFile))
 
 // 4. Custom regex routes
 $routes = [
-    "#^/form/"  . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/form.php',
+    "#^/form/"  . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/Form.php',
 
-    "#^/cases/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/case-overview.php',
-    "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/todo-overview.php',
-    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/file-overview.php',
-    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/file-render.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/CaseOverview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/todos/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/TodoOverview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/FileOverview.php',
+    "#^/cases/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/FileRender.php',
 
-    "#^/users/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/user-overview.php',
-    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/file-overview.php',
-    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/file-render.php',
+    "#^/users/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/UserOverview.php',
+    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/FileOverview.php',
+    "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/FileRender.php',
 
     /*
     "/new"              => "$routedDir/new.php",
