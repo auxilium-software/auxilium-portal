@@ -5,6 +5,7 @@ namespace Auxilium\TwigHandling;
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\Exceptions\DatabaseConnectionException;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
@@ -42,6 +43,7 @@ class PageBuilder
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
         $this->twig->addGlobal(name: "_SELECTED_LANGUAGE_",  value: CookieHandling::GetCookieValue(targetCookie: CookieKey::LANGUAGE));
+        $this->twig->addGlobal(name: "_SYSTEM_BULLETIN_",  value: APIInteractions::Get(endpoint: '/system-bulletin', requireAuth: false)->Payload);
 
         if($useAuth)
         {

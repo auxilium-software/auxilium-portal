@@ -73,11 +73,11 @@
 
 
 .note-info {
-    background-color: var(--warning-color);
-    color: var(--warning-color-contrast);
+    background-color: var(--information-color);
+    color: var(--information-color-contrast);
 }
 .note-info > h2 {
-    color: var(--warning-color-contrast);
+    color: var(--information-color-contrast);
 }
 .note-info::before {
     content: "";

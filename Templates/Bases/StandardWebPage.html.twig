@@ -107,6 +107,46 @@
 
         {% block default_content_link %}<div id="main-content" class="reference-element"></div>{% endblock %}
 
+
+
+        {% for bulletin in _SYSTEM_BULLETIN_ %}
+            <div class="system-bulletin">
+                <div class="inner-content">
+                    {% if bulletin.severity == 'Critical' %}
+                        <div class="critical-note">
+                            {% if bulletin.title %}
+                                <span class="note-heading">{{ bulletin.title }}</span>
+                            {% endif %}
+                            <p>{{ bulletin.content }}</p>
+                            {% if bulletin.link %}
+                                <p><a href="{{ bulletin.link }}">{{ bulletin.linkText | default("More information") | translate }}</a></p>
+                            {% endif %}
+                        </div>
+
+                    {% elseif bulletin.severity == 'Warning' %}
+                        <div class="note-warning side-note">
+                            <h2>{{ bulletin.title }}</h2>
+                            <p>{{ bulletin.content }}</p>
+                            {% if bulletin.link %}
+                                <p><a href="{{ bulletin.link }}">{{ bulletin.linkText | default("More information") | translate }}</a></p>
+                            {% endif %}
+                        </div>
+
+                    {% elseif bulletin.severity == 'Informational' %}
+                        <div class="note-info side-note">
+                            <h2>{{ bulletin.title }}</h2>
+                            <p>{{ bulletin.content }}</p>
+                            {% if bulletin.link %}
+                                <p><a href="{{ bulletin.link }}">{{ bulletin.linkText | default("More information") | translate }}</a></p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+
+
         {% block content %}{% endblock %}
 
         <div class="spacer"></div>
