@@ -5,65 +5,22 @@
         <meta id="viewport" name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,maximum-scale=5,user-scalable=yes">
         <meta name="description" content="{{ page.description }}">
         {% block head_assets %}
-            <style>@import url("/Static/CSS/Mapper.css");</style>
+            <style>@import url("/Static/CSS/StandardWebPage.css");</style>
             {% if "dark-mode" in head_asset_options %}
-                <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "Logo") }}" />
-                <style>@import url("/Static/CSS/Themes/DarkMode.css");</style>
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoRelativePath") }}" />
+            <style>@import url("/Static/CSS/Themes/DarkMode.css");</style>
             {% else %}
-                <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />
-            {% endif %}
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+        {% endif %}
             {% if "large-fonts" in head_asset_options %}
-                <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
-            {% endif %}
+            <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
+        {% endif %}
         {% endblock %}
         <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
 
-        <script>
-            const API_BASE_URL = "{{ GetUserConfiguration("API", "AvailableAt") }}";
-        </script>
-        
-        <!-- <script src="/Static/JS/ThirdParty/Purify.js"></script> -->
-        <script src="/Static/JS/ThirdParty/SodiumSumo.js"></script>
-        <script src="/Static/JS/ThirdParty/JSZip.min.js"></script>
-
-        <script src="/Static/JS/General/Utils.js"></script>
-
-        <script src="/Static/JS/Classes/ObjectManagers/BaseManager.js"></script>
-
-        <script src="/Static/JS/Classes/ObjectManagers/CaseManager.js"></script>
-        <script src="/Static/JS/Classes/ObjectManagers/FileManager.js"></script>
-        <script src="/Static/JS/Classes/ObjectManagers/MessageManager.js"></script>
-        <script src="/Static/JS/Classes/ObjectManagers/TodoManager.js"></script>
-
-        <script src="/Static/JS/Classes/PropertyManagers/BasePropertyManager.js"></script>
-        <script src="/Static/JS/Classes/PropertyManagers/CasePropertyManager.js"></script>
-        <script src="/Static/JS/Classes/PropertyManagers/UserPropertyManager.js"></script>
-
-        <script src="/Static/JS/Classes/Utilities/APIInteractions.js"></script>
-        <script src="/Static/JS/Classes/Utilities/InfiniteScroller.js"></script>
-        <script src="/Static/JS/Classes/Utilities/Localisation.js"></script>
-
-        <script src="/Static/JS/Classes/DynamicElements/ToastNotification.js"></script>
-        <script src="/Static/JS/Classes/DynamicElements/NewPropertyPopup.js"></script>
-
-        <script src="/Static/JS/General/PopupUI.js"></script>
-        <script src="/Static/JS/General/CookieUtilities.js"></script>
-
-        <script src="/Static/JS/ThirdParty/iCal.js"></script>
-
-        <script src="/Static/JS/General/RFC822Parser.js"></script>
-
-        <script src="/Static/JS/APIControllers/AuthenticationController.js"></script>
-        <script src="/Static/JS/APIControllers/CaseController.js"></script>
-        <script src="/Static/JS/APIControllers/FileController.js"></script>
-        <script src="/Static/JS/APIControllers/MessageController.js"></script>
-        <script src="/Static/JS/APIControllers/UserController.js"></script>
-
-        <script>
-            const RECAPTCHA_SITE_KEY = "{{ GetUserConfiguration("ReCAPTCHA", "SiteKey") }}";
-        </script>
+        {% include '/Partials/JSImports.html.twig' %}
     </head>
-    
+
     <body>
         <span id="auxilium_instance_uuid" style="display: none;">{{ INSTANCE_UUID }}</span>
         <span id="auxilium_instance_fqdn" style="display: none;">{{ INSTANCE_DOMAIN_NAME }}</span>
@@ -77,16 +34,17 @@
                 </div>
             </div>
         {% endif %}
-        
+
+
         <nav>
             <div class="inner-content">
                 <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
                 <a id="navigation-logo" href="/">
-                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
                     {{ GetUserConfiguration("Instance", "Branding", "Name") }}
                 </a>
                 <a id="navigation-logo-ultra-small" href="/">
-                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrast") }}" />
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
                 </a>
                 <div id="navigation-buttons">
                     {% if GetUserConfiguration("Instance", "Navigation", "About") %}
@@ -146,11 +104,11 @@
                 </div>
             </div>
         {% endif %}
-        
+
         {% block default_content_link %}<div id="main-content" class="reference-element"></div>{% endblock %}
-        
+
         {% block content %}{% endblock %}
-        
+
         <div class="spacer"></div>
 
         <footer>
@@ -193,7 +151,7 @@
                     {% if ABOUT_PAGE_URL %}
                         <a href="{{ ABOUT_PAGE_URL }}">{{ "About Us"|translate|ndsentence }}</a>
                     {% endif %}
-                    
+
                     <li><a href="/onboard-new-case">{{ "Open New Case"|translate|ndsentence }}</a></li>
                     <li><a href="/dashboard">{{ "Home"|translate|ndsentence }}</a></li>
                     {% if _SELECTED_LANGUAGE_ == "en-GB" %}
