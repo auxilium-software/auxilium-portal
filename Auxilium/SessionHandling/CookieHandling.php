@@ -36,7 +36,7 @@ class CookieHandling
             value: '',
             expires_or_options: time() - 86400 * 2,
             path: '/',
-            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
+            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['FQDN'],
             secure: true,
             httponly: false,
         );
@@ -59,7 +59,7 @@ class CookieHandling
             value: $value,
             expires_or_options: time() + self::GetCookieTTL($targetCookie),
             path: '/',
-            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['QualifiedDNS'],
+            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['FQDN'],
             secure: true,
             httponly: false,
         );
