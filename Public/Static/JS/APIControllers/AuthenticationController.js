@@ -26,4 +26,23 @@ class AuthenticationController {
             return false;
         }
     }
+
+
+
+    async VerifyTotp(mfaSessionToken, totpCode) {
+        const [statusCode, payload] = await this.#APIInstance.API_POST(
+            "/api/v3/authentication/verify-totp",
+            {
+                mfaSessionToken: mfaSessionToken,
+                totpCode: totpCode
+            },
+            false,
+        );
+
+        if (statusCode === 200) {
+            return payload;
+        }
+
+        throw new Error('Verification failed');
+    }
 }
