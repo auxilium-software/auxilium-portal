@@ -9,7 +9,7 @@ class APIInteractions
             "credentials": 'include',
         };
 
-        if (method === 'POST' || method === 'PATCH')
+        if (method === 'POST' || method === 'PATCH' || method === 'PUT')
         {
             headers["Content-Type"] = "application/json";
         }
@@ -95,6 +95,12 @@ class APIInteractions
     {
         return await this.#apiRequest('PATCH', target, useAuth, payload);
     }
+
+    async API_PUT(target, payload, useAuth = true)
+    {
+        return await this.#apiRequest('PUT', target, useAuth, payload);
+    }
+
 
     async API_POST(target, payload, useAuth = true)
     {
