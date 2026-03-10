@@ -79,6 +79,11 @@ class FormHandler
             return;
         }
 
+        if($this->formSpec['requireAuthentication'] === "false")
+        {
+            return;
+        }
+
         SecurityUtilities::RequireLogin();
         $targetUserID = $this->formData['UserID'];
 
@@ -235,7 +240,6 @@ class FormHandler
         if($this->isReviewPage)
         {
             $this->submitForm();
-            return;
         }
 
         // for any other page, navigate to the next visible page/review page
