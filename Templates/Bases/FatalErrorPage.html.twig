@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="{{ _SELECTED_LANGUAGE_ }}">
+    <head>
+        <meta charset="utf-8">
+        <meta id="viewport" name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,maximum-scale=5,user-scalable=yes">
+        <meta name="description" content="{{ page.description }}">
+        {% block head_assets %}
+            <style>@import url("/Static/CSS/StandardWebPage.css");</style>
+            {% if "dark-mode" in head_asset_options %}
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoRelativePath") }}" />
+            <style>@import url("/Static/CSS/Themes/DarkMode.css");</style>
+            {% else %}
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+        {% endif %}
+            {% if "large-fonts" in head_asset_options %}
+            <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
+        {% endif %}
+        {% endblock %}
+        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
+    </head>
+
+    <body>
+        <span id="auxilium_instance_uuid" style="display: none;">{{ INSTANCE_UUID }}</span>
+        <span id="auxilium_instance_fqdn" style="display: none;">{{ INSTANCE_DOMAIN_NAME }}</span>
+
+        {% if header_warning %}
+            <div>
+                <div class="inner-content">
+                    <h2>{{ header_warning_title }}</h2>
+                    <p>{{ header_warning_content }}</p>
+                    <div class="spacer"></div>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <nav>
+            <div class="inner-content">
+                <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
+                <a id="navigation-logo" href="/">
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+                    {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                </a>
+                <a id="navigation-logo-ultra-small" href="/">
+                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+                </a>
+                <div id="navigation-buttons">
+                    {% if _SELECTED_LANGUAGE_ == "en-GB" %}
+                        <a href="/lang?switch=cy-GB" class="language-swap" lang="cy-GB" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
+                    {% else %}
+                        <a href="/lang?switch=en-GB" class="language-swap" lang="en-GB" title="Switch language to English"><strong>English</strong></a>
+                    {% endif %}
+                </div>
+                <div id="hamburger-menu-button">
+                    <input type="checkbox" id="hamburger-menu-button-input" />
+                    <label for="hamburger-menu-button-input"></label>
+                    <span id="burger-bun-top"></span>
+                    <span id="burger-meat"></span>
+                    <span id="burger-bun-bottom"></span>
+                    <div id="navigation-menu">
+                        <div class="inner-content">
+                            {% if _SELECTED_LANGUAGE_ == "en-GB" %}
+                                <a href="/lang?switch=cy-GB" class="language-swap" lang="cy-GB" title="Newid iaith i'r Gymraeg"><strong>Cymraeg</strong></a>
+                            {% else %}
+                                <a href="/lang?switch=en-GB" class="language-swap" lang="en-GB" title="Switch language to English"><strong>English</strong></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        {% block default_content_link %}<div id="main-content" class="reference-element"></div>{% endblock %}
+
+
+        {% block content %}
+        {% endblock %}
+
+
+
+
+        <div class="spacer"></div>
+
+        <footer>
+            <div class="inner-content">
+                <p>
+                    <strong>
+                        {{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                    </strong>
+                </p>
+                {% if GetUserConfiguration("Instance", "Contacts", "Operator") %}
+                    <p>
+                        {{
+                            "{instanceName} is owned by operated by {operatorName}."|translate({
+                                "{instanceName}": GetUserConfiguration("Instance", "Branding", "Name"),
+                                "{operatorName}": "<a href=\"mailto: "
+                                    ~ GetUserConfiguration("Instance", "Contacts", "Operator", "EmailAddress")
+                                    ~ "\">"
+                                    ~ GetUserConfiguration("Instance", "Contacts", "Operator", "Name")
+                                    ~ "</a>".
+                            })
+                        }}
+                    </p>
+                {% endif %}
+            </div>
+        </footer>
+        <footer>
+            <div class="inner-content">
+                <div class="spacer"></div>
+                <span>{{ GetSystemConfiguration("Development", "CurrentVersion") }}</span>
+                <div class="spacer"></div>
+            </div>
+        </footer>
+    </body>
+</html>
