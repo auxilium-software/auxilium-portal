@@ -1,0 +1,47 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="info-boxes">
+        <div class="info-box">
+            <div class="info-box__header">{{ "404: Not Found"|translate }}</div>
+            <div class="info-box__content">
+                {% if Suggestions is not empty %}
+                    <p>
+                        {% if ParentLabel %}
+                            {% if ParentHref %}
+                                {% set parentHtml = "<a href=\"" ~ ParentHref ~ "\">" ~ ParentLabel ~ "</a>: " %}
+                            {% else %}
+                                {% set parentHtml = ParentLabel ~ ": " %}
+                            {% endif %}
+                            {{
+                                "Here's what's available under {parent}",
+                                [
+                                    "{parent}" => parentHtml
+                                ]
+                                |translate
+                            }}
+
+                        {% else %}
+                            {{ "Here are some places you can go:"|translate }}
+                        {% endif %}
+                    </p>
+
+                    <ul class="suggestion-list">
+                        {% for page in Suggestions %}
+                            <li>
+                                <a href="{{ page.HREF }}">
+                                {% if page.Icon %}
+                                    <span class="icon"><i class="ph-duotone ph-{{ item.Icon }}"></i></span>
+                                {% endif %}
+                                    {{ page.Label }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
