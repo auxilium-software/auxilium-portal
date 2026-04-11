@@ -31,7 +31,7 @@
             <div class="info-box__content">
                 {% for quickAction in QuickActions %}
                     <button class="quick-button" onclick="window.location.href = '{{ quickAction.HREF }}';">
-                        {{ quickAction.Icon }} {{ quickAction.Label|translate }}
+                        <i class="ph-duotone ph-{{ quickAction.Icon }}"></i> {{ quickAction.Label|translate }}
                     </button>
                 {% endfor %}
             </div>
