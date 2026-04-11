@@ -1459,6 +1459,12 @@ body {
     color: #990000;
 }
 
+.profile-header__avatar--caseworkermanager {
+    background: linear-gradient(135deg, #ffe0aa 0%, #ffd080 100%);
+    border-color: #cc8800;
+    color: #996600;
+}
+
 .profile-header__avatar--caseworker {
     background: linear-gradient(135deg, #ffe0aa 0%, #ffd080 100%);
     border-color: #cc8800;
