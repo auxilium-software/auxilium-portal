@@ -13,11 +13,9 @@
                                 {% set parentHtml = ParentLabel ~ ": " %}
                             {% endif %}
                             {{
-                                "Here's what's available under {parent}",
-                                [
-                                    "{parent}" => parentHtml
-                                ]
-                                |translate
+                                "Here's what's available under {parentHtml}"|translate({
+                                    "{parent}": parentHtml
+                                })
                             }}
 
                         {% else %}
