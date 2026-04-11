@@ -104,4 +104,17 @@ class ConfigurationUtilities
 
         return $temp;
     }
+
+    public static function GetAdminConsoleNavigationTree(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleNavigation.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
+    public static function GetAdminConsoleQuickActions(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleQuickActions.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
 }
