@@ -1,0 +1,40 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="welcome-box">
+        <div class="welcome-box__title">
+            {{ "Welcome to the Auxilium Administration Console"|translate }}
+        </div>
+        <div class="welcome-box__text" id="selectedDisplay">
+            {{ "Select an option from the navigation panel to get started."|translate }}
+        </div>
+    </div>
+
+    <div class="info-boxes">
+        <div class="info-box">
+            <div class="info-box__header">System Status</div>
+            <div class="info-box__content">
+                <div class="status-row">
+                    <span>{{ "Portal" }}</span>
+                    <span class="status-row__value status-row__value--good">{{ "online" }}</span>
+                </div>
+                <div class="status-row">
+                    <span>{{ "API Server" }}</span>
+                    <span class="status-row__value status-row__value--good">{{ "online" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-box__header">
+                {{ "Quick Actions"|translate }}
+            </div>
+            <div class="info-box__content">
+                {% for quickAction in QuickActions %}
+                    <button class="quick-button" onclick="window.location.href = '{{ quickAction.HREF }}';">
+                        {{ quickAction.Icon }} {{ quickAction.Label|translate }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
