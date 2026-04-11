@@ -1,4 +1,5 @@
 
+input[type=button],
 input[type=submit] {
     display: block;
     margin-top: 0.2rem;
@@ -12,7 +13,11 @@ input[type=submit] {
     box-sizing: border-box;
     font-family: inherit;
 }
-.button, input[type=submit], .file-input-holder, .inline-button {
+.button,
+input[type=button],
+input[type=submit],
+.file-input-holder,
+.inline-button {
     color: var(--brand-color-contrast);
     background-color: var(--brand-color);
     display: inline-block;

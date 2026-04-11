@@ -1,0 +1,25 @@
+{% extends '/Bases/FatalErrorPage.html.twig' %}
+{% block content %}
+    <div class="inner-content">
+        <div class="critical-note">
+            <span class="note-heading">{{ "Your IP has been blocked."|translate }}</span>
+            <p>
+                {{ "Unfortunately this IP Address has been flagged as potentially dangerous by our Firewall." }}
+            </p>
+            <p>
+                {{ "You will not be able to interact with Auxilium Services." }}
+            </p>
+            <p>
+                {{
+                "If you think this is a mistake, you can contact the Auxilium IT department at {email_address_href}."|translate({
+                    '{email_address_href}': '<a href="mailto:'
+                    ~ GetUserConfiguration("Instance", "Contacts", "Maintainer", "EmailAddress")
+                    ~ '">'
+                    ~ GetUserConfiguration("Instance", "Contacts", "Maintainer", "EmailAddress")
+                    ~ '</a>'
+                })
+                }}
+            </p>
+        </div>
+    </div>
+{% endblock %}

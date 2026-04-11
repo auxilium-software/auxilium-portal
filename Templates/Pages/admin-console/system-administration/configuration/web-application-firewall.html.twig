@@ -1,0 +1,1386 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+
+    <!-- Page Title -->
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-fire"></i> {{ "Web Application Firewall Management"|translate }}
+            <span class="page-title__sub">{{ "Security Control Panel"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <select id="statsPeriod" class="form-select" onchange="loadStatistics()" style="width: auto;">
+                <option value="24">{{ "Last 24 Hours"|translate }}</option>
+                <option value="48">{{ "Last 48 Hours"|translate }}</option>
+                <option value="168">{{ "Last 7 Days"|translate }}</option>
+                <option value="720">{{ "Last 30 Days"|translate }}</option>
+                <option value="4380">{{ "Last 6 Months"|translate }}</option>
+                <option value="8760">{{ "Last 1 Year"|translate }}</option>
+            </select>
+            <button type="button" class="form-btn" onclick="loadAllData()">
+                <i class="ph-duotone ph-arrow-clockwise"></i> {{ "Refresh All"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="statBlockedIps">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">Blocked IPs</div>
+            <div class="stat-card__detail">
+                <span id="statPermBlocks">{{ "Loading..."|translate }}</span> {{ "perm"|translate }}
+                /
+                <span id="statTempBlocks">{{ "Loading..."|translate }}</span> {{ "temp"|translate }}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="statLockedUsers">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Locked Users"|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="statFailedLogins">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Failed Logins"|translate }}</div>
+            <div class="stat-card__detail" id="statFailedDetail">{{ "Loading..."|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="statSuccessLogins">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Successful Logins"|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="statDistinctIps">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Offending IPs"|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value status-active" id="statWafStatus">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "WAF Status"|translate }}</div>
+        </div>
+    </div>
+
+    <!-- Hourly Chart -->
+    <div class="panel">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-chart-bar"></i>
+                {{ "Login Activity"|translate }}
+            </span>
+        </div>
+        <div class="panel__body">
+            <div id="activityChart" style="height: 200px; display: flex; align-items: flex-end; gap: 2px; padding: 10px 0;"></div>
+            <div class="chart-legend">
+                <span class="chart-legend__item"><span class="chart-legend__color" style="background: #4CAF50;"></span> {{ "Successful"|translate }}</span>
+                <span class="chart-legend__item"><span class="chart-legend__color" style="background: #f44336;"></span> {{ "Failed"|translate }}</span>
+                <span class="chart-legend__item"><span class="chart-legend__color" style="background: #333;"></span> {{ "Blocked"|translate }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three Column Layout: Top Offenders, Top Targets, Alerts -->
+    <div class="detail-grid detail-grid--three">
+        <!-- Top Offending IPs -->
+        <div class="panel">
+            <div class="panel__header">
+                <span>
+                    <i class="ph-duotone ph-target"></i>
+                    {{ "Top Offending IPs"|translate }}
+                </span>
+            </div>
+            <div class="panel__body panel__body--compact" id="topOffendersBody">
+                <div class="empty-state">{{ "Loading..."|translate }}</div>
+            </div>
+        </div>
+
+        <!-- Top Targeted Users -->
+        <div class="panel">
+            <div class="panel__header">
+                <span>
+                    <i class="ph-duotone ph-user"></i>
+                    {{ "Top Targeted Users"|translate }}
+                </span>
+            </div>
+            <div class="panel__body panel__body--compact" id="topTargetsBody">
+                <div class="empty-state">{{ "Loading..."|translate }}</div>
+            </div>
+        </div>
+
+        <!-- Active Alerts -->
+        <div class="panel">
+            <div class="panel__header">
+                <span>
+                    <i class="ph-duotone ph-warning"></i>
+                    {{ "Active Alerts"|translate }}
+                </span>
+                <span class="badge badge--inactive" id="alertCountBadge" style="margin-left: auto;">0</span>
+            </div>
+            <div class="panel__body panel__body--compact" id="alertsContainer">
+                <div class="empty-state">{{ "Loading..."|translate }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="detail-grid">
+        <!-- Left Column -->
+        <div>
+            <!-- IP Control Panel -->
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-gear"></i>
+                        {{ "IP Control"|translate }}
+                    </span>
+                </div>
+                <div class="panel__body">
+                    <div class="waf-control-form">
+                        <div class="waf-form-row">
+                            <div class="waf-form-field">
+                                <label class="waf-label">{{ "IP Address:"|translate }}</label>
+                                <input type="text" id="targetIpInput" class="form-input" placeholder="192.168.1.100" maxlength="45">
+                            </div>
+                            <div class="waf-form-field waf-form-field--wide">
+                                <label class="waf-label">{{ "Reason:"|translate }}</label>
+                                <input type="text" id="blockReasonInput" class="form-input" placeholder="Suspicious activity" maxlength="200">
+                            </div>
+                        </div>
+                        <div class="waf-form-row">
+                            <div class="waf-form-field">
+                                <label class="waf-label">{{ "Block Type:"|translate }}</label>
+                                <select id="blockTypeSelect" class="form-select">
+                                    <option value="permanent">{{ "Permanent"|translate }}</option>
+                                    <option value="temporary">{{ "Temporary"|translate }}</option>
+                                </select>
+                            </div>
+                            <div class="waf-form-field" id="durationField" style="display: none;">
+                                <label class="waf-label">{{ "Duration (min):"|translate }}</label>
+                                <input type="number" id="blockDurationInput" class="form-input" value="60" min="1">
+                            </div>
+                            <div class="waf-form-field waf-form-field--buttons">
+                                <button type="button" class="form-btn form-btn--danger" onclick="blockIp()">
+                                    <i class="ph-duotone ph-prohibit"></i>
+                                    {{ "Block"|translate }}
+                                </button>
+                                <button type="button" class="form-btn form-btn--primary" onclick="unblockIp()">
+                                    <i class="ph-duotone ph-check-circle"></i>
+                                    {{ "Unblock"|translate }}
+                                </button>
+                                <button type="button" class="form-btn" onclick="addToWhitelist()">
+                                    <i class="ph-duotone ph-star"></i>
+                                    {{ "Whitelist"|translate }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blocked IPs Panel -->
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-prohibit"></i>
+                        {{ "Blocked IP Addresses"|translate }}
+                    </span>
+                    <label style="font-weight: normal; margin-left: auto; font-size: 10px;">
+                        <input type="checkbox" id="showExpiredBlocks" onchange="refreshBlockedIps()"> {{ "Show Expired"|translate }}
+                    </label>
+                </div>
+                <div class="panel__body" style="padding: 0; max-height: 350px; overflow-y: auto;">
+                    <table class="admin-table admin-table--compact">
+                        <thead>
+                            <tr>
+                                <th>{{ "Status"|translate }}</th>
+                                <th>{{ "IP Address"|translate }}</th>
+                                <th>{{ "Type"|translate }}</th>
+                                <th>{{ "Reason"|translate }}</th>
+                                <th>{{ "Blocked"|translate }}</th>
+                                <th>{{ "Expires"|translate }}</th>
+                                <th>{{ "Actions"|translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockedIpsBody">
+                            <tr><td colspan="7" class="empty-state">{{ "Loading..."|translate }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel__footer">
+                    <span id="blockedIpsPagination" class="pagination__info"></span>
+                    <div class="pagination__buttons" id="blockedIpsPaginationBtns"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <!-- Locked Out Users Panel -->
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-lock"></i>
+                        {{ "Locked Out Users"|translate }}
+                    </span>
+                    <label style="font-weight: normal; margin-left: auto; font-size: 10px;">
+                        <input type="checkbox" id="showExpiredLockouts" onchange="refreshLockedUsers()"> {{ "Show Expired"|translate }}
+                    </label>
+                </div>
+                <div class="panel__body" style="padding: 0; max-height: 250px; overflow-y: auto;">
+                    <table class="admin-table admin-table--compact">
+                        <thead>
+                            <tr>
+                                <th>{{ "Status"|translate }}</th>
+                                <th>{{ "User"|translate }}</th>
+                                <th>{{ "Reason"|translate }}</th>
+                                <th>{{ "Locked At"|translate }}</th>
+                                <th>{{ "Expires"|translate }}</th>
+                                <th>{{ "Actions"|translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lockedUsersBody">
+                            <tr><td colspan="6" class="empty-state">{{ "Loading..."|translate }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Whitelist Panel -->
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-star"></i>
+                        {{ "IP Whitelist"|translate }}
+                    </span>
+                </div>
+                <div class="panel__body" style="padding: 0; max-height: 200px; overflow-y: auto;">
+                    <table class="admin-table admin-table--compact">
+                        <thead>
+                            <tr>
+                                <th>{{ "IP Address / CIDR"|translate }}</th>
+                                <th style="width: 80px;">{{ "Actions"|translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="whitelistBody">
+                            <tr><td colspan="2" class="empty-state">{{ "Loading..."|translate }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quick Actions Panel -->
+            <div class="panel">
+                <div class="panel__header">
+                    ⚡ Quick Actions
+                </div>
+                <div class="panel__body">
+                    <div class="quick-actions-grid">
+                        <button type="button" class="quick-button" onclick="exportBlockedIps()">
+                            <i class="ph-duotone ph-download-simple"></i>
+                            {{ "Export Blocked IPs"|translate }}
+                        </button>
+                        <button type="button" class="quick-button" onclick="exportLoginAttempts()">
+                            <i class="ph-duotone ph-download-simple"></i>
+                            {{ "Export Login Log"|translate }}
+                        </button>
+                        <button type="button" class="quick-button" onclick="viewIpDetails()">
+                            <i class="ph-duotone ph-magnifying-glass"></i>
+                            {{ "IP Lookup"|translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Attempts Log -->
+    <div class="panel">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-scroll"></i>
+                {{ "Login Attempt Log"|translate }}
+            </span>
+        </div>
+        <div class="toolbar" style="margin-bottom: 0; border: none; box-shadow: none;">
+            <div class="toolbar__group">
+                <span class="toolbar__label">{{ "Filter:"|translate }}</span>
+                <select id="logFilterType" class="form-select" onchange="refreshLoginAttempts()">
+                    <option value="">{{ "All Attempts"|translate }}</option>
+                    <option value="failed">{{ "Failed Only"|translate }}</option>
+                    <option value="success">{{ "Successful Only"|translate }}</option>
+                    <option value="blocked">{{ "Blocked by WAF"|translate }}</option>
+                </select>
+            </div>
+            <div class="toolbar__group">
+                <span class="toolbar__label">{{ "IP:"|translate }}</span>
+                <input type="text" id="logFilterIp" class="form-input form-input--search" placeholder="Filter by IP..." style="width: 120px;">
+            </div>
+            <div class="toolbar__group">
+                <span class="toolbar__label">{{ "Email:"|translate }}</span>
+                <input type="text" id="logFilterEmail" class="form-input form-input--search" placeholder="Filter by email..." style="width: 140px;">
+            </div>
+            <div class="toolbar__group">
+                <span class="toolbar__label">{{ "Show:"|translate }}</span>
+                <select id="logFilterCount" class="form-select" onchange="refreshLoginAttempts()">
+                    <option value="50">{{ "50 entries"|translate }}</option>
+                    <option value="100" selected>{{ "100 entries"|translate }}</option>
+                    <option value="200">{{ "200 entries"|translate }}</option>
+                </select>
+            </div>
+            <div class="toolbar__spacer"></div>
+            <div class="toolbar__group">
+                <label style="font-size: 10px;">
+                    <input type="checkbox" id="autoRefreshCheck" checked onchange="toggleAutoRefresh()"> {{ "Auto-refresh"|translate }}
+                </label>
+            </div>
+            <button type="button" class="form-btn form-btn--sm" onclick="refreshLoginAttempts()">
+                <i class="ph-duotone ph-arrow-clockwise"></i>
+                {{ "Refresh"|translate }}
+            </button>
+        </div>
+        <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+            <table class="admin-table admin-table--compact">
+                <thead>
+                    <tr>
+                        <th style="width: 140px;">{{ "Timestamp"|translate }}</th>
+                        <th style="width: 70px;">{{ "Status"|translate }}</th>
+                        <th style="width: 130px;">{{ "IP Address"|translate }}</th>
+                        <th>{{ "Email"|translate }}</th>
+                        <th>{{ "Failure Reason"|translate }}</th>
+                        <th style="width: 60px;">{{ "Actions"|translate }}</th>
+                    </tr>
+                </thead>
+                <tbody id="loginAttemptsBody">
+                    <tr><td colspan="6" class="empty-state">{{ "Loading..."|translate }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel__footer">
+            <span class="pagination__info" id="logPaginationInfo">{{ "Showing 0 entries"|translate }}</span>
+            <span id="lastRefreshTime" style="font-size: 10px; color: #666;">{{ "Last refresh: Loading..."|translate }}</span>
+            <div class="pagination__buttons" id="logPaginationBtns"></div>
+        </div>
+    </div>
+
+    <!-- IP Details Modal -->
+    <div class="confirm-overlay" id="ipDetailsOverlay">
+        <div class="confirm-dialog confirm-dialog--wide">
+            <div class="error-box">
+                <div class="error-box__header">
+                    <span class="error-box__header-icon"><i class="ph-duotone ph-magnifying-glass"></i></span>
+                    {{ "IP Details:"|translate }} <span id="ipDetailsTitle">{{ "Loading..." }}</span>
+                </div>
+                <div class="error-box__body" style="max-height: 500px; overflow-y: auto;">
+                    <div id="ipDetailsContent">{{ "Loading..."|translate }}</div>
+                </div>
+                <div class="error-box__footer">
+                    <button type="button" class="error-box__btn" onclick="closeIpDetails()">{{ "Close"|translate }}</button>
+                    <button type="button" class="error-box__btn error-box__btn--danger" id="ipDetailsBlockBtn" onclick="blockFromDetails()">{{ "Block IP"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-dialog">
+            <div class="error-box">
+                <div class="error-box__header">
+                    <span class="error-box__header-icon" id="confirmIcon"><i class="ph-duotone ph-warning"></i></span>
+                    <span id="confirmTitle">{{ "Confirm Action"|translate }}</span>
+                </div>
+                <div class="error-box__body">
+                    <div class="error-box__message">
+                        <div class="error-box__text" id="confirmMessage">{{ "Are you sure?"|translate }}</div>
+                        <div id="confirmReasonField" style="margin-top: 12px; display: none;">
+                            <label class="waf-label">{{ "Reason (optional):"|translate }}</label>
+                            <input type="text" id="confirmReasonInput" class="form-input" placeholder="{{ "Reason for this action"|translate }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="error-box__footer">
+                    <button type="button" class="error-box__btn" onclick="closeConfirmDialog()">{{ "Cancel"|translate }}</button>
+                    <button type="button" class="error-box__btn error-box__btn--primary" id="confirmActionBtn" onclick="executeConfirmedAction()">{{ "Confirm"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .waf-control-form { display: flex; flex-direction: column; gap: 10px; }
+        .waf-form-row { display: flex; gap: 12px; align-items: flex-end; }
+        .waf-form-field { display: flex; flex-direction: column; gap: 4px; }
+        .waf-form-field--wide { flex: 1; }
+        .waf-form-field--buttons { display: flex; gap: 6px; }
+        .waf-label { font-size: 10px; color: #444; font-weight: bold; }
+
+        .detail-grid--three { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 1200px) { .detail-grid--three { grid-template-columns: 1fr; } }
+
+        .stat-card__detail { font-size: 9px; color: #666; margin-top: 2px; }
+        .panel__body--compact { padding: 0; max-height: 250px; overflow-y: auto; }
+        .panel__footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f5f5f5; border-top: 1px solid #ddd; font-size: 10px; }
+
+        .waf-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #eee; }
+        .waf-list-item:last-child { border-bottom: none; }
+        .waf-list-item__main { display: flex; flex-direction: column; gap: 2px; }
+        .waf-list-item__title { font-family: "Courier New", monospace; font-size: 11px; }
+        .waf-list-item__detail { font-size: 9px; color: #666; }
+        .waf-list-item__badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 3px; background: #f44336; color: white; }
+        .waf-list-item__badge--warning { background: #ff9800; }
+        .waf-list-item__badge--blocked { background: #333; }
+
+        .waf-alert-item { padding: 8px 10px; border-bottom: 1px solid #eee; border-left: 3px solid #cc0000; background: linear-gradient(90deg, #ffe0e0 0%, #fff 100%); }
+        .waf-alert-item:last-child { border-bottom: none; }
+        .waf-alert-item--warning { border-left-color: #cc8800; background: linear-gradient(90deg, #fff8e0 0%, #fff 100%); }
+        .waf-alert-item--info { border-left-color: #0066cc; background: linear-gradient(90deg, #e0f0ff 0%, #fff 100%); }
+        .waf-alert-item__message { font-size: 11px; }
+
+        .chart-legend { display: flex; justify-content: center; gap: 20px; font-size: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .chart-legend__item { display: flex; align-items: center; gap: 4px; }
+        .chart-legend__color { width: 12px; height: 12px; border-radius: 2px; }
+        .chart-bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
+        .chart-bar-stack { display: flex; flex-direction: column-reverse; width: 100%; max-width: 20px; }
+        .chart-bar { width: 100%; min-height: 1px; }
+        .chart-bar--success { background: #4CAF50; }
+        .chart-bar--failed { background: #f44336; }
+        .chart-bar--blocked { background: #333; }
+        .chart-label { font-size: 8px; color: #666; margin-top: 4px; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); max-height: 50px; overflow: hidden; }
+
+        .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .confirm-dialog--wide { max-width: 700px; width: 90%; }
+        .empty-state { text-align: center; color: #666; padding: 20px; }
+        .waf-ip-cell { font-family: "Courier New", monospace; font-size: 11px; }
+        .waf-truncate { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pagination__buttons { display: flex; gap: 4px; }
+        .pagination__buttons button { padding: 2px 8px; font-size: 10px; }
+
+        @media (max-width: 768px) {
+            .waf-form-row { flex-direction: column; align-items: stretch; }
+            .waf-form-field--buttons { flex-wrap: wrap; }
+            .quick-actions-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const api = new APIInteractions();
+
+        const wafState = {
+            statistics: null,
+            blockedIps: [],
+            blockedIpsPage: 1,
+            blockedIpsTotal: 0,
+            lockedUsers: [],
+            whitelist: [],
+            loginAttempts: [],
+            loginAttemptsPage: 1,
+            loginAttemptsTotal: 0,
+            autoRefreshInterval: null,
+            pendingAction: null
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+            toggleAutoRefresh();
+            setupEventListeners();
+        });
+
+        function setupEventListeners()
+        {
+            document.getElementById('blockTypeSelect').addEventListener('change', function()
+            {
+                document.getElementById('durationField').style.display = this.value === 'temporary' ? 'block' : 'none';
+            });
+            document.getElementById('logFilterIp').addEventListener('keypress', e => { if (e.key === 'Enter') refreshLoginAttempts(); });
+            document.getElementById('logFilterEmail').addEventListener('keypress', e => { if (e.key === 'Enter') refreshLoginAttempts(); });
+            document.getElementById('targetIpInput').addEventListener('keypress', e => { if (e.key === 'Enter') blockIp(); });
+        }
+
+        function loadAllData()
+        {
+            loadStatistics();
+            refreshBlockedIps();
+            refreshLockedUsers();
+            refreshWhitelist();
+            refreshLoginAttempts();
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // STATISTICS
+        // ====================================================================================================
+        async function loadStatistics()
+        {
+            try
+            {
+                const hours = document.getElementById('statsPeriod').value;
+                const [status, data] = await api.API_GET(`/api/v3/web-application-firewall/statistics?hoursBack=${hours}`);
+                if (status !== 200) throw new Error('{{ "Failed to load statistics"|translate }}');
+                wafState.statistics = data;
+                await renderStatistics();
+                await renderChart();
+                renderTopOffenders();
+                renderTopTargets();
+                updateAlerts();
+            }
+            catch (err)
+            {
+                console.error('{{ "Failed to load statistics:"|translate }}', err);
+            }
+        }
+
+        async function renderStatistics()
+        {
+            const s = wafState.statistics;
+            if (!s) return;
+            document.getElementById('statBlockedIps').textContent = s.currentlyBlockedIps;
+            document.getElementById('statPermBlocks').textContent = s.permanentlyBannedIps;
+            document.getElementById('statTempBlocks').textContent = s.temporarilyBlockedIps;
+            document.getElementById('statLockedUsers').textContent = s.lockedOutUsers;
+            document.getElementById('statFailedLogins').textContent = s.failedLoginAttempts;
+            document.getElementById('statFailedDetail').textContent = await Localisation.translate(
+                "{count} blocked by WAF",
+                {
+                    "{count}": s.blockedByWafAttempts
+                }
+            );
+            document.getElementById('statSuccessLogins').textContent = s.successfulLoginAttempts;
+            document.getElementById('statDistinctIps').textContent = s.distinctOffendingIps;
+
+            const wafStatusEl = document.getElementById('statWafStatus');
+            wafStatusEl.textContent = s.wafEnabled ? '{{ "Active"|translate }}' : '{{ "Disabled"|translate }}';
+            wafStatusEl.className = 'stat-card__value ' + (s.wafEnabled ? 'status-active' : 'status-error');
+
+            const failedEl = document.getElementById('statFailedLogins');
+            failedEl.className = 'stat-card__value' + (s.failedLoginAttempts > 100 ? ' status-error' : s.failedLoginAttempts > 20 ? ' status-warning' : '');
+        }
+
+        async function renderChart()
+        {
+            const s = wafState.statistics;
+            if (!s?.hourlyBreakdown?.length) {
+                document.getElementById('activityChart').innerHTML = '<div class="empty-state">{{ "No data available"|translate }}</div>';
+                return;
+            }
+            const maxTotal = Math.max(...s.hourlyBreakdown.map(h => h.totalAttempts), 1);
+            const chartHeight = 180;
+            let html = '';
+            for (const hour of s.hourlyBreakdown)
+            {
+                const successHeight = ((hour.totalAttempts - hour.failedAttempts) / maxTotal) * chartHeight;
+                const failedHeight = ((hour.failedAttempts - hour.blockedAttempts) / maxTotal) * chartHeight;
+                const blockedHeight = (hour.blockedAttempts / maxTotal) * chartHeight;
+                const date = new Date(hour.hour);
+                const label = date.getHours().toString().padStart(2, '0') + ':00';
+                const title = await Localisation.translate(
+                    "{date}: {totalAttempts} total",
+                    {
+                        "{date}": date.toLocaleString(),
+                        "{totalAttempts}": hour.totalAttempts,
+                    }
+                );
+
+                html += `<div class="chart-bar-group" title="${title}">
+                    <div class="chart-bar-stack">
+                        <div class="chart-bar chart-bar--success" style="height:${successHeight}px;"></div>
+                        <div class="chart-bar chart-bar--failed" style="height:${failedHeight}px;"></div>
+                        <div class="chart-bar chart-bar--blocked" style="height:${blockedHeight}px;"></div>
+                    </div>
+                    <div class="chart-label">${label}</div>
+                </div>`;
+            }
+            document.getElementById('activityChart').innerHTML = html;
+        }
+
+        async function renderTopOffenders()
+        {
+            const s = wafState.statistics;
+            const container = document.getElementById('topOffendersBody');
+            if (!s?.topOffendingIps?.length) { container.innerHTML = '<div class="empty-state">{{ "No offending IPs"|translate }}</div>'; return; }
+            let html = '';
+            for (const o of s.topOffendingIps)
+            {
+                const badgeClass = o.isCurrentlyBlocked ? 'waf-list-item__badge--blocked' : (o.failedAttempts > 50 ? 'waf-list-item__badge' : 'waf-list-item__badge--warning');
+                const badgeText = o.isCurrentlyBlocked ? 'BLOCKED' : o.failedAttempts;
+                const detail = await Localisation.translate(
+                    "{distinctUsersTargetedCount} users · {lastAttemptTimeAgo}",
+                    {
+                        "{distinctUsersTargetedCount}": distinctUsersTargeted,
+                        "{lastAttemptTimeAgo}": await formatTimeAgo(o.lastAttempt),
+                    }
+                );
+
+                html += `<div class="waf-list-item">
+                    <div class="waf-list-item__main">
+                        <div class="waf-list-item__title">${escapeHtml(o.ipAddress)}</div>
+                        <div class="waf-list-item__detail">${detail}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <span class="${badgeClass}">${badgeText}</span>
+                        ${
+                    !o.isCurrentlyBlocked
+                        ? `<button class="form-btn form-btn--sm form-btn--danger" onclick="quickBlock('${escapeHtml(o.ipAddress)}')">{{ "Block"|translate }}</button>`
+                        : ''
+                }
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        async function renderTopTargets()
+        {
+            const s = wafState.statistics;
+            const container = document.getElementById('topTargetsBody');
+            if (!s?.topTargetedUsers?.length) { container.innerHTML = '<div class="empty-state">{{ "No targeted users"|translate }}</div>'; return; }
+            let html = '';
+            for (const t of s.topTargetedUsers)
+            {
+                const statusBadge = t.isCurrentlyLockedOut ? '<span class="badge badge--inactive">{{ "LOCKED"|translate }}</span>' : '';
+                const detail = await Localisation.translate(
+                    "{failedAttemptsCount} attempts from {distinctIpAddressesCount} IPs",
+                    {
+                        "{failedAttemptsCount}": t.failedAttempts,
+                        "{distinctIpAddressesCount}": t.distinctIpAddresses
+                    }
+                );
+
+                html += `<div class="waf-list-item">
+                    <div class="waf-list-item__main">
+                        <div class="waf-list-item__title">${escapeHtml(t.email || 'Unknown')}</div>
+                        <div class="waf-list-item__detail">${detail}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;">${statusBadge}<span class="waf-list-item__badge--warning">${t.failedAttempts}</span></div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        async function updateAlerts()
+        {
+            const s = wafState.statistics;
+            const container = document.getElementById('alertsContainer');
+            const badge = document.getElementById('alertCountBadge');
+            const alerts = [];
+            if (s)
+            {
+                if (!s.wafEnabled)
+                {
+                    alerts.push({ type: 'danger', message: '{{ "WAF is currently DISABLED"|translate }}' });
+                }
+
+                if (s.failedLoginAttempts > 100)
+                {
+                    const message = await Localisation.translate(
+                        "High failed logins: {failedLoginAttemptCount}",
+                        {
+                            "{failedLoginAttemptCount}": s.failedLoginAttempts
+                        }
+                    );
+                    alerts.push({ type: 'danger', message: message });
+                }
+                else if (s.failedLoginAttempts > 20)
+                {
+                    const message = await Localisation.translate(
+                        "Elevated failed logins: {failedLoginAttemptCount}",
+                        {
+                            "{failedLoginAttemptCount}": s.failedLoginAttempts
+                        }
+                    );
+                    alerts.push({ type: 'warning', message: message });
+                }
+
+                if (s.permanentlyBannedIps > 0)
+                {
+                    const message = await Localisation.translate(
+                        "{permanentlyBannedIpsCount} permanent ban(s) active",
+                        {
+                            "{permanentlyBannedIpsCount}": s.permanentlyBannedIps
+                        }
+                    );
+                    alerts.push({ type: 'info', message: message });
+                }
+
+                if (s.lockedOutUsers > 0)
+                {
+                    const message = await Localisation.translate(
+                        "{lockedOutUsersCount} user(s) locked",
+                        {
+                            "{lockedOutUsersCount}": s.lockedOutUsers
+                        }
+                    );
+                    alerts.push({ type: 'warning', message: message });
+                }
+
+                for (const t of s.topTargetedUsers)
+                {
+                    if (t.distinctIpAddresses >= 5)
+                    {
+                        const message = await Localisation.translate(
+                            "Distributed attack on {emailAddress}: {distinctIpAddressesCount} IPs",
+                            {
+                                "{emailAddress}": t.email,
+                                "{distinctIpAddressesCount}": t.distinctIpAddresses
+                            }
+                        )
+                        alerts.push({ type: 'danger', message: message });
+                    }
+                }
+            }
+            badge.textContent = alerts.length;
+            badge.className = 'badge ' + (alerts.length > 0 ? 'badge--inactive' : 'badge--active');
+            if (!alerts.length)
+            {
+                container.innerHTML = '<div class="empty-state">{{ "No active alerts"|translate }}</div>';
+                return;
+            }
+            let html = '';
+            alerts.slice(0, 8).forEach(a => {
+                const cls = a.type === 'warning' ? 'waf-alert-item--warning' : (a.type === 'info' ? 'waf-alert-item--info' : '');
+                html += `<div class="waf-alert-item ${cls}"><div class="waf-alert-item__message">${escapeHtml(a.message)}</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // BLOCKED IPS
+        // ====================================================================================================
+        async function refreshBlockedIps(page = 1)
+        {
+            try
+            {
+                const includeExpired = document.getElementById('showExpiredBlocks').checked;
+                const [status, data] = await api.API_GET(`/api/v3/web-application-firewall/blacklist/ips?includeExpired=${includeExpired}&page=${page}&pageSize=20`);
+                if (status !== 200) throw new Error('{{ "Failed to fetch"|translate }}');
+                wafState.blockedIps = data.blocks || [];
+                wafState.blockedIpsPage = data.page;
+                renderBlockedIps();
+                document.getElementById('blockedIpsPagination').textContent = await Localisation.translate(
+                    "Page {currentPageNumber} of {totalPagesCount} ({totalCount} total)",
+                    {
+                        "{currentPageNumber}": data.page,
+                        "{totalPagesCount}": data.totalPages,
+                        "{totalCount}": data.totalCount,
+                    }
+                );
+                let btns = '';
+                if (data.page > 1) btns += `<button class="form-btn form-btn--sm" onclick="refreshBlockedIps(${data.page - 1})"><i class="ph-duotone ph-skip-back"></i> {{ "Prev"|translate }}</button>`;
+                if (data.page < data.totalPages) btns += `<button class="form-btn form-btn--sm" onclick="refreshBlockedIps(${data.page + 1})">{{ "Next"|translate }} <i class="ph-duotone ph-skip-forward"></i></button>`;
+                document.getElementById('blockedIpsPaginationBtns').innerHTML = btns;
+            }
+            catch (err)
+            {
+                console.error('Failed to load blocked IPs:', err);
+                document.getElementById('blockedIpsBody').innerHTML = '<tr><td colspan="7" class="empty-state" style="color:#cc0000;">{{ "Error loading data"|translate }}</td></tr>';
+            }
+        }
+
+        function renderBlockedIps()
+        {
+            const tbody = document.getElementById('blockedIpsBody');
+            if (!wafState.blockedIps.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">{{ "No blocked IPs"|translate }}</td></tr>'; return; }
+            let html = '';
+            wafState.blockedIps.forEach(b => {
+                const statusClass = b.isActive ? 'status-error' : '';
+                const statusText = b.isActive ? '{{ "BLOCKED"|translate }}' : '{{ "Expired"|translate }}';
+                const typeClass = b.isPermanent ? 'badge--inactive' : 'badge--suspended';
+                const typeText = b.isPermanent ? '{{ "Permanent"|translate }}' : '{{ "Temporary"|translate }}';
+                html += `<tr${b.isActive ? '' : ' style="opacity:0.6"'}>
+                    <td class="cell-status ${statusClass}">${statusText}</td>
+                    <td class="waf-ip-cell"><a href="javascript:void(0)" onclick="showIpDetails('${escapeHtml(b.ipAddress)}')">${escapeHtml(b.ipAddress)}</a></td>
+                    <td><span class="badge ${typeClass}">${typeText}</span></td>
+                    <td class="waf-truncate" title="${escapeHtml(b.reason || '')}">${escapeHtml(b.reason || '-')}</td>
+                    <td>${formatDate(b.blockedAt)}</td>
+                    <td>${b.expiresAt ? formatDate(b.expiresAt) : '-'}</td>
+                    <td class="cell-actions">${b.isActive ? `<button onclick="quickUnblock('${escapeHtml(b.ipAddress)}')">{{ "Unblock"|translate }}</button>` : ''}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // LOCKED USERS
+        // ====================================================================================================
+        async function refreshLockedUsers()
+        {
+            try
+            {
+                const includeExpired = document.getElementById('showExpiredLockouts').checked;
+                const [status, data] = await api.API_GET(`/api/v3/web-application-firewall/blacklist/users?includeExpired=${includeExpired}&pageSize=20`);
+                if (status !== 200) throw new Error('{{ "Failed to fetch"|translate }}');
+                wafState.lockedUsers = data.users || [];
+                renderLockedUsers();
+            }
+            catch (err)
+            {
+                console.error('Failed to load locked users:', err);
+                document.getElementById('lockedUsersBody').innerHTML = '<tr><td colspan="6" class="empty-state" style="color:#cc0000;">{{ "Error"|translate }}</td></tr>';
+            }
+        }
+
+        function renderLockedUsers()
+        {
+            const tbody = document.getElementById('lockedUsersBody');
+            if (!wafState.lockedUsers.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">{{ "No locked users"|translate }}</td></tr>'; return; }
+            let html = '';
+            wafState.lockedUsers.forEach(u => {
+                const statusClass = u.isLockedOut ? 'status-error' : '';
+                const statusText = u.isLockedOut ? '{{ "LOCKED"|translate }}' : '{{ "Expired"|translate }}';
+                html += `<tr${u.isLockedOut ? '' : ' style="opacity:0.6"'}>
+                    <td class="cell-status ${statusClass}">${statusText}</td>
+                    <td title="${escapeHtml(u.email || '')}">${escapeHtml(u.fullName || u.email || 'Unknown')}</td>
+                    <td class="waf-truncate" title="${escapeHtml(u.lockoutReason || '')}">${escapeHtml(u.lockoutReason || '-')}</td>
+                    <td>${formatDate(u.lockedOutAt)}</td>
+                    <td>${u.lockoutEndsAt ? formatDate(u.lockoutEndsAt) : 'Manual'}</td>
+                    <td class="cell-actions">${u.isLockedOut ? `<button onclick="unlockUser('${u.userId}','${escapeHtml(u.email || '')}')">{{ "Unlock"|translate }}</button>` : ''}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // WHITELIST
+        // ====================================================================================================
+        async function refreshWhitelist()
+        {
+            try
+            {
+                const [status, data] = await api.API_GET('/api/v3/web-application-firewall/whitelist/ips');
+                if (status !== 200) throw new Error('Failed to fetch');
+                wafState.whitelist = data.ipAddresses || [];
+                renderWhitelist();
+            }
+            catch (err)
+            {
+                console.error('Failed to load whitelist:', err);
+                document.getElementById('whitelistBody').innerHTML = '<tr><td colspan="2" class="empty-state" style="color:#cc0000;">{{ "Error"|translate }}</td></tr>';
+            }
+        }
+
+        function renderWhitelist()
+        {
+            const tbody = document.getElementById('whitelistBody');
+            if (!wafState.whitelist.length)
+            {
+                tbody.innerHTML = '<tr><td colspan="2" class="empty-state">{{ "No whitelisted IPs"|translate }}</td></tr>';
+                return;
+            }
+            let html = '';
+            wafState.whitelist.forEach(ip => {
+                html += `<tr><td class="waf-ip-cell">${escapeHtml(ip)}</td><td class="cell-actions"><button onclick="removeFromWhitelist('${escapeHtml(ip)}')">{{ "Remove"|translate }}</button></td></tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // LOGIN ATTEMPTS
+        // ====================================================================================================
+        async function refreshLoginAttempts(page = 1)
+        {
+            try
+            {
+                const filterType = document.getElementById('logFilterType').value;
+                const ipFilter = document.getElementById('logFilterIp').value.trim();
+                const emailFilter = document.getElementById('logFilterEmail').value.trim();
+                const count = document.getElementById('logFilterCount').value;
+
+                let url = `/api/v3/web-application-firewall/login-attempts?page=${page}&pageSize=${count}`;
+                if (filterType === 'failed') url += '&failedOnly=true';
+                else if (filterType === 'success') url += '&successfulOnly=true';
+                else if (filterType === 'blocked') url += '&blockedOnly=true';
+                if (ipFilter) url += '&ipAddress=' + encodeURIComponent(ipFilter);
+                if (emailFilter) url += '&email=' + encodeURIComponent(emailFilter);
+
+                const [status, data] = await api.API_GET(url);
+                if (status !== 200) throw new Error('{{ "Failed to fetch"|translate }}');
+                wafState.loginAttempts = data.attempts || [];
+
+                renderLoginAttempts();
+
+                document.getElementById('logPaginationInfo').textContent = await Localisation.translate(
+                    "Showing {loginAttemptCount} of {totalLoginAttempts}",
+                    {
+                        "{loginAttemptCount}": data.attempts.length,
+                        "{totalLoginAttempts}": data.totalCount,
+                    }
+                );
+                document.getElementById('lastRefreshTime').textContent = Localisation.translate(
+                    "Last refresh: {currentDateTime}",
+                    {
+                        "{currentDateTime}": new Date().toLocaleTimeString(),
+                    }
+                );
+
+                let btns = '';
+                if (data.page > 1) btns += `<button class="form-btn form-btn--sm" onclick="refreshLoginAttempts(${data.page - 1})"><i class="ph-duotone ph-skip-back"></i> {{ "Prev"|translate }}</button>`;
+                if (data.page < data.totalPages) btns += `<button class="form-btn form-btn--sm" onclick="refreshLoginAttempts(${data.page + 1})">{{ "Next"|translate }} <i class="ph-duotone ph-skip-forward"></i></button>`;
+                document.getElementById('logPaginationBtns').innerHTML = btns;
+            }
+            catch (err)
+            {
+                console.error('{{ "Failed to load login attempts:"|translate }}', err);
+                document.getElementById('loginAttemptsBody').innerHTML = '<tr><td colspan="6" class="empty-state" style="color:#cc0000;">{{ "Error"|translate }}</td></tr>';
+            }
+        }
+
+        function renderLoginAttempts()
+        {
+            const tbody = document.getElementById('loginAttemptsBody');
+            if (!wafState.loginAttempts.length)
+            {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">{{ "No login attempts"|translate }}</td></tr>';
+                return;
+            }
+            let html = '';
+            wafState.loginAttempts.forEach(a => {
+                let statusClass, statusText;
+                if (a.wasBlockedByWaf)
+                {
+                    statusClass = 'status-blocked';
+                    statusText = 'BLOCKED';
+                }
+                else if (a.wasSuccessful)
+                {
+                    statusClass = 'status-success';
+                    statusText = 'OK';
+                }
+                else
+                {
+                    statusClass = 'status-error';
+                    statusText = 'FAIL';
+                }
+                html += `<tr>
+                    <td>${formatDate(a.attemptedAt)}</td>
+                    <td class="cell-status ${statusClass}">${statusText}</td>
+                    <td class="waf-ip-cell"><a href="javascript:void(0)" onclick="showIpDetails('${escapeHtml(a.ipAddress)}')">${escapeHtml(a.ipAddress)}</a></td>
+                    <td>${escapeHtml(a.targetEmail || '-')}</td>
+                    <td class="waf-truncate" title="${escapeHtml(a.failureReason || '')}">${escapeHtml(a.failureReason || '-')}</td>
+                    <td class="cell-actions">${!a.wasSuccessful ? `<button onclick="quickBlock('${escapeHtml(a.ipAddress)}')">{{ "Block"|translate }}</button>` : ''}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // IP DETAILS
+        // ====================================================================================================
+        async function showIpDetails(ipAddress) {
+            document.getElementById('ipDetailsTitle').textContent = ipAddress;
+            document.getElementById('ipDetailsContent').innerHTML = '<div class="empty-state">Loading...</div>';
+            document.getElementById('ipDetailsOverlay').classList.add('is-visible');
+            document.getElementById('ipDetailsBlockBtn').onclick = () => blockFromDetails(ipAddress);
+            try {
+                const [status, data] = await api.API_GET(`/api/v3/web-application-firewall/blacklist/ips/${encodeURIComponent(ipAddress)}`);
+                if (status === 404)
+                {
+                    document.getElementById('ipDetailsContent').innerHTML = `<div class="status-row"><span>{{ "Status"|translate }}</span><span>{{ "Not Blocked"|translate }}</span></div><p style="margin-top:15px;color:#666;">{{ "No block history found."|translate }}</p>`;
+                    document.getElementById('ipDetailsBlockBtn').style.display = 'inline-block';
+                    return;
+                }
+                if (status !== 200) throw new Error('{{ "Failed"|translate }}');
+                let html = `<div class="status-row"><span>{{ "Current Status"|translate }}</span><span class="${data.currentBlock ? 'status-error' : ''}">${data.currentBlock ? '{{ "BLOCKED"|translate }}' : '{{ "Not Blocked"|translate }}'}</span></div>
+                    <div class="status-row"><span>{{ "First Seen At"|translate }}</span><span>${data.firstSeenAt ? formatDate(data.firstSeenAt) : '-'}</span></div>
+                    <div class="status-row"><span>{{ "Last Seen At"|translate }}</span><span>${data.lastSeenAt ? formatDate(data.lastSeenAt) : '-'}</span></div>
+                    <div class="status-row"><span>{{ "Failed Attempts"|translate }}</span><span>${data.totalFailedAttempts}</span></div>
+                    <div class="status-row"><span>{{ "Blocked Attempts"|translate }}</span><span>${data.totalBlockedAttempts}</span></div>`;
+                if (data.currentBlock)
+                {
+                    html += `<h4 style="margin-top:15px;">{{ "Current Block"|translate }}</h4>
+                        <div class="status-row"><span>{{ "Type"|translate }}</span><span>${data.currentBlock.isPermanent ? '{{ "Permanent"|translate }}' : '{{ "Temporary"|translate }}'}</span></div>
+                        <div class="status-row"><span>{{ "Reason"|translate }}</span><span>${escapeHtml(data.currentBlock.reason || '-')}</span></div>
+                        <div class="status-row"><span>{{ "Blocked At"|translate }}</span><span>${formatDate(data.currentBlock.blockedAt)}</span></div>`;
+                    document.getElementById('ipDetailsBlockBtn').style.display = 'none';
+                }
+                else
+                {
+                    document.getElementById('ipDetailsBlockBtn').style.display = 'inline-block';
+                }
+                if (data.blockHistory?.length)
+                {
+                    const blockHistoryText = await Localisation.translate(
+                        "Block History (blockHistoryCount)",
+                        {
+                            "{blockHistoryCount}": data.blockHistory.length
+                        }
+                    );
+                    html += `<h4 style="margin-top:15px;">${blockHistoryText}</h4><div style="max-height:150px;overflow-y:auto;">`;
+                    data.blockHistory.forEach(h => {
+                        html += `<div style="padding:6px 0;border-bottom:1px solid #eee;font-size:11px;">
+                            <div><strong>${h.isPermanent ? '{{ "Permanent"|translate }}' : '{{ "Temporary"|translate }}'}</strong> - ${escapeHtml(h.reason || '{{ "No reason"|translate }}')}</div>
+                            <div style="color:#666;">${formatDate(h.blockedAt)} ${h.wasManuallyUnblocked ? '<i class="ph-duotone ph-arrow-right"></i> {{ "Unblocked"|translate }}' : ''}</div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+                if (data.recentLoginAttempts?.length)
+                {
+                    html += `<h4 style="margin-top:15px;">{{ "Recent Attempts"|translate }}</h4><div style="max-height:150px;overflow-y:auto;">`;
+                    data.recentLoginAttempts.slice(0, 20).forEach(a => {
+                        const icon = a.wasBlockedByWaf ? '🚫' : (a.wasSuccessful ? '✓' : '✗');
+                        html += `<div style="padding:4px 0;border-bottom:1px solid #eee;font-size:11px;">${icon} ${formatDate(a.attemptedAt)} - ${escapeHtml(a.targetEmail || '{{ "Unknown"|translate }}')}</div>`;
+                    });
+                    html += '</div>';
+                }
+                document.getElementById('ipDetailsContent').innerHTML = html;
+            }
+            catch (err)
+            {
+                document.getElementById('ipDetailsContent').innerHTML = '<div class="empty-state" style="color:#cc0000;">{{ "Error loading details"|translate }}</div>';
+            }
+        }
+
+        function closeIpDetails()
+        {
+            document.getElementById('ipDetailsOverlay').classList.remove('is-visible');
+        }
+        function viewIpDetails()
+        {
+            const ip = document.getElementById('targetIpInput').value.trim();
+            if (!ip)
+            {
+                alert('{{ "Enter an IP address"|translate }}');
+                return;
+            }
+            showIpDetails(ip);
+        }
+        async function blockFromDetails(ip)
+        {
+            document.getElementById('targetIpInput').value = ip || document.getElementById('ipDetailsTitle').textContent;
+            closeIpDetails();
+            await blockIp();
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // ACTIONS
+        // ====================================================================================================
+        async function blockIp()
+        {
+            const ip = document.getElementById('targetIpInput').value.trim();
+            const reason = document.getElementById('blockReasonInput').value.trim();
+            const isPermanent = document.getElementById('blockTypeSelect').value === 'permanent';
+            const duration = parseInt(document.getElementById('blockDurationInput').value) || 60;
+            if (!ip)
+            {
+                alert('{{ "Enter an IP address"|translate }}');
+                return;
+            }
+            wafState.pendingAction = {
+                action: async () => {
+                    const [status, data] = await api.API_POST('/api/v3/web-application-firewall/block-ip', {
+                        ipAddress: ip,
+                        reason: reason || 'Manually blocked', //TODO: figure out whether this be translated
+                        isPermanent,
+                        durationMinutes: isPermanent ? null : duration
+                    });
+                    if (status === 201)
+                    {
+                        document.getElementById('targetIpInput').value = '';
+                        document.getElementById('blockReasonInput').value = '';
+                        loadAllData();
+                        return true;
+                    }
+                    throw new Error(data.message || 'Failed');
+                }
+            };
+            showConfirmDialog(
+                '<i class="ph-duotone ph-prohibit"></i>',
+                '{{ "Block IP"|translate }}',
+                await Localisation.translate(
+                    "Block {ipAddress} {duration}?",
+                    {
+                        "{ipAddress}": ip,
+                        "{duration}": isPermanent ? '{{ "permanently"|translate }}' : await Localisation.translate(
+                            "for {duration} minutes",
+                            {
+                                "{duration}": duration
+                            }
+                        )
+                    }
+                ),
+            );
+        }
+
+        async function quickBlock(ip)
+        {
+            document.getElementById('targetIpInput').value = ip;
+            document.getElementById('blockReasonInput').value = '{{ "Blocked from WAF monitor"|translate }}';
+            await blockIp();
+        }
+
+        async function unblockIp()
+        {
+            const ip = document.getElementById('targetIpInput').value.trim();
+            if (!ip) { alert('Enter an IP address'); return; }
+            wafState.pendingAction = {
+                showReason: true,
+                action: async (reason) => {
+                    const url = `/api/v3/web-application-firewall/blocked-ips/${encodeURIComponent(ip)}${reason ? '?reason=' + encodeURIComponent(reason) : ''}`;
+                    const [status, data] = await api.API_DELETE(url);
+                    if (status === 204)
+                    {
+                        document.getElementById('targetIpInput').value = '';
+                        loadAllData();
+                        return true;
+                    }
+                    throw new Error(data.message || 'Failed');
+                }
+            };
+            showConfirmDialog(
+                '<i class="ph-duotone ph-check"></i>',
+                '{{ "Unblock IP"|translate }}',
+                await Localisation.translate(
+                    "Unblock {ipAddress}?",
+                    {
+                        "{ipAddress}": ip,
+                    }
+                ),
+                true
+            );
+        }
+
+        async function quickUnblock(ip)
+        {
+            wafState.pendingAction = {
+                showReason: true,
+                action: async (reason) => {
+                    const [status, data] = await api.API_DELETE(`/api/v3/web-application-firewall/blocked-ips/${encodeURIComponent(ip)}${reason ? '?reason=' + encodeURIComponent(reason) : ''}`);
+                    if (status === 204) { loadAllData(); return true; }
+                    throw new Error(data.message || '{{ "Failed"|translate }}');
+                }
+            };
+            showConfirmDialog(
+                '<i class="ph-duotone ph-check"></i>',
+                '{{ "Unblock IP"|translate }}',
+                await Localisation.translate(
+                    "Unblock {ipAddress}?",
+                    {
+                        "{ipAddress}": ip,
+                    }
+                ),
+                true
+            );
+        }
+
+        async function unlockUser(userId, email) {
+            wafState.pendingAction = {
+                showReason: true,
+                action: async (reason) => {
+                    const [status, data] = await api.API_POST(`/api/v3/web-application-firewall/locked-out-users/${userId}/unlock`, { reason: reason || null });
+                    if (status === 204)
+                    {
+                        loadAllData();
+                        return true;
+                    }
+                    throw new Error(data.message || '{{ "Failed"|translate }}');
+                }
+            };
+            showConfirmDialog(
+                '<i class="ph-duotone ph-lock-key-open"></i>',
+                '{{ "Unlock User"|translate }}',
+                await Localisation.translate(
+                    "Unlock {emailOrUserId}?",
+                    {
+                        "{emailOrUserId}": email || userId,
+                    }
+                ),
+                true
+            );
+        }
+
+        async function addToWhitelist()
+        {
+            const ip = document.getElementById('targetIpInput').value.trim();
+            if (!ip)
+            {
+                alert('{{ "Enter an IP address"|translate }}');
+                return;
+            }
+            wafState.pendingAction = {
+                showReason: true,
+                action: async (reason) => {
+                    const [status, data] = await api.API_POST('/api/v3/web-application-firewall/whitelist', { ipAddress: ip, reason: reason || null });
+                    if (status === 200) { document.getElementById('targetIpInput').value = ''; loadAllData(); return true; }
+                    throw new Error(data.message || '{{ "Failed"|translate }}');
+                }
+            };
+            showConfirmDialog(
+                '<i class="ph-duotone ph-star"></i>',
+                '{{ "Add to Whitelist"|translate }}',
+                await Localisation.translate(
+                    "Whitelist {ipAddress}? This IP will bypass all WAF checks!",
+                    {
+                        "{ipAddress}": ip,
+                    }
+                ),
+                true
+            );
+        }
+
+        async function removeFromWhitelist(ip)
+        {
+            wafState.pendingAction = {
+                showReason: true,
+                action: async (reason) => {
+                    const [status, data] = await api.API_DELETE(`/api/v3/web-application-firewall/whitelist/${encodeURIComponent(ip)}${reason ? '?reason=' + encodeURIComponent(reason) : ''}`);
+                    if (status === 200) { loadAllData(); return true; }
+                    throw new Error(data.message || 'Failed');
+                }
+            };
+            showConfirmDialog(
+                '☆',
+                '{{ "Remove from Whitelist"|translate }}',
+                await Localisation.translate(
+                    "Remove {ipAddress} from whitelist?",
+                    {
+                        "{ipAddress}": ip,
+                    }
+                ),
+                true
+            );
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // CONFIRM DIALOGUE
+        // ====================================================================================================
+        function showConfirmDialog(icon, title, message, showReason = false)
+        {
+            document.getElementById('confirmIcon').innerHTML = icon;
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmReasonField').style.display = showReason ? 'block' : 'none';
+            document.getElementById('confirmReasonInput').value = '';
+            document.getElementById('confirmOverlay').classList.add('is-visible');
+        }
+
+        function closeConfirmDialog()
+        {
+            document.getElementById('confirmOverlay').classList.remove('is-visible');
+            wafState.pendingAction = null;
+        }
+
+        async function executeConfirmedAction()
+        {
+            if (!wafState.pendingAction) return;
+            const btn = document.getElementById('confirmActionBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '{{ "Processing..."|translate }}';
+            btn.disabled = true;
+            try
+            {
+                const reason = document.getElementById('confirmReasonInput').value.trim();
+                await wafState.pendingAction.action(reason);
+                closeConfirmDialog();
+            }
+            catch (err)
+            {
+                alert(err.message || '{{ "Action failed"|translate }}');
+            }
+            finally { btn.textContent = originalText; btn.disabled = false; }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // AUTO REFRESH
+        // ====================================================================================================
+        function toggleAutoRefresh()
+        {
+            const enabled = document.getElementById('autoRefreshCheck').checked;
+            if (wafState.autoRefreshInterval)
+            {
+                clearInterval(wafState.autoRefreshInterval);
+                wafState.autoRefreshInterval = null;
+            }
+            if (enabled) wafState.autoRefreshInterval = setInterval(loadAllData, 30000);
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // EXPORT
+        // ====================================================================================================
+        function exportBlockedIps()
+        {
+            let csv = 'IP Address,Type,Reason,Blocked At,Expires At,Active\n';
+            wafState.blockedIps.forEach(b => { csv += `"${b.ipAddress}","${b.isPermanent ? 'Permanent' : 'Temporary'}","${(b.reason || '').replace(/"/g, '""')}","${b.blockedAt}","${b.expiresAt || ''}","${b.isActive}"\n`; });
+            downloadCsv(csv, 'waf-blocked-ips.csv');
+        }
+
+        function exportLoginAttempts()
+        {
+            let csv = 'Timestamp,IP Address,Email,Success,Blocked,Failure Reason\n';
+            wafState.loginAttempts.forEach(a => { csv += `"${a.attemptedAt}","${a.ipAddress}","${a.targetEmail || ''}","${a.wasSuccessful}","${a.wasBlockedByWaf}","${(a.failureReason || '').replace(/"/g, '""')}"\n`; });
+            downloadCsv(csv, 'waf-login-attempts.csv');
+        }
+
+        function downloadCsv(content, filename)
+        {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; link.click();
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // UTILITIES
+        // ====================================================================================================
+        function escapeHtml(text)
+        {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(iso)
+        {
+            if (!iso) return '-';
+            const d = new Date(iso);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        async function formatTimeAgo(iso)
+        {
+            if (!iso) return '-';
+            const diffMins = Math.floor((new Date() - new Date(iso)) / 60000);
+            if (diffMins < 1) return '{{ "just now"|translate }}';
+            if (diffMins < 60) await Localisation.translate("{minutesAgo}m ago", {"minutesAgo": diffMins});
+            if (diffMins < 1440) await Localisation.translate("{hoursAgo}h ago", {"hoursAgo": Math.floor(diffMins / 60)});
+            return await Localisation.translate("{daysAgo}d ago", {"daysAgo": Math.floor(diffMins / 1440)});
+        }
+    </script>
+{% endblock %}

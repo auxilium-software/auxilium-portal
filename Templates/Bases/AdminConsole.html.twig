@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ "Auxilium Administration Console"|translate }}</title>
+        <link rel="stylesheet" href="/Static/CSS/AdminConsole.css">
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css"
+        />
+        {% include '/Partials/JSImports.html.twig' %}
+    </head>
+    <body>
+        <div class="page-container">
+
+            {# ====== MOBILE TOGGLE BUTTON ====== #}
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="nav-toggle__icon">☰</span>
+                <span class="nav-toggle__text">Menu</span>
+            </button>
+
+            {# ====== MOBILE OVERLAY ====== #}
+            <div class="nav-overlay" id="navOverlay">
+            </div>
+
+            {# ====== NAVIGATION PANEL ====== #}
+            <nav class="nav-panel" id="navPanel">
+                <div class="nav-header">
+                    <div class="nav-header-inner">
+                        {{ "Auxilium Administration Console"|translate }}
+                    </div>
+                </div>
+
+                <div class="nav-content">
+                    {% for item in NavigationTree %}
+                    {% include '/Partials/AdminConsoleNavigationItem.html.twig' with {'item': item, 'depth': 0} %}
+                    {% endfor %}
+                </div>
+
+                <div class="nav-footer">
+                    <span class="nav-footer__text">{{ "Administrator Mode"|translate }}</span>
+                    <span class="nav-footer__status">
+                        <span class="nav-footer__status-dot"></span> {{ "Operational"|translate }}
+                    </span>
+                </div>
+            </nav>
+
+            {# ====== MAIN CONTENT ====== #}
+            <main class="main-content">
+                <div class="content-header">
+                    <span class="breadcrumb">
+                        <a href="/">{{ "Auxilium Home"|translate }}</a> »
+                        {% for crumbDetails in Breadcrumbs %}
+                            <a href="{{ crumbDetails.HREF }}">{{ crumbDetails.Label }}</a>{% if not loop.last %} » {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span id="DateTimeReadout" class="date-time">{{ "now"|date("l, F j, Y") }}</span>
+                </div>
+
+                <div class="content-body">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+
+                <div class="content-footer">
+                    © {{ "now"|date("Y") }} Auxilium Software. All Rights Reserved.
+                </div>
+            </main>
+        </div>
+
+        <script src="/Static/JS/AdminConsole/TreeNavigation.js"></script>
+        <script src="/Static/JS/APIControllers/BulletinController.js"></script>
+        {% block scripts %}
+        {% endblock %}
+        <script>
+            setInterval(function () {
+                const now = new Date();
+                document.getElementById('DateTimeReadout').textContent = now.toLocaleDateString('en-GB', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }) + ' ' + now.toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }, 100);
+        </script>
+    </body>
+</html>

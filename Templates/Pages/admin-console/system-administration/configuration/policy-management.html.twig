@@ -1,0 +1,1133 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-scroll"></i> {{ "Policy Management"|translate }}
+            <span class="page-title__sub">{{ "System Configuration" }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button type="button" class="form-btn" onclick="refreshSettings()"><i class="ph-duotone ph-arrow-clockwise"></i> {{ "Refresh"|translate }}</button>
+        </div>
+    </div>
+
+    <div class="reg-editor">
+        <div class="reg-tree-panel">
+            <div class="reg-tree-header">
+                <span><i class="ph-duotone ph-folder"></i> {{ "System Settings"|translate }}</span>
+            </div>
+            <div class="reg-tree-body" id="policyTree">
+                <div style="padding: 12px; color: #666;">{{ "Loading..."|translate }}</div>
+            </div>
+        </div>
+
+
+        <div class="reg-values-panel">
+            <div class="reg-path-bar">
+                <span class="reg-path-label">{{ "Path:"|translate }}</span>
+                <span class="reg-path-value" id="currentPath">{{ "System Settings"|translate }}</span>
+            </div>
+
+            <div class="reg-values-body">
+                <table class="admin-table admin-table--compact">
+                    <thead>
+                        <tr>
+                            <th style="width: 24px;"></th>
+                            <th style="width: 220px;" class="is-sortable">{{ "Name"|translate }}</th>
+                            <th style="width: 100px;">{{ "Type"|translate }}</th>
+                            <th>Data</th>
+                            <th style="width: 70px;">{{ "Status"|translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="valuesBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #666; padding: 20px;">
+                                {{ "Select a category from the tree"|translate }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="reg-status-bar">
+                <span id="statusText">{{ "Ready"|translate }}</span>
+                <span id="itemCount"></span>
+            </div>
+        </div>
+    </div>
+
+    {# CONTEXT MENU #}
+    <div class="ctx-menu" id="contextMenu">
+        <div class="ctx-menu__item" data-action="edit">
+            <span class="ctx-menu__icon"><i class="ph-duotone ph-pencil"></i></span>
+            <span class="ctx-menu__label">{{ "Modify"|translate }}</span>
+            <span class="ctx-menu__shortcut"></span>
+        </div>
+
+        <div class="ctx-menu__separator"></div>
+
+        <div class="ctx-menu__item" data-action="history">
+            <span class="ctx-menu__icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span>
+            <span class="ctx-menu__label">{{ "View History"|translate }}</span>
+            <span class="ctx-menu__shortcut"></span>
+        </div>
+        <div class="ctx-menu__item" data-action="reset" id="ctxResetItem">
+            <span class="ctx-menu__icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span>
+            <span class="ctx-menu__label">{{ "Reset to Default"|translate }}</span>
+            <span class="ctx-menu__shortcut"></span>
+        </div>
+
+        <div class="ctx-menu__separator"></div>
+
+        <div class="ctx-menu__item" data-action="help">
+            <span class="ctx-menu__icon"><i class="ph-duotone ph-question-mark"></i></span>
+            <span class="ctx-menu__label">{{ "What's This?"|translate }}</span>
+            <span class="ctx-menu__shortcut">F1</span>
+        </div>
+    </div>
+
+    {# VALUE EDIT DIALOGUE #}
+    <div class="confirm-overlay" id="editOverlay">
+        <div class="confirm-dialog" style="width: 480px;">
+            <div class="error-box">
+                <div class="error-box__header">
+                    <span class="error-box__header-icon"><i class="ph-duotone ph-pencil"></i></span>
+                    <span id="editDialogTitle">{{ "Edit Value"|translate }}</span>
+                </div>
+                <div class="error-box__body" style="flex-direction: column; gap: 0;">
+                    <div class="error-box__message" style="width: 100%;">
+
+                        <div class="reg-edit-field">
+                            <label class="reg-edit-label">{{ "Setting Key:"|translate }}</label>
+                            <input type="text" id="editValueKey" class="form-input" readonly style="background: #ece9d8; font-family: monospace; font-size: 10px;">
+                        </div>
+
+                        <div class="reg-edit-field">
+                            <label class="reg-edit-label">{{ "Name:"|translate }}</label>
+                            <input type="text" id="editValueName" class="form-input" readonly style="background: #ece9d8;">
+                        </div>
+
+                        <div class="reg-edit-field" id="editTypeField">
+                            <label class="reg-edit-label">{{ "Type:"|translate }}</label>
+                            <input type="text" id="editValueType" class="form-input" readonly style="background: #ece9d8;">
+                        </div>
+
+                        <!-- String Value -->
+                        <div class="reg-edit-field" id="editStringField" style="display: none;">
+                            <label class="reg-edit-label">{{ "Value data:"|translate }}</label>
+                            <input type="text" id="editStringValue" class="form-input">
+                        </div>
+
+                        <!-- Number Value -->
+                        <div class="reg-edit-field" id="editNumberField" style="display: none;">
+                            <label class="reg-edit-label">{{ "Value data:"|translate }}</label>
+                            <input type="number" id="editNumberValue" class="form-input" style="width: 140px;">
+                        </div>
+
+                        <!-- Boolean Value -->
+                        <div class="reg-edit-field" id="editBoolField" style="display: none;">
+                            <label class="reg-edit-label">{{ "Value data:"|translate }}</label>
+                            <div style="display: flex; gap: 16px;">
+                                <label style="font-size: 11px;">
+                                    <input type="radio" name="boolValue" value="true"> {{ "True (Enabled)"|translate }}
+                                </label>
+                                <label style="font-size: 11px;">
+                                    <input type="radio" name="boolValue" value="false"> {{ "False (Disabled)"|translate }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- StringArray Value -->
+                        <div class="reg-edit-field" id="editArrayField" style="display: none;">
+                            <label class="reg-edit-label">{{ "Value data (one per line):"|translate }}</label>
+                            <textarea id="editArrayValue" class="form-input" rows="4" style="resize: vertical; font-family: monospace;"></textarea>
+                        </div>
+
+                        <!-- Default Value Display -->
+                        <div class="reg-edit-field" style="margin-top: 8px;">
+                            <label class="reg-edit-label" style="color: #666;">{{ "Default value:"|translate }}</label>
+                            <span id="editDefaultValue" style="font-size: 11px; font-family: monospace; color: #666;"></span>
+                        </div>
+
+                        <!-- Reason for modification -->
+                        <div class="reg-edit-field" style="margin-top: 12px; padding-top: 10px; border-top: 1px dotted #ccc;">
+                            <label class="reg-edit-label">Reason for change: <span style="color: #cc0000;">*</span></label>
+                            <input type="text" id="editReason" class="form-input" placeholder="{{ "e.g., Increased password length per security audit"|translate }}">
+                        </div>
+
+                        <!-- TOTP -->
+                        <div class="reg-edit-field">
+                            <label class="reg-edit-label">{{ "TOTP Code:"|translate }} <span style="color: #cc0000;">*</span></label>
+                            <input type="text"
+                                   id="editTotpCode"
+                                   class="form-input"
+                                   style="font-size: 16px; letter-spacing: 4px; text-align: center; width: 140px;"
+                                   placeholder="000000"
+                                   maxlength="9"
+                                   autocomplete="one-time-code"
+                                   inputmode="numeric">
+                        </div>
+
+                        <div id="editError" style="color: #cc0000; font-size: 10px; margin-top: 8px; display: none;"></div>
+                    </div>
+                </div>
+                <div class="error-box__footer">
+                    <button type="button" class="error-box__btn" onclick="closeEditDialog()">{{ "Cancel"|translate }}</button>
+                    <button type="button" class="error-box__btn" onclick="resetToDefault()" id="resetDefaultBtn">{{ "Reset to Default"|translate }}</button>
+                    <button type="button" class="error-box__btn error-box__btn--primary" onclick="saveValue()">{{ "OK"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# HISTORY DIALOGUE #}
+    <div class="confirm-overlay" id="historyOverlay">
+        <div class="confirm-dialog" style="width: 600px;">
+            <div class="error-box">
+                <div class="error-box__header">
+                    <span class="error-box__header-icon"><i class="ph-duotone ph-clock-counter-clockwise"></i></span>
+                    <span id="historyDialogTitle">{{ "Setting History"|translate }}</span>
+                </div>
+                <div class="error-box__body" style="flex-direction: column; padding: 0;">
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table class="admin-table admin-table--compact" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th>{{ "Date"|translate }}</th>
+                                    <th>{{ "Value"|translate }}</th>
+                                    <th>{{ "Modified By"|translate }}</th>
+                                    <th>{{ "Reason"|translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                                <tr><td colspan="4" style="text-align: center;">{{ "Loading..."|translate }}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="error-box__footer">
+                    <button type="button" class="error-box__btn error-box__btn--primary" onclick="closeHistoryDialog()">{{ "Close"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# TOAST NOTIFICATION #}
+    <div class="toast" id="toast">
+        <span class="toast__icon"><i class="ph-duotone ph-thumbs-up"></i></span>
+        <span class="toast__message" id="toastMessage">{{ "Copied to clipboard"|translate }}</span>
+    </div>
+
+    {# WHAT'S THIS? (POPUP) #}
+    <div class="help-popup" id="helpPopup">
+        <div class="help-popup__pointer"></div>
+        <div class="help-popup__content">
+            <div class="help-popup__title" id="helpTitle">{{ "Setting Name"|translate }}</div>
+            <div class="help-popup__body" id="helpBody">{{ "Description goes here..."|translate }}</div>
+            <div class="help-popup__recommendation" id="helpRecommendation"></div>
+            <div class="help-popup__meta" id="helpMeta"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const api = new APIInteractions();
+
+        let policyData = {
+            settings: [],
+            tree: null,
+            settingsMap: {},
+            selectedPath: null,
+            selectedSetting: null,
+            contextMenuTarget: null
+        };
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await refreshSettings();
+            initContextMenu();
+
+            document.addEventListener('keydown', async function(e) {
+                const selectedRow = document.querySelector('#valuesBody tr.is-selected');
+                const key = selectedRow.dataset.key;
+
+                switch(e.key)
+                {
+                    case "Enter":
+                        editSetting(key)
+                        break;
+                    case "Escape":
+                        closeContextMenu();
+                        closeEditDialog();
+                        closeHistoryDialog();
+                        hideHelpPopup();
+                        break;
+                    case "F1":
+                        e.preventDefault();
+                        if (selectedRow && key) await showHelpPopup(key, selectedRow);
+                        else showToast('Select a setting first, then press F1 for help');
+                        break;
+                }
+            });
+
+            document.getElementById('editTotpCode').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') saveValue();
+            });
+        });
+
+        function initContextMenu()
+        {
+            const menu = document.getElementById('contextMenu');
+
+            document.addEventListener('click', function(e) {
+                if (!menu.contains(e.target)) closeContextMenu();
+            });
+
+            document.addEventListener('scroll', closeContextMenu, true);
+
+            menu.querySelectorAll('.ctx-menu__item:not(.ctx-menu__item--disabled)').forEach(function(item) {
+                item.addEventListener('click', async function() {
+                    const action = this.dataset.action;
+                    if (action) await handleContextMenuAction(action);
+                });
+            });
+        }
+
+        function showContextMenu(event, key)
+        {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const setting = policyData.settingsMap[key];
+            if (!setting) return;
+
+            policyData.contextMenuTarget = setting;
+
+            // visually highlight the row
+            document.querySelectorAll('#valuesBody tr').forEach(function(row) {
+                row.classList.remove('is-selected');
+            });
+            const targetRow = document.querySelector('#valuesBody tr[data-key="' + key + '"]');
+            if (targetRow) targetRow.classList.add('is-selected');
+
+            // enable/disable reset option based on whether using default
+            const resetItem = document.getElementById('ctxResetItem');
+            if (setting.isUsingDefault) resetItem.classList.add('ctx-menu__item--disabled');
+            else resetItem.classList.remove('ctx-menu__item--disabled');
+
+            const menu = document.getElementById('contextMenu');
+
+            // show menu temporarily to get dimensions
+            menu.style.visibility = 'hidden';
+            menu.classList.add('is-visible');
+
+            const menuRect = menu.getBoundingClientRect();
+
+            // make sure the menu doesn't go off-screen
+            if (event.clientX + menuRect.width > window.innerWidth)     event.clientX = window.innerWidth - menuRect.width - 5;
+            if (event.clientY + menuRect.height > window.innerHeight)   event.clientY = window.innerHeight - menuRect.height - 5;
+
+            menu.style.left = event.clientX + 'px';
+            menu.style.top = event.clientY + 'px';
+            menu.style.visibility = 'visible';
+        }
+
+        function closeContextMenu()
+        {
+            const menu = document.getElementById('contextMenu');
+            menu.classList.remove('is-visible');
+        }
+
+        async function handleContextMenuAction(action)
+        {
+            const setting = policyData.contextMenuTarget;
+            closeContextMenu();
+
+            switch (action) {
+                case 'edit':
+                    if (setting) editSetting(setting.key);
+                    break;
+
+                case 'history':
+                    if (setting) loadHistory(setting.key);
+                    break;
+
+                case 'reset':
+                    if (setting && !setting.isUsingDefault)
+                    {
+                        editSetting(setting.key);
+                        setTimeout(resetToDefault, 100);
+                    }
+                    break;
+
+                case 'help':
+                    if (setting)
+                    {
+                        const row = document.querySelector('#valuesBody tr[data-key="' + setting.key + '"]');
+                        await showHelpPopup(setting.key, row);
+                    }
+                    break;
+            }
+        }
+
+        function showToast(message)
+        {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.textContent = message;
+            toast.classList.add('is-visible');
+
+            setTimeout(function() {
+                toast.classList.remove('is-visible');
+            }, 2000);
+        }
+
+
+
+
+
+        async function refreshSettings()
+        {
+            document.getElementById('statusText').textContent = "{{ "Loading..."|translate}}";
+
+            try
+            {
+                const [statusCode, data] = await api.API_GET('/api/v3/system-settings/all');
+                if (statusCode !== 200) throw new Error('{{ "Failed to get settings"|translate }}');
+
+                policyData.settings = data.settings || [];
+
+                policyData.settingsMap = {};
+                policyData.settings.forEach(function(s) {
+                    policyData.settingsMap[s.key] = s;
+                });
+
+                policyData.tree = buildTreeFromSettings(policyData.settings);
+
+                renderTree();
+                document.getElementById('statusText').textContent = await Localisation.translate(
+                    'Loaded {count} settings',
+                    {
+                        '{count}' : policyData.settings.length
+                    }
+                );
+            }
+            catch (ex)
+            {
+                console.error('Failed to load settings:', ex);
+                document.getElementById('statusText').textContent = "{{ "Error loading settings"|translate }}";
+                document.getElementById('policyTree').innerHTML = '<div style="padding:12px;color:#cc0000;">{{ "Failed to load settings"|translate }}</div>';
+            }
+        }
+
+        async function loadHistory(settingKey)
+        {
+            document.getElementById('historyBody').innerHTML = '<tr><td colspan="4" style="text-align:center;">{{ "Loading..."|translate }}</td></tr>';
+            document.getElementById('historyDialogTitle').textContent = await Localisation.translate(
+                'History: {settingKey}',
+                {
+                    '{settingKey}': settingKey
+                }
+            );
+            document.getElementById('historyOverlay').classList.add('is-visible');
+
+            try
+            {
+                const [statusCode, history] = await api.API_GET('/api/v3/system-settings/' + encodeURIComponent(settingKey) + '/history');
+                if (statusCode !== 200) throw new Error('{{ "Failed to get history"|translate }}');
+
+                if (history.length === 0)
+                {
+                    document.getElementById('historyBody').innerHTML =
+                        '<tr><td colspan="4" style="text-align:center;color:#666;">'
+                        + await Localisation.translate('No history (using default value)')
+                        + '</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                history.forEach(function(entry) {
+                    html += '<tr>';
+                    html += '<td style="white-space:nowrap;">' + formatDate(entry.modifiedAt) + '</td>';
+                    html += '<td class="reg-value-data">' + escapeHtml(formatValueDisplay(entry.value, entry.valueType)) + '</td>';
+                    html += '<td>' + escapeHtml(entry.modifiedByName || '-') + '</td>';
+                    html += '<td>' + escapeHtml(entry.reasonForModification || '-') + '</td>';
+                    html += '</tr>';
+                });
+
+                document.getElementById('historyBody').innerHTML = html;
+
+            }
+            catch (err)
+            {
+                document.getElementById('historyBody').innerHTML =
+                    '<tr><td colspan="4" style="text-align:center;color:#cc0000;">'
+                    + '{{ "Failed to load history"|translate }}'
+                    + '</td></tr>';
+            }
+        }
+
+        async function saveValue()
+        {
+            const setting = policyData.selectedSetting;
+            if (!setting) return;
+
+            const reason = document.getElementById('editReason').value.trim();
+            const totp = document.getElementById('editTotpCode').value.trim();
+
+            if (!reason)
+            {
+                showEditError('{{ 'Please provide a reason for this change'|translate }}');
+                return;
+            }
+
+            if (!totp)
+            {
+                showEditError('{{ 'Please enter your TOTP code'|translate }}');
+                return;
+            }
+
+            const newValue = getEditedValue(setting.valueType);
+
+            document.getElementById('statusText').textContent = '{{ "Saving..."|translate }}';
+
+            try
+            {
+                const [statusCode, data] = await api.API_PUT(
+                    '/api/v3/system-settings/' + encodeURIComponent(setting.key),
+                    {
+                        value: newValue,
+                        reasonForModification: reason
+                    }
+                );
+                if (statusCode !== 200 && statusCode !== 201)
+                {
+                    throw new Error(data.message || data.detail || '{{ "Failed to save"|translate }}');
+                }
+
+                closeEditDialog();
+                await refreshSettings();
+
+                // re-select the same path to refresh the values view
+                if (policyData.selectedPath)
+                {
+                    loadValuesForPath(policyData.selectedPath);
+                }
+
+                document.getElementById('statusText').textContent = '{{ 'Saved successfully'|translate }}';
+                showToast('{{ "Setting saved successfully"|translate }}');
+
+            }
+            catch (err)
+            {
+                showEditError(err.message);
+                document.getElementById('statusText').textContent = '{{ 'Error saving'|translate}}';
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // TREE BUILDING
+        // ====================================================================================================
+        function buildTreeFromSettings(settings)
+        {
+            const root = {
+                id: 'root',
+                label: '{{ "System Settings"|translate }}',
+                icon: 'ph-folder',
+                path: '',
+                children: [],
+                settings: []
+            };
+
+            settings.forEach(function(setting)
+            {
+                const parts = setting.jsonKey.split('.');
+                let current = root;
+                let pathSoFar = '';
+
+                for (let i = 0; i < parts.length - 1; i++)
+                {
+                    pathSoFar += (pathSoFar ? '.' : '') + parts[i];
+
+                    let existing = current.children.find(function (c)
+                    {
+                        return c.id === pathSoFar;
+                    });
+
+                    if (!existing)
+                    {
+                        existing = {
+                            id: pathSoFar,
+                            label: formatLabel(parts[i]),
+                            icon: getCategoryIcon(pathSoFar),
+                            path: pathSoFar,
+                            children: [],
+                            settings: []
+                        };
+                        current.children.push(existing);
+                    }
+
+                    current = existing;
+                }
+
+                current.settings.push(setting);
+            });
+
+            sortTreeChildren(root);
+            return root;
+        }
+
+        function sortTreeChildren(node)
+        {
+            node.children.sort(function(a, b) { return a.label.localeCompare(b.label); });
+            node.children.forEach(sortTreeChildren);
+        }
+
+        function getCategoryIcon(path)
+        {
+            const icons = {
+                'policies': 'ph-scroll',
+                'policies.webApplicationFirewall': 'ph-fire',
+                'policies.webApplicationFirewall.user': 'ph-user',
+                'policies.webApplicationFirewall.ip': 'ph-globe',
+                'policies.webApplicationFirewall.rateLimiting': 'ph-timer',
+                'policies.webApplicationFirewall.whitelisting': 'ph-check',
+                'policies.webApplicationFirewall.distributedAttackDetection': 'ph-target',
+                'policies.password': 'ph-key',
+                'policies.totp': 'ph-device-mobile',
+                'policies.accountLockout': 'ph-lock',
+                'policies.logging': 'ph-clipboard',
+                'policies.logging.security': 'ph-lock',
+                'policies.logging.entityActions': 'ph-note',
+                'policies.logging.entityActions.cases': 'ph-briefcase',
+                'policies.logging.entityActions.users': 'ph-users',
+                'instance': 'ph-building',
+                'instance.branding': 'ph-palette',
+                'instance.contacts': 'ph-phone',
+                'instance.defaults': 'ph-gear',
+                'instance.navigation': 'ph-compass',
+                'system': 'ph-hard-drive'
+            };
+            return icons[path] || 'ph-question';
+        }
+
+        function formatLabel(str)
+        {
+            return str
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, function(s) { return s.toUpperCase(); })
+                .trim();
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // TREE RENDERING
+        // ====================================================================================================
+        function renderTree()
+        {
+            if (!policyData.tree) return;
+
+            const container = document.getElementById('policyTree');
+            container.innerHTML = renderTreeNode(policyData.tree, 0);
+
+            const rootItem = container.querySelector('.reg-tree-item');
+            if (rootItem)
+            {
+                rootItem.classList.add('is-open');
+                const expandIcon = rootItem.querySelector('.reg-tree-item__expand');
+                if (expandIcon) expandIcon.innerHTML = '<i class="ph-duotone ph-folder-open"></i>';
+            }
+        }
+
+        function renderTreeNode(node, depth)
+        {
+            const hasChildren = node.children && node.children.length > 0;
+            const hasSettings = node.settings && node.settings.length > 0;
+            const expandIcon = hasChildren ? '<i class="ph-duotone ph-folder"></i>' : '';
+            const isLeaf = !hasChildren && hasSettings;
+
+            let html = '<div class="reg-tree-item" data-id="' + escapeHtml(node.id) + '" data-depth="' + depth + '" data-path="' + escapeHtml(node.path) + '">';
+            html += '<div class="reg-tree-item__row" onclick="handleTreeClick(event, \'' + escapeHtml(node.path) + '\')">';
+            html += '<span class="reg-tree-item__expand">' + expandIcon + '</span>';
+            html += '<span class="reg-tree-item__icon">' + (isLeaf ? '<i class="ph-duotone ph-file"></i>' : `<i class="ph-duotone ${node.icon}"></i>`) + '</span>';
+            html += '<span class="reg-tree-item__label">' + escapeHtml(node.label) + '</span>';
+            html += '</div>';
+
+            if (hasChildren)
+            {
+                html += '<div class="reg-tree-item__children">';
+                node.children.forEach(function(child) {
+                    html += renderTreeNode(child, depth + 1);
+                });
+                html += '</div>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function handleTreeClick(event, path)
+        {
+            const item = event.target.closest('.reg-tree-item');
+            const row = event.target.closest('.reg-tree-item__row');
+
+            document.querySelectorAll('.reg-tree-item__row.is-selected').forEach(function(el)
+            {
+                el.classList.remove('is-selected');
+            });
+
+            row.classList.add('is-selected');
+
+            const childContainer = item.querySelector(':scope > .reg-tree-item__children');
+            if (childContainer)
+            {
+                item.classList.toggle('is-open');
+                const expandIcon = item.querySelector(':scope > .reg-tree-item__row .reg-tree-item__expand');
+                expandIcon.innerHTML = item.classList.contains('is-open') ? '<i class="ph-duotone ph-folder-open"></i>' : '<i class="ph-duotone ph-folder"></i>';
+            }
+
+            policyData.selectedPath = path;
+            loadValuesForPath(path);
+            updatePathDisplay(path);
+        }
+
+        function updatePathDisplay(path)
+        {
+            let display = '{{ "System Settings"|translate }}';
+            if (path)
+                display += '\\' + path.split('.').map(formatLabel).join('\\');
+            document.getElementById('currentPath').textContent = display;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // VALUES RENDERING
+        // ====================================================================================================
+        function loadValuesForPath(path) {
+            const tbody = document.getElementById('valuesBody');
+            const node = findNodeByPath(policyData.tree, path);
+
+            if (!node)
+            {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;padding:20px;">{{ "(Select a category)"|translate }}</td></tr>';
+                document.getElementById('itemCount').textContent = '';
+                return;
+            }
+
+            const settings = node.settings || [];
+
+            if (settings.length === 0)
+            {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;padding:20px;">{{ "(No settings at this level - expand subcategories)"|translate }}</td></tr>';
+                document.getElementById('itemCount').textContent = '';
+                return;
+            }
+
+            let html = '';
+            settings.forEach(function(setting)
+            {
+                const typeIcon = getTypeIcon(setting.valueType);
+                const displayValue = formatValueDisplay(setting.value, setting.valueType);
+                const valueClass = setting.isUsingDefault ? 'reg-value-default' : 'reg-value-modified';
+                const statusBadge = setting.isUsingDefault
+                    ? '<span class="badge badge--user">{{ "Default"|translate }}</span>'
+                    : '<span class="badge badge--active">{{ "Modified"|translate }}</span>';
+
+                const nameParts = setting.jsonKey.split('.');
+                const settingName = nameParts[nameParts.length - 1];
+
+                html += '<tr data-key="' + escapeHtml(setting.key) + '" onclick="selectRow(this)" ondblclick="editSetting(\'' + escapeHtml(setting.key) + '\')" oncontextmenu="showContextMenu(event, \'' + escapeHtml(setting.key) + '\')">';
+                html += '<td style="text-align:center;">' + typeIcon + '</td>';
+                html += '<td>' + escapeHtml(formatLabel(settingName)) + '</td>';
+                html += '<td>' + getTypeName(setting.valueType) + '</td>';
+                html += '<td class="reg-value-data ' + valueClass + '">' + escapeHtml(displayValue) + '</td>';
+                html += '<td>' + statusBadge + '</td>';
+                html += '</tr>';
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('itemCount').textContent = settings.length + ' value(s)';
+        }
+
+        function findNodeByPath(node, path)
+        {
+            if (node.path === path) return node;
+
+            if (node.children)
+            {
+                for (let i = 0; i < node.children.length; i++)
+                {
+                    const found = findNodeByPath(node.children[i], path);
+                    if (found) return found;
+                }
+            }
+
+            return null;
+        }
+
+        function selectRow(row)
+        {
+            document.querySelectorAll('#valuesBody tr.is-selected').forEach(function(tr) {
+                tr.classList.remove('is-selected');
+            });
+
+            row.classList.add('is-selected');
+
+            hideHelpPopup();
+        }
+
+        function getTypeIcon(valueType)
+        {
+            const icons = {
+                'String': '<span class="reg-type-icon reg-type-icon--String">ab</span>',
+                'Int': '<span class="reg-type-icon reg-type-icon--Int">12</span>',
+                'Bool': '<span class="reg-type-icon reg-type-icon--Bool">☑</span>',
+                'StringArray': '<span class="reg-type-icon reg-type-icon--StringArray">[]</span>',
+                'Decimal': '<span class="reg-type-icon reg-type-icon--Decimal">.0</span>',
+                'Json': '<span class="reg-type-icon reg-type-icon--Json">{}</span>'
+            };
+            return icons[valueType] || icons['String'];
+        }
+
+        function getTypeName(valueType)
+        {
+            const names = {
+                'String': '{{ "String"|translate }}',
+                'Int': '{{ "Integer"|translate }}',
+                'Bool': '{{ "Boolean"|translate }}',
+                'StringArray': '{{ "String Array"|translate }}',
+                'Decimal': '{{ "Decimal"|translate }}',
+                'Json': '{{ "JSON"|translate }}'
+            };
+            return names[valueType] || 'String';
+        }
+
+        function formatValueDisplay(value, valueType)
+        {
+            if (value === null || value === undefined) return '{{ "(not set)"|translate }}';
+
+            if (valueType === 'Bool')
+            {
+                return value ? 'True' : 'False';
+            }
+            else if (valueType === 'StringArray')
+            {
+                if (Array.isArray(value))
+                {
+                    return value.length > 0 ? value.join(', ') : '(empty)';
+                }
+                return String(value);
+            }
+            return String(value);
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // EDIT DIALOGUE
+        // ====================================================================================================
+        function editSetting(key) {
+            const setting = policyData.settingsMap[key];
+            if (!setting) return;
+
+            policyData.selectedSetting = setting;
+
+            const nameParts = setting.jsonKey.split('.');
+            const settingName = formatLabel(nameParts[nameParts.length - 1]);
+
+            document.getElementById('editValueKey').value = setting.jsonKey;
+            document.getElementById('editValueName').value = settingName;
+            document.getElementById('editValueType').value = getTypeName(setting.valueType);
+            document.getElementById('editDefaultValue').textContent = formatValueDisplay(setting.defaultValue, setting.valueType);
+            document.getElementById('editReason').value = '';
+            document.getElementById('editTotpCode').value = '';
+            document.getElementById('editError').style.display = 'none';
+
+            document.getElementById('resetDefaultBtn').style.display = setting.isUsingDefault ? 'none' : 'inline-block';
+
+            document.getElementById('editStringField').style.display = 'none';
+            document.getElementById('editNumberField').style.display = 'none';
+            document.getElementById('editBoolField').style.display = 'none';
+            document.getElementById('editArrayField').style.display = 'none';
+
+            switch (setting.valueType)
+            {
+                case 'String':
+                    document.getElementById('editStringField').style.display = 'block';
+                    document.getElementById('editStringValue').value = setting.value || '';
+                    break;
+
+                case 'Int':
+                case 'Decimal':
+                    document.getElementById('editNumberField').style.display = 'block';
+                    document.getElementById('editNumberValue').value = setting.value || 0;
+                    break;
+
+                case 'Bool':
+                    document.getElementById('editBoolField').style.display = 'block';
+                    const boolValue = setting.value ? 'true' : 'false';
+                    const radio = document.querySelector('input[name="boolValue"][value="' + boolValue + '"]');
+                    if (radio) radio.checked = true;
+                    break;
+
+                case 'StringArray':
+                    document.getElementById('editArrayField').style.display = 'block';
+                    const arrayValue = Array.isArray(setting.value) ? setting.value.join('\n') : '';
+                    document.getElementById('editArrayValue').value = arrayValue;
+                    break;
+            }
+
+            document.getElementById('editDialogTitle').textContent = 'Edit: ' + settingName;
+            document.getElementById('editOverlay').classList.add('is-visible');
+        }
+
+        function getEditedValue(valueType)
+        {
+            switch (valueType) {
+                case 'String':
+                    return document.getElementById('editStringValue').value;
+
+                case 'Int':
+                    return parseInt(document.getElementById('editNumberValue').value, 10) || 0;
+
+                case 'Decimal':
+                    return parseFloat(document.getElementById('editNumberValue').value) || 0;
+
+                case 'Bool':
+                    return document.querySelector('input[name="boolValue"]:checked').value === 'true';
+
+                case 'StringArray':
+                    var text = document.getElementById('editArrayValue').value;
+                    return text.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+
+                default:
+                    return document.getElementById('editStringValue').value;
+            }
+        }
+
+        function resetToDefault()
+        {
+            const setting = policyData.selectedSetting;
+            if (!setting) return;
+
+            switch (setting.valueType) {
+                case 'String':
+                    document.getElementById('editStringValue').value = setting.defaultValue || '';
+                    break;
+                case 'Int':
+                case 'Decimal':
+                    document.getElementById('editNumberValue').value = setting.defaultValue || 0;
+                    break;
+                case 'Bool':
+                    const boolValue = setting.defaultValue ? 'true' : 'false';
+                    const radio = document.querySelector('input[name="boolValue"][value="' + boolValue + '"]');
+                    if (radio) radio.checked = true;
+                    break;
+                case 'StringArray':
+                    const arrayValue = Array.isArray(setting.defaultValue) ? setting.defaultValue.join('\n') : '';
+                    document.getElementById('editArrayValue').value = arrayValue;
+                    break;
+            }
+
+            document.getElementById('editReason').value = 'Reset to default value';
+        }
+
+        function showEditError(message)
+        {
+            document.getElementById('editError').textContent = message;
+            document.getElementById('editError').style.display = 'block';
+        }
+
+        function closeEditDialog() {
+            document.getElementById('editOverlay').classList.remove('is-visible');
+            policyData.selectedSetting = null;
+        }
+
+        function closeHistoryDialog() {
+            document.getElementById('historyOverlay').classList.remove('is-visible');
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // UTILITIES
+        // ====================================================================================================
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            var div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '-';
+            var d = new Date(iso);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // WHAT'S THIS? (POPUP)
+        // ====================================================================================================
+        async function getSettingHelp(jsonKey)
+        {
+            const parts = jsonKey.split('.');
+            const settingName = parts[parts.length - 1];
+            const category = parts.length > 1 ? formatLabel(parts[0]) : 'General';
+
+            for (const setting of policyData.settings)
+            {
+                if(setting.jsonKey === jsonKey)
+                {
+                    return {
+                        title: formatLabel(settingName),
+                        description: setting.description,
+                        recommendation: setting.recommendation,
+                        category: category
+                    };
+                }
+            }
+
+            return {
+                title: formatLabel(settingName),
+                description: await Localisation.translate(
+                    'Controls the "{jsonKey}" system setting. No detailed documentation is available for this setting.',
+                    {
+                        '{jsonKey}': jsonKey
+                    }
+                ),
+                recommendation: null,
+                category: category
+            };
+        }
+
+        async function showHelpPopup(settingKey, anchorElement)
+        {
+            let anchorRect;
+            const setting = policyData.settingsMap[settingKey];
+            if (!setting) return;
+
+            const help = await getSettingHelp(setting.jsonKey);
+            const popup = document.getElementById('helpPopup');
+
+            document.getElementById('helpTitle').textContent = help.title;
+            document.getElementById('helpBody').textContent = help.description;
+
+            const recEl = document.getElementById('helpRecommendation');
+            if (help.recommendation)
+            {
+                recEl.innerHTML = '<i class="ph-duotone ph-lightbulb"></i> ' + help.recommendation;
+                recEl.classList.add('is-visible');
+            }
+            else
+            {
+                recEl.classList.remove('is-visible');
+            }
+
+            const metaEl = document.getElementById('helpMeta');
+            let metaText = await Localisation.translate(
+                "Key: {jsonKey}",
+                {
+                    "{jsonKey}": setting.jsonKey,
+                }
+            )
+                + "<br>"
+                + await Localisation.translate(
+                    "Type: {valueType}",
+                    {
+                        "{valueType}": setting.valueType,
+                    }
+                );
+            if (help.category)
+            {
+                metaText = await Localisation.translate(
+                        "Category: {category}",
+                        {
+                            "{category}": help.category,
+                        }
+                    )
+                    + "<br>"
+                    + metaText;
+            }
+            metaEl.innerHTML = metaText;
+            metaEl.classList.add('is-visible');
+
+            popup.style.left = '0';
+            popup.style.top = '0';
+            popup.classList.add('is-visible');
+
+            const popupRect = popup.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            let x, y;
+
+            if (anchorElement)
+            {
+                anchorRect = anchorElement.getBoundingClientRect();
+                x = anchorRect.left;
+                y = anchorRect.bottom + 10;
+
+                const pointer = popup.querySelector('.help-popup__pointer');
+                pointer.style.left = '20px';
+            }
+            else
+            {
+                x = (windowWidth - popupRect.width) / 2;
+                y = (windowHeight - popupRect.height) / 2;
+            }
+
+            if (x + popupRect.width > windowWidth - 10)
+            {
+                x = windowWidth - popupRect.width - 10;
+            }
+            if (x < 10) x = 10;
+
+            if (y + popupRect.height > windowHeight - 10)
+            {
+                if (anchorElement)
+                {
+                    anchorRect = anchorElement.getBoundingClientRect();
+                    y = anchorRect.top - popupRect.height - 10;
+                }
+                else
+                {
+                    y = windowHeight - popupRect.height - 10;
+                }
+            }
+            if (y < 10) y = 10;
+
+            popup.style.left = x + 'px';
+            popup.style.top = y + 'px';
+        }
+
+        function hideHelpPopup()
+        {
+            document.getElementById('helpPopup').classList.remove('is-visible');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.help-popup') && !e.target.closest('.ctx-menu')) {
+                hideHelpPopup();
+            }
+        });
+    </script>
+{% endblock %}

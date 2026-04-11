@@ -160,9 +160,16 @@
                 </p>
                 {% if GetUserConfiguration("Instance", "Contacts", "Operator") %}
                     <p>
-                        {{ GetUserConfiguration("Instance", "Branding", "Name") }}
-                        is owned and operated by
-                        <a href="mailto:{{ GetUserConfiguration("Instance", "Contacts", "Operator", "EmailAddress") }}">{{ GetUserConfiguration("Instance", "Contacts", "Operator", "Name") }}</a>.
+                        {{
+                        "{instanceName} is owned by operated by {operatorName}."|translate({
+                            "{instanceName}": GetUserConfiguration("Instance", "Branding", "Name"),
+                            "{operatorName}": "<a href=\"mailto: "
+                            ~ GetUserConfiguration("Instance", "Contacts", "Operator", "EmailAddress")
+                            ~ "\">"
+                            ~ GetUserConfiguration("Instance", "Contacts", "Operator", "Name")
+                            ~ "</a>".
+                        })
+                        }}
                     </p>
                 {% endif %}
             </div>

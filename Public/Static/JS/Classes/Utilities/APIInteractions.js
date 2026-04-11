@@ -2,16 +2,21 @@ class APIInteractions
 {
     #refreshPromise = null; // Prevent multiple simultaneous refresh attempts
 
-    #getHeaders(method, useAuth)
+    #getHeaders(method, totpCode=null)
     {
         const headers = {
             "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),
             "credentials": 'include',
         };
 
-        if (method === 'POST' || method === 'PATCH')
+        if (method === 'POST' || method === 'PATCH' || method === 'PUT')
         {
             headers["Content-Type"] = "application/json";
+        }
+
+        if (totpCode !== null)
+        {
+            headers['X-TOTP-Code'] =  totpCode || '';
         }
 
         return headers;
@@ -60,13 +65,13 @@ class APIInteractions
         return await this.#refreshPromise;
     }
 
-    async #apiRequest(method, target, useAuth, payload = null, isRetry = false)
+    async #apiRequest(method, target, useAuth, payload = null, isRetry = false, totpCode = null)
     {
         try
         {
             const options = {
                 method: method,
-                headers: this.#getHeaders(method, useAuth),
+                headers: this.#getHeaders(method, totpCode),
                 body: payload ? JSON.stringify(payload) : null,
                 credentials: 'include',
             };
@@ -76,7 +81,13 @@ class APIInteractions
             if (response.status === 401 && useAuth && !isRetry)
             {
                 await this.#refreshAccessToken();
-                return await this.#apiRequest(method, target, useAuth, payload, true);
+                return await this.#apiRequest(
+                    method,
+                    target,
+                    useAuth,
+                    payload,
+                    true
+                );
             }
 
             if (!response.ok)
@@ -85,30 +96,37 @@ class APIInteractions
             }
 
             return [response.status, await response.json()];
-        } catch (error)
+        }
+        catch (error)
         {
             return [null, error.message];
         }
     }
 
-    async API_PATCH(target, payload, useAuth = true)
+    async API_PATCH(target, payload, useAuth = true, totpCode = null)
     {
-        return await this.#apiRequest('PATCH', target, useAuth, payload);
+        return await this.#apiRequest('PATCH', target, useAuth, payload, false, totpCode);
     }
 
-    async API_POST(target, payload, useAuth = true)
+    async API_PUT(target, payload, useAuth = true, totpCode = null)
     {
-        return await this.#apiRequest('POST', target, useAuth, payload);
+        return await this.#apiRequest('PUT', target, useAuth, payload, false, totpCode);
     }
 
-    async API_GET(target, useAuth = true)
+
+    async API_POST(target, payload, useAuth = true, totpCode = null)
     {
-        return await this.#apiRequest('GET', target, useAuth);
+        return await this.#apiRequest('POST', target, useAuth, payload, false, totpCode);
     }
 
-    async API_DELETE(target, useAuth = true)
+    async API_GET(target, useAuth = true, totpCode = null)
     {
-        return await this.#apiRequest('DELETE', target, useAuth);
+        return await this.#apiRequest('GET', target, useAuth, false, totpCode);
+    }
+
+    async API_DELETE(target, useAuth = true, totpCode = null)
+    {
+        return await this.#apiRequest('DELETE', target, useAuth, false, totpCode);
     }
 
     async API_FILE_UPLOAD(target, file, description = null, useAuth = true, isRetry = false)

@@ -1,0 +1,863 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-users"></i> {{ "User Overview"|translate }}
+            <span class="page-title__sub">{{ "Manage all registered accounts"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button class="form-btn form-btn--primary" onclick="document.getElementById('addUserDialog').style.display='block'">
+                <i class="ph-duotone ph-user-plus"></i> {{ "Add New User"|translate }}
+            </button>
+            <button class="form-btn">
+                <i class="ph-duotone ph-export"></i> {{ "Export Options"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-TotalUsers">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Users"|translate }}</div>
+            <div class="stat-card__change" id="StatCard-TotalUsers-Change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-TotalCaseWorkers">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Case Workers"|translate }}</div>
+            <div class="stat-card__change" id="StatCard-TotalCaseWorkers-Change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-TotalCaseWorkerManagers">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Case Worker Managers"|translate }}</div>
+            <div class="stat-card__change" id="StatCard-TotalCaseWorkerManagers-Change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-TotalAdministrators">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Administrators"|translate }}</div>
+            <div class="stat-card__change" id="StatCard-TotalAdministrators-Change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">
+                {{ "Total Users over Time"|translate }}
+                <div class="chart-container__header-actions">
+                    <button class="chart-container__header-btn is-active" data-period="week">{{ "Week"|translate }}</button>
+                    <button class="chart-container__header-btn" data-period="month">{{ "Month"|translate }}</button>
+                    <button class="chart-container__header-btn" data-period="year">{{ "Year"|translate }}</button>
+                    <button class="chart-container__header-btn" data-period="all">{{ "All Time"|translate }}</button>
+                </div>
+            </div>
+            <div class="chart-container__body">
+                <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
+                    <canvas id="lineChart1"></canvas>
+                </div>
+            </div>
+            <div class="chart-container__footer" id="lineChartFooter">
+                <span></span>
+                <span>{{ "Loading..."|translate }}</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Languages"|translate }}</div>
+            <div class="chart-container__body">
+                <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container__footer" id="pieChartFooter">
+                <span></span>
+                <span>{{ "Loading..."|translate }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Search"|translate }}:</span>
+            <input type="text" class="form-input form-input--search" placeholder="{{ "Name, email or ID..."|translate }}" id="userSearch">
+            <button class="form-btn" onclick="filterUsers()"><i class="ph-duotone ph-magnifying-glass"></i> {{ "Find"|translate }}</button>
+        </div>
+
+        <div class="toolbar__separator"></div>
+
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Role"|translate }}:</span>
+            <select class="form-select" id="filterRole">
+                <option value="">{{ "All Roles"|translate }}</option>
+                <option value="admin">{{ "Administrator"|translate }}</option>
+                <option value="caseworker">{{ "Case Worker"|translate }}</option>
+                <option value="caseworker-manager">{{ "Case Worker Manager"|translate }}</option>
+                <option value="user">{{ "User"|translate }}</option>
+            </select>
+        </div>
+
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Status"|translate }}:</span>
+            <select class="form-select" id="filterStatus">
+                <option value="">{{ "All"|translate }}</option>
+                <option value="active">{{ "Active"|translate }}</option>
+                <option value="inactive">{{ "Inactive"|translate }}</option>
+                <option value="suspended">{{ "Suspended"|translate }}</option>
+            </select>
+        </div>
+
+        <div class="toolbar__spacer"></div>
+
+        <div class="toolbar__group">
+            <button class="form-btn form-btn--sm" onclick="resetFilters()">✕ {{ "Clear"|translate }}</button>
+            <span class="toolbar__label" id="resultCount"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="usersTable">
+            <caption>{{ "Paginated Users (50 per page)"|translate }}</caption>
+            <thead>
+                <tr>
+                    {# <th class="cell-checkbox"><input type="checkbox" id="selectAll"></th>  #}
+                    <th class="is-sortable" data-sort="fullname">{{ "User"|translate }}</th>
+                    <th class="is-sortable is-sorted-desc" data-sort="createdat">{{ "Created At"|translate }}</th>
+                    <th>{{ "Created By"|translate }}</th>
+                    <th>{{ "Telephone"|translate }}</th>
+                    <th>{{ "Date of Birth"|translate }}</th>
+                    <th>{{ "Language"|translate }}</th>
+                    <th>{{ "Email Verified?"|translate }}</th>
+                    <th>{{ "Allow Login?"|translate }}</th>
+                    <th>{{ "Controls"|translate }}</th>
+                </tr>
+            </thead>
+            <tbody id="AllUsersTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="Pagination">
+        <div class="toolbar__group" id="bulkActionsGroup">
+            {#
+            <span class="toolbar__label">{{ "With selected"|translate }}:</span>
+            <select class="form-select" id="bulkAction">
+                <option value="">-- {{ "Action"|translate }} --</option>
+                <option value="activate">{{ "Activate"|translate }}</option>
+                <option value="deactivate">{{ "Deactivate"|translate }}</option>
+                <option value="suspend">{{ "Suspend"|translate }}</option>
+                <option value="export">{{ "Export"|translate }}</option>
+            </select>
+            <button class="form-btn form-btn--sm" onclick="applyBulkAction()">{{ "Apply"|translate }}</button>
+            #}
+        </div>
+    </div>
+
+    <div id="addUserDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:400px;">
+            <div class="panel">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-user-plus"></i> {{ "Add New User"|translate }}
+                    <button class="chart-container__header-btn" onclick="document.getElementById('addUserDialog').style.display='none'"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" style="grid-template-columns: 100px 1fr;">
+                        <dt>{{ "Full Name"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newUserName" style="width:100%;"></dd>
+
+                        <dt>{{ "Email"|translate }}</dt>
+                        <dd><input type="email" class="form-input" id="newUserEmail" style="width:100%;"></dd>
+
+                        <dt>{{ "Telephone"|translate }}</dt>
+                        <dd><input type="tel" class="form-input" id="newUserPhone" style="width:100%;"></dd>
+
+                        <dt>{{ "Date of Birth"|translate }}</dt>
+                        <dd><input type="date" class="form-input" id="newUserDOB" style="width:100%;"></dd>
+
+                        <dt>{{ "Language"|translate }}</dt>
+                        <dd>
+                            <select class="form-select" id="newUserLanguage" style="width:100%;">
+                                <option value="en">English</option>
+                                <option value="cy">Cymraeg</option>
+                            </select>
+                        </dd>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="document.getElementById('addUserDialog').style.display='none'">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="createUser()"><i class="ph-duotone ph-floppy-disk"></i> {{ "Create User"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/Static/JS/General/ChartJSConfig.js"></script>
+    <script>
+        const userController = new UserController();
+
+        const allUsersTableBody = document.getElementById('AllUsersTableBody');
+        const paginationContainer = document.getElementById('Pagination');
+
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalRecords = 0;
+        const perPage = 50;
+
+        let currentSortBy = 'createdAt';
+        let currentSortOrder = 'desc';
+        let currentSearch = '';
+        let currentRoleFilter = '';
+
+
+        // ====================================================================================================
+        // CHARTS
+        // ====================================================================================================
+        function initLineChart(data) {
+            AdminChart.line('lineChart1',
+                data.labels,
+                [{
+                    label: '{{ "Total Users"|translate }}',
+                    data: data.values,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }],
+                {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 },
+                        },
+                    },
+                }
+            );
+        }
+
+        function initPieChart(data) {
+            AdminChart.doughnut('pieChart',
+                data.labels,
+                data.values,
+                {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                    },
+                }
+            );
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // DATA LOADING
+        // ====================================================================================================
+        async function loadStats()
+        {
+            const stats = await userController.GetUserStatistics('week');
+            if (!stats) return;
+
+            console.log(stats);
+
+            // total users
+            updateStatCard('TotalUsers', stats.totalUsers, stats.growthPercentage);
+
+            // from userTypeBreakdown
+            if (stats.userTypeBreakdown)
+            {
+                updateStatCard('TotalCaseWorkers', stats.userTypeBreakdown.caseWorkers, null);
+                updateStatCard('TotalCaseWorkerManagers', stats.userTypeBreakdown.caseWorkerManagers, null);
+                updateStatCard('TotalAdministrators', stats.userTypeBreakdown.admins, null);
+            }
+        }
+
+        function updateStatCard(id, value, growthPercent)
+        {
+            const valueEl = document.getElementById('StatCard-' + id);
+            const changeEl = document.getElementById('StatCard-' + id + '-Change');
+
+            if (valueEl)
+            {
+                valueEl.textContent = (typeof value === 'number') ? value.toLocaleString() : (value || '-');
+            }
+
+            if (changeEl && typeof growthPercent === 'number')
+            {
+                if (growthPercent >= 0)
+                {
+                    changeEl.className = 'stat-card__change stat-card__change--up';
+                    changeEl.textContent = '▲ ' + growthPercent + '% {{ "from last month"|translate }}';
+                }
+                else
+                {
+                    changeEl.className = 'stat-card__change stat-card__change--down';
+                    changeEl.textContent = '▼ ' + Math.abs(growthPercent) + '% {{ "from last month"|translate }}';
+                }
+            }
+            else if (changeEl && growthPercent === null)
+            {
+                changeEl.textContent = '';
+            }
+        }
+
+        async function loadLineChartData(period = 'week')
+        {
+            const stats = await userController.GetUserStatistics(period);
+            if (!stats) return;
+
+            initLineChart({
+                labels: stats.growthChart.labels,
+                values: stats.growthChart.cumulativeValues,
+            });
+
+            const periodLabels = {
+                week: '{{ "this week"|translate }}',
+                month: '{{ "this month"|translate }}',
+                year: '{{ "this year"|translate }}',
+                all: '{{ "all time"|translate }}',
+            };
+
+            const newUsers = stats.growthChart.values.reduce(function (a, b)
+            {
+                return a + b;
+            }, 0);
+
+            document.getElementById('lineChartFooter').innerHTML =
+                '<span>' + newUsers.toLocaleString() + ' {{ "new users"|translate }} ' + periodLabels[period] + '</span>' +
+                '<span>{{ "Last updated"|translate }}: ' + new Date(stats.generatedAt).toLocaleTimeString() + '</span>';
+        }
+
+        async function loadPieChartData()
+        {
+            const stats = await userController.GetUserStatistics('week');
+            if (!stats) return;
+
+            initPieChart({
+                labels: stats.languageDistribution.map(function(l) { return l.language; }),
+                values: stats.languageDistribution.map(function(l) { return l.count; }),
+            });
+
+            const total = stats.languageDistribution.reduce(function (a, l)
+            {
+                return a + l.count;
+            }, 0);
+
+            document.getElementById('pieChartFooter').innerHTML =
+                '<span>' + stats.languageDistribution.length + ' {{ "languages"|translate }}</span>' +
+                '<span>' + total.toLocaleString() + ' {{ "users total"|translate }}</span>';
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // CHART PERIOD TOGGLE
+        // ====================================================================================================
+        function setupChartToggle() {
+            const buttons = document.querySelectorAll('.chart-container__header-btn[data-period]');
+
+            buttons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(function(b) { b.classList.remove('is-active'); });
+                    btn.classList.add('is-active');
+                    loadLineChartData(btn.dataset.period);
+                });
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // SORTING
+        // ====================================================================================================
+        function setupSortableHeaders() {
+            const headers = document.querySelectorAll('#usersTable thead th.is-sortable[data-sort]');
+
+            headers.forEach(function(th) {
+                th.addEventListener('click', function() {
+                    var sortField = th.dataset.sort;
+
+                    // if already sorting by this field, toggle direction
+                    if (currentSortBy === sortField)
+                    {
+                        currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+                    }
+                    else
+                    {
+                        currentSortBy = sortField;
+                        currentSortOrder = 'asc';
+                    }
+
+                    // update header classes
+                    headers.forEach(function(h) {
+                        h.classList.remove('is-sorted-asc', 'is-sorted-desc');
+                    });
+
+                    th.classList.add(currentSortOrder === 'asc' ? 'is-sorted-asc' : 'is-sorted-desc');
+
+                    // reload from page 1 with new sort
+                    goToPage(1);
+                });
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // FILTERS
+        // ====================================================================================================
+        function filterUsers()
+        {
+            currentSearch = document.getElementById('userSearch').value.trim();
+            currentRoleFilter = document.getElementById('filterRole').value;
+
+            // search and sort are server-side via the API
+            // role is filtered client-side as the API doesn't yet handle this
+            // TODO: sort this out lol
+            goToPage(1);
+        }
+
+        function resetFilters()
+        {
+            document.getElementById('userSearch').value = '';
+            document.getElementById('filterRole').value = '';
+            document.getElementById('filterStatus').value = '';
+
+            currentSearch = '';
+            currentRoleFilter = '';
+
+            goToPage(1);
+        }
+
+        // allow pressing `Enter` in the search box
+        function setupSearchEnter()
+        {
+            const searchInput = document.getElementById('userSearch');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('keydown', function(e)
+            {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    filterUsers();
+                }
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // USER TABLE RENDERING
+        // ====================================================================================================
+        function getInitial(name)
+        {
+            return name ? name.charAt(0).toUpperCase() : '?';
+        }
+
+        function getRoleBadges(user)
+        {
+            let builder = '';
+            if (user.isAdmin)
+            {
+                builder += '<span class="badge badge--admin">{{ "Admin"|translate }}</span>';
+            }
+            if (user.isCaseWorkerManager)
+            {
+                builder += '<span class="badge badge--caseworker-manager">{{ "Case Worker Manager"|translate }}</span>';
+            }
+            if (user.isCaseWorker)
+            {
+                builder += '<span class="badge badge--caseworker">{{ "Case Worker"|translate }}</span>';
+            }
+            if(builder === '')
+            {
+                return '<span class="badge badge--user">{{ "User"|translate }}</span>';
+            }
+            return builder;
+        }
+
+        function getAvatarClass(user)
+        {
+            if (user.isAdmin) return 'user-avatar user-avatar--admin';
+            if (user.isCaseWorkerManager) return 'user-avatar user-avatar--caseworker-manager';
+            if (user.isCaseWorker) return 'user-avatar user-avatar--caseworker';
+            return 'user-avatar';
+        }
+
+        function formatDate(dateStr)
+        {
+            if (!dateStr) return '-';
+            try
+            {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+            catch (e)
+            {
+                return dateStr;
+            }
+        }
+
+        function formatDateTime(dateStr)
+        {
+            if (!dateStr) return '-';
+            try
+            {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            }
+            catch (e)
+            {
+                return dateStr;
+            }
+        }
+
+        function escapeHtml(str)
+        {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        async function renderUsers(users) {
+            allUsersTableBody.innerHTML = '';
+
+            // client-side role filter
+            let filtered = users;
+            if (currentRoleFilter)
+            {
+                filtered = users.filter(function(user)
+                {
+                    switch (currentRoleFilter) {
+                        case 'admin':      return user.isAdmin === true;
+                        case 'caseworker': return user.isCaseWorker === true;
+                        case 'caseworker-manager': return user.isCaseWorkerManager === true;
+                        case 'user':       return !user.isAdmin && !user.isCaseWorkerManager && !user.isCaseWorker;
+                        default:           return true;
+                    }
+                });
+            }
+
+            if (filtered.length === 0)
+            {
+                const emptyRow = document.createElement('tr');
+                const emptyCell = document.createElement('td');
+                emptyCell.colSpan = 8;
+                emptyCell.style.textAlign = 'center';
+                emptyCell.style.padding = '20px';
+                emptyCell.style.color = '#666';
+                emptyCell.textContent = '{{ "No users found matching your criteria."|translate }}';
+                emptyRow.appendChild(emptyCell);
+                allUsersTableBody.appendChild(emptyRow);
+                return;
+            }
+
+            for (let i = 0; i < filtered.length; i++)
+            {
+                const user = filtered[i];
+                const row = document.createElement('tr');
+
+                // checkbox
+                /*
+                const cbCell = document.createElement('td');
+                cbCell.className = 'cell-checkbox';
+                cbCell.innerHTML = '<input type="checkbox" name="user_ids[]" value="' + escapeHtml(user.id) + '">';
+                row.appendChild(cbCell);
+                */
+
+                // user cell (avatar + name + email + role badge)
+                const userCell = document.createElement('td');
+                userCell.innerHTML =
+                    '<div class="user-cell">' +
+                    '<div class="' + getAvatarClass(user) + '">' + getInitial(user.fullName) + '</div>' +
+                    '<div class="user-cell__info">' +
+                    '<span class="user-cell__name">' + escapeHtml(user.fullName || '-') + ' ' + getRoleBadges(user) + '</span>' +
+                    '<span class="user-cell__email">' + escapeHtml(user.emailAddress || '-') + '</span>' +
+                    '</div>' +
+                    '</div>';
+                row.appendChild(userCell);
+
+                // created At
+                const createdAtCell = document.createElement('td');
+                createdAtCell.textContent = formatDateTime(user.createdAt);
+                row.appendChild(createdAtCell);
+
+                // created By
+                const createdByCell = document.createElement('td');
+                createdByCell.textContent = user.createdBy || '-';
+                row.appendChild(createdByCell);
+
+                // telephone
+                const phoneCell = document.createElement('td');
+                phoneCell.className = 'cell-number';
+                phoneCell.textContent = user.telephoneNumber || '-';
+                row.appendChild(phoneCell);
+
+                // date of Birth
+                const dobCell = document.createElement('td');
+                dobCell.textContent = formatDate(user.dateOfBirth);
+                row.appendChild(dobCell);
+
+                // language
+                const langCell = document.createElement('td');
+                langCell.innerHTML = escapeHtml(user.languagePreference || '-');
+                row.appendChild(langCell);
+
+                // email Verified
+                const emailVerifiedCell = document.createElement('td');
+                if(user.isEmailVerified)
+                    emailVerifiedCell.innerHTML = '<span class="badge badge--active">{{ "Yes"|translate }}</span>';
+                else
+                    emailVerifiedCell.innerHTML = '<span class="badge badge--inactive">{{ "No"|translate }}</span>';
+                row.appendChild(emailVerifiedCell);
+
+                // allow Login
+                const allowLoginCell = document.createElement('td');
+                if(user.allowLogin)
+                    allowLoginCell.innerHTML = '<span class="badge badge--active">{{ "Allowed"|translate }}</span>';
+                else
+                    allowLoginCell.innerHTML = '<span class="badge badge--inactive">{{ "Not Allowed"|translate }}</span>';
+                row.appendChild(allowLoginCell);
+
+                // controls
+                const controlsCell = document.createElement('td');
+                controlsCell.className = 'cell-actions';
+                controlsCell.innerHTML = '<button class="form-btn form-btn--sm" onclick="viewUser(\'' + escapeHtml(user.id) + '\')"><i class="ph-duotone ph-user"></i> {{ "View"|translate }}</button>';
+                row.appendChild(controlsCell);
+
+                allUsersTableBody.appendChild(row);
+            }
+
+            // update result count in toolbar
+            const resultCount = document.getElementById('resultCount');
+            if (resultCount)
+            {
+                const start = ((currentPage - 1) * perPage) + 1;
+                const end = Math.min(currentPage * perPage, totalRecords);
+                resultCount.textContent = await Localisation.translate(
+                    "Showing {start}-{end} of {totalRecords}",
+                    {
+                        "{start}": start,
+                        "{end}": end,
+                        "{totalRecords}": totalRecords
+                    }
+                );
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // PAGINATION
+        // ====================================================================================================
+        async function renderPagination()
+        {
+            const bulkGroup = document.getElementById('bulkActionsGroup');
+            paginationContainer.innerHTML = '';
+
+            if (bulkGroup)
+            {
+                paginationContainer.appendChild(bulkGroup);
+            }
+
+            const info = document.createElement('span');
+            info.className = 'pagination__info';
+            info.style.marginLeft = 'auto';
+            info.textContent = await Localisation.translate(
+                "Page {currentPage} of {totalPages} ({totalRecords} total records)",
+                {
+                    "{currentPage}": currentPage,
+                    "{totalPages}": totalPages,
+                    "{totalRecords}": totalRecords
+                }
+            );
+            paginationContainer.appendChild(info);
+
+            addPageBtn('<i class="ph-duotone ph-rewind"></i> {{ "First"|translate }}', 1, currentPage === 1);
+            addPageBtn('<i class="ph-duotone ph-skip-back"></i> {{ "Prev"|translate }}', currentPage - 1, currentPage === 1);
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+
+            if (startPage > 1)
+            {
+                addPageBtn('1', 1, false);
+                if (startPage > 2) addEllipsis();
+            }
+
+            for (let i = startPage; i <= endPage; i++)
+            {
+                const btn = document.createElement('button');
+                btn.className = 'pagination__btn';
+                if (i === currentPage)
+                    btn.classList.add('is-current');
+                btn.textContent = i;
+                btn.addEventListener('click', (function(page) {
+                    return function() { goToPage(page); };
+                })(i));
+                paginationContainer.appendChild(btn);
+            }
+
+            if (endPage < totalPages)
+            {
+                if (endPage < totalPages - 1) addEllipsis();
+                addPageBtn(totalPages, totalPages, false);
+            }
+
+            addPageBtn('{{ "Next"|translate }} <i class="ph-duotone ph-skip-forward"></i>', currentPage + 1, currentPage === totalPages);
+            addPageBtn('{{ "Last"|translate }} <i class="ph-duotone ph-fast-forward"></i>', totalPages, currentPage === totalPages);
+        }
+
+        function addPageBtn(label, page, disabled)
+        {
+            const btn = document.createElement('button');
+            btn.className = 'pagination__btn';
+            btn.innerHTML = label;
+            btn.disabled = disabled;
+            btn.addEventListener('click', function() { goToPage(page); });
+            paginationContainer.appendChild(btn);
+        }
+
+        function addEllipsis()
+        {
+            const dots = document.createElement('span');
+            dots.className = 'pagination__btn';
+            dots.style.cssText = 'border:none; background:none; box-shadow:none; cursor:default;';
+            dots.textContent = '...';
+            paginationContainer.appendChild(dots);
+        }
+
+        async function goToPage(page)
+        {
+            const result = await userController.GetUsersPage(page, perPage, currentSortBy, currentSortOrder, currentSearch);
+            if (!result) return;
+
+            currentPage = result.page;
+            totalPages = result.totalPages;
+            totalRecords = result.total;
+
+            await renderUsers(result.users);
+            await renderPagination();
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // BULK ACTIONS
+        // ====================================================================================================
+        /*
+        function applyBulkAction()
+        {
+            var action = document.getElementById('bulkAction').value;
+            if (!action) return;
+
+            var checked = document.querySelectorAll('#usersTable tbody input[type="checkbox"]:checked');
+            var ids = [];
+            checked.forEach(function(cb) { ids.push(cb.value); });
+
+            if (ids.length === 0) {
+                alert('{{ "No users selected."|translate }}');
+                return;
+            }
+
+            console.log('Bulk action:', action, 'on IDs:', ids);
+        }
+        */
+
+
+
+
+
+        // ====================================================================================================
+        // CREATE USER
+        // ====================================================================================================
+        async function createUser()
+        {
+            var data = {
+                fullName: document.getElementById('newUserName').value,
+                emailAddress: document.getElementById('newUserEmail').value,
+                telephoneNumber: document.getElementById('newUserPhone').value,
+                dateOfBirth: document.getElementById('newUserDOB').value,
+                languagePreference: document.getElementById('newUserLanguage').value,
+            };
+
+            console.log('Create user:', data);
+            document.getElementById('addUserDialog').style.display = 'none';
+
+            // TODO sort this out lol
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // NAVIGATION
+        // ====================================================================================================
+        function viewUser(id)
+        {
+            window.location.href = '/admin-console/object-management/user-management/' + id;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // SELECT ALL
+        // ====================================================================================================
+        function setupSelectAll()
+        {
+            const selectAll = document.getElementById('selectAll');
+            if (!selectAll) return;
+
+            selectAll.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('#usersTable tbody input[type="checkbox"]');
+                checkboxes.forEach(function(cb) { cb.checked = selectAll.checked; });
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // INIT
+        // ====================================================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadLineChartData('week');
+            loadPieChartData();
+            setupChartToggle();
+            setupSortableHeaders();
+            setupSelectAll();
+            setupSearchEnter();
+            goToPage(1);
+        });
+    </script>
+{% endblock %}

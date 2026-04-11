@@ -1,0 +1,53 @@
+- Label: AAC Dashboard
+  Type: HREF
+  Icon: house
+  HREF: /admin-console
+
+- Label: AAC Terminal
+  Type: HREF
+  Icon: terminal
+  HREF: /admin-console/console
+
+- Label: System Administration
+  Type: Header
+  HREF: /admin-console/system-administration
+
+- Label: Instance Management
+  Type: Dropdown
+  Icon: faders
+  HREF: /admin-console/system-administration/instance-management
+  Children:
+    - Label: System Bulletins
+      Type: HREF
+      Icon: chalkboard
+      HREF: /admin-console/system-administration/instance-management/system-bulletins
+
+- Label: Configuration
+  Type: Dropdown
+  Icon: gear
+  HREF: /admin-console/system-administration/configuration
+  Children:
+    - Label: Web Application Firewall
+      Type: HREF
+      Icon: wall
+      HREF: /admin-console/system-administration/configuration/web-application-firewall
+    - Label: Policy Management
+      Type: HREF
+      Icon: scroll
+      HREF: /admin-console/system-administration/configuration/policy-management
+
+- Type: Line
+
+- Label: Object Management
+  Type: Header
+  HREF: /admin-console/object-management
+
+- Label: User Management
+  Type: Dropdown
+  Icon: users
+  HREF: /admin-console/object-management/user-management
+  Children:
+    - Label: All Users
+      Type: HREF
+      Icon: users
+      HREF: /admin-console/object-management/user-management/all-users
