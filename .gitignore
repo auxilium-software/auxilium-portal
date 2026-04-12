@@ -12,6 +12,7 @@ vendor
 .phpdoc-export
 phpunit.phar
 phpDocumentor.phar
+/Documentation
 
 # Dev (Misc) Files
 *.jar
