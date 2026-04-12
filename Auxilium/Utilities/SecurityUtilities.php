@@ -33,7 +33,8 @@ class SecurityUtilities
     {
         $userDetails = self::getCachedUserDetails();
 
-        if (self::shouldRefreshUserDetails($userDetails)) {
+        if (self::shouldRefreshUserDetails($userDetails))
+        {
             $userDetails = self::fetchAndCacheUserDetails();
         }
 
