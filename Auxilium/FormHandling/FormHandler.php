@@ -2,6 +2,7 @@
 
 namespace Auxilium\FormHandling;
 
+use Auxilium\Auxilium\AuxiliumScript;
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\Utilities\CacheUtilities;
 use Auxilium\Utilities\ConfigurationUtilities;
@@ -275,7 +276,19 @@ class FormHandler
         if($submissionResult->Success)
         {
             CacheUtilities::MarkFormAsComplete($this->formInstanceID);
-            NavigationUtilities::Redirect(target: $this->formSpec['afterSubmissionRedirect']['target']);
+
+
+            //TODO fix this bit
+            $redirectionTarget = AuxiliumScript::evaluate_variable_path(
+                string: $this->formSpec['afterSubmissionRedirect']['target'],
+                vars: [
+                    'formData'=>[
+                        "case_id"=>"test"
+                    ],
+                ]
+            );
+
+            NavigationUtilities::Redirect(target: $redirectionTarget);
         }
 
         SessionUtilities::Set(key: SessionKey::FORM_SUBMISSION_ERROR, value: $submissionResult->Message);
