@@ -19,7 +19,7 @@ class BasePropertyManager
             const apiPath = `${this.basePath}/${encodeURIComponent(propertyKey)}`;
             const payload = {
                 content: newContent,
-                content_type: 'text/plain'
+                contentType: 'text/plain'
             };
 
             const [status, response] = await this.apiClient.API_PATCH(apiPath, payload);
