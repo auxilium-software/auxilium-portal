@@ -106,13 +106,13 @@ class FormSubmissionHandler
         // add reCAPTCHA token if the form spec says so
         if($this->formSpec['useReCAPTCHA'])
         {
-            $payloadToSend['recaptcha_token'] = $_POST['ReCAPTCHAToken'];
+            $payloadToSend['recaptchaToken'] = $_POST['ReCAPTCHAToken'];
         }
 
         return APIInteractions::Post(
             endpoint   : $apiRequest['endpoint'],
             payload    : $payloadToSend,
-            requireAuth: $this->formSpec['requireAuthentication'],
+            requireAuth: $this->formSpec['requireAuthentication'] === "true",
         );
     }
 }

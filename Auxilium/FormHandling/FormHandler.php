@@ -164,6 +164,7 @@ class FormHandler
         // update form data for all actions except "back"
         if($action !== 'back')
         {
+            $this->hashPasswordFields();
             CacheUtilities::UpdateFormData($this->formInstanceID, $_POST);
             $this->formData = CacheUtilities::GetFormData($this->formInstanceID);
         }
@@ -366,5 +367,35 @@ class FormHandler
             $this->pageIndexMap,
             $this->storedPageIndex
         );
+    }
+
+
+
+
+
+
+
+
+    private function hashPasswordFields(): void
+    {
+        $pages = $this->formSpec['pages']['page'];
+        $currentPage = $pages[$this->storedPageIndex] ?? null;
+
+        if(!$currentPage || !isset($currentPage['components']['component']))
+        {
+            return;
+        }
+
+        foreach($currentPage['components']['component'] as $component)
+        {
+            if(($component['type'] ?? '') === 'PASSWORD_FIELD')
+            {
+                $fieldId = $component['id'];
+                if(isset($_POST[$fieldId]) && $_POST[$fieldId] !== '')
+                {
+                    $_POST[$fieldId] = hash('sha512', $_POST[$fieldId]);
+                }
+            }
+        }
     }
 }
