@@ -4,57 +4,55 @@ namespace Auxilium\TwigHandling;
 
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\Enumerators\SessionKey;
-use Auxilium\Exceptions\DatabaseConnectionException;
+use Auxilium\Exceptions\ApiException;
 use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
-use Auxilium\SessionHandling\Session;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
-use Auxilium\Utilities\ConfigurationUtilities;
-use Auxilium\Utilities\JWTUtilities;
 use Auxilium\Utilities\SecurityUtilities;
 use Auxilium\Utilities\SessionUtilities;
-use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 
 class PageBuilder
 {
-    private static array $AdditionalVariables = [];
-    public FilesystemLoader $loader;
-    public Environment $twig;
+    private Environment $twig;
 
     public function __construct(bool $useAuth)
     {
-        $this->loader = new FilesystemLoader(__DIR__ . "/../../Templates/");
-        $this->twig = new Environment($this->loader, [
-                "debug" => true,
-                "cache" => false,
-            ]
-        );
+        $loader = new FilesystemLoader(__DIR__ . '/../../Templates/');
+        $this->twig = new Environment($loader, [
+            'debug' => true,
+            'cache' => false,
+        ]);
 
 
         $this->twig->addGlobal('style_options', []);
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
-        $this->twig->addGlobal(name: "_SELECTED_LANGUAGE_",  value: CookieHandling::GetCookieValue(targetCookie: CookieKey::LANGUAGE));
-        $this->twig->addGlobal(name: "_SYSTEM_BULLETIN_",  value: APIInteractions::Get(endpoint: '/system-bulletin', requireAuth: false)->Payload);
+        $this->twig->addGlobal('_SELECTED_LANGUAGE_', CookieHandling::GetCookieValue(CookieKey::LANGUAGE));
+        $this->twig->addGlobal('_SYSTEM_BULLETIN_', APIInteractions::Get('/system-bulletin', [], false)->Payload);
 
-        if($useAuth)
+        if ($useAuth)
         {
             SecurityUtilities::RequireLogin();
-            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",                          value: true);
-            $this->twig->addGlobal(name: "_IS_ADMIN_",                              value: SecurityUtilities::IsAdmin());
-            $this->twig->addGlobal(name: "_CURRENTLY_LOGGED_IN_USER_FULL_NAME_",    value: SessionUtilities::Get(key: SessionKey::USER_DETAILS)['FullName']);
+
+            $userDetails = SessionUtilities::Get(SessionKey::USER_DETAILS);
+
+            $this->twig->addGlobal('_IS_LOGGED_IN_', true);
+            $this->twig->addGlobal('_IS_ADMIN_', SecurityUtilities::IsAdmin());
+            $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_FULL_NAME_', $userDetails['fullName']);
         }
         else
         {
-            $this->twig->addGlobal(name: "_IS_LOGGED_IN_",  value: false);
+            $this->twig->addGlobal('_IS_LOGGED_IN_', false);
+        }
+
+        if (isset($_COOKIE['style']))
+        {
+            $this->twig->addGlobal('head_asset_options', explode(' ', $_COOKIE['style']));
         }
 
 
@@ -62,132 +60,107 @@ class PageBuilder
         $this->twig->addExtension(new CommonFunctions());
 
 
-        // Grab style options if present
-        if(isset($_COOKIE["style"]))
-        {
-            $this->twig->addGlobal('head_asset_options', explode(" ", $_COOKIE["style"]));
-        }
+        $this->checkServerAccess();
     }
 
-    #[NoReturn] public static function AutoRender(array $variables = []): void
+    private function checkServerAccess(): void
     {
-        PageBuilder::Render(
-            template : PageBuilder::GuessTargetTwigFile(),
-            variables: $variables,
-            useAuth: true,
-        );
-    }
+        $ping = APIInteractions::Get('/server/ping', [], false);
 
-    #[NoReturn] public static function AutoRenderUnsafe(array $variables = []): void
-    {
-        PageBuilder::Render(
-            template : PageBuilder::GuessTargetTwigFile(),
-            variables: $variables,
-            useAuth: false,
-        );
-    }
-
-    #[NoReturn] public static function Render(string $template, array $variables = [], bool $useAuth = true): void
-    {
-
-        foreach(self::$AdditionalVariables as $key => $value)
+        if ($ping->StatusCode === 403 || $ping->StatusCode === 429)
         {
-            $variables[$key] = $value;
-        }
-
-        try
-        {
-            echo (new PageBuilder($useAuth))->twig->render($template, $variables);
+            echo $this->twig->render('/VirtualPages/IpBlockedErrorPage.html.twig', [
+                'ErrorPayload' => $ping->Payload,
+            ]);
             exit();
         }
-        catch(RuntimeError $e)
-        {
-            throw $e;
-            die();
-            $e = $e->getPrevious();
-            PageBuilder::RenderInternalSystemError($e);
-        }
-        catch(LoaderError $e)
-        {
-            throw $e;
-            die();
-        }
-        catch(SyntaxError $e)
-        {
-            throw $e;
-            die();
-        }
-        catch(Exception $e)
-        {
-            throw $e;
-            die();
-        }
     }
 
-    #[NoReturn] public static function RenderInternalSystemError(Throwable $ex): void
+    #[NoReturn]
+    public static function AutoRender(array $variables = []): void
+    {
+        self::Render(
+            template: self::guessTargetTwigFile(),
+            variables: $variables,
+            useAuth: true
+        );
+    }
+
+    #[NoReturn]
+    public static function AutoRenderUnsafe(array $variables = []): void
+    {
+        self::Render(
+            template: self::guessTargetTwigFile(),
+            variables: $variables,
+            useAuth: false
+        );
+    }
+
+    #[NoReturn]
+    public static function Render(string $template, array $variables = [], bool $useAuth = true): void
+    {
+        $builder = new self($useAuth);
+        echo $builder->twig->render($template, $variables);
+        exit();
+    }
+
+    #[NoReturn]
+    public static function RenderInternalSystemError(Throwable $ex): void
     {
         http_response_code(500);
 
-        if($ex instanceof DatabaseConnectionException)
-        {
-            $technicalDetails = "Exception Type:\n    " . get_class($ex);
-            $technicalDetails .= "\nMessage:\n    " . $ex->getMessage();
-            $technicalDetails .= "\nURI:\n    " . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
+        if ($ex instanceof ApiException) {
+            $technicalDetails = sprintf(
+                "Exception Type:\n    %s\nMessage:\n    %s\nURI:\n    %s%s",
+                get_class($ex),
+                $ex->getMessage(),
+                $_SERVER['HTTP_HOST'],
+                $_SERVER['REQUEST_URI']
+            );
 
             self::Render(
-                template : "ErrorPages/InternalSystemError.html.twig",
-                variables: [
-                    "technical_details" => $technicalDetails,
-                ],
+                template: 'ErrorPages/InternalSystemError.html.twig',
+                variables: ['technical_details' => $technicalDetails],
+                useAuth: false
             );
         }
-        else
-        {
-            throw $ex;
-            die();
 
-
-            echo "<pre>";
-            echo get_class($ex) . "\n";
-            echo htmlentities($ex->getMessage()) . "\n";
-            echo htmlentities(json_encode($ex->getTrace(), JSON_PRETTY_PRINT)) . "\n";
-            echo htmlentities(json_encode(get_class_methods($ex), JSON_PRETTY_PRINT));
-            echo "</pre>";
-        }
-        die();
+        throw $ex;
     }
 
-    /**
-     * Uses the $_SERVER['REQUEST_URI'] variable to figure out which twig file to target.
-     * Means that you don't have to specify the twig file every time, small QoL feature.
-     *
-     * @return string The relative path of the template to load.
-     */
-    private static function GuessTargetTwigFile(): string
-    {
-        $phpPage = $_SERVER["REQUEST_URI"];
-
-        $twigFile = str_replace(search: ".php", replace: ".html.twig", subject: $phpPage);
-        if(!str_ends_with(haystack: $twigFile, needle: ".html.twig")) $twigFile .= ".html.twig";
-
-        $pageTemplateDirectory = __DIR__ . "/../../Templates/Pages";
-
-        if(!file_exists($pageTemplateDirectory . $twigFile))
-        {
-            echo "template not found";
-            die();
-        }
-
-        return "Pages" . $twigFile;
-    }
-
-    #[NoReturn] public static function Render404(): void
+    #[NoReturn]
+    public static function Render404(): void
     {
         http_response_code(404);
         self::Render(
-            template : "Pages/node-views/404.html.twig",
-            variables: [
-            ],
+            template: 'Pages/node-views/404.html.twig',
+            variables: [],
+            useAuth: true
         );
+    }
+
+    /**
+     * Determines the Twig template path based on the current REQUEST_URI.
+     *
+     * @throws \RuntimeException If the template file does not exist.
+     */
+    private static function guessTargetTwigFile(): string
+    {
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $uri = preg_replace('/[^a-zA-Z0-9\/_\-.]/', '', $uri); // Sanitize
+
+        $twigFile = str_replace('.php', '.html.twig', $uri);
+
+        if (!str_ends_with($twigFile, '.html.twig')) {
+            $twigFile .= '.html.twig';
+        }
+
+        $fullPath = __DIR__ . '/../../Templates/Pages' . $twigFile;
+
+        if (!file_exists($fullPath)) {
+            throw new \RuntimeException("Template not found: {$twigFile}");
+        }
+
+        return 'Pages' . $twigFile;
     }
 }
