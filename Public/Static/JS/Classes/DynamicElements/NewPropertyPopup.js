@@ -450,7 +450,7 @@ class NewPropertyPopup
 
     async #saveContent(content, contentType, defaultName = null)
     {
-        const apiPath = this.#calculateApiPath(defaultName);
+        const [apiPath, originalName] = this.#calculateApiPathAndOriginalName(defaultName);
 
         let payload;
         if (contentType === 'multipart/form-data')
@@ -460,8 +460,9 @@ class NewPropertyPopup
         else
         {
             payload = {
+                originalName: originalName,
                 content: content,
-                content_type: contentType
+                contentType: contentType
             };
         }
 
@@ -475,13 +476,14 @@ class NewPropertyPopup
         return response;
     }
 
-    #calculateApiPath(defaultName = null)
+    #calculateApiPathAndOriginalName(defaultName = null)
     {
+        const nameInput = this.#innerContainer.querySelector('.property-name-input');
+
         let propertyName = defaultName || 'untitled';
 
         if (this.#mode === 'dict')
         {
-            const nameInput = this.#innerContainer.querySelector('.property-name-input');
             if (nameInput && nameInput.value.trim())
             {
                 propertyName = this.#sanitizeName(nameInput.value.trim());
@@ -496,15 +498,15 @@ class NewPropertyPopup
         {
             if (this.#mode === 'dict')
             {
-                return this.#resourcePath.replace(/\/\*$/, '/' + propertyName);
+                return [this.#resourcePath.replace(/\/\*$/, '/' + propertyName), nameInput.value.trim()];
             }
             else if (this.#mode === 'array')
             {
-                return this.#resourcePath.replace(/\/#$/, '');
+                return [this.#resourcePath.replace(/\/#$/, ''), null];
             }
             else
             {
-                return this.#resourcePath;
+                return [this.#resourcePath, null];
             }
         }
         else
