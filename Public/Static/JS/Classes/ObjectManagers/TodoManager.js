@@ -155,7 +155,7 @@ class TodoManager extends BaseManager
             const currentUser = this.getCurrentUser();
             if (currentUser) {
                 this.selectUser(currentUser);
-                input.value = `${currentUser.full_name} (${currentUser.email_address})`;
+                input.value = `${currentUser.fullName} (${currentUser.emailAddress})`;
                 dropdown.style.display = 'none';
             }
         };
@@ -213,7 +213,7 @@ class TodoManager extends BaseManager
 
         const filteredUsers = this.users.filter(user => {
             const search = searchTerm.toLowerCase();
-            return user.full_name.toLowerCase().includes(search) || user.email_address.toLowerCase().includes(search);
+            return user.fullName.toLowerCase().includes(search) || user.emailAddress.toLowerCase().includes(search);
         });
 
         if (filteredUsers.length === 0)
@@ -224,10 +224,10 @@ class TodoManager extends BaseManager
 
         dropdown.innerHTML = filteredUsers.map(user => `
             <div class="user-dropdown-item" data-user-id="${user.id}" tabindex="0">
-                <div class="user-avatar">${this.getInitials(user.full_name)}</div>
+                <div class="user-avatar">${this.getInitials(user.fullName)}</div>
                 <div class="user-info">
-                    <div class="user-name">${user.full_name}</div>
-                    <div class="user-email">${user.email_address}</div>
+                    <div class="user-name">${user.fullName}</div>
+                    <div class="user-email">${user.emailAddress}</div>
                 </div>
             </div>
         `).join('');
@@ -280,7 +280,7 @@ class TodoManager extends BaseManager
     {
         if (window.currentUser) return window.currentUser;
         if (window.USER) return window.USER;
-        return this.users.find(u => u.isCurrentUser || u.is_me) || this.users[0];
+        return this.users.find(u => u.isCurrentUser || u.isMe) || this.users[0];
     }
 
     async handleSubmit(e)
@@ -291,8 +291,8 @@ class TodoManager extends BaseManager
             summary: document.getElementById('todo-summary').value.trim(),
             description: document.getElementById('todo-description').value.trim() || null,
             priority: document.getElementById('todo-priority').value,
-            due_date: document.getElementById('todo-due-date').value || null,
-            assigned_to: document.getElementById('todo-assigned-to-id').value || null,
+            dueDate: document.getElementById('todo-due-date').value || null,
+            assignedTo: document.getElementById('todo-assigned-to-id').value || null,
             reminder: document.getElementById('todo-reminder').value || null
         };
 
