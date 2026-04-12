@@ -7,7 +7,7 @@ use Auxilium\Enumerators\SessionKey;
 /**
  * Utilities to help with interacting with $_SESSION.
  */
-class SessionUtilities
+final class SessionUtilities
 {
     /**
      * Gets an object from $_SESSION, if that object doesn't exist, it'll return the value of \$default.

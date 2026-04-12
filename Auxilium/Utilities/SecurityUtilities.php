@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * Utilities to help with Security.
  */
-class SecurityUtilities
+final class SecurityUtilities
 {
     /**
      * Makes sure that the current user is logged in.

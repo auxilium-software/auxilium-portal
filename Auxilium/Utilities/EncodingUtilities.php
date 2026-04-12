@@ -9,7 +9,7 @@ namespace Auxilium\Utilities;
 /**
  * A utility class that provides encoding tools for various operations.
  */
-class EncodingUtilities
+final class EncodingUtilities
 {
     /**
      * Encodes the given data to a URL-safe Base64 string.

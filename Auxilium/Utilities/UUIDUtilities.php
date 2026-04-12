@@ -7,7 +7,7 @@ use Random\RandomException;
 /**
  * Utilities to help with the usage of UUIDs.
  */
-class UUIDUtilities
+final class UUIDUtilities
 {
     /**
      * @var string Regex to pattern match a UUID.

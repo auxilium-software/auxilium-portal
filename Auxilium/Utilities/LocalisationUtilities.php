@@ -11,7 +11,7 @@ use JsonException;
 /**
  * Utilities to help with Localisation.
  */
-class LocalisationUtilities
+final class LocalisationUtilities
 {
     public static ?array $LanguagePackCache = null;
 

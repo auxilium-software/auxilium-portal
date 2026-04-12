@@ -5,7 +5,7 @@ namespace Auxilium\Utilities;
 use Exception;
 use RuntimeException;
 
-class CacheUtilities
+final class CacheUtilities
 {
     public static string $CacheDirectory = __DIR__ . '/../../LocalStorage/Cache';
 

@@ -7,7 +7,7 @@ use JetBrains\PhpStorm\NoReturn;
 /**
  * Utilities to help with Navigation.
  */
-class NavigationUtilities
+final class NavigationUtilities
 {
     /**
      * Simple abstraction function to handle internal redirects.

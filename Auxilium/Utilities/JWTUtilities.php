@@ -10,7 +10,7 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class JWTUtilities
+final class JWTUtilities
 {
 
     /**

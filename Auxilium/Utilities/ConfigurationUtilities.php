@@ -7,7 +7,7 @@ use Exception;
 use SimpleXMLElement;
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigurationUtilities
+final class ConfigurationUtilities
 {
     public static array $SystemConfiguration;
     public static array $UserConfiguration;

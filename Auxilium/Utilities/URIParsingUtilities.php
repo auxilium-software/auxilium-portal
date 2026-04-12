@@ -5,7 +5,7 @@ namespace Auxilium\Utilities;
 /**
  * Utilities to help with the parsing of URIs.
  */
-class URIParsingUtilities
+final class URIParsingUtilities
 {
     /**
      * Extracts UUIDs from the URI and returns back the UUID at the requested index.
