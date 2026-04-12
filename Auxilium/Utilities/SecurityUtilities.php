@@ -5,7 +5,6 @@ namespace Auxilium\Utilities;
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\ServiceInteractions\APIInteractions;
 use Exception;
-use phpDocumentor\Compiler\ApiDocumentation\Pass\VarTagModifier;
 use RuntimeException;
 
 /**
