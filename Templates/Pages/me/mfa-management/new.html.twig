@@ -1,0 +1,268 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "TOTP Setup" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/me">{{ "User Overview" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/me/mfa-management">{{ "MFA Management" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/me/mfa-management/new">{{ "TOTP Setup" | translate }}</a>
+            </div>
+
+            <h1>{{ "Set Up Two-Factor Authentication" | translate }}</h1>
+
+            <div class="separator"></div>
+
+            {#
+                =========================
+                = SETUP PHASE
+                =========================
+            #}
+
+            <div id="setupPhase">
+
+                <div id="errorBanner" class="warning-note" style="display:none;"></div>
+
+
+                {# step 1: scan qr #}
+                <div class="marked-section">
+                    <h2>{{ "1. Scan this QR code with your authenticator app" | translate }}</h2>
+                    <p>
+                        {{ "Open your authenticator app (Google Authenticator, Authy, 1Password, etc.) and scan the QR code below." | translate }}
+                    </p>
+
+                    <img
+                            id="qrCodeImg"
+                            src="{{ QrCodeImgData|raw }}"
+                            alt="{{ "QR Code for MFA Setup" | translate }}"
+                            style="display:block; width:50mm; height:50mm; image-rendering:pixelated; margin-bottom:1rem;"
+                    >
+
+                    <details>
+                        <summary style="cursor:pointer;">{{ "Can't scan? Enter the code manually" | translate }}</summary>
+                        <p>{{ "Enter this secret key into your authenticator app:" | translate }}</p>
+                        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+                            <code id="manualSecret" style="font-family:'IBM Plex Mono',monospace; font-size:1.1em; font-weight:bold; letter-spacing:0.1em; word-break:break-all;">{{ ManualSecret }}</code>
+                            <a class="button" href="javascript:void(0)" onclick="copySecret()" style="margin:0; white-space:nowrap;">{{ "Copy" | translate }}</a>
+                        </div>
+                    </details>
+                </div>
+
+
+                {# step 2: verify #}
+                <div class="marked-section">
+                    <h2>{{ "2. Verify your authenticator" | translate }}</h2>
+                    <p>
+                        {{ "Enter the 6-digit code shown in your authenticator app to confirm setup." | translate }}
+                    </p>
+
+                    <div style="display:flex; gap:1rem; align-items:flex-start;">
+                        <input
+                                type="text"
+                                id="totpCode"
+                                maxlength="6"
+                                placeholder="000000"
+                                autocomplete="one-time-code"
+                                inputmode="numeric"
+                                autofocus
+                                style="width:12em; font-family:'IBM Plex Mono',monospace; font-size:1.2em; text-align:center; letter-spacing:0.3em;"
+                        >
+                        <a class="button" href="javascript:void(0)" id="verifyBtn" onclick="verifyCode()" style="margin:0; margin-top:0.2rem;">
+                            {{ "Verify & Enable" | translate }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {#
+                =========================
+                = RECOVERY CODES PHASE
+                =========================
+            #}
+            <div id="recoveryPhase" style="display:none;">
+
+                <div class="info-note" style="margin-bottom:2rem;">
+                    <span class="note-heading">✓ {{ "Enabled" | translate }}</span>
+                    <p>{{ "Two-factor authentication has been enabled on your account." | translate }}</p>
+                </div>
+
+                <h2>{{ "Save Your Recovery Codes" | translate }}</h2>
+
+                <div class="warning-note" style="position:relative;">
+                    <strong>{{ "Important" | translate }}</strong>
+                    <p>
+                        {{ "These codes are the only way to access your account if you lose your authenticator device. Each code can only be used once." | translate }}
+                    </p>
+                    <p>
+                        {{ "Save them somewhere safe. You will not be able to see these codes again." | translate }}
+                    </p>
+                </div>
+
+                <div class="marked-section">
+                    <div id="codesGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 2rem; margin-bottom:1.5rem;"></div>
+
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <a class="button" href="javascript:void(0)" onclick="copyCodes()" id="copyCodesBtn" style="margin:0;">
+                            {{ "Copy to Clipboard" | translate }}
+                        </a>
+                        <a class="button" href="javascript:void(0)" onclick="downloadCodes()" style="margin:0;">
+                            {{ "Download as File" | translate }}
+                        </a>
+                        <a class="button" href="javascript:void(0)" onclick="window.print()" style="margin:0;">
+                            {{ "Print" | translate }}
+                        </a>
+                    </div>
+                </div>
+
+                <p>{{ "Once you have saved your recovery codes, you can return to MFA management." | translate }}</p>
+                <a class="button" href="/me/mfa-management">
+                    {{ "I've saved my codes - Continue" | translate }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @media print {
+            .navigation-breadcrumb-container,
+            .info-note,
+            .separator,
+            #setupPhase { display: none !important; }
+        }
+
+        @media only screen and (max-width: 128mm) {
+            #codesGrid { grid-template-columns: 1fr !important; }
+        }
+    </style>
+
+    <script>
+        let recoveryCodes = [];
+
+        function copySecret()
+        {
+            const secret = document.getElementById('manualSecret').textContent;
+            navigator.clipboard.writeText(secret);
+        }
+
+        function showError(message)
+        {
+            const banner = document.getElementById('errorBanner');
+            banner.textContent = message;
+            banner.style.display = 'block';
+        }
+
+        function hideError()
+        {
+            document.getElementById('errorBanner').style.display = 'none';
+        }
+
+        async function verifyCode()
+        {
+            hideError();
+
+            const input = document.getElementById('totpCode');
+            const code = input.value.replace(/\D/g, '');
+
+            if (code.length !== 6)
+            {
+                showError('{{ "Please enter a valid 6-digit code from your authenticator app." | translate }}');
+                input.focus();
+                input.select();
+                return;
+            }
+
+            const btn = document.getElementById('verifyBtn');
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            btn.textContent = '{{ "Verifying..." | translate }}';
+
+            try
+            {
+                const userController = new UserController();
+                const result = await userController.EnableTotp(code);
+
+                if (result && result.recoveryCodes)
+                {
+                    recoveryCodes = result.recoveryCodes;
+                    showRecoveryCodes(recoveryCodes);
+                }
+                else
+                {
+                    showError('{{ "Invalid code. Check your authenticator app and try again." | translate }}');
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                    btn.textContent = '{{ "Verify & Enable" | translate }}';
+                    input.focus();
+                    input.select();
+                }
+            }
+            catch (err)
+            {
+                showError('{{ "Something went wrong. Please try again." | translate }}');
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.textContent = '{{ "Verify & Enable" | translate }}';
+            }
+        }
+
+        function showRecoveryCodes(codes)
+        {
+            document.getElementById('setupPhase').style.display = 'none';
+
+            const grid = document.getElementById('codesGrid');
+            grid.innerHTML = '';
+            codes.forEach(function(code) {
+                var el = document.createElement('code');
+                el.style.fontFamily = "'IBM Plex Mono', monospace";
+                el.style.fontSize = '1.2em';
+                el.style.fontWeight = 'bold';
+                el.style.letterSpacing = '0.1em';
+                el.style.padding = '0.4em 0.6em';
+                el.style.border = 'var(--outline-width) solid var(--foreground-color-outlines)';
+                el.style.textAlign = 'center';
+                el.textContent = code;
+                grid.appendChild(el);
+            });
+
+            document.getElementById('recoveryPhase').style.display = 'block';
+        }
+
+        function copyCodes()
+        {
+            let text = "Auxilium Admin - Recovery Codes\n";
+            text += "================================\n\n";
+            recoveryCodes.forEach(function(code) { text += code + "\n"; });
+            text += "\nKeep these codes safe. Each can only be used once.";
+            navigator.clipboard.writeText(text);
+        }
+
+        function downloadCodes() {
+            let text = "Auxilium Admin - Recovery Codes\r\n";
+            text += "================================\r\n\r\n";
+            recoveryCodes.forEach(function(code) { text += code + "\r\n"; });
+            text += "\r\nKeep these codes safe. Each can only be used once.\r\n";
+            text += "Generated: " + new Date().toISOString() + "\r\n";
+
+            const blob = new Blob([text], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'auxilium-recovery-codes.txt';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        document.getElementById('totpCode').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+            if (e.target.value.length === 6) verifyCode();
+        });
+
+        document.getElementById('totpCode').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); verifyCode(); }
+        });
+    </script>
+
+{% endblock %}
