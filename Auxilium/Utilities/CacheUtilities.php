@@ -136,7 +136,7 @@ class CacheUtilities
             "FormSpecID" => $formSpecName,
             "UserID" => $userID,
             "Data" => [],
-            "CurrentPageIndex" => 0,  // Track actual page index
+            "CurrentPageIndex" => 0,  // track actual page index
             "Status" => "in_progress",
             "CreatedAt" => date('Y-m-d H:i:s'),
         ];

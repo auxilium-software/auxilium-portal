@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 try
 {
-    // if totp is already enabled, redirect to management
+    // If TOTP is already enabled, redirect to management
     $status = APIInteractions::Get(endpoint: '/me/totp/status');
 
     if ($status->Payload['isEnabled'] === true)
@@ -17,7 +17,7 @@ try
         exit;
     }
 
-    // generate a pending secret and QR code
+    // Generate a pending secret and QR code
     $setup = APIInteractions::Post(
         endpoint: '/me/totp/setup',
         payload: []
