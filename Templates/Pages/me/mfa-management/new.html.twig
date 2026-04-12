@@ -240,7 +240,8 @@
             navigator.clipboard.writeText(text);
         }
 
-        function downloadCodes() {
+        function downloadCodes()
+        {
             let text = "Auxilium Admin - Recovery Codes\r\n";
             text += "================================\r\n\r\n";
             recoveryCodes.forEach(function(code) { text += code + "\r\n"; });
