@@ -8,9 +8,48 @@ use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class JWTUtilities
 {
+
+    /**
+     * Checks to see whether there's currently an ongoing session.
+     *
+     * @return bool Is the user logged in?
+     */
+    public static function IsLoggedIn(): bool
+    {
+        if (!isset($_COOKIE[CookieKey::ACCESS_TOKEN->value], $_COOKIE[CookieKey::REFRESH_TOKEN->value]))
+        {
+            return false;
+        }
+
+        try
+        {
+            $config = ConfigurationUtilities::GetUserConfiguration()['JWT'];
+
+            $decodedObject = JWT::decode(
+                jwt: $_COOKIE[CookieKey::ACCESS_TOKEN->value],
+                keyOrKeyArray: new Key($config['SecretKey'], $config['Algorithm'])
+            );
+
+            $decodedArray = json_decode(
+                json: json_encode($decodedObject, JSON_THROW_ON_ERROR),
+                associative: true,
+                depth: 512,
+                flags: JSON_THROW_ON_ERROR
+            );
+
+            return true;
+        }
+        catch (Exception $e)
+        {
+            return false;
+        }
+    }
+
+
     /**
      * Used for getting information from the JWT in the `access_token` cookie.
      * If that cookie doesn't exist, along with no refresh token, the user will be redirected to the login page.
@@ -28,7 +67,10 @@ class JWTUtilities
         if (!isset($_COOKIE[CookieKey::ACCESS_TOKEN->value]))
         {
             return self::refreshAccessToken();
+            echo 5;
+            die();
         }
+
 
         return self::decodeAccessToken($_COOKIE[CookieKey::ACCESS_TOKEN->value]);
     }
@@ -46,7 +88,8 @@ class JWTUtilities
             requireAuth: false
         );
 
-        if ($response->StatusCode !== 200) {
+        if ($response->StatusCode !== 200)
+        {
             NavigationUtilities::Redirect(target: '/login');
         }
 
@@ -70,10 +113,7 @@ class JWTUtilities
 
             $decodedObject = JWT::decode(
                 jwt: $token,
-                keyOrKeyArray: $config['SecretKey'],
-                allowed_algs: [
-                    $config['Algorithm'],
-                ]
+                keyOrKeyArray: new Key($config['SecretKey'], $config['Algorithm'])
             );
 
             $decodedArray = json_decode(
