@@ -3,11 +3,6 @@
   Icon: house
   HREF: /admin-console
 
-- Label: AAC Terminal
-  Type: HREF
-  Icon: terminal
-  HREF: /admin-console/console
-
 - Label: System Administration
   Type: Header
   HREF: /admin-console/system-administration
