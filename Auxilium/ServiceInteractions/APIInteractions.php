@@ -56,11 +56,18 @@ class APIInteractions
     {
         $headers = ['Content-Type: application/json'];
 
-        if ($this->requiresAuth) {
+        if ($this->requiresAuth)
+        {
             $accessToken = CookieHandling::GetCookieValue(CookieKey::ACCESS_TOKEN);
 
-            if (!$accessToken) {
-                $this->redirectToLogin();
+            if (!$accessToken)
+            {
+                $refreshToken = CookieHandling::GetCookieValue(CookieKey::REFRESH_TOKEN);
+
+                if (!$refreshToken)
+                {
+                    $this->redirectToLogin();
+                }
             }
 
             $headers[] = 'Authorization: Bearer ' . $accessToken;
