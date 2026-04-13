@@ -59,16 +59,6 @@
                                     <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name) }}</dt>
                                     <dd data-property-key="{{ property_name }}">
                                         <span class="property-content">{{ property_data.content }}</span>
-                                        <a class="edit-icon inline-icon"
-                                           title="Remove property"
-                                           href="javascript:void(0)"
-                                           onclick="CasePropertyManager.editProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
-                                        </a>
-                                        <a class="delete-icon inline-icon"
-                                           title="Remove property"
-                                           href="javascript:void(0)"
-                                           onclick="CasePropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
-                                        </a>
                                     </dd>
                                 {% endif %}
                             {% endfor %}
