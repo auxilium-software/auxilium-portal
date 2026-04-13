@@ -142,7 +142,6 @@ class UserController
 
         const [statusCode, payload] = await this.#APIInstance.API_DELETE(
             `/api/v3/users/${userID}`,
-            {},
             true,
             totpCode
         );

@@ -798,7 +798,7 @@
         // ====================================================================================================
         async function createUser()
         {
-            var data = {
+            const data = {
                 fullName: document.getElementById('newUserName').value,
                 emailAddress: document.getElementById('newUserEmail').value,
                 telephoneNumber: document.getElementById('newUserPhone').value,
@@ -806,7 +806,7 @@
                 languagePreference: document.getElementById('newUserLanguage').value,
             };
 
-            console.log('Create user:', data);
+            console.log(data);
             document.getElementById('addUserDialog').style.display = 'none';
 
             // TODO sort this out lol

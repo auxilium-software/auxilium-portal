@@ -38,11 +38,6 @@
   HREF: /admin-console/object-management
 
 - Label: User Management
-  Type: Dropdown
+  Type: HREF
   Icon: users
   HREF: /admin-console/object-management/user-management
-  Children:
-    - Label: All Users
-      Type: HREF
-      Icon: users
-      HREF: /admin-console/object-management/user-management/all-users
