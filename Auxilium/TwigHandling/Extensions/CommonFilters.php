@@ -123,7 +123,7 @@ class CommonFilters extends AbstractExtension
     {
         // $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
         preg_match("/" . UUIDUtilities::$Regex . "/", $string, $matches);
-        return $matches[1] ?? '';
+        return $matches[0] ?? '';
     }
 
     public function ndtitle($string): string
