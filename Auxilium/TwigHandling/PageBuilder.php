@@ -39,11 +39,9 @@ class PageBuilder
         {
             SecurityUtilities::RequireLogin();
 
-            $userDetails = SessionUtilities::Get(SessionKey::USER_DETAILS);
-
             $this->twig->addGlobal('_IS_LOGGED_IN_', true);
             $this->twig->addGlobal('_IS_ADMIN_', SecurityUtilities::IsAdmin());
-            $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_FULL_NAME_', $userDetails['fullName']);
+            $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_FULL_NAME_', SecurityUtilities::GetUserName());
         }
         else
         {
