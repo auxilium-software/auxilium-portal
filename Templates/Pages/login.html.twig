@@ -7,10 +7,6 @@
         <div class="inner-content">
             <h1>{{ "Login"|translate }}</h1>
 
-            <div id="GlobalErrorMessage" class="error-toast global-error" style="display:none;">
-                <span id="GlobalErrorText"></span>
-                <button type="button" class="error-close" onclick="hideGlobalError()">&times;</button>
-            </div>
             <div id="SuccessMessage" class="success-toast" style="display:none;">
                 <span id="SuccessText"></span>
             </div>
@@ -42,16 +38,46 @@
                 <div class="separator"></div>
                 <a href="/forgot-password">{{ "I've forgotten my password"|translate }}</a>
 
-
-                <h2>{{ "Security Notice"|translate }}</h2>
-                <p>
-                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
-                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
-                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
-                    }) }}
-                </p>
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             </form>
+
+            <form method="POST" id="MfaForm" style="display:none;">
+                <!-- TOTP input -->
+                <div id="TotpInputSection">
+                    <label for="totp_token">{{ "TOTP Token"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                    <input type="text" name="totp_token" placeholder="{{ "XXXXXX"|translate }}" id="totp_token"
+                           inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" />
+                    <p id="ErrorReadout-TotpToken" class="error-toast" style="display:none;"></p>
+                </div>
+
+                <!-- Recovery code input -->
+                <div id="RecoveryCodeSection" style="display:none;">
+                    <label for="recovery_code">{{ "Recovery Code"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                    <input type="text" name="recovery_code" placeholder="{{ "Recovery Code"|translate }}" id="recovery_code"
+                           autocomplete="off" />
+                    <p id="ErrorReadout-RecoveryCode" class="error-toast" style="display:none;"></p>
+                </div>
+
+                <button type="submit" id="MfaSubmitButton" class="button">
+                    <span class="button-text">{{ "Verify"|translate }}</span>
+                    <span class="loading-spinner" style="display:none;">⏳</span>
+                </button>
+
+                <div class="separator"></div>
+
+                <a href="#" id="ToggleMfaMode">{{ "Use recovery code instead"|translate }}</a>
+                <br/>
+                <a href="#" id="BackToLogin">{{ "Back to login"|translate }}</a>
+            </form>
+
+
+            <h2>{{ "Security Notice"|translate }}</h2>
+            <p>
+                {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                    '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                    '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                }) }}
+            </p>
 
             <h2>{{ "Cookie Notice"|translate }}</h2>
             <p>
@@ -64,18 +90,18 @@
     </div>
 
     <script>
-        function hideGlobalError() {
+        function hideGlobalError()
+        {
             const errorContainer = document.getElementById('GlobalErrorMessage');
-            if (errorContainer) {
+            if (errorContainer)
                 errorContainer.style.display = 'none';
-            }
         }
 
-        function hideSuccessMessage() {
+        function hideSuccessMessage()
+        {
             const successContainer = document.getElementById('SuccessMessage');
-            if (successContainer) {
+            if (successContainer)
                 successContainer.style.display = 'none';
-            }
         }
     </script>
     <script src="/Static/JS/Handlers/LoginFormHandler.js"></script>
