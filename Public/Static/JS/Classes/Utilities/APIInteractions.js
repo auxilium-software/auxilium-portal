@@ -86,7 +86,8 @@ class APIInteractions
                     target,
                     useAuth,
                     payload,
-                    true
+                    true,
+                    totpCode
                 );
             }
 
