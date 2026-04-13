@@ -73,9 +73,9 @@ class APIInteractions
             $headers[] = 'Authorization: Bearer ' . $accessToken;
         }
 
-        // Add cookie header to send cookies with the request
         $cookieHeader = $this->buildCookieHeader();
-        if ($cookieHeader) {
+        if ($cookieHeader)
+        {
             $headers[] = $cookieHeader;
         }
 
@@ -158,11 +158,12 @@ class APIInteractions
             PageBuilder::RenderInternalSystemError($ex);
         }
 
-        if ($response === false) {
+        if ($response === false)
+        {
             $error = curl_error($this->CurlHandler);
             curl_close($this->CurlHandler);
 
-            PageBuilder::RenderInternalSystemError(new Exception($error));
+            PageBuilder::RenderInternalSystemError(new ApiException($error));
 
         }
 
@@ -207,12 +208,14 @@ class APIInteractions
         }
 
         // If we already tried refreshing, or it's a different error
-        if ($statusCode === 401) {
+        if ($statusCode === 401)
+        {
             $this->redirectToLogin();
         }
 
         // Handle other HTTP errors
-        if ($statusCode >= 400) {
+        if ($statusCode >= 400)
+        {
             error_log("API Error: Status $statusCode, Response: $body");
         }
 
