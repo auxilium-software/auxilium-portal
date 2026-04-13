@@ -3,6 +3,12 @@
 {% block title %}{{ "user overview" | translate }}{% endblock %}
 
 {% block content %}
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ UserDetails|json_encode }}
+        </code>
+    {% endif %}
+
     <div>
         <div class="inner-content">
             <div class="navigation-breadcrumb-container">

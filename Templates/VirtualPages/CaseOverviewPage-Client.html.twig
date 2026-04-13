@@ -3,9 +3,11 @@
 {% block title %}{{ "case overview" | translate }}{% endblock %}
 
 {% block content %}
-    <code>
-        {{ CaseDetails|json_encode }}
-    </code>
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ CaseDetails|json_encode }}
+        </code>
+    {% endif %}
 
     <div>
         <div class="inner-content">

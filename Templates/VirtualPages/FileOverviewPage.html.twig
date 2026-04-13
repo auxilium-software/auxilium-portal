@@ -3,9 +3,11 @@
 {% block title %}{{ "file overview" | translate }}{% endblock %}
 
 {% block content %}
-    <code>
-        {{ FileDetails|json_encode }}
-    </code>
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ FileDetails|json_encode }}
+        </code>
+    {% endif %}
 
     <div>
         <div class="inner-content">
