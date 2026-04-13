@@ -7,7 +7,12 @@ use RuntimeException;
 
 final class CacheUtilities
 {
-    public static string $CacheDirectory = __DIR__ . '/../../LocalStorage/Cache';
+    public static function GetFormDataDirectory(): string
+    {
+        return ConfigurationUtilities::GetUserConfiguration()['FileSystem']['RootStorageDirectories']['FormData'];
+    }
+
+
 
     public static function SetFormData(string $formInstanceID, string $key, string $value): void
     {
@@ -15,7 +20,7 @@ final class CacheUtilities
         $formData['Data'][$key] = $value;
 
         file_put_contents(
-            filename: self::$CacheDirectory . "/FormData/$formInstanceID.json",
+            filename: self::GetFormDataDirectory() . "/$formInstanceID.json",
             data    : json_encode(
                           $formData,
                           JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
@@ -35,7 +40,7 @@ final class CacheUtilities
             throw new Exception("Form does not exist: $formInstanceID");
         }
 
-        $filePath = self::$CacheDirectory . "/FormData/$formInstanceID.json";
+        $filePath = self::GetFormDataDirectory() . "/$formInstanceID.json";
         $fileContents = file_get_contents($filePath);
 
         if($fileContents === false)
@@ -48,7 +53,7 @@ final class CacheUtilities
 
     public static function DoesFormExistYet(string $formInstanceID): bool
     {
-        $filePath = self::$CacheDirectory . "/FormData/$formInstanceID.json";
+        $filePath = self::GetFormDataDirectory() . "/$formInstanceID.json";
         return file_exists($filePath);
     }
 
@@ -67,7 +72,7 @@ final class CacheUtilities
         }
 
         file_put_contents(
-            filename: self::$CacheDirectory . "/FormData/$formInstanceID.json",
+            filename: self::GetFormDataDirectory() . "/$formInstanceID.json",
             data    : json_encode(
                           $formData,
                           JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
@@ -77,7 +82,7 @@ final class CacheUtilities
 
     public static function CleanupOldForms(int $maxAgeHours = 24): void
     {
-        $formDataDir = self::$CacheDirectory . "/FormData";
+        $formDataDir = self::GetFormDataDirectory() . "/FormData";
         if(!is_dir($formDataDir))
         {
             return;
@@ -109,7 +114,7 @@ final class CacheUtilities
         $formData['CurrentPageIndex'] = $pageIndex;
 
         file_put_contents(
-            filename: self::$CacheDirectory . "/FormData/$formInstanceID.json",
+            filename: self::GetFormDataDirectory() . "/$formInstanceID.json",
             data    : json_encode(
                           $formData,
                           JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
@@ -119,7 +124,7 @@ final class CacheUtilities
 
     public static function MarkFormAsComplete(string $formInstanceID): void
     {
-        unlink(filename: self::$CacheDirectory . "/FormData/$formInstanceID.json");
+        unlink(filename: self::GetFormDataDirectory() . "/$formInstanceID.json");
     }
 
     public static function CreateNewForm(string $formSpecName, bool $requireAuth): string
@@ -144,7 +149,7 @@ final class CacheUtilities
         $formInstanceID = UUIDUtilities::CreateV4();
 
         // Ensure directory exists
-        $formDataDir = self::$CacheDirectory . "/FormData";
+        $formDataDir = self::GetFormDataDirectory() . "/FormData";
         if(!is_dir($formDataDir))
         {
             if(!mkdir($formDataDir, 0755, true) && !is_dir($formDataDir))
@@ -154,7 +159,7 @@ final class CacheUtilities
         }
 
         file_put_contents(
-            filename: self::$CacheDirectory . "/FormData/$formInstanceID.json",
+            filename: self::GetFormDataDirectory() . "/$formInstanceID.json",
             data    : json_encode(
                           $formDataTemplate,
                           JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT
