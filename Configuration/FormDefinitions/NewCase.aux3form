@@ -5,6 +5,7 @@
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
 
 
 
@@ -438,6 +439,6 @@
         </apiRequest>
     </submissionActions>
     <afterSubmissionRedirect>
-        <target>/login</target>
+        <target>/cases/$formData["case_id"]</target>
     </afterSubmissionRedirect>
 </auxForm>

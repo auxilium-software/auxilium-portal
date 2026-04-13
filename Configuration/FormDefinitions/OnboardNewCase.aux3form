@@ -5,6 +5,7 @@
     <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
 
 
 
@@ -30,13 +31,11 @@
                             <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
-                        <!--
                         <option>
                             <primaryLabel>I am referring someone.</primaryLabel>
                             <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
-                        -->
                     </options>
                 </component>
             </components>
@@ -328,13 +327,13 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <primaryLabel>Confirm Email Address</primaryLabel>
                 </component>
                 <component>
-                    <id>raw_password</id>
+                    <id>password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
                     <primaryLabel>Password</primaryLabel>
                 </component>
                 <component>
-                    <id>raw_password_confirm</id>
+                    <id>password_confirm</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
                     <primaryLabel>Confirm Password</primaryLabel>
@@ -359,7 +358,7 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
             <id>passwords_not_equal</id>
             <title>Passwords do not match.</title>
             <description>Please ensure you enter the same password into both fields.</description>
-            <renderIf>not(equals($formData["raw_password"],$formData["raw_password_confirm"]))</renderIf>
+            <renderIf>not(equals($formData["password"],$formData["password_confirm"]))</renderIf>
             <abandonForm>true</abandonForm>
             <components>
             </components>
@@ -504,19 +503,20 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
             <method>POST</method>
             <payload>
                 <who_is_case_about>$formData["who_is_case_about"]</who_is_case_about>
-                <data_processing_consent>$formData["data_processing_consent"]</data_processing_consent>
-                <full_name>$formData["full_name"]</full_name>
-                <telephone_number>$formData["telephone_number"]</telephone_number>
-                <full_address>$formData["full_address"]</full_address>
+                <dataProcessingConsent>$formData["data_processing_consent"]</dataProcessingConsent>
+                <fullName>$formData["full_name"]</fullName>
+                <telephoneNumber>$formData["telephone_number"]</telephoneNumber>
+                <fullAddress>$formData["full_address"]</fullAddress>
                 <gender>$formData["gender"]</gender>
-                <ethnic_group>$formData["ethnic_group"]</ethnic_group>
-                <date_of_birth>$formData["date_of_birth"]</date_of_birth>
-                <how_did_you_find_out_about_our_service>$formData["how_did_you_find_out_about_our_service"]</how_did_you_find_out_about_our_service>
-                <on_behalf_of>$formData["on_behalf_of"]</on_behalf_of>
-                <email_address>$formData["email_address"]</email_address>
-                <raw_password>$formData["raw_password"]</raw_password>
-                <title>$formData["case_title"]</title>
-                <description>$formData["case_description"]</description>
+                <ethnicGroup>$formData["ethnic_group"]</ethnicGroup>
+                <dateOfBirth>$formData["date_of_birth"]</dateOfBirth>
+                <howDidYouFindOutAboutOurService>$formData["how_did_you_find_out_about_our_service"]</howDidYouFindOutAboutOurService>
+                <onBehalfOf>$formData["on_behalf_of"]</onBehalfOf>
+                <emailAddress>$formData["email_address"]</emailAddress>
+                <passwordSha512>$formData["password"]</passwordSha512>
+                <caseTitle>$formData["case_title"]</caseTitle>
+                <caseDescription>$formData["case_description"]</caseDescription>
+                <languagePreference>en-GB</languagePreference>
             </payload>
         </apiRequest>
     </submissionActions>

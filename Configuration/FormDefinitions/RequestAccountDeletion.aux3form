@@ -5,6 +5,7 @@
     <subtitle>This form will guide you through requesting the deletion of your account.</subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
 
 
 

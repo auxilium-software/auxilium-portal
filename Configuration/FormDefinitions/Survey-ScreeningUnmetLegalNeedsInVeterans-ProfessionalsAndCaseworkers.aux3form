@@ -5,6 +5,7 @@
     <subtitle>This screening tool is meant to explore whether a veteran has unmet legal issues, whether they realise it or not. You should submit the form whether you or the veteran need help or not. </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
 
 
 
