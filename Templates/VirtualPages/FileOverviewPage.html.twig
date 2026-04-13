@@ -58,7 +58,7 @@
                         <dd>{{ FileDetails.createdAt|date('Y-m-d H:i:s') }}</dd>
 
                         <dt>{{ "Uploaded by" | translate }}:</dt>
-                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.uploaded_by} %}</dd>
+                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.createdBy} %}</dd>
                     </dl>
                 </div>
             </div>
