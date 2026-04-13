@@ -4,6 +4,7 @@ namespace Auxilium\ServiceInteractions;
 
 use Auxilium\DataClasses\APIResponsePayload;
 use Auxilium\Enumerators\CookieKey;
+use Auxilium\Exceptions\ApiException;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\ConfigurationUtilities;
@@ -14,6 +15,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 class APIInteractions
 {
+    private static bool $isRefreshing = false;
     private static bool $hasAttemptedRefresh = false;
 
     private CurlHandle $CurlHandler;
