@@ -7,10 +7,10 @@
         {% block head_assets %}
             <style>@import url("/Static/CSS/StandardWebPage.css");</style>
             {% if "dark-mode" in head_asset_options %}
-            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoRelativePath") }}" />
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ _LOGO_PATH_ }}" />
             <style>@import url("/Static/CSS/Themes/DarkMode.css");</style>
             {% else %}
-            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+            <link rel="{# shortcut #}icon" type="image/png" href="/Static/Images/Logos/{{ _LOGO_CONTRAST_PATH_ }}" />
         {% endif %}
             {% if "large-fonts" in head_asset_options %}
             <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>

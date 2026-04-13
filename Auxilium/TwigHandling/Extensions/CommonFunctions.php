@@ -4,6 +4,7 @@ namespace Auxilium\TwigHandling\Extensions;
 
 use Auxilium\Enumerators\CookieKey;
 use Auxilium\MicroTemplate;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\Utilities\ConfigurationUtilities;
 use Auxilium\Utilities\Security;
