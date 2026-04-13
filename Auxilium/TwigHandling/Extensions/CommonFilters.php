@@ -122,7 +122,7 @@ class CommonFilters extends AbstractExtension
     public function extract_file_id_from_auxlfs_url(string $string): string
     {
         // $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
-        preg_match(UUIDUtilities::$Regex, $string, $matches);
+        preg_match("/" . UUIDUtilities::$Regex . "/", $string, $matches);
         return $matches[1] ?? '';
     }
 
