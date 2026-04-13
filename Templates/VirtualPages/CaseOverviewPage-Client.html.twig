@@ -35,11 +35,6 @@
                     <div class="marked-section">
                         <h2>
                             {{ "Properties" | translate }}
-                            <a href="javascript:void(0)"
-                               class="inline-icon add-icon add-property-trigger"
-                               data-type="PLAIN_TEXT"
-                               data-resource="/api/v3/cases/{{ CaseDetails.id }}/additional_properties/*"
-                               title="{{ "Add Entry" | translate }}"
                             ></a>
                             <script>
                                 document.addEventListener('click', async (e) => {
@@ -104,10 +99,6 @@
                     <div class="marked-section">
                         <h2>
                             {{ "ToDo List" | translate }}
-                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.showCreateModal();}"
-                               class="inline-icon add-icon"
-                               title="{{ "Add Entry" | translate }}"
-                            ></a>
                         </h2>
                         <ul class="collection-list todo-list">
                             {% for toDoID, toDoItemDetails in CaseDetails.todos %}
@@ -171,9 +162,6 @@
                 <div class="right-preferential-box">
                     <div class="marked-section">
                         <h2>{{ "Clients" | translate }}
-                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddClientModal();}"
-                               class="inline-icon group-add-icon"
-                               title="{{ "Add Client" | translate }}"></a>
                         </h2>
                         <br />
                         <ul class="collection-list">
