@@ -149,7 +149,7 @@ final class CacheUtilities
         $formInstanceID = UUIDUtilities::CreateV4();
 
         // Ensure directory exists
-        $formDataDir = self::GetFormDataDirectory() . "/FormData";
+        $formDataDir = self::GetFormDataDirectory();
         if(!is_dir($formDataDir))
         {
             if(!mkdir($formDataDir, 0755, true) && !is_dir($formDataDir))
