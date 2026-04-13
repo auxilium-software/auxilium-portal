@@ -16,7 +16,7 @@ class APIInteractions
 
         if (totpCode !== null)
         {
-            headers['X-TOTP-Code'] =  totpCode || '';
+            headers['X-TOTP-Code'] =  totpCode;
         }
 
         return headers;
@@ -127,7 +127,7 @@ class APIInteractions
 
     async API_DELETE(target, useAuth = true, totpCode = null)
     {
-        return await this.#apiRequest('DELETE', target, useAuth, false, totpCode);
+        return await this.#apiRequest('DELETE', target, useAuth, {}, false, totpCode);
     }
 
     async API_FILE_UPLOAD(target, file, description = null, useAuth = true, isRetry = false)
