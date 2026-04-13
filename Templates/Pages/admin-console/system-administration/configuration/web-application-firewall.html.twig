@@ -1227,7 +1227,8 @@
                         '/api/v3/web-application-firewall/whitelist/ips',
                         {
                             ipAddress: ip,
-                            reason: reason || null
+                            reason: reason || null,
+                            isPermanent: true,
                         }
                     );
                     if (status === 200)
