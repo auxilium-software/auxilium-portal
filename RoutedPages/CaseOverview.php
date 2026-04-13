@@ -17,8 +17,20 @@ try
         endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
+    if(SecurityUtilities::IsAdmin() || in_array(needle: SecurityUtilities::GetUserId(), haystack: $caseData, strict: true))
+    {
+        PageBuilder::Render(
+            template: '/VirtualPages/CaseOverviewPage-CaseWorker.html.twig',
+            variables: [
+                "is_admin" => SecurityUtilities::IsAdmin(),
+                "CaseID" => URIParsingUtilities::GetUUIDFromURI(index: 0),
+                "CaseDetails" => $caseData,
+            ]
+        );
+    }
+
     PageBuilder::Render(
-        template: '/VirtualPages/CaseOverviewPage.html.twig',
+        template: '/VirtualPages/CaseOverviewPage-Client.html.twig',
         variables: [
             "is_admin" => SecurityUtilities::IsAdmin(),
             "CaseID" => URIParsingUtilities::GetUUIDFromURI(index: 0),

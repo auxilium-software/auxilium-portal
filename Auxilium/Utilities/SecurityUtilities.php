@@ -41,6 +41,20 @@ final class SecurityUtilities
         return $userDetails['IsAdmin'] ?? false;
     }
 
+
+
+    public static function GetUserId(): ?string
+    {
+        $userDetails = self::getCachedUserDetails();
+
+        if (self::shouldRefreshUserDetails($userDetails))
+        {
+            $userDetails = self::fetchAndCacheUserDetails();
+        }
+
+        return $userDetails['Id'] ?? null;
+    }
+
     /**
      * Retrieves user details from the Session.
      *

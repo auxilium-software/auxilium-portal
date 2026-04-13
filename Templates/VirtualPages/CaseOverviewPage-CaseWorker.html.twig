@@ -170,7 +170,8 @@
 
                 <div class="right-preferential-box">
                     <div class="marked-section">
-                        <h2>{{ "Clients" | translate }}
+                        <h2>
+                            {{ "Clients" | translate }}
                             <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddClientModal();}"
                                class="inline-icon group-add-icon"
                                title="{{ "Add Client" | translate }}"></a>
@@ -187,7 +188,8 @@
                         </ul>
                     </div>
                     <div class="marked-section">
-                        <h2>{{ "Case Workers" | translate }}
+                        <h2>
+                            {{ "Case Workers" | translate }}
                             <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddWorkerModal();}"
                                class="inline-icon group-add-icon"
                                title="{{ "Add Case Worker" | translate }}"></a>
@@ -204,6 +206,7 @@
                         </ul>
                     </div>
 
+                    {#
                     <div class="marked-section">
                         <h2>{{ "Case Management" | translate }}</h2><br />
                         {% if _IS_ADMIN_ %}
@@ -217,9 +220,11 @@
                         <br>
                         <a class="navigational-link" href="/cases/{{ CaseDetails.id }}/pdf">{{ "Generate PDF" | translate }}</a>
                     </div>
+                    #}
 
                     <div class="marked-section">
-                        <h2>{{ "Files" | translate }}
+                        <h2>
+                            {{ "Files" | translate }}
                             <a href="javascript:{const cm = new FileManager('CASE', '{{ CaseDetails.id }}'); cm.showUploadModal();}"
                                class="inline-icon add-icon"
                                title="{{ "Add File" | translate }}"></a>
@@ -237,7 +242,8 @@
                     </div>
 
                     <div class="marked-section">
-                        <h2>{{ "Messages" | translate }}
+                        <h2>
+                            {{ "Messages" | translate }}
                             <a href="javascript:{const mm = new MessageManager('{{ CaseDetails.id }}'); mm.showCreateModal();}"
                                class="inline-icon add-icon"
                                title="{{ "Compose Message" | translate }}"></a>
