@@ -512,7 +512,8 @@ class LoginFormHandler
     resetReCaptcha()
     {
         this.recaptchaToken.value = '';
-        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset)
+        {
             grecaptcha.reset();
         }
     }
