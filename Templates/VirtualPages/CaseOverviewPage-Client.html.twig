@@ -196,7 +196,12 @@
                     #}
 
                     <div class="marked-section">
-                        <h2>{{ "Files" | translate }}</h2>
+                        <h2>
+                            {{ "Files" | translate }}
+                            <a href="javascript:{const cm = new FileManager('CASE', '{{ CaseDetails.id }}'); cm.showUploadModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add File" | translate }}"></a>
+                        </h2>
                         <br />
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
