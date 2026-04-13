@@ -16,7 +16,7 @@
             <style>@import url("/Static/CSS/Accessibility/LargeFonts.css");</style>
         {% endif %}
         {% endblock %}
-        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ GetUserConfiguration("Instance", "Branding", "Name") }}</title>
+        <title>{% block title %}{{ "Case Portal"|translate }}{% endblock %} - {{ _INSTANCE_NAME_ }}</title>
 
         {% include '/Partials/JSImports.html.twig' %}
     </head>
@@ -40,11 +40,11 @@
             <div class="inner-content">
                 <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
                 <a id="navigation-logo" href="/">
-                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
-                    {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                    <img alt="{{ _INSTANCE_NAME_ }} Logo" src="/Static/Images/Logos/{{ _LOGO_PATH_ }}" />
+                    {{ _INSTANCE_NAME_ }}
                 </a>
                 <a id="navigation-logo-ultra-small" href="/">
-                    <img alt="{{ GetUserConfiguration("Instance", "Branding", "Name") }} Logo" src="/Static/Images/Logos/{{ GetUserConfiguration("Instance", "Branding", "LogoContrastRelativePath") }}" />
+                    <img alt="{{ _INSTANCE_NAME_ }} Logo" src="/Static/Images/Logos/{{ _LOGO_PATH_ }}" />
                 </a>
                 <div id="navigation-buttons">
                     {% if GetUserConfiguration("Instance", "Navigation", "About") %}
@@ -155,7 +155,7 @@
             <div class="inner-content">
                 <p>
                     <strong>
-                        {{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ GetUserConfiguration("Instance", "Branding", "Name") }}
+                        {{ "Copyright"|translate|ndsentence }} 2015 - {{ 'now' | date('Y') }} {{ _INSTANCE_NAME_ }}
                     </strong>
                 </p>
                 {% if GetUserConfiguration("Instance", "Contacts", "Operator") %}
