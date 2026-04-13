@@ -43,6 +43,9 @@ $routes = [
     "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '$#'          => __DIR__ . '/../RoutedPages/FileOverview.php',
     "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/FileRender.php',
 
+    "#^/admin-console/object-management/user-management/" . UUIDUtilities::$Regex . "$#"    => __DIR__ . '/../RoutedPages/AdminConsoleUserOverviewPage.php',
+    "#^/admin-console#"                                                                     => __DIR__ . '/../RoutedPages/AdminConsoleFallback.php',
+
     /*
     "/new"              => "$routedDir/new.php",
     "/graph"            => "$routedDir/graph.php",
