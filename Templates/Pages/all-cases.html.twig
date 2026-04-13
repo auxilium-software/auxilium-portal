@@ -11,7 +11,7 @@
                 <a class="navigation-breadcrumb" href="/all-cases">{{ "all cases" | translate }}</a>
             </div>
 
-            <h1>{{ "all cases" | translate }}</h1>
+            <h1>{{ "All Cases" | translate }}</h1>
 
             <div class="separator"></div>
 
@@ -49,8 +49,6 @@
                         caseDiv.style.marginBottom = '15px';
                         caseDiv.style.padding = '15px';
 
-                        let statusClass = 'status-' + (caseItem.status || 'unknown').toLowerCase();
-
                         caseDiv.innerHTML = `
                             <div class="case-header">
                                 <h3 class="case-title">
@@ -58,8 +56,11 @@
                                         ${caseItem.title || 'Case #' + caseItem.id}
                                     </a>
                                 </h3>
-                                <span class="case-status ${statusClass}">
-                                    ${caseItem.status || 'Unknown'}
+                                <span class="case-status status-${caseItem.status.toLowerCase()}">
+                                    ${caseItem.status}
+                                </span>
+                                <span class="case-sensitivity sensitivity-${caseItem.sensitivity.toLowerCase()}">
+                                    ${caseItem.sensitivity}
                                 </span>
                             </div>
                             <div class="case-body">
@@ -71,12 +72,6 @@
                                         <strong>{{ 'created' | translate }}:</strong>
                                         ${new Date(caseItem.createdAt).toLocaleDateString()}
                                     </span>
-                                    ${caseItem.priority ? `
-                                        <span class="case-priority priority-${caseItem.priority.toLowerCase()}">
-                                            <strong>{{ 'priority' | translate }}:</strong>
-                                            ${caseItem.priority}
-                                        </span>
-                                    ` : ''}
                                 </div>
                             </div>
                             <div class="case-actions">
