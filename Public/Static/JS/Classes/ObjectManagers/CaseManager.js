@@ -191,11 +191,17 @@ class CaseManager extends BaseManager {
         }
 
         dropdown.innerHTML = filteredUsers.map(user => `
-            <div class="user-dropdown-item" data-user-id="${user.id}" tabindex="0">
-                <div class="user-avatar">${this.getInitials(user.fullName)}</div>
-                <div class="user-info">
-                    <div class="user-name">${user.fullName}</div>
-                    <div class="user-email">${user.emailAddress}</div>
+            <div class="user-dropdown-item" data-user-id="${user.id}" tabindex="0" style="display: flex; align-items: center; padding: 12px; cursor: pointer; border-bottom: 1px solid #e0e0e0; transition: background-color 0.2s;">
+                <div class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; background-color: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; flex-shrink: 0;">
+                    ${this.getInitials(user.fullName)}
+                </div>
+                <div class="user-info" style="flex: 1; min-width: 0;">
+                    <div class="user-name" style="font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${user.fullName}
+                    </div>
+                    <div class="user-email" style="font-size: 0.85em; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                        ${user.emailAddress}
+                    </div>
                 </div>
             </div>
         `).join('');
