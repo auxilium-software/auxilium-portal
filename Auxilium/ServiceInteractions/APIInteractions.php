@@ -138,7 +138,16 @@ class APIInteractions
         // Enable header capture
         curl_setopt($this->CurlHandler, CURLOPT_HEADER, true);
 
-        $response = curl_exec($this->CurlHandler);
+        $response = null;
+
+        try
+        {
+            $response = curl_exec($this->CurlHandler);
+        }
+        catch (Exception $ex)
+        {
+            PageBuilder::RenderInternalSystemError($ex);
+        }
 
         if ($response === false) {
             $error = curl_error($this->CurlHandler);
