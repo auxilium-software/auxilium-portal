@@ -54,6 +54,17 @@ final class SecurityUtilities
 
         return $userDetails['Id'] ?? null;
     }
+    public static function GetUserName(): ?string
+    {
+        $userDetails = self::getCachedUserDetails();
+
+        if (self::shouldRefreshUserDetails($userDetails))
+        {
+            $userDetails = self::fetchAndCacheUserDetails();
+        }
+
+        return $userDetails['FullName'] ?? null;
+    }
 
     /**
      * Retrieves user details from the Session.
