@@ -45,7 +45,10 @@
                         </iframe>
 
                     {% elseif FileDetails.contentType starts with 'text' %}
-                        <pre><code id="text-preview" style="max-width: 100%; overflow-x: auto; white-space: pre-wrap;"></code></pre>
+                        <pre>
+                            <code id="text-preview" style="max-width: 100%; overflow-x: auto; white-space: pre-wrap;">
+                            </code>
+                        </pre>
                         <script>
                             document.addEventListener('DOMContentLoaded', async function() {
                                 const response = await fetch('/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render');
