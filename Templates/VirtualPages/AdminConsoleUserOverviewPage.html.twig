@@ -770,11 +770,14 @@
 
                 case 'delete':
                     result = await api.DeleteUser(userId, totpCode);
-                    if (result) {
+                    if (result)
+                    {
                         alert('{{ "User has been deleted."|translate }}');
                         window.location.href = '/admin-console/object-management/user-management';
-                    } else {
-                        showTotpFailure('{{ "Failed to delete user. Check your authenticator code and try again."|translate }}');
+                    }
+                    else
+                    {
+                        showTotpFailure('{{ "Failed to delete user. Check your authenticator code and try again.  Also make sure that this user does not belong to any cases."|translate }}');
                     }
                     break;
             }
