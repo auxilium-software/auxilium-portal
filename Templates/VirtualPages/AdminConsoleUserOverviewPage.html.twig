@@ -606,8 +606,8 @@
 
             const data = {
                 isAdmin: document.getElementById('permAdmin').checked,
-                isCaseWorker: document.getElementById('permCaseWorker').checked,
                 isCaseWorkerManager: document.getElementById('permCaseWorkerManager').checked,
+                isCaseWorker: document.getElementById('permCaseWorker').checked,
             };
 
             const result = await api.UpdateUserPermissions(userId, data, totpCode);

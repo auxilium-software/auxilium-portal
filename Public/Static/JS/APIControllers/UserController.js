@@ -76,12 +76,13 @@ class UserController
     async UpdateUser(userID, data, totpCode)
     {
         const [statusCode, payload] = await this.#APIInstance.API_PATCH(
-            `/api/v3/users/${userID}`,
-            data,
-            true,
-            totpCode
+            `/api/v3/users/${userID}`, data, true, totpCode
         );
-        return statusCode === 204 ? payload : false;
+        if (statusCode === 204)
+        {
+            return await this.GetSingleUser(userID);
+        }
+        return false;
     }
 
     async UpdateUserPermissions(userID, data, totpCode)

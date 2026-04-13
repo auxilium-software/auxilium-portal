@@ -1223,7 +1223,7 @@
             wafState.pendingAction = {
                 showReason: true,
                 action: async (reason) => {
-                    const [status, data] = await api.API_POST('/api/v3/web-application-firewall/whitelist', { ipAddress: ip, reason: reason || null });
+                    const [status, data] = await api.API_POST('/api/v3/web-application-firewall/whitelist/ips', { ipAddress: ip, reason: reason || null });
                     if (status === 200) { document.getElementById('targetIpInput').value = ''; loadAllData(); return true; }
                     throw new Error(data.message || '{{ "Failed"|translate }}');
                 }
