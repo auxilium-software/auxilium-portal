@@ -14,7 +14,7 @@ try
     SecurityUtilities::RequireLogin();
 
     $userData = APIInteractions::Get(
-        endpoint: '/users/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+        endpoint: '/api/v3/users/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
     PageBuilder::Render(

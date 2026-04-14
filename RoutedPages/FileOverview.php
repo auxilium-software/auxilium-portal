@@ -18,7 +18,7 @@ try
     $fileId = URIParsingUtilities::GetUUIDFromURI(index: 2);
 
     $fileData = APIInteractions::Get(
-        endpoint: "/$parentType/" . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 1),
+        endpoint: "/api/v3/$parentType/" . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 1),
     )->Payload;
 
     PageBuilder::Render(

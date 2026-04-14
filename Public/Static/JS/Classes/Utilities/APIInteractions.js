@@ -32,7 +32,7 @@ class APIInteractions
         this.#refreshPromise = (async () => {
             try
             {
-                const response = await fetch(`${API_BASE_URL}/authentication/refresh`, {
+                const response = await fetch(`/API/BFFAPIProxy/authentication/refresh`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: {
@@ -76,7 +76,7 @@ class APIInteractions
                 credentials: 'include',
             };
 
-            const response = await fetch(`${API_BASE_URL}${target}`, options);
+            const response = await fetch(`/API/BFFAPIProxy${target}`, options);
 
             if (response.status === 401 && useAuth && !isRetry)
             {
@@ -136,7 +136,7 @@ class APIInteractions
         formData.append('file', file);
         formData.append('description', description);
 
-        const response = await fetch(`${API_BASE_URL}${target}`, {
+        const response = await fetch(`/API/BFFAPIProxy${target}`, {
             method: 'POST',
             headers: {
                 "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),

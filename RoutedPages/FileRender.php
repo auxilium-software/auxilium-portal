@@ -16,7 +16,7 @@ try
     $fileId = URIParsingUtilities::GetUUIDFromURI(index: 1);
 
     $response = APIInteractions::GetRaw(
-        endpoint: "/{$parentType}/{$parentId}/files/{$fileId}/render",
+        endpoint: "/api/v3/{$parentType}/{$parentId}/files/{$fileId}/render",
     );
 
     http_response_code($response->StatusCode);

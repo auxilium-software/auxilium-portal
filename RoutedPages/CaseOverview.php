@@ -14,7 +14,7 @@ try
     SecurityUtilities::RequireLogin();
 
     $caseData = APIInteractions::Get(
-        endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+        endpoint: '/api/v3/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
     if(SecurityUtilities::IsAdmin() || in_array(needle: SecurityUtilities::GetUserId(), haystack: $caseData, strict: true))

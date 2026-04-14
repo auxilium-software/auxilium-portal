@@ -15,7 +15,7 @@ try
     SecurityUtilities::RequireLogin();
 
     PageBuilder::AutoRender(variables: [
-        "AboutMe" => APIInteractions::Get(endpoint: '/me')->Payload
+        "AboutMe" => APIInteractions::Get(endpoint: '/api/v3/me')->Payload
     ]
     );
 }

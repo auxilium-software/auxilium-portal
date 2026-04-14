@@ -26,7 +26,7 @@ class APIInteractions
 
     public static function GetBaseURL(): string
     {
-        return ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'] . '/api/v3';
+        return ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'];
     }
 
     private function __construct(bool $requiresAuth = true)
@@ -268,7 +268,7 @@ class APIInteractions
             }
 
             $response = self::Post(
-                endpoint: '/authentication/refresh',
+                endpoint: '/api/v3/authentication/refresh',
                 payload: ['refreshToken' => $refreshToken],
                 requireAuth: false
             );

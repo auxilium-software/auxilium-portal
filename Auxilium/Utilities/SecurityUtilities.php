@@ -120,7 +120,7 @@ final class SecurityUtilities
      */
     private static function fetchAndCacheUserDetails(): array
     {
-        $response = APIInteractions::Get(endpoint: '/me');
+        $response = APIInteractions::Get(endpoint: '/api/v3/me');
 
         $userDetails = [
             'LastUpdatedAt' => time(),

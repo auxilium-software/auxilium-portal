@@ -90,8 +90,8 @@ final class SystemSettingsUtilities
         $isLoggedIn = JWTUtilities::IsLoggedIn();
 
         $response = $isLoggedIn
-            ? APIInteractions::Get(endpoint: '/system-settings/visible')
-            : APIInteractions::Get(endpoint: '/system-settings/visible', requireAuth: false);
+            ? APIInteractions::Get(endpoint: '/api/v3/system-settings/visible')
+            : APIInteractions::Get(endpoint: '/api/v3/system-settings/visible', requireAuth: false);
 
         $settings = [];
 
