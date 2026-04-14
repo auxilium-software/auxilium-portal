@@ -235,9 +235,12 @@ class LoginFormHandler
                 recoveryCode
             );
 
-            if (response.accessToken) {
-                await this.handleLoginSuccess(response);
-            } else {
+            if (response.expiresIn)
+            {
+                await this.handleLoginSuccess();
+            }
+            else
+            {
                 await this.handleMfaError('Verification failed. Please try again.');
             }
 
@@ -250,10 +253,8 @@ class LoginFormHandler
         }
     }
 
-    async handleLoginSuccess(response) {
-        CookieUtilities.setCookie('access_token', response.accessToken, 15);
-        CookieUtilities.setCookie('refresh_token', response.refreshToken, 60 * 24 * 7);
-
+    async handleLoginSuccess()
+    {
         new ToastNotification(
             await Localisation.translate('Login successful! Redirecting...'),
             'check-circle',
