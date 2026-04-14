@@ -69,6 +69,42 @@ if ($response === null) {
     return;
 }
 
+
+if (str_starts_with($path, '/api/v3/authentication') && $response->StatusCode === 200)
+{
+    $payload = $response->Payload;
+
+    if (isset($payload['accessToken']))
+    {
+        setcookie('access_token', $payload['accessToken'], [
+            'httponly'  => true,
+            'secure'    => true,
+            'samesite'  => 'Strict',
+            'path'      => '/',
+        ]);
+        unset($payload['accessToken']);
+    }
+
+    if (isset($payload['refreshToken']))
+    {
+        setcookie('refresh_token', $payload['refreshToken'], [
+            'httponly'  => true,
+            'secure'    => true,
+            'samesite'  => 'Strict',
+            'path'      => '/',
+        ]);
+        unset($payload['refreshToken']);
+    }
+
+    // return the rest (expiresIn, mfaRequired, etc.) without the tokens
+    http_response_code($response->StatusCode);
+    header('Content-Type: application/json');
+    echo json_encode($payload, JSON_THROW_ON_ERROR);
+    return;
+}
+
+
+
 http_response_code($response->StatusCode);
 header('Content-Type: application/json');
 
