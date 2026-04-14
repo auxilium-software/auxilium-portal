@@ -8,6 +8,7 @@ const PROXY_ROUTES = [
     '/api/v3/authentication/logout'     => 'REQUIRED',
     '/api/v3/authentication'            => 'NONE',
     '/api/v3/system-bulletin'           => 'OPTIONAL',
+    '/api/v3'                           => 'REQUIRED',
 ];
 
 $prefix = '/API/BFFAPIProxy';
@@ -32,6 +33,7 @@ if ($authMode === null)
     echo json_encode(['error' => 'Forbidden proxy path'], JSON_THROW_ON_ERROR);
     return;
 }
+
 
 $requireAuth = match ($authMode) {
     'NONE'      => false,
