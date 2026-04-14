@@ -133,7 +133,7 @@
                     {
                         nodeBuilder.push({
                             id: "PERSON@" + temp.id,
-                            label: temp.full_name,
+                            label: temp.fullName,
                             group: 'person'
                         });
                     }
@@ -176,10 +176,14 @@
                     });
 
                     network.on("click", function (params) {
-                        if (params.nodes.length) {
-                            if (params.nodes[0].startsWith("CASE@")) {
+                        if (params.nodes.length)
+                        {
+                            if (params.nodes[0].startsWith("CASE@"))
+                            {
                                 window.location = "/cases/" + params.nodes[0].replace("CASE@", "");
-                            } else if (params.nodes[0].startsWith("PERSON@")) {
+                            }
+                            else if (params.nodes[0].startsWith("PERSON@"))
+                            {
                                 window.location = "/users/" + params.nodes[0].replace("PERSON@", "");
                             }
                         }
