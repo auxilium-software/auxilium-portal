@@ -87,7 +87,7 @@ class LoginFormHandler
                 return;
             }
 
-            if (response.accessToken)
+            if (response.expiresIn)
             {
                 await this.handleLoginSuccess(response);
             }
@@ -159,7 +159,7 @@ class LoginFormHandler
                 totpCode
             );
 
-            if (response.accessToken)
+            if (response.expiresIn)
             {
                 await this.handleLoginSuccess(response);
             }
@@ -205,7 +205,7 @@ class LoginFormHandler
                 totpCode
             );
 
-            if (response.accessToken) {
+            if (response.expiresIn) {
                 await this.handleLoginSuccess(response);
             } else {
                 await this.handleMfaError('Verification failed. Please try again.');
