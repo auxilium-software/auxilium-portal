@@ -4,6 +4,7 @@ namespace Auxilium\Utilities;
 
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\ServiceInteractions\APIInteractions;
+use Auxilium\TwigHandling\PageBuilder;
 use Exception;
 use RuntimeException;
 
@@ -39,6 +40,22 @@ final class SecurityUtilities
         }
 
         return $userDetails['IsAdmin'] ?? false;
+    }
+
+    public static function RequireAdmin(): void
+    {
+        if(!self::IsAdmin())
+        {
+            PageBuilder::Render(
+                template: '/ErrorPages/InsufficientPermissionsErrorPage.html.twig',
+                variables: [
+                    "RequiredPermissions" => [
+                        "Administrator",
+                    ],
+                ],
+                useAuth: false,
+            );
+        }
     }
 
 
