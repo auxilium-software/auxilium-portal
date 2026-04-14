@@ -24,10 +24,6 @@ class APIInteractions
     private string $lastMethod = 'GET';
     private bool $requiresAuth;
 
-    public static function GetBaseURL(): string
-    {
-        return ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'];
-    }
 
     private function __construct(bool $requiresAuth = true)
     {
@@ -40,7 +36,7 @@ class APIInteractions
 
         curl_setopt($this->CurlHandler, CURLOPT_HEADER, 0);
         curl_setopt($this->CurlHandler, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->CurlHandler, CURLOPT_FOLLOWLOCATION, 1);
+        // curl_setopt($this->CurlHandler, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($this->CurlHandler, CURLOPT_TIMEOUT, 30);
 
         if(ConfigurationUtilities::GetUserConfiguration()["Development"]["PHPAcceptSelfSignedCertificatesForAPI"] === true)
@@ -66,6 +62,8 @@ class APIInteractions
 
                 if (!$refreshToken)
                 {
+                    echo 1;
+                    die();
                     $this->redirectToLogin();
                 }
             }
@@ -113,7 +111,11 @@ class APIInteractions
     private function setTarget(string $endpoint): void
     {
         $this->lastEndpoint = $endpoint;
-        curl_setopt($this->CurlHandler, CURLOPT_URL, self::GetBaseURL() . $endpoint);
+        curl_setopt(
+            $this->CurlHandler,
+            CURLOPT_URL,
+            ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'] . $endpoint
+        );
     }
 
     private function setMethod(string $method): void
@@ -204,12 +206,16 @@ class APIInteractions
                 return $this->retryRequest();
             }
 
+            echo 2;
+            die();
             $this->redirectToLogin();
         }
 
         // If we already tried refreshing, or it's a different error
-        if ($statusCode === 401)
+        if ($statusCode === 401 && $this->requiresAuth)
         {
+            echo 3;
+            die();
             $this->redirectToLogin();
         }
 
