@@ -27,7 +27,7 @@
         document.addEventListener('DOMContentLoaded', async function() {
             const fileController = new FileController();
 
-            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}').textContent
+            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_EXPANDED_ %}A{% else %}B{% endif %}').textContent
                     = (await fileController.GetSingleFileFromAuxLFSURL('CASE', '{{ CaseDetails.id }}', '{{ _data }}'))['filename'];
 
             document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
@@ -39,11 +39,6 @@
             `;
         });
     </script>
-
-
-
-
-
 {% else %}
 {% endif %}
 
