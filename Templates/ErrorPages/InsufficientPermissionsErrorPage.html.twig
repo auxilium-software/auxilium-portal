@@ -1,0 +1,23 @@
+{% extends '/Bases/FatalErrorPage.html.twig' %}
+{% block content %}
+    <div class="inner-content">
+        <div class="critical-note">
+            <span class="note-heading">{{ "Permissions Error"|translate }}</span>
+            <div class="side-note">
+                <p>
+                    {{ "The page you have requested requires certain permissions you haven't got."|translate }}
+                </p>
+                <p>
+                    {{ "Required permissions:"|translate }}
+                </p>
+                <ul>
+                    {% for permissionName in RequiredPermissions %}
+                        <li>
+                            {{ permissionName|translate }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
