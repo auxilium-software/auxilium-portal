@@ -77,6 +77,8 @@ class APIInteractions
             $headers[] = $cookieHeader;
         }
 
+        $headers[] = 'X-Forwarded-For: ' . $_SERVER['REMOTE_ADDR'];
+
         curl_setopt($this->CurlHandler, CURLOPT_HTTPHEADER, $headers);
     }
 
