@@ -139,6 +139,26 @@ class UserController
         return statusCode === 204 ? payload : false;
     }
 
+    async CreateUser(
+        fullName,
+        emailAddress,
+        language,
+        totpCode
+    ) {
+
+        const [statusCode, payload] = await this.#APIInstance.API_POST(
+            `/api/v3/users`,
+            {
+                "fullName": fullName,
+                "emailAddress": emailAddress,
+                "languagePreference": language,
+            },
+            true,
+            totpCode
+        );
+        return statusCode === 201 ? payload : false;
+    }
+
     async DeleteUser(userID, totpCode) {
 
         const [statusCode, payload] = await this.#APIInstance.API_DELETE(
