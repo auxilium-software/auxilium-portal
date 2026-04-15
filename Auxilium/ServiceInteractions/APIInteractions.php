@@ -77,6 +77,11 @@ class APIInteractions
             $headers[] = $cookieHeader;
         }
 
+        if (!empty($_SERVER['HTTP_X_TOTP_CODE']))
+        {
+            $headers[] = 'X-TOTP-Code: ' . $_SERVER['HTTP_X_TOTP_CODE'];
+        }
+
         $headers[] = 'X-Forwarded-For: ' . $_SERVER['REMOTE_ADDR'];
 
         curl_setopt($this->CurlHandler, CURLOPT_HTTPHEADER, $headers);
