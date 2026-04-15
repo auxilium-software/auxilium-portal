@@ -53,7 +53,7 @@ class AuthenticationController {
             "/api/v3/authentication/forced-password-change",
             {
                 passwordChangeToken: passwordChangeToken,
-                passwordSha512: HashingUtilities.SHA512(newPasswordRaw)
+                passwordSha512: await HashingUtilities.SHA512(newPasswordRaw)
             },
             false,
         );
