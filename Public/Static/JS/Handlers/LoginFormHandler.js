@@ -181,7 +181,7 @@ class LoginFormHandler
                 this.mfaSessionToken,
                 totpCode
             );
-            
+
             if (response.mustChangePassword && response.mustChangePassword === true)
             {
                 this.passwordChangeToken = response.passwordChangeToken;

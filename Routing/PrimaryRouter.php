@@ -33,6 +33,7 @@ if (is_file($rawFile))
 
 // 4. Custom regex routes
 $routes = [
+    "#^/API/BFFAPIFileProxy/.+#"                                                            => __DIR__ . '/../RoutedPages/BFFAPIFileProxy.php',
     "#^/API/BFFAPIProxy/.+#"                                                                => __DIR__ . '/../RoutedPages/BFFAPIProxy.php',
 
     "#^/form/"  . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/Form.php',

@@ -136,7 +136,7 @@ class APIInteractions
         formData.append('file', file);
         formData.append('description', description);
 
-        const response = await fetch(`/API/BFFAPIProxy${target}`, {
+        const response = await fetch(`/API/BFFAPIFileProxy${target}`, {
             method: 'POST',
             headers: {
                 "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),
