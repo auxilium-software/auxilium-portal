@@ -67,9 +67,9 @@
                                     <dd data-property-key="{{ property_name }}">
                                         <span class="property-content">{{ property_data.content }}</span>
                                         <a class="edit-icon inline-icon"
-                                           title="Remove property"
+                                           title="Edit property"
                                            href="javascript:void(0)"
-                                           onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
+                                           onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content|e('js') }}')">
                                         </a>
                                         <a class="delete-icon inline-icon"
                                            title="Remove property"
