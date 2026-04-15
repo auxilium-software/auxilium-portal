@@ -402,7 +402,7 @@
                     equals($formData["on_behalf_of"],"MYSELF")
                 )
             </executeIf>
-            <endpoint>/cases</endpoint>
+            <endpoint>/api/v3/cases</endpoint>
             <method>POST</method>
             <payload>
                 <title>$formData["case_title"]</title>
@@ -419,7 +419,7 @@
                     )
                 )
             </executeIf>
-            <endpoint>/authentication/register</endpoint>
+            <endpoint>/api/v3/authentication/register</endpoint>
             <method>POST</method>
             <payload>
                 <who_is_case_about>$formData["who_is_case_about"]</who_is_case_about>

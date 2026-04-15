@@ -29,6 +29,7 @@ class CommonFilters extends AbstractExtension
             new TwigFilter('is_uuid',                           [$this, 'is_uuid']),
             new TwigFilter('is_auxlfs_url',                     [$this, 'is_auxlfs_url']),
             new TwigFilter('is_auxmsg_url',                     [$this, 'is_auxmsg_url']),
+            new TwigFilter('extract_type_from_auxlfs_url',      [$this, 'extract_type_from_auxlfs_url']),
             new TwigFilter('extract_file_id_from_auxlfs_url',   [$this, 'extract_file_id_from_auxlfs_url']),
             new TwigFilter('ndtitle',                           [$this, 'ndtitle']),
             new TwigFilter('ndsentence',                        [$this, 'ndsentence']),
@@ -117,6 +118,14 @@ class CommonFilters extends AbstractExtension
         $pattern = '/^auxmsg:\/\/localhost\/message\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
+    }
+
+    public function extract_type_from_auxlfs_url(string $url): string
+    {
+        if (str_contains($url, '/user-file/')) {
+            return 'USER';
+        }
+        return 'CASE';
     }
 
     public function extract_file_id_from_auxlfs_url(string $string): string

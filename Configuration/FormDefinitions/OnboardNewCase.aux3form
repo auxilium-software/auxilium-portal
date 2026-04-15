@@ -499,7 +499,7 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
     <submissionActions>
         <apiRequest>
             <executeIf>true</executeIf>
-            <endpoint>/authentication/register</endpoint>
+            <endpoint>/api/v3/authentication/register</endpoint>
             <method>POST</method>
             <payload>
                 <who_is_case_about>$formData["who_is_case_about"]</who_is_case_about>

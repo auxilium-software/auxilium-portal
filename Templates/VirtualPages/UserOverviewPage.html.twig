@@ -111,7 +111,7 @@
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% for fileDetails in UserDetails.files %}
-                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails, '_fileParentId': UserDetails.id} %}
                             {% else %}
                                 <li><em>File list empty</em></li>
                             {% endfor %}

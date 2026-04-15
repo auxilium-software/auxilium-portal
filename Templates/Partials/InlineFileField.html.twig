@@ -1,6 +1,7 @@
 {% if _data|is_auxlfs_url %}
     {% set _fieldID = GeneratePseudoRandomCharacters(16) %}
     {% set _fileId = _data|extract_file_id_from_auxlfs_url %}
+    {% set _fileParentType = _data|extract_type_from_auxlfs_url %}
 
     {% if _fileParentType == 'CASE' %}
         {% set _viewUrl = '/cases/' ~ _fileParentId ~ '/files/' ~ _fileId %}
