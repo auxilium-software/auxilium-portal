@@ -6,7 +6,7 @@ use Auxilium\Utilities\ConfigurationUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$prefix = '/API/BFFFileProxy';
+$prefix = '/API/BFFAPIFileProxy';
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path   = substr($uri, strlen($prefix));
 
@@ -34,11 +34,31 @@ $headers = [
 // for uploads, forward content type and raw body
 if ($method === 'POST' || $method === 'PUT')
 {
-    $rawBody = file_get_contents('php://input');
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $rawBody);
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
-    if (!empty($_SERVER['CONTENT_TYPE'])) {
-        $headers[] = 'Content-Type: ' . $_SERVER['CONTENT_TYPE'];
+    if (str_contains($contentType, 'multipart/form-data'))
+    {
+        // rebuild multipart from php's parsed data
+        $postFields = $_POST;
+
+        foreach ($_FILES as $fieldName => $file) {
+            $postFields[$fieldName] = new CURLFile(
+                $file['tmp_name'],
+                $file['type'],
+                $file['name']
+            );
+        }
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        // let curl set its own Content-Type with boundary
+    }
+    else
+    {
+        $rawBody = file_get_contents('php://input');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $rawBody);
+        if (!empty($contentType)) {
+            $headers[] = 'Content-Type: ' . $contentType;
+        }
     }
 }
 
@@ -51,7 +71,25 @@ curl_setopt_array($ch, [
     CURLOPT_FOLLOWLOCATION => false,
 ]);
 
-$response   = curl_exec($ch);
+if (ConfigurationUtilities::GetUserConfiguration()['Development']['PHPAcceptSelfSignedCertificatesForAPI'] === true)
+{
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+}
+
+$response = curl_exec($ch);
+
+if ($response === false)
+{
+    $error = curl_error($ch);
+    curl_close($ch);
+    http_response_code(502);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Upstream request failed', 'detail' => $error]);
+    return;
+}
+
+
 $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 curl_close($ch);
