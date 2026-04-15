@@ -19,7 +19,7 @@ try
 
     // Generate a pending secret and QR code
     $setup = APIInteractions::Post(
-        endpoint: '/api/v3/api/v3/me/totp/setup',
+        endpoint: '/api/v3/me/totp/setup',
         payload: []
     );
 
