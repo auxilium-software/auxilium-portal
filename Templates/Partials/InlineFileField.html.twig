@@ -1,23 +1,26 @@
-
 {% if _data|is_auxlfs_url %}
     {% set _fieldID = GeneratePseudoRandomCharacters(16) %}
+    {% set _fileId = _data|extract_file_id_from_auxlfs_url %}
+
+    {% if _fileParentType == 'CASE' %}
+        {% set _viewUrl = '/cases/' ~ _fileParentId ~ '/files/' ~ _fileId %}
+    {% else %}
+        {% set _viewUrl = '/users/' ~ _fileParentId ~ '/files/' ~ _fileId %}
+    {% endif %}
 
     {% if _INLINE_NODE_EXPANDED_ %}
         <h3 class="low-margin-heading">
-            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} class="navigational-link" href="/cases/{{ CaseDetails.id }}/files/{{ _data|extract_file_id_from_auxlfs_url }}">
-                <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
-                </span>
+            <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} href="{{ _viewUrl }}">
+                <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="File"></span>
                 <span id="{{ _fieldID }}-A"></span>
             </a>
             <span id="{{ _fieldID }}-A-RemoveButton"></span>
         </h3>
         <div class="small-spacer"></div>
-        <dl>
-        </dl>
+        <dl></dl>
     {% else %}
-        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %}class="navigational-link" href="/cases/{{ CaseDetails.id }}/files/{{ _data|extract_file_id_from_auxlfs_url }}">
-            <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="User account">
-            </span>
+        <a {% if _INLINE_NODE_NEW_TAB_ %} class="navigational-link-new-tab" target="_blank" {% else %} class="navigational-link" {% endif %} href="{{ _viewUrl }}">
+            <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="File"></span>
             <span id="{{ _fieldID }}-B"></span>
         </a>
         <span id="{{ _fieldID }}-B-RemoveButton"></span>
@@ -27,18 +30,16 @@
         document.addEventListener('DOMContentLoaded', async function() {
             const fileController = new FileController();
 
-            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_EXPANDED_ %}A{% else %}B{% endif %}').textContent
-                    = (await fileController.GetSingleFileFromAuxLFSURL('CASE', '{{ CaseDetails.id }}', '{{ _data }}'))['filename'];
+            document.getElementById('{{ _fieldID }}-{% if _INLINE_NODE_EXPANDED_ %}A{% else %}B{% endif %}').textContent
+                = (await fileController.GetSingleFileFromAuxLFSURL('{{ _fileParentType }}', '{{ _fileParentId }}', '{{ _data }}'))['filename'];
 
-            document.getElementById('{{_fieldID}}-{% if _INLINE_NODE_NEW_TAB_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
+            document.getElementById('{{ _fieldID }}-{% if _INLINE_NODE_EXPANDED_ %}A{% else %}B{% endif %}-RemoveButton').innerHTML = `
                 <a href="#"
                     class="inline-icon link-off-icon"
                     title="{{ "Delete File" | translate }}"
-                    onclick="{const fm = new FileManager('CASE', '{{ CaseDetails.id }}'); fm.removeFile('{{ _data }}', true).then(() => {window.location.reload();});}"
+                    onclick="{const fm = new FileManager('{{ _fileParentType }}', '{{ _fileParentId }}'); fm.removeFile('{{ _data }}', true).then(() => {window.location.reload();});}"
                 ></a>
             `;
         });
     </script>
-{% else %}
 {% endif %}
-

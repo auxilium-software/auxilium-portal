@@ -1,4 +1,5 @@
-class FileManager extends BaseManager {
+class FileManager extends BaseManager
+{
     constructor(documentType, documentID) {
         super();
         this.documentType = documentType;

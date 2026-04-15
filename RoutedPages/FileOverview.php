@@ -15,10 +15,10 @@ try
 
     $parentType = explode("/", $_SERVER['REQUEST_URI'])[1];
     $parentId = URIParsingUtilities::GetUUIDFromURI(index: 0);
-    $fileId = URIParsingUtilities::GetUUIDFromURI(index: 2);
+    $fileId = URIParsingUtilities::GetUUIDFromURI(index: 1);
 
     $fileData = APIInteractions::Get(
-        endpoint: "/api/v3/$parentType/" . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/files/' . URIParsingUtilities::GetUUIDFromURI(index: 1),
+        endpoint: "/api/v3/$parentType/$parentId/files/$fileId",
     )->Payload;
 
     PageBuilder::Render(

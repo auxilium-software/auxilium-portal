@@ -104,7 +104,7 @@ class CommonFilters extends AbstractExtension
         // \?size=\d+ - size parameter with digits
         // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
 
-        $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
+        $pattern = '/^auxlfs:\/\/localhost\/(case-file|user-file)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
     }
