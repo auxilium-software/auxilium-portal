@@ -238,7 +238,7 @@ class APIInteractions
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 PageBuilder::Render(
-                    template: '/VirtualPages/ApiErrorPage.html.twig',
+                    template: '/ErrorPage/ApiErrorPage.html.twig',
                     variables: [
                         'ErrorMessage' => json_last_error_msg(),
                     ],
