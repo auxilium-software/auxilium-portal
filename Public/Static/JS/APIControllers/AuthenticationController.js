@@ -18,7 +18,6 @@ class AuthenticationController {
         );
         if(statusCode === 200)
         {
-            console.log(payload);
             return payload;
         }
         else
@@ -39,7 +38,8 @@ class AuthenticationController {
             false,
         );
 
-        if (statusCode === 200) {
+        if (statusCode === 200)
+        {
             return payload;
         }
 
@@ -58,7 +58,8 @@ class AuthenticationController {
             false,
         );
 
-        if (statusCode === 200) {
+        if (statusCode === 200)
+        {
             return payload;
         }
 
