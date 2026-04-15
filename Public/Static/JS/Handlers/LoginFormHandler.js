@@ -96,14 +96,14 @@ class LoginFormHandler
                 recaptchaToken
             );
 
-            if (response.mfaRequired)
+            if (response.mfaRequired && response.mfaRequired === true)
             {
                 // MFA required - store token and show MFA form
                 this.mfaSessionToken = response.mfaSessionToken;
                 this.showMfaForm();
                 return;
             }
-            if (response.mustChangePassword)
+            if (response.mustChangePassword && response.mustChangePassword === true)
             {
                 this.passwordChangeToken = response.passwordChangeToken;
                 this.showPasswordChangeForm();
