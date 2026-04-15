@@ -45,4 +45,23 @@ class AuthenticationController {
 
         throw new Error('Verification failed');
     }
+
+
+
+    async ForcedPasswordChange(passwordChangeToken, newPasswordRaw) {
+        const [statusCode, payload] = await this.#APIInstance.API_POST(
+            "/api/v3/authentication/forced-password-change",
+            {
+                passwordChangeToken: passwordChangeToken,
+                passwordSha512: HashingUtilities.SHA512(newPasswordRaw)
+            },
+            false,
+        );
+
+        if (statusCode === 200) {
+            return payload;
+        }
+
+        throw new Error('Verification failed');
+    }
 }
