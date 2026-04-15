@@ -96,17 +96,17 @@ class LoginFormHandler
                 recaptchaToken
             );
 
-            if (response.mustChangePassword && response.mustChangePassword === true)
-            {
-                this.passwordChangeToken = response.passwordChangeToken;
-                this.showPasswordChangeForm();
-                return;
-            }
             if (response.mfaRequired && response.mfaRequired === true)
             {
                 // MFA required - store token and show MFA form
                 this.mfaSessionToken = response.mfaSessionToken;
                 this.showMfaForm();
+                return;
+            }
+            if (response.mustChangePassword && response.mustChangePassword === true)
+            {
+                this.passwordChangeToken = response.passwordChangeToken;
+                this.showPasswordChangeForm();
                 return;
             }
 
@@ -181,6 +181,13 @@ class LoginFormHandler
                 this.mfaSessionToken,
                 totpCode
             );
+            
+            if (response.mustChangePassword && response.mustChangePassword === true)
+            {
+                this.passwordChangeToken = response.passwordChangeToken;
+                this.showPasswordChangeForm();
+                return;
+            }
 
             if (response.expiresIn)
             {
