@@ -41,7 +41,7 @@
                         <audio controls src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render"></audio>
 
                     {% elseif FileDetails.contentType == 'application/pdf' %}
-                        <iframe src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render" style="width: 100%; height: 600px; border: none;">
+                        <iframe src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render" sandbox style="width: 100%; height: 600px; border: none;">
                         </iframe>
 
                     {% elseif FileDetails.contentType starts with 'text' %}
