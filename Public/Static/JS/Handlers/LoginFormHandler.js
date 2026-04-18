@@ -18,8 +18,16 @@ class LoginFormHandler
         this.toggleMfaModeLink = document.getElementById('ToggleMfaMode');
         this.backToLoginLink = document.getElementById('BackToLogin');
 
+        // password change elements
+        this.passwordChangeForm = document.getElementById('PasswordChangeForm');
+        this.newPasswordField = document.getElementById('new_password');
+        this.confirmPasswordField = document.getElementById('confirm_password');
+        this.passwordChangeButton = document.getElementById('PasswordChangeButton');
+        this.backToLoginFromPwChange = document.getElementById('BackToLoginFromPwChange');
+
         // state
         this.mfaSessionToken = null;
+        this.passwordChangeToken = null;
         this.isRecoveryCodeMode = false;
 
         this.initializeForm();
@@ -41,6 +49,15 @@ class LoginFormHandler
         this.mfaForm.addEventListener('submit', (e) => this.handleMfaSubmit(e));
         this.totpField.addEventListener('input', () => this.clearFieldError('TotpToken'));
         this.recoveryCodeField.addEventListener('input', () => this.clearFieldError('RecoveryCode'));
+
+        // password change form handlers
+        this.passwordChangeForm.addEventListener('submit', (e) => this.handlePasswordChangeSubmit(e));
+        this.newPasswordField.addEventListener('input', () => this.clearFieldError('NewPassword'));
+        this.confirmPasswordField.addEventListener('input', () => this.clearFieldError('ConfirmPassword'));
+        this.backToLoginFromPwChange.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showLoginForm();
+        });
 
         // toggle between TOTP and recovery code
         this.toggleMfaModeLink.addEventListener('click', (e) => {
@@ -79,15 +96,21 @@ class LoginFormHandler
                 recaptchaToken
             );
 
-            if (response.mfaRequired)
+            if (response.mfaRequired && response.mfaRequired === true)
             {
                 // MFA required - store token and show MFA form
                 this.mfaSessionToken = response.mfaSessionToken;
                 this.showMfaForm();
                 return;
             }
+            if (response.mustChangePassword && response.mustChangePassword === true)
+            {
+                this.passwordChangeToken = response.passwordChangeToken;
+                this.showPasswordChangeForm();
+                return;
+            }
 
-            if (response.accessToken)
+            if (response.expiresIn)
             {
                 await this.handleLoginSuccess(response);
             }
@@ -159,7 +182,14 @@ class LoginFormHandler
                 totpCode
             );
 
-            if (response.accessToken)
+            if (response.mustChangePassword && response.mustChangePassword === true)
+            {
+                this.passwordChangeToken = response.passwordChangeToken;
+                this.showPasswordChangeForm();
+                return;
+            }
+
+            if (response.expiresIn)
             {
                 await this.handleLoginSuccess(response);
             }
@@ -205,7 +235,7 @@ class LoginFormHandler
                 totpCode
             );
 
-            if (response.accessToken) {
+            if (response.expiresIn) {
                 await this.handleLoginSuccess(response);
             } else {
                 await this.handleMfaError('Verification failed. Please try again.');
@@ -235,9 +265,12 @@ class LoginFormHandler
                 recoveryCode
             );
 
-            if (response.accessToken) {
-                await this.handleLoginSuccess(response);
-            } else {
+            if (response.expiresIn)
+            {
+                await this.handleLoginSuccess();
+            }
+            else
+            {
                 await this.handleMfaError('Verification failed. Please try again.');
             }
 
@@ -250,10 +283,8 @@ class LoginFormHandler
         }
     }
 
-    async handleLoginSuccess(response) {
-        CookieUtilities.setCookie('access_token', response.accessToken, 15);
-        CookieUtilities.setCookie('refresh_token', response.refreshToken, 60 * 24 * 7);
-
+    async handleLoginSuccess()
+    {
         new ToastNotification(
             await Localisation.translate('Login successful! Redirecting...'),
             'check-circle',
@@ -280,10 +311,13 @@ class LoginFormHandler
         this.totpField.focus();
     }
 
-    showLoginForm() {
+    showLoginForm()
+    {
         this.mfaForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'none';
         this.loginForm.style.display = 'block';
         this.mfaSessionToken = null;
+        this.passwordChangeToken = null;
         this.isRecoveryCodeMode = false;
         this.totpField.value = '';
         this.recoveryCodeField.value = '';
@@ -517,4 +551,146 @@ class LoginFormHandler
             grecaptcha.reset();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    showPasswordChangeForm()
+    {
+        this.loginForm.style.display = 'none';
+        this.mfaForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'block';
+
+        this.newPasswordField.value = '';
+        this.confirmPasswordField.value = '';
+        this.newPasswordField.focus();
+    }
+
+    async validateNewPassword()
+    {
+        const password = this.newPasswordField.value;
+        const confirm = this.confirmPasswordField.value;
+        let isValid = true;
+
+        if (!password)
+        {
+            this.showFieldError('NewPassword', await Localisation.translate('New password is required'));
+            isValid = false;
+        }
+
+        if (!confirm)
+        {
+            this.showFieldError('ConfirmPassword', await Localisation.translate('Please confirm your password'));
+            isValid = false;
+        }
+        else if (password !== confirm)
+        {
+            this.showFieldError('ConfirmPassword', await Localisation.translate('Passwords do not match'));
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    async handlePasswordChangeSubmit(e)
+    {
+        e.preventDefault();
+        this.clearFieldError('NewPassword');
+        this.clearFieldError('ConfirmPassword');
+
+        if (!await this.validateNewPassword())
+        {
+            return;
+        }
+
+        this.setPasswordChangeLoadingState(true);
+
+        try
+        {
+            const authCtrl = new AuthenticationController();
+            const response = await authCtrl.ForcedPasswordChange(
+                this.passwordChangeToken,
+                this.newPasswordField.value
+            );
+
+            new ToastNotification(
+                await Localisation.translate('Password changed successfully. Please log in with your new password.'),
+                'check-circle',
+                'success'
+            );
+
+            this.showLoginForm();
+            this.passwordField.value = '';
+            this.emailField.focus();
+        }
+        catch (error)
+        {
+            console.error('Password change error:', error);
+
+            if (error.message?.includes('expired') || error.message?.includes('Invalid'))
+            {
+                new ToastNotification(
+                    await Localisation.translate('Session expired. Please log in again.'),
+                    'alert-circle',
+                    'error'
+                );
+                this.showLoginForm();
+                return;
+            }
+
+            if (error.message)
+            {
+                new ToastNotification(error.message, 'alert-circle', 'error');
+            }
+            else
+            {
+                new ToastNotification(
+                    await Localisation.translate('Failed to change password. Please try again.'),
+                    'alert-circle',
+                    'error'
+                );
+            }
+        }
+        finally
+        {
+            this.setPasswordChangeLoadingState(false);
+        }
+    }
+
+    setPasswordChangeLoadingState(loading)
+    {
+        const buttonText = this.passwordChangeButton.querySelector('.button-text');
+        const spinner = this.passwordChangeButton.querySelector('.loading-spinner');
+
+        if (loading)
+        {
+            this.passwordChangeButton.disabled = true;
+            buttonText.style.display = 'none';
+            spinner.style.display = 'inline';
+        }
+        else
+        {
+            this.passwordChangeButton.disabled = false;
+            buttonText.style.display = 'inline';
+            spinner.style.display = 'none';
+        }
+    }
+
 }

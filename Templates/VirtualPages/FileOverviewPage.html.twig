@@ -36,6 +36,26 @@
                             <source src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render">
                             Your browser does not support the video tag.
                         </video>
+
+                    {% elseif FileDetails.contentType starts with 'audio' %}
+                        <audio controls src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render"></audio>
+
+                    {% elseif FileDetails.contentType == 'application/pdf' %}
+                        <iframe src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render" sandbox style="width: 100%; height: 600px; border: none;">
+                        </iframe>
+
+                    {% elseif FileDetails.contentType starts with 'text' %}
+                        <pre>
+                            <code id="text-preview" style="max-width: 100%; overflow-x: auto; white-space: pre-wrap;">
+                            </code>
+                        </pre>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', async function() {
+                                const response = await fetch('/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render');
+                                document.getElementById('text-preview').textContent = await response.text();
+                            });
+                        </script>
+
                     {% else %}
                         <p>{{ "Preview not available for this file type" | translate }}</p>
                         <p>{{ "File type" | translate }}: {{ FileDetails.contentType }}</p>
@@ -49,7 +69,7 @@
                         <dd>{{ FileDetails.filename }}</dd>
 
                         <dt>{{ "File size" | translate }}:</dt>
-                        <dd>{{ (FileDetails.size / 1024)|round(2) }} KB</dd>
+                        <dd>{{ FileDetails.human_filesize }}</dd>
 
                         <dt>{{ "Content type" | translate }}:</dt>
                         <dd>{{ FileDetails.contentType }}</dd>
@@ -58,7 +78,7 @@
                         <dd>{{ FileDetails.createdAt|date('Y-m-d H:i:s') }}</dd>
 
                         <dt>{{ "Uploaded by" | translate }}:</dt>
-                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.uploaded_by} %}</dd>
+                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.createdBy} %}</dd>
                     </dl>
                 </div>
             </div>

@@ -208,7 +208,7 @@
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% for fileDetails in CaseDetails.files %}
-                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails, '_fileParentId': CaseDetails.id} %}
                             {% else %}
                                 <li><em>{{ "File list empty"|translate }}</em></li>
                             {% endfor %}

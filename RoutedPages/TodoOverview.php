@@ -14,7 +14,7 @@ try
     SecurityUtilities::RequireLogin();
 
     $toDoData = APIInteractions::Get(
-        endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/todos/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+        endpoint: '/api/v3/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0) . '/todos/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
     PageBuilder::Render(

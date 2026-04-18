@@ -4,6 +4,7 @@ namespace Auxilium\Utilities;
 
 use Auxilium\Enumerators\SessionKey;
 use Auxilium\ServiceInteractions\APIInteractions;
+use Auxilium\TwigHandling\PageBuilder;
 use Exception;
 use RuntimeException;
 
@@ -39,6 +40,22 @@ final class SecurityUtilities
         }
 
         return $userDetails['IsAdmin'] ?? false;
+    }
+
+    public static function RequireAdmin(): void
+    {
+        if(!self::IsAdmin())
+        {
+            PageBuilder::Render(
+                template: '/ErrorPages/InsufficientPermissionsErrorPage.html.twig',
+                variables: [
+                    "RequiredPermissions" => [
+                        "Administrator",
+                    ],
+                ],
+                useAuth: false,
+            );
+        }
     }
 
 
@@ -103,7 +120,7 @@ final class SecurityUtilities
      */
     private static function fetchAndCacheUserDetails(): array
     {
-        $response = APIInteractions::Get(endpoint: '/me');
+        $response = APIInteractions::Get(endpoint: '/api/v3/me');
 
         $userDetails = [
             'LastUpdatedAt' => time(),

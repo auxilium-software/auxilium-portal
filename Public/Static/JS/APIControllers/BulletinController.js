@@ -46,4 +46,15 @@ class BulletinController
             true
         );
     }
+
+    async Admin_DeleteBulletin(
+        bulletinId
+    )
+    {
+        const [statusCode, payload] = await this.#APIInstance.API_DELETE(
+            `/api/v3/system-bulletin/${bulletinId}`,
+            true,
+            true
+        );
+    }
 }

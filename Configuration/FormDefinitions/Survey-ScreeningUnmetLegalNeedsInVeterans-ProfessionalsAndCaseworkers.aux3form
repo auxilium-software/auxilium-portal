@@ -388,7 +388,7 @@
     <submissionActions>
         <apiRequest>
             <executeIf>true</executeIf>
-            <endpoint>/surveys/screening-unmet-legal-needs-in-veterans-for-professionals-and-caseworkers</endpoint>
+            <endpoint>/api/v3/surveys/screening-unmet-legal-needs-in-veterans-for-professionals-and-caseworkers</endpoint>
             <method>POST</method>
             <payload>
                 <name_of_organisation>$formData["name_of_organisation_referring"]</name_of_organisation>

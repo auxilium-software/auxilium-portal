@@ -2,7 +2,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const API_BASE_URL = "{{ GetUserConfiguration("API", "AvailableAt") }}";
     const RECAPTCHA_SITE_KEY = "{{ GetUserConfiguration("ReCAPTCHA", "SiteKey") }}";
 </script>
 
@@ -24,6 +23,7 @@
 <script src="/Static/JS/Classes/PropertyManagers/UserPropertyManager.js"></script>
 
 <script src="/Static/JS/Classes/Utilities/APIInteractions.js"></script>
+<script src="/Static/JS/Classes/Utilities/HashingUtilities.js"></script>
 <script src="/Static/JS/Classes/Utilities/InfiniteScroller.js"></script>
 <script src="/Static/JS/Classes/Utilities/Localisation.js"></script>
 

@@ -67,9 +67,9 @@
                                     <dd data-property-key="{{ property_name }}">
                                         <span class="property-content">{{ property_data.content }}</span>
                                         <a class="edit-icon inline-icon"
-                                           title="Remove property"
+                                           title="Edit property"
                                            href="javascript:void(0)"
-                                           onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
+                                           onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content|e('js') }}')">
                                         </a>
                                         <a class="delete-icon inline-icon"
                                            title="Remove property"
@@ -111,7 +111,7 @@
                         <ul class="collection-list">
                             {% set inline_node_expanded = true %}
                             {% for fileDetails in UserDetails.files %}
-                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails} %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails, '_fileParentId': UserDetails.id} %}
                             {% else %}
                                 <li><em>File list empty</em></li>
                             {% endfor %}
@@ -119,12 +119,14 @@
                         </ul>
                     </div>
 
+                    {#
                     <div class="marked-section">
                         <h2>{{ "User Management" | translate }}</h2><br />
                         <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@references?{{ url_metadata }}">{{ "See References" | translate }}</a>
                         <br>
                         <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
                     </div>
+                    #}
                 </div>
             </div>
         </div>

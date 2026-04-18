@@ -13,7 +13,7 @@
             <h1>
                 {{ "{greeting}, {username}"|translate({
                     '{greeting}': ("Good "~TimePeriod)|translate,
-                    '{username}': "Cerys",
+                    '{username}': _CURRENTLY_LOGGED_IN_USER_FULL_NAME_,
                 })|raw }}
             </h1>
 

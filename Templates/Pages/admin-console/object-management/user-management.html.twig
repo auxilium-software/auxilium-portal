@@ -166,17 +166,11 @@
                         <dt>{{ "Email"|translate }}</dt>
                         <dd><input type="email" class="form-input" id="newUserEmail" style="width:100%;"></dd>
 
-                        <dt>{{ "Telephone"|translate }}</dt>
-                        <dd><input type="tel" class="form-input" id="newUserPhone" style="width:100%;"></dd>
-
-                        <dt>{{ "Date of Birth"|translate }}</dt>
-                        <dd><input type="date" class="form-input" id="newUserDOB" style="width:100%;"></dd>
-
                         <dt>{{ "Language"|translate }}</dt>
                         <dd>
                             <select class="form-select" id="newUserLanguage" style="width:100%;">
-                                <option value="en">English</option>
-                                <option value="cy">Cymraeg</option>
+                                <option value="en-GB">British English</option>
+                                <option value="cy-GB">Cymraeg</option>
                             </select>
                         </dd>
                     </div>
@@ -768,48 +762,26 @@
 
 
         // ====================================================================================================
-        // BULK ACTIONS
-        // ====================================================================================================
-        /*
-        function applyBulkAction()
-        {
-            var action = document.getElementById('bulkAction').value;
-            if (!action) return;
-
-            var checked = document.querySelectorAll('#usersTable tbody input[type="checkbox"]:checked');
-            var ids = [];
-            checked.forEach(function(cb) { ids.push(cb.value); });
-
-            if (ids.length === 0) {
-                alert('{{ "No users selected."|translate }}');
-                return;
-            }
-
-            console.log('Bulk action:', action, 'on IDs:', ids);
-        }
-        */
-
-
-
-
-
-        // ====================================================================================================
         // CREATE USER
         // ====================================================================================================
         async function createUser()
         {
-            const data = {
-                fullName: document.getElementById('newUserName').value,
-                emailAddress: document.getElementById('newUserEmail').value,
-                telephoneNumber: document.getElementById('newUserPhone').value,
-                dateOfBirth: document.getElementById('newUserDOB').value,
-                languagePreference: document.getElementById('newUserLanguage').value,
-            };
-
-            console.log(data);
             document.getElementById('addUserDialog').style.display = 'none';
 
-            // TODO sort this out lol
+            const totpCode = prompt(
+                "{{ "Please enter your TOTP code"|translate }}"
+            )
+
+            const response = await userController.CreateUser(
+                document.getElementById('newUserName').value,
+                document.getElementById('newUserEmail').value,
+                document.getElementById('newUserLanguage').value,
+                totpCode,
+            );
+            if(response !== false)
+            {
+                viewUser(response.id)
+            }
         }
 
 

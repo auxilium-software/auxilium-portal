@@ -29,6 +29,7 @@ class CommonFilters extends AbstractExtension
             new TwigFilter('is_uuid',                           [$this, 'is_uuid']),
             new TwigFilter('is_auxlfs_url',                     [$this, 'is_auxlfs_url']),
             new TwigFilter('is_auxmsg_url',                     [$this, 'is_auxmsg_url']),
+            new TwigFilter('extract_type_from_auxlfs_url',      [$this, 'extract_type_from_auxlfs_url']),
             new TwigFilter('extract_file_id_from_auxlfs_url',   [$this, 'extract_file_id_from_auxlfs_url']),
             new TwigFilter('ndtitle',                           [$this, 'ndtitle']),
             new TwigFilter('ndsentence',                        [$this, 'ndsentence']),
@@ -104,7 +105,7 @@ class CommonFilters extends AbstractExtension
         // \?size=\d+ - size parameter with digits
         // &hash=[0-9a-f]{40} - hash parameter with 40 hex characters (SHA-1)
 
-        $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\?size=\d+&hash=[0-9a-f]+$/';
+        $pattern = '/^auxlfs:\/\/localhost\/(case-file|user-file)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
         return preg_match($pattern, $string) === 1;
     }
@@ -119,11 +120,19 @@ class CommonFilters extends AbstractExtension
         return preg_match($pattern, $string) === 1;
     }
 
+    public function extract_type_from_auxlfs_url(string $url): string
+    {
+        if (str_contains($url, '/user-file/')) {
+            return 'USER';
+        }
+        return 'CASE';
+    }
+
     public function extract_file_id_from_auxlfs_url(string $string): string
     {
-        $pattern = '/^auxlfs:\/\/localhost\/file\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?size=\d+&hash=[0-9a-f]+$/';
-        preg_match($pattern, $string, $matches);
-        return $matches[1] ?? '';
+        // $pattern = '/^auxlfs:\/\/localhost\/file\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
+        preg_match("/" . UUIDUtilities::$Regex . "/", $string, $matches);
+        return $matches[0] ?? '';
     }
 
     public function ndtitle($string): string

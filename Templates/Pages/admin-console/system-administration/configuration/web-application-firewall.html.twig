@@ -516,13 +516,14 @@
             {
                 const hours = document.getElementById('statsPeriod').value;
                 const [status, data] = await api.API_GET(`/api/v3/web-application-firewall/statistics?hoursBack=${hours}`);
-                if (status !== 200) throw new Error('{{ "Failed to load statistics"|translate }}');
+                if (status !== 200)
+                    throw new Error('{{ "Failed to load statistics"|translate }}');
                 wafState.statistics = data;
                 await renderStatistics();
                 await renderChart();
-                renderTopOffenders();
-                renderTopTargets();
-                updateAlerts();
+                await renderTopOffenders();
+                await renderTopTargets();
+                await updateAlerts();
             }
             catch (err)
             {
@@ -860,7 +861,7 @@
             {
                 const [status, data] = await api.API_GET('/api/v3/web-application-firewall/whitelist/ips');
                 if (status !== 200) throw new Error('Failed to fetch');
-                wafState.whitelist = data.ipAddresses || [];
+                wafState.whitelist = data.entries || [];
                 renderWhitelist();
             }
             catch (err)

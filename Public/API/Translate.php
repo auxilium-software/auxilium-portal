@@ -12,7 +12,8 @@ try
 {
     $input = json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
 
-    if (!isset($input['text'])) {
+    if (!isset($input['text']))
+    {
         http_response_code(400);
         echo json_encode(['error' => 'Missing required field: text'], JSON_THROW_ON_ERROR);
         return;
@@ -21,7 +22,8 @@ try
     $text = $input['text'];
     $substitutions = $input['substitutions'] ?? [];
 
-    if (!is_array($substitutions)) {
+    if (!is_array($substitutions))
+    {
         http_response_code(400);
         echo json_encode(['error' => 'Substitutions must be an object'], JSON_THROW_ON_ERROR);
         return;

@@ -7,14 +7,14 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 try
 {
-    $status = APIInteractions::Get(endpoint: '/me/totp/status');
+    $status = APIInteractions::Get(endpoint: '/api/v3/me/totp/status');
     $isEnabled = $status->Payload['isEnabled'] ?? false;
 
     $remainingCodes = 0;
 
     if ($isEnabled)
     {
-        $codesResult = APIInteractions::Get(endpoint: '/me/totp/recovery-codes/count');
+        $codesResult = APIInteractions::Get(endpoint: '/api/v3/me/totp/recovery-codes/count');
         $remainingCodes = $codesResult->Payload['remaining'] ?? 0;
     }
 

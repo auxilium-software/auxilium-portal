@@ -68,7 +68,7 @@
     <submissionActions>
         <apiRequest>
             <executeIf>true</executeIf>
-            <endpoint>/me/request-account-deletion</endpoint>
+            <endpoint>/api/v3/me/request-account-deletion</endpoint>
             <method>POST</method>
             <payload>
                 <reason>$formData["reason"]</reason>

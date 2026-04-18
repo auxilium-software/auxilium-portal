@@ -11,6 +11,7 @@ use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
 use Auxilium\Utilities\SecurityUtilities;
 use Auxilium\Utilities\SessionUtilities;
+use Auxilium\Utilities\SystemSettingsUtilities;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 use Twig\Environment;
@@ -33,7 +34,10 @@ class PageBuilder
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
         $this->twig->addGlobal('_SELECTED_LANGUAGE_', CookieHandling::GetCookieValue(CookieKey::LANGUAGE));
-        $this->twig->addGlobal('_SYSTEM_BULLETIN_', APIInteractions::Get('/system-bulletin', [], false)->Payload);
+        $this->twig->addGlobal('_SYSTEM_BULLETIN_', APIInteractions::Get('/api/v3/system-bulletin', [], false)->Payload);
+        $this->twig->addGlobal('_INSTANCE_NAME_', SystemSettingsUtilities::GetInstanceName());
+        $this->twig->addGlobal('_LOGO_PATH_', SystemSettingsUtilities::GetLogoPath());
+        $this->twig->addGlobal('_LOGO_CONTRAST_PATH_', SystemSettingsUtilities::GetLogoContrastPath());
 
         if ($useAuth)
         {
@@ -63,7 +67,7 @@ class PageBuilder
 
     private function checkServerAccess(): void
     {
-        $ping = APIInteractions::Get('/server/ping', [], false);
+        $ping = APIInteractions::Get('/api/v3/server/ping', [], false);
 
         if ($ping->StatusCode === 403 || $ping->StatusCode === 429)
         {
@@ -117,7 +121,7 @@ class PageBuilder
             );
 
             self::Render(
-                template: 'ErrorPages/InternalSystemError.html.twig',
+                template: 'ErrorPages/InternalSystemErrorPage.html.twig',
                 variables: ['technical_details' => $technicalDetails],
                 useAuth: false
             );

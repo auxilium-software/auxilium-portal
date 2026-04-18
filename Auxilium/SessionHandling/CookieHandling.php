@@ -3,7 +3,10 @@
 namespace Auxilium\SessionHandling;
 
 use Auxilium\Enumerators\CookieKey;
+use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\Utilities\ConfigurationUtilities;
+use Auxilium\Utilities\SystemSettingsUtilities;
+use Composer\Config;
 use Exception;
 
 class CookieHandling
@@ -36,7 +39,7 @@ class CookieHandling
             value: '',
             expires_or_options: time() - 86400 * 2,
             path: '/',
-            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['FQDN'],
+            domain: SystemSettingsUtilities::GetFqdn(),
             secure: true,
             httponly: false,
         );
@@ -59,7 +62,7 @@ class CookieHandling
             value: $value,
             expires_or_options: time() + self::GetCookieTTL($targetCookie),
             path: '/',
-            domain: ConfigurationUtilities::GetUserConfiguration()['Instance']['FQDN'],
+            domain: SystemSettingsUtilities::GetFqdn(),
             secure: true,
             httponly: false,
         );

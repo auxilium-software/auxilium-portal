@@ -1,5 +1,6 @@
 <?php
 
+use Auxilium\TwigHandling\PageBuilder;
 use Auxilium\Utilities\UUIDUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -32,6 +33,9 @@ if (is_file($rawFile))
 
 // 4. Custom regex routes
 $routes = [
+    "#^/API/BFFAPIFileProxy/.+#"                                                            => __DIR__ . '/../RoutedPages/BFFAPIFileProxy.php',
+    "#^/API/BFFAPIProxy/.+#"                                                                => __DIR__ . '/../RoutedPages/BFFAPIProxy.php',
+
     "#^/form/"  . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/Form.php',
 
     "#^/cases/" . UUIDUtilities::$Regex . '$#'                                              => __DIR__ . '/../RoutedPages/CaseOverview.php',
@@ -68,5 +72,8 @@ foreach ($routes as $pattern => $file)
 }
 
 
-echo 404;
-die();
+PageBuilder::Render(
+    template: '/ErrorPages/404.html.twig',
+    variables: [],
+    useAuth: false,
+);

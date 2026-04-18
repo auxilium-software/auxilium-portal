@@ -235,22 +235,9 @@
                             <div class="action-card__desc">{{ "User will be required to change their password on next login."|translate }}</div>
                         </div>
                         <div class="action-card__control">
-                            <button class="form-btn form-btn--sm" onclick="confirmAction('forceReset')">
+                            <button class="form-btn form-btn--sm" onclick="confirmAction('forcePasswordReset')">
                                 <i class="ph-duotone ph-lock"></i>
                                 {{ "Send Reset"|translate }}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="action-card">
-                        <div class="action-card__info">
-                            <div class="action-card__title">{{ "Send Password Reset Email"|translate }}</div>
-                            <div class="action-card__desc">{{ "Email the user a link to voluntarily reset their password."|translate }}</div>
-                        </div>
-                        <div class="action-card__control">
-                            <button class="form-btn form-btn--sm" onclick="confirmAction('sendResetEmail')">
-                                <i class="ph-duotone ph-envelope"></i>
-                                {{ "Send Email"|translate }}
                             </button>
                         </div>
                     </div>
@@ -634,7 +621,7 @@
                 desc: '{{ "This will immediately prevent or allow the user from signing in. Any active sessions will be affected."|translate }}',
                 btn: '{{ "Confirm"|translate }}',
             },
-            forceReset: {
+            forcePasswordReset: {
                 icon: '🔒',
                 title: '{{ "Force Password Reset"|translate }}',
                 desc: '{{ "The user will be required to set a new password on their next login attempt."|translate }}',
@@ -661,7 +648,8 @@
                 return;
 
             // If it's the block toggle and user unchecked it, revert until confirmed
-            if (action === 'toggleBlock') {
+            if (action === 'toggleBlock')
+            {
                 var chk = document.getElementById('chkBlockLogin');
                 confirmMessage = Object.assign({}, confirmMessage);
                 confirmMessage.title = chk.checked
@@ -750,21 +738,12 @@
                     }
                     break;
 
-                case 'forceReset':
+                case 'forcePasswordReset':
                     result = await api.ForcePasswordReset(userId, totpCode);
                     if (result) {
                         alert('{{ "Password reset has been enforced. The user must change their password on next login."|translate }}');
                     } else {
                         showTotpFailure('{{ "Failed to force password reset. Check your authenticator code and try again."|translate }}');
-                    }
-                    break;
-
-                case 'sendResetEmail':
-                    result = await api.SendPasswordResetEmail(userId, totpCode);
-                    if (result) {
-                        alert('{{ "Password reset email has been sent."|translate }}');
-                    } else {
-                        showTotpFailure('{{ "Failed to send password reset email. Check your authenticator code and try again."|translate }}');
                     }
                     break;
 

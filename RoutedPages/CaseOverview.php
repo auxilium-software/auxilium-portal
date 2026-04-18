@@ -14,10 +14,13 @@ try
     SecurityUtilities::RequireLogin();
 
     $caseData = APIInteractions::Get(
-        endpoint: '/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
+        endpoint: '/api/v3/cases/' . URIParsingUtilities::GetUUIDFromURI(index: 0),
     )->Payload;
 
-    if(SecurityUtilities::IsAdmin() || in_array(needle: SecurityUtilities::GetUserId(), haystack: $caseData, strict: true))
+    if(
+        SecurityUtilities::IsAdmin()
+        || in_array(needle: SecurityUtilities::GetUserId(), haystack: $caseData['workers'], strict: true)
+    )
     {
         PageBuilder::Render(
             template: '/VirtualPages/CaseOverviewPage-CaseWorker.html.twig',
