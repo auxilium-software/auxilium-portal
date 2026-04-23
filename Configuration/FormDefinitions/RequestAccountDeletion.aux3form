@@ -26,6 +26,20 @@
                 </component>
             </components>
         </page>
+
+        <page>
+            <id>current_password</id>
+            <title>Current Password</title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>current_password</id>
+                    <type>PASSWORD_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>Current Password</primaryLabel>
+                </component>
+            </components>
+        </page>
     </pages>
 
 
@@ -34,21 +48,17 @@
     <reviewPage>
         <components>
             <component>
-                <type>DESCRIPTION_LIST</type>
+                <type>PARAGRAPH</type>
+                <title>Reason</title>
+                <value>$formData["reason"]</value>
                 <if>true</if>
-                <dictionary>
-                    <item>
-                        <key>Old Password</key>
-                        <value>[REDACTED]</value>
-                    </item>
-                </dictionary>
             </component>
             <component>
                 <type>DESCRIPTION_LIST</type>
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>New Password</key>
+                        <key>Password</key>
                         <value>[REDACTED]</value>
                     </item>
                 </dictionary>
@@ -72,6 +82,7 @@
             <method>POST</method>
             <payload>
                 <reason>$formData["reason"]</reason>
+                <currentPasswordSha512>$formData["current_password"]</currentPasswordSha512>
             </payload>
         </apiRequest>
     </submissionActions>
