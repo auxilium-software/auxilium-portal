@@ -4,6 +4,8 @@ use Auxilium\Enumerators\CookieKey;
 use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 const PROXY_ROUTES = [
     '/api/v3/authentication/logout'     => 'REQUIRED',
     '/api/v3/authentication'            => 'NONE',
@@ -44,8 +46,11 @@ $requireAuth = match ($authMode) {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$isJson = str_contains($contentType, 'application/json');
+
 $body = [];
-if (!in_array($method, ['GET', 'HEAD', 'DELETE'], true))
+if (!in_array($method, ['GET', 'HEAD', 'DELETE'], true) && $isJson)
 {
     $raw = file_get_contents('php://input');
     if (!empty($raw)) {
