@@ -1,8 +1,13 @@
-{% extends '/Templates/Bases/FatalErrorPage.html.twig' %}
+{% extends '/Bases/OfflineFatalErrorPage.html.twig' %}
 {% block content %}
     <div class="inner-content">
         <div class="critical-note">
             <span class="note-heading">{{ "API Error"|translate }}</span>
+            <div class="side-note">
+                <p>
+                    {{ ErrorMessage }}
+                </p>
+            </div>
         </div>
     </div>
 {% endblock %}

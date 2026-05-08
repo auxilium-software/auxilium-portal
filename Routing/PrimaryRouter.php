@@ -5,6 +5,30 @@ use Auxilium\Utilities\UUIDUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+
+
+
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && $error['type'] === E_ERROR && str_contains($error['message'], 'Maximum execution time'))
+    {
+        PageBuilder::OfflineRender(
+            template: '/ErrorPages/FatalApiFailureErrorPage.html.twig',
+            variables: ['ErrorMessage' => 'The request to the API server timed out. The API server may be unavailable.'],
+        );
+    }
+    PageBuilder::OfflineRender(
+        template: '/ErrorPages/InternalSystemErrorErrorPage.html.twig',
+        variables: [],
+    );
+});
+
+
+
+
+
+
 // Get path without query string
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $publicDir = __DIR__ . '/../Public';
@@ -72,8 +96,4 @@ foreach ($routes as $pattern => $file)
 }
 
 
-PageBuilder::Render(
-    template: '/ErrorPages/404.html.twig',
-    variables: [],
-    useAuth: false,
-);
+PageBuilder::Render404();

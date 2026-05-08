@@ -23,7 +23,7 @@ class PageBuilder
 
     public function __construct(bool $useAuth)
     {
-        $loader = new FilesystemLoader(__DIR__ . '/../../Templates/');
+        $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
         $this->twig = new Environment($loader, [
             'debug' => true,
             'cache' => false,
@@ -107,6 +107,27 @@ class PageBuilder
     }
 
     #[NoReturn]
+    public static function OfflineRender(string $template, array $variables = []): void
+    {
+        $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
+        $twig = new Environment($loader, [
+            'debug' => true,
+            'cache' => false,
+        ]);
+        $twig->addGlobal('style_options', []);
+        $twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
+        $twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
+        $twig->addGlobal('_SELECTED_LANGUAGE_', CookieHandling::GetCookieValue(CookieKey::LANGUAGE));
+        $twig->addGlobal('_SYSTEM_BULLETIN_',[]);
+        $twig->addGlobal('_INSTANCE_NAME_', "");
+        $twig->addGlobal('_LOGO_CONTRAST_PATH_', "");
+        $twig->addExtension(new CommonFilters());
+        // $twig->addExtension(new CommonFunctions());
+        echo $twig->render($template, $variables);
+        die();
+    }
+
+    #[NoReturn]
     public static function RenderInternalSystemError(Throwable $ex): void
     {
         http_response_code(500);
@@ -121,7 +142,7 @@ class PageBuilder
             );
 
             self::Render(
-                template: 'ErrorPages/InternalSystemErrorPage.html.twig',
+                template: '/ErrorPages/InternalSystemErrorPage.html.twig',
                 variables: ['technical_details' => $technicalDetails],
                 useAuth: false
             );
@@ -135,9 +156,9 @@ class PageBuilder
     {
         http_response_code(404);
         self::Render(
-            template: 'Pages/node-views/404.html.twig',
+            template: '/ErrorPages/404.html.twig',
             variables: [],
-            useAuth: true
+            useAuth: false
         );
     }
 

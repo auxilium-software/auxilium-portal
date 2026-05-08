@@ -15,7 +15,6 @@ use JetBrains\PhpStorm\NoReturn;
 
 class APIInteractions
 {
-    private static bool $isRefreshing = false;
     private static bool $hasAttemptedRefresh = false;
 
     private CurlHandle $CurlHandler;
@@ -30,14 +29,17 @@ class APIInteractions
         $this->requiresAuth = $requiresAuth;
         $this->CurlHandler = curl_init();
 
-        if ($this->CurlHandler === false) {
+        if ($this->CurlHandler === false)
+        {
             throw new Exception('Failed to initialize cURL');
         }
 
         curl_setopt($this->CurlHandler, CURLOPT_HEADER, 0);
         curl_setopt($this->CurlHandler, CURLOPT_RETURNTRANSFER, 1);
         // curl_setopt($this->CurlHandler, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($this->CurlHandler, CURLOPT_TIMEOUT, 30);
+        curl_setopt($this->CurlHandler, CURLOPT_TIMEOUT, 10);
+        // curl_setopt($this->CurlHandler, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($this->CurlHandler, CURLOPT_NOSIGNAL, 1);
 
         if(ConfigurationUtilities::GetUserConfiguration()["Development"]["PHPAcceptSelfSignedCertificatesForAPI"] === true)
         {
@@ -146,7 +148,8 @@ class APIInteractions
     {
         $this->lastPayload = $payload;
 
-        if (!empty($payload)) {
+        if (!empty($payload))
+        {
             curl_setopt($this->CurlHandler, CURLOPT_POSTFIELDS, json_encode($payload, JSON_THROW_ON_ERROR));
         }
     }
@@ -160,12 +163,14 @@ class APIInteractions
 
         try
         {
+            // set_time_limit(seconds: 45);
             $response = curl_exec($this->CurlHandler);
         }
         catch (Exception $ex)
         {
             PageBuilder::RenderInternalSystemError($ex);
         }
+
 
         if ($response === false)
         {
@@ -374,5 +379,25 @@ class APIInteractions
         return $apiWrapper->executeRequest(
             decodeAsJSON: false,
         );
+    }
+
+
+
+
+    public static function Ping(): bool
+    {
+        try {
+            $apiWrapper = new self(requiresAuth: false);
+            $apiWrapper->setTarget('/api/ping');
+            $apiWrapper->setMethod('GET');
+
+            curl_setopt($apiWrapper->CurlHandler, CURLOPT_TIMEOUT, 5);
+
+            $response = $apiWrapper->executeRequest(decodeAsJSON: false);
+
+            return $response->StatusCode === 200;
+        } catch (Exception) {
+            return false;
+        }
     }
 }
