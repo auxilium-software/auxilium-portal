@@ -11,8 +11,9 @@ RUN composer install \
     --optimize-autoloader
 
 
+
 # shared runtime base
-FROM php:8.3-fpm-alpine AS base
+FROM php:8.4-fpm-alpine AS base
 
 RUN apk add --no-cache \
         nginx \
@@ -38,6 +39,7 @@ COPY docker/supervisord.conf    /etc/supervisord.conf
 WORKDIR /var/www/html
 
 
+
 # dev
 FROM base AS dev
 
@@ -56,6 +58,7 @@ EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
 
+
 # 4: prod
 FROM base AS prod
 
@@ -64,7 +67,7 @@ COPY --from=vendor /build/vendor ./vendor
 COPY . .
 
 RUN chown -R www-data:www-data var \
-    && chmod -R 755 public
+    && chmod -R 755 Public
 
 EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
