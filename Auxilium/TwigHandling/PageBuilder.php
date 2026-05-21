@@ -142,7 +142,7 @@ class PageBuilder
             );
 
             self::Render(
-                template: '/ErrorPages/InternalSystemErrorPage.html.twig',
+                template: '/ErrorPages/InternalSystemErrorErrorPage.html.twig',
                 variables: ['technical_details' => $technicalDetails],
                 useAuth: false
             );
