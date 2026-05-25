@@ -21,6 +21,7 @@ RUN composer install \
     --optimize-autoloader
 
 
+
 # shared runtime base
 FROM php:8.4-fpm-alpine AS base
 
@@ -33,6 +34,7 @@ RUN apk add --no-cache \
     libzip-dev \
     icu-dev \
     oniguruma-dev \
+    curl-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo_mysql \
@@ -40,7 +42,6 @@ RUN apk add --no-cache \
         intl \
         zip \
         opcache \
-        fileinfo \
         curl \
         gd \
         bcmath \
@@ -51,6 +52,7 @@ COPY docker/php/app.ini         $PHP_INI_DIR/conf.d/10-app.ini
 COPY docker/supervisord.conf    /etc/supervisord.conf
 
 WORKDIR /var/www/html
+
 
 
 # dev
@@ -69,6 +71,7 @@ RUN mkdir -p Public var && chown -R www-data:www-data .
 
 EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
+
 
 
 # prod
