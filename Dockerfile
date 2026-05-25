@@ -1,6 +1,16 @@
+# composer - production vendor install
+# use php 8.4 (not the composer image, which ships php 8.5) so that platform requirement checks run against the same version as the runtime stage.
+FROM php:8.4-alpine AS vendor
 
-# composer
-FROM composer:2 AS vendor
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+RUN apk add --no-cache \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install bcmath gd zip
 
 WORKDIR /build
 COPY composer.json composer.lock ./
@@ -11,17 +21,18 @@ RUN composer install \
     --optimize-autoloader
 
 
-
 # shared runtime base
 FROM php:8.4-fpm-alpine AS base
 
 RUN apk add --no-cache \
-        nginx \
-        supervisor \
-        libpng-dev \
-        libzip-dev \
-        icu-dev \
-        oniguruma-dev \
+    nginx \
+    supervisor \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    icu-dev \
+    oniguruma-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo_mysql \
@@ -42,7 +53,6 @@ COPY docker/supervisord.conf    /etc/supervisord.conf
 WORKDIR /var/www/html
 
 
-
 # dev
 FROM base AS dev
 
@@ -55,14 +65,13 @@ RUN apk add --no-cache $PHPIZE_DEPS linux-headers \
 COPY docker/php/xdebug.ini $PHP_INI_DIR/conf.d/20-xdebug.ini
 COPY --from=vendor /usr/bin/composer /usr/bin/composer
 
-RUN mkdir -p public var && chown -R www-data:www-data .
+RUN mkdir -p Public var && chown -R www-data:www-data .
 
 EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
 
-
-# 4: prod
+# prod
 FROM base AS prod
 
 COPY docker/php/opcache.ini $PHP_INI_DIR/conf.d/20-opcache.ini
