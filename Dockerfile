@@ -30,6 +30,8 @@ RUN apk add --no-cache \
         opcache \
         fileinfo \
         curl \
+        gd \
+        bcmath \
     && rm -rf /var/cache/apk/*
 
 COPY docker/nginx/default.conf  /etc/nginx/http.d/default.conf
