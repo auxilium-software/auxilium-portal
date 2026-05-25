@@ -3,17 +3,17 @@
     "description": "CRM and Case Management Portal",
     "type": "project",
     "license": "Apache-2.0",
-    "version": "v2-alpha-20250818",
+    "version": "v3-dev",
 
-    "authors": [
+  "authors": [
+        {
+          "name": "Cerys Lewis",
+          "email": "cerys.lewis@aber.ac.uk",
+          "role": "Developer"
+        },
         {
             "name": "Hannah Baldwin",
             "email": "contact@hannahbaldwin.net",
-            "role": "Developer"
-        },
-        {
-            "name": "Cerys Lewis",
-            "email": "cerys.lewis@aber.ac.uk",
             "role": "Developer"
         }
     ],
@@ -56,8 +56,6 @@
 
         "ezyang/htmlpurifier": "^4.14",
 
-        "phpfui/icalendar": "1.1.0",
-
         "zircote/swagger-php": "~4.8.7",
 
         "unional/jsonc": "~1.0.1",
@@ -66,6 +64,7 @@
         "chillerlan/php-qrcode": "~5.0.5"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "phpdocumentor/shim": "*"
     },
     "config": {
