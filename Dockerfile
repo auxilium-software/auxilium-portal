@@ -81,8 +81,8 @@ COPY docker/php/opcache.ini $PHP_INI_DIR/conf.d/20-opcache.ini
 COPY --from=vendor /build/vendor ./vendor
 COPY . .
 
-RUN mkdir -p var \
-    && chown -R www-data:www-data var \
+RUN mkdir -p var /var/auxilium/formdata /var/auxilium/auxlfs \
+    && chown -R www-data:www-data var /var/auxilium \
     && chmod -R 755 Public
 
 EXPOSE 80
