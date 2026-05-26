@@ -90,11 +90,17 @@ class LoginFormHandler
             const recaptchaToken = await this.getReCaptchaToken();
 
             const authCtrl = new AuthenticationController();
-            const response = await authCtrl.Login(
+            const [statusCode, response] = await authCtrl.Login(
                 this.emailField.value.trim(),
                 this.passwordField.value,
                 recaptchaToken
             );
+
+            if(statusCode === 401)
+            {
+                await this.handleLoginError(response);
+                return;
+            }
 
             if (response.mfaRequired && response.mfaRequired === true)
             {
@@ -109,15 +115,12 @@ class LoginFormHandler
                 this.showPasswordChangeForm();
                 return;
             }
-
-            if (response.expiresIn)
+            if (response.accessToken)
             {
-                await this.handleLoginSuccess(response);
+                await this.handleLoginSuccess();
+                return;
             }
-            else
-            {
-                await this.handleLoginError('Unknown login error. Please try again.');
-            }
+            await this.handleLoginError(response.detail ?? 'Unknown login error. Please try again.');
 
         }
         catch (error)
@@ -403,6 +406,10 @@ class LoginFormHandler
         {
             new ToastNotification(error.message, 'alert-circle', 'error');
         }
+        else if (error.detail)
+        {
+            new ToastNotification(error.detail, 'alert-circle', 'error');
+        }
         else
         {
             new ToastNotification(
@@ -546,10 +553,12 @@ class LoginFormHandler
     resetReCaptcha()
     {
         this.recaptchaToken.value = '';
+        /*
         if (typeof grecaptcha !== 'undefined' && grecaptcha.reset)
         {
             grecaptcha.reset();
         }
+        */
     }
 
 
@@ -692,5 +701,4 @@ class LoginFormHandler
             spinner.style.display = 'none';
         }
     }
-
 }
