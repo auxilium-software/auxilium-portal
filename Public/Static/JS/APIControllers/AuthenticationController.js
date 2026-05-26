@@ -19,7 +19,7 @@ class AuthenticationController {
 
     async Login(emailAddress, rawPassword, recaptchaToken)
     {
-        const [statusCode, payload] = await this.#APIInstance.API_POST(
+        return await this.#APIInstance.API_POST(
             "/api/v3/authentication/login",
             {
                 "emailAddress": emailAddress,
@@ -28,14 +28,6 @@ class AuthenticationController {
             },
             false,
         );
-        if(statusCode === 200)
-        {
-            return payload;
-        }
-        else
-        {
-            return false;
-        }
     }
 
 
