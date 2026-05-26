@@ -1,7 +1,0 @@
-[
-    {
-        "id": "8c5b68fb-b79d-4b5f-b3bb-984ee3214891",
-        "name": "forms/new_case/title",
-        "schema_limit": ["https://schemas.auxiliumsoftware.co.uk/v1/user.json"]
-    }
-]
