@@ -16,7 +16,7 @@ class EncodingUtilitiesTest extends TestCase
     {
         $encoded = EncodingUtilities::Base64EncodeURLSafe('a');
 
-        // standard base64 of 'a' is 'YQ==' — URL-safe should strip the padding
+        // standard base64 of 'a' is 'YQ==' - URL-safe should strip the padding
         $this->assertStringNotContainsString('=', $encoded);
     }
 

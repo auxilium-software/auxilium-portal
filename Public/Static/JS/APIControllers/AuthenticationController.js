@@ -24,6 +24,7 @@ class AuthenticationController {
             {
                 "emailAddress": emailAddress,
                 "rawPassword": rawPassword,
+                // "passwordSha512": await HashingUtilities.SHA512(rawPassword),
                 "recaptchaToken": recaptchaToken
             },
             false,
@@ -38,6 +39,27 @@ class AuthenticationController {
             {
                 mfaSessionToken: mfaSessionToken,
                 totpCode: totpCode
+            },
+            false,
+        );
+
+        if (statusCode === 200)
+        {
+            return payload;
+        }
+
+        throw new Error('Verification failed');
+    }
+
+
+
+    async VerifyRecoveryCode(mfaSessionToken, recoveryCode)
+    {
+        const [statusCode, payload] = await this.#APIInstance.API_POST(
+            "/api/v3/authentication/verify-recovery-code",
+            {
+                mfaSessionToken: mfaSessionToken,
+                recoveryCode: recoveryCode
             },
             false,
         );

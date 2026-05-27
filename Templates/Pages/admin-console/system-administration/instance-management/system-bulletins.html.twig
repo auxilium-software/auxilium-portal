@@ -148,7 +148,7 @@
 
         function formatDate(dateStr)
         {
-            if (!dateStr) return '—';
+            if (!dateStr) return '-';
             const d = new Date(dateStr);
             return d.toLocaleDateString('en-GB', {
                 day: 'numeric', month: 'short', year: 'numeric',
@@ -174,7 +174,7 @@
                            onclick="deactivateBulletin('${bulletin.id}')">
                        <i class="ph ph-trash"></i> {{ "Deactivate"|translate }}
                    </button>`
-                : '—';
+                : '-';
 
             return `
                 <tr>
@@ -184,8 +184,8 @@
                     <td>${bulletin.isDismissible ? '✓' : '✗'}</td>
                     <td>${formatDate(bulletin.startsAt)}</td>
                     <td>${formatDate(bulletin.endsAt)}</td>
-                    <td>${bulletin.targetAudience || '—'}</td>
-                    <td>${bulletin.specificUserId || '—'}</td>
+                    <td>${bulletin.targetAudience || '-'}</td>
+                    <td>${bulletin.specificUserId || '-'}</td>
                     <td>${controls}</td>
                 </tr>
             `;

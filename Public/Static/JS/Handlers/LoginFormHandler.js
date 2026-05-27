@@ -12,66 +12,51 @@ class LoginFormHandler
         this.recoveryCodeField = document.getElementById('recovery_code');
         this.recaptchaToken = document.getElementById('ReCAPTCHAToken');
 
-        // MFA sections
         this.totpSection = document.getElementById('TotpInputSection');
         this.recoveryCodeSection = document.getElementById('RecoveryCodeSection');
         this.toggleMfaModeLink = document.getElementById('ToggleMfaMode');
         this.backToLoginLink = document.getElementById('BackToLogin');
 
-        // password change elements
         this.passwordChangeForm = document.getElementById('PasswordChangeForm');
         this.newPasswordField = document.getElementById('new_password');
         this.confirmPasswordField = document.getElementById('confirm_password');
         this.passwordChangeButton = document.getElementById('PasswordChangeButton');
         this.backToLoginFromPwChange = document.getElementById('BackToLoginFromPwChange');
 
-        // state
         this.mfaSessionToken = null;
         this.passwordChangeToken = null;
         this.isRecoveryCodeMode = false;
 
-        this.initializeForm();
+        this.initialiseForm();
     }
 
-    initializeForm()
+    initialiseForm()
     {
-        // hide MFA form initially
         this.mfaForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'none';
 
-        // login form handlers
         this.loginForm.addEventListener('submit', (e) => this.handleLoginSubmit(e));
         this.emailField.addEventListener('blur', () => this.validateEmail());
         this.passwordField.addEventListener('blur', () => this.validatePassword());
         this.emailField.addEventListener('input', () => this.clearFieldError('EmailAddress'));
         this.passwordField.addEventListener('input', () => this.clearFieldError('Password'));
 
-        // MFA form handlers
         this.mfaForm.addEventListener('submit', (e) => this.handleMfaSubmit(e));
         this.totpField.addEventListener('input', () => this.clearFieldError('TotpToken'));
         this.recoveryCodeField.addEventListener('input', () => this.clearFieldError('RecoveryCode'));
+        this.toggleMfaModeLink.addEventListener('click', (e) => { e.preventDefault(); this.toggleMfaMode(); });
+        this.backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); this.showLoginForm(); });
 
-        // password change form handlers
         this.passwordChangeForm.addEventListener('submit', (e) => this.handlePasswordChangeSubmit(e));
         this.newPasswordField.addEventListener('input', () => this.clearFieldError('NewPassword'));
         this.confirmPasswordField.addEventListener('input', () => this.clearFieldError('ConfirmPassword'));
-        this.backToLoginFromPwChange.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showLoginForm();
-        });
-
-        // toggle between TOTP and recovery code
-        this.toggleMfaModeLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.toggleMfaMode();
-        });
-
-        // back to login
-        this.backToLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.showLoginForm();
-        });
+        this.backToLoginFromPwChange.addEventListener('click', (e) => { e.preventDefault(); this.showLoginForm(); });
     }
 
+
+    // --------------------------------------------------
+    // Login
+    // --------------------------------------------------
 
     async handleLoginSubmit(e)
     {
@@ -88,7 +73,6 @@ class LoginFormHandler
         try
         {
             const recaptchaToken = await this.getReCaptchaToken();
-
             const authCtrl = new AuthenticationController();
             const [statusCode, response] = await authCtrl.Login(
                 this.emailField.value.trim(),
@@ -96,32 +80,33 @@ class LoginFormHandler
                 recaptchaToken
             );
 
-            if(statusCode === 401)
+            if (statusCode === 401)
             {
                 await this.handleLoginError(response);
                 return;
             }
 
-            if (response.mfaRequired && response.mfaRequired === true)
+            if (response.mfaRequired)
             {
-                // MFA required - store token and show MFA form
                 this.mfaSessionToken = response.mfaSessionToken;
                 this.showMfaForm();
                 return;
             }
-            if (response.mustChangePassword && response.mustChangePassword === true)
+
+            if (response.mustChangePassword)
             {
                 this.passwordChangeToken = response.passwordChangeToken;
                 this.showPasswordChangeForm();
                 return;
             }
-            if (response.accessToken)
+
+            if (response.expiresIn)
             {
                 await this.handleLoginSuccess();
                 return;
             }
-            await this.handleLoginError(response.detail ?? 'Unknown login error. Please try again.');
 
+            await this.handleLoginError(response.detail ?? 'Unknown login error. Please try again.');
         }
         catch (error)
         {
@@ -132,6 +117,11 @@ class LoginFormHandler
             this.setLoadingState(false);
         }
     }
+
+
+    // --------------------------------------------------
+    // MFA
+    // --------------------------------------------------
 
     toggleMfaMode()
     {
@@ -159,6 +149,19 @@ class LoginFormHandler
     async handleMfaSubmit(e)
     {
         e.preventDefault();
+
+        if (this.isRecoveryCodeMode)
+        {
+            await this.handleRecoveryCodeSubmit();
+        }
+        else
+        {
+            await this.handleTotpSubmit();
+        }
+    }
+
+    async handleTotpSubmit()
+    {
         this.clearFieldError('TotpToken');
 
         const totpCode = this.totpField.value.trim();
@@ -180,93 +183,14 @@ class LoginFormHandler
         try
         {
             const authCtrl = new AuthenticationController();
-            const response = await authCtrl.VerifyTotp(
-                this.mfaSessionToken,
-                totpCode
-            );
+            const response = await authCtrl.VerifyTotp(this.mfaSessionToken, totpCode);
 
-            if (response.mustChangePassword && response.mustChangePassword === true)
+            if (response.mustChangePassword)
             {
                 this.passwordChangeToken = response.passwordChangeToken;
                 this.showPasswordChangeForm();
                 return;
             }
-
-            if (response.expiresIn)
-            {
-                await this.handleLoginSuccess(response);
-            }
-            else
-            {
-                await this.handleLoginError('Verification failed. Please try again.');
-            }
-
-        }
-        catch (error)
-        {
-            await this.handleMfaError(error);
-        }
-        finally
-        {
-            this.setMfaLoadingState(false);
-        }
-    }
-
-    async handleTotpSubmit()
-    {
-        const totpCode = this.totpField.value.trim();
-
-        if (!totpCode)
-        {
-            this.showFieldError('TotpToken', await Localisation.translate('TOTP code is required'));
-            return;
-        }
-
-        if (!/^\d{6}$/.test(totpCode))
-        {
-            this.showFieldError('TotpToken', await Localisation.translate('TOTP code must be 6 digits'));
-            return;
-        }
-
-        this.setMfaLoadingState(true);
-
-        try
-        {
-            const authCtrl = new AuthenticationController();
-            const response = await authCtrl.VerifyTotp(
-                this.mfaSessionToken,
-                totpCode
-            );
-
-            if (response.expiresIn) {
-                await this.handleLoginSuccess(response);
-            } else {
-                await this.handleMfaError('Verification failed. Please try again.');
-            }
-
-        } catch (error) {
-            await this.handleMfaError(error);
-        } finally {
-            this.setMfaLoadingState(false);
-        }
-    }
-
-    async handleRecoveryCodeSubmit() {
-        const recoveryCode = this.recoveryCodeField.value.trim();
-
-        if (!recoveryCode) {
-            this.showFieldError('RecoveryCode', await Localisation.translate('Recovery code is required'));
-            return;
-        }
-
-        this.setMfaLoadingState(true);
-
-        try {
-            const authCtrl = new AuthenticationController();
-            const response = await authCtrl.VerifyRecoveryCode(
-                this.mfaSessionToken,
-                recoveryCode
-            );
 
             if (response.expiresIn)
             {
@@ -276,144 +200,158 @@ class LoginFormHandler
             {
                 await this.handleMfaError('Verification failed. Please try again.');
             }
-
-        } catch (error) {
+        }
+        catch (error)
+        {
             await this.handleMfaError(error);
-            this.recoveryCodeField.value = '';
-            this.recoveryCodeField.focus();
-        } finally {
+            this.totpField.value = '';
+            this.totpField.focus();
+        }
+        finally
+        {
             this.setMfaLoadingState(false);
         }
     }
 
+    async handleRecoveryCodeSubmit()
+    {
+        this.clearFieldError('RecoveryCode');
+
+        const recoveryCode = this.recoveryCodeField.value.trim();
+
+        if (!recoveryCode)
+        {
+            this.showFieldError('RecoveryCode', await Localisation.translate('Recovery code is required'));
+            return;
+        }
+
+        this.setMfaLoadingState(true);
+
+        try
+        {
+            const authCtrl = new AuthenticationController();
+            const response = await authCtrl.VerifyRecoveryCode(this.mfaSessionToken, recoveryCode);
+
+            if (response.mustChangePassword)
+            {
+                this.passwordChangeToken = response.passwordChangeToken;
+                this.showPasswordChangeForm();
+                return;
+            }
+
+            if (response.expiresIn)
+            {
+                await this.handleLoginSuccess();
+            }
+            else
+            {
+                await this.handleMfaError('Verification failed. Please try again.');
+            }
+        }
+        catch (error)
+        {
+            await this.handleMfaError(error);
+            this.recoveryCodeField.value = '';
+            this.recoveryCodeField.focus();
+        }
+        finally
+        {
+            this.setMfaLoadingState(false);
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Forced password change
+    // --------------------------------------------------
+
+    async handlePasswordChangeSubmit(e)
+    {
+        e.preventDefault();
+        this.clearFieldError('NewPassword');
+        this.clearFieldError('ConfirmPassword');
+
+        if (!await this.validateNewPassword())
+        {
+            return;
+        }
+
+        this.setPasswordChangeLoadingState(true);
+
+        try
+        {
+            const authCtrl = new AuthenticationController();
+            await authCtrl.ForcedPasswordChange(this.passwordChangeToken, this.newPasswordField.value);
+
+            new ToastNotification(
+                await Localisation.translate('Password changed successfully. Please log in with your new password.'),
+                'check-circle',
+                'success'
+            );
+
+            this.showLoginForm();
+            this.passwordField.value = '';
+            this.emailField.focus();
+        }
+        catch (error)
+        {
+            console.error('Password change error:', error);
+
+            if (error.message?.includes('expired') || error.message?.includes('Invalid'))
+            {
+                new ToastNotification(
+                    await Localisation.translate('Session expired. Please log in again.'),
+                    'alert-circle',
+                    'error'
+                );
+                this.showLoginForm();
+                return;
+            }
+
+            new ToastNotification(
+                error.message ?? await Localisation.translate('Failed to change password. Please try again.'),
+                'alert-circle',
+                'error'
+            );
+        }
+        finally
+        {
+            this.setPasswordChangeLoadingState(false);
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Success / error handlers
+    // --------------------------------------------------
+
     async handleLoginSuccess()
     {
+        // Tokens are set as HttpOnly cookies by the BFF proxy before this point -  nothing to do here except redirect.
+
         new ToastNotification(
             await Localisation.translate('Login successful! Redirecting...'),
             'check-circle',
             'success'
         );
 
-        setTimeout(() => {
-            window.location.href = '/dashboard';
-        }, 50);
-    }
-
-    showMfaForm() {
-        this.loginForm.style.display = 'none';
-        this.mfaForm.style.display = 'block';
-
-        // Reset to TOTP mode
-        this.isRecoveryCodeMode = false;
-        this.totpSection.style.display = 'block';
-        this.recoveryCodeSection.style.display = 'none';
-        this.toggleMfaModeLink.textContent = 'Use recovery code instead';
-
-        this.totpField.value = '';
-        this.recoveryCodeField.value = '';
-        this.totpField.focus();
-    }
-
-    showLoginForm()
-    {
-        this.mfaForm.style.display = 'none';
-        this.passwordChangeForm.style.display = 'none';
-        this.loginForm.style.display = 'block';
-        this.mfaSessionToken = null;
-        this.passwordChangeToken = null;
-        this.isRecoveryCodeMode = false;
-        this.totpField.value = '';
-        this.recoveryCodeField.value = '';
-    }
-
-    async validateForm() {
-        let isValid = true;
-
-        if (!await this.validateEmail()) {
-            isValid = false;
-        }
-
-        if (!await this.validatePassword()) {
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    async validateEmail() {
-        const email = this.emailField.value.trim();
-
-        if (!email) {
-            this.showFieldError('EmailAddress', await Localisation.translate('Email address is required'));
-            return false;
-        }
-
-        if (!this.isValidEmail(email)) {
-            this.showFieldError('EmailAddress', await Localisation.translate('Please enter a valid email address'));
-            return false;
-        }
-
-        this.clearFieldError('EmailAddress');
-        return true;
-    }
-
-    async validatePassword() {
-        const password = this.passwordField.value;
-
-        if (!password) {
-            this.showFieldError('Password', await Localisation.translate('Password is required'));
-            return false;
-        }
-
-        this.clearFieldError('Password');
-        return true;
-    }
-
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    async getReCaptchaToken() {
-        try {
-            if (typeof grecaptcha === 'undefined') {
-                throw new Error('reCAPTCHA not loaded');
-            }
-
-            const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, {
-                action: 'login'
-            });
-
-            this.recaptchaToken.value = token;
-            return token;
-        } catch (error) {
-            console.error('reCAPTCHA error:', error);
-            throw new Error(await Localisation.translate('Security verification failed. Please refresh the page and try again.'));
-        }
+        setTimeout(() => { window.location.href = '/dashboard'; }, 50);
     }
 
     async handleLoginError(error)
     {
         console.error('Login error:', error);
 
-        if (error.fieldErrors)
+        if (error?.fieldErrors)
         {
             Object.keys(error.fieldErrors).forEach(field => {
                 this.showFieldError(field, error.fieldErrors[field]);
             });
         }
-        else if (error.message)
-        {
-            new ToastNotification(error.message, 'alert-circle', 'error');
-        }
-        else if (error.detail)
-        {
-            new ToastNotification(error.detail, 'alert-circle', 'error');
-        }
         else
         {
             new ToastNotification(
-                await Localisation.translate('An unexpected error occurred. Please try again.'),
+                error?.message ?? error?.detail ?? await Localisation.translate('An unexpected error occurred. Please try again.'),
                 'alert-circle',
                 'error'
             );
@@ -426,7 +364,7 @@ class LoginFormHandler
     {
         console.error('MFA error:', error);
 
-        if (error.message?.includes('expired') || error.message?.includes('Invalid MFA session'))
+        if (error?.message?.includes('expired') || error?.message?.includes('Invalid MFA session'))
         {
             new ToastNotification(
                 await Localisation.translate('Session expired. Please log in again.'),
@@ -437,69 +375,159 @@ class LoginFormHandler
             return;
         }
 
-        if (error.message)
-        {
-            new ToastNotification(error.message, 'alert-circle', 'error');
-        }
-        else
-        {
-            new ToastNotification(
-                await Localisation.translate('Invalid code. Please try again.'),
-                'alert-circle',
-                'error'
-            );
-        }
-
-        // clear the appropriate field
-        if (this.isRecoveryCodeMode)
-        {
-            this.recoveryCodeField.value = '';
-            this.recoveryCodeField.focus();
-        }
-        else
-        {
-            this.totpField.value = '';
-            this.totpField.focus();
-        }
+        new ToastNotification(
+            error?.message ?? await Localisation.translate('Invalid code. Please try again.'),
+            'alert-circle',
+            'error'
+        );
     }
 
-    setLoadingState(loading)
+
+    // --------------------------------------------------
+    // Form visibility
+    // --------------------------------------------------
+
+    showLoginForm()
     {
-        const buttonText = this.submitButton.querySelector('.button-text');
-        const spinner = this.submitButton.querySelector('.loading-spinner');
+        this.mfaForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'none';
+        this.loginForm.style.display = 'block';
 
-        if (loading)
-        {
-            this.submitButton.disabled = true;
-            buttonText.style.display = 'none';
-            spinner.style.display = 'inline';
-            this.loginForm.classList.add('loading');
-        }
-        else
-        {
-            this.submitButton.disabled = false;
-            buttonText.style.display = 'inline';
-            spinner.style.display = 'none';
-            this.loginForm.classList.remove('loading');
-        }
+        this.mfaSessionToken = null;
+        this.passwordChangeToken = null;
+        this.isRecoveryCodeMode = false;
+        this.totpField.value = '';
+        this.recoveryCodeField.value = '';
     }
 
-    setMfaLoadingState(loading)
+    showMfaForm()
     {
-        const buttonText = this.mfaSubmitButton.querySelector('.button-text');
-        const spinner = this.mfaSubmitButton.querySelector('.loading-spinner');
+        this.loginForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'none';
+        this.mfaForm.style.display = 'block';
 
-        if (loading) {
-            this.mfaSubmitButton.disabled = true;
-            buttonText.style.display = 'none';
-            spinner.style.display = 'inline';
-        } else {
-            this.mfaSubmitButton.disabled = false;
-            buttonText.style.display = 'inline';
-            spinner.style.display = 'none';
-        }
+        this.isRecoveryCodeMode = false;
+        this.totpSection.style.display = 'block';
+        this.recoveryCodeSection.style.display = 'none';
+        this.toggleMfaModeLink.textContent = 'Use recovery code instead';
+
+        this.totpField.value = '';
+        this.recoveryCodeField.value = '';
+        this.totpField.focus();
     }
 
+    showPasswordChangeForm()
+    {
+        this.loginForm.style.display = 'none';
+        this.mfaForm.style.display = 'none';
+        this.passwordChangeForm.style.display = 'block';
+
+        this.newPasswordField.value = '';
+        this.confirmPasswordField.value = '';
+        this.newPasswordField.focus();
+    }
+
+
+    // --------------------------------------------------
+    // Validation
+    // --------------------------------------------------
+
+    async validateForm()
+    {
+        const emailOk = await this.validateEmail();
+        const passwordOk = await this.validatePassword();
+        return emailOk && passwordOk;
+    }
+
+    async validateEmail()
+    {
+        const email = this.emailField.value.trim();
+
+        if (!email)
+        {
+            this.showFieldError('EmailAddress', await Localisation.translate('Email address is required'));
+            return false;
+        }
+
+        if (!this.isValidEmail(email))
+        {
+            this.showFieldError('EmailAddress', await Localisation.translate('Please enter a valid email address'));
+            return false;
+        }
+
+        this.clearFieldError('EmailAddress');
+        return true;
+    }
+
+    async validatePassword()
+    {
+        if (!this.passwordField.value)
+        {
+            this.showFieldError('Password', await Localisation.translate('Password is required'));
+            return false;
+        }
+
+        this.clearFieldError('Password');
+        return true;
+    }
+
+    async validateNewPassword()
+    {
+        const password = this.newPasswordField.value;
+        const confirm = this.confirmPasswordField.value;
+        let isValid = true;
+
+        if (!password)
+        {
+            this.showFieldError('NewPassword', await Localisation.translate('New password is required'));
+            isValid = false;
+        }
+
+        if (!confirm)
+        {
+            this.showFieldError('ConfirmPassword', await Localisation.translate('Please confirm your password'));
+            isValid = false;
+        }
+        else if (password !== confirm)
+        {
+            this.showFieldError('ConfirmPassword', await Localisation.translate('Passwords do not match'));
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    isValidEmail(email)
+    {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+
+    // --------------------------------------------------
+    // reCAPTCHA
+    // --------------------------------------------------
+
+    async getReCaptchaToken()
+    {
+        if (typeof grecaptcha === 'undefined')
+        {
+            throw new Error(await Localisation.translate('Security verification failed. Please refresh the page and try again.'));
+        }
+
+        const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'login' });
+        this.recaptchaToken.value = token;
+        return token;
+    }
+
+    resetReCaptcha()
+    {
+        this.recaptchaToken.value = '';
+    }
+
+
+    // --------------------------------------------------
+    // Field error UI
+    // --------------------------------------------------
 
     showFieldError(fieldName, message)
     {
@@ -546,159 +574,43 @@ class LoginFormHandler
         this.clearFieldError('EmailAddress');
         this.clearFieldError('Password');
         this.clearFieldError('TotpToken');
+        this.clearFieldError('RecoveryCode');
         hideGlobalError();
         hideSuccessMessage();
     }
 
-    resetReCaptcha()
+
+    // --------------------------------------------------
+    // Loading states
+    // --------------------------------------------------
+
+    setLoadingState(loading)
     {
-        this.recaptchaToken.value = '';
-        /*
-        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset)
-        {
-            grecaptcha.reset();
-        }
-        */
+        this._setButtonLoadingState(this.submitButton, this.loginForm, loading, 'loading');
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    showPasswordChangeForm()
+    setMfaLoadingState(loading)
     {
-        this.loginForm.style.display = 'none';
-        this.mfaForm.style.display = 'none';
-        this.passwordChangeForm.style.display = 'block';
-
-        this.newPasswordField.value = '';
-        this.confirmPasswordField.value = '';
-        this.newPasswordField.focus();
-    }
-
-    async validateNewPassword()
-    {
-        const password = this.newPasswordField.value;
-        const confirm = this.confirmPasswordField.value;
-        let isValid = true;
-
-        if (!password)
-        {
-            this.showFieldError('NewPassword', await Localisation.translate('New password is required'));
-            isValid = false;
-        }
-
-        if (!confirm)
-        {
-            this.showFieldError('ConfirmPassword', await Localisation.translate('Please confirm your password'));
-            isValid = false;
-        }
-        else if (password !== confirm)
-        {
-            this.showFieldError('ConfirmPassword', await Localisation.translate('Passwords do not match'));
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    async handlePasswordChangeSubmit(e)
-    {
-        e.preventDefault();
-        this.clearFieldError('NewPassword');
-        this.clearFieldError('ConfirmPassword');
-
-        if (!await this.validateNewPassword())
-        {
-            return;
-        }
-
-        this.setPasswordChangeLoadingState(true);
-
-        try
-        {
-            const authCtrl = new AuthenticationController();
-            const response = await authCtrl.ForcedPasswordChange(
-                this.passwordChangeToken,
-                this.newPasswordField.value
-            );
-
-            new ToastNotification(
-                await Localisation.translate('Password changed successfully. Please log in with your new password.'),
-                'check-circle',
-                'success'
-            );
-
-            this.showLoginForm();
-            this.passwordField.value = '';
-            this.emailField.focus();
-        }
-        catch (error)
-        {
-            console.error('Password change error:', error);
-
-            if (error.message?.includes('expired') || error.message?.includes('Invalid'))
-            {
-                new ToastNotification(
-                    await Localisation.translate('Session expired. Please log in again.'),
-                    'alert-circle',
-                    'error'
-                );
-                this.showLoginForm();
-                return;
-            }
-
-            if (error.message)
-            {
-                new ToastNotification(error.message, 'alert-circle', 'error');
-            }
-            else
-            {
-                new ToastNotification(
-                    await Localisation.translate('Failed to change password. Please try again.'),
-                    'alert-circle',
-                    'error'
-                );
-            }
-        }
-        finally
-        {
-            this.setPasswordChangeLoadingState(false);
-        }
+        this._setButtonLoadingState(this.mfaSubmitButton, null, loading);
     }
 
     setPasswordChangeLoadingState(loading)
     {
-        const buttonText = this.passwordChangeButton.querySelector('.button-text');
-        const spinner = this.passwordChangeButton.querySelector('.loading-spinner');
+        this._setButtonLoadingState(this.passwordChangeButton, null, loading);
+    }
 
-        if (loading)
+    _setButtonLoadingState(button, form, loading, formClass = null)
+    {
+        const buttonText = button.querySelector('.button-text');
+        const spinner = button.querySelector('.loading-spinner');
+
+        button.disabled = loading;
+        buttonText.style.display = loading ? 'none' : 'inline';
+        spinner.style.display = loading ? 'inline' : 'none';
+
+        if (form && formClass)
         {
-            this.passwordChangeButton.disabled = true;
-            buttonText.style.display = 'none';
-            spinner.style.display = 'inline';
-        }
-        else
-        {
-            this.passwordChangeButton.disabled = false;
-            buttonText.style.display = 'inline';
-            spinner.style.display = 'none';
+            form.classList.toggle(formClass, loading);
         }
     }
 }
