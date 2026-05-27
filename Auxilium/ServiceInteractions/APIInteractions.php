@@ -125,7 +125,7 @@ class APIInteractions
         curl_setopt(
             $this->CurlHandler,
             CURLOPT_URL,
-            ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'] . $endpoint
+            ConfigurationUtilities::GetUserConfiguration()['API']['PrimarilyAvailableAt'] . $endpoint
         );
     }
 

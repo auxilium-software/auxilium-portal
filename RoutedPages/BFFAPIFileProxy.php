@@ -10,7 +10,7 @@ $prefix = '/API/BFFAPIFileProxy';
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path   = substr($uri, strlen($prefix));
 
-$apiBase = ConfigurationUtilities::GetUserConfiguration()['API']['AvailableAt'];
+$apiBase = ConfigurationUtilities::GetUserConfiguration()['API']['PrimarilyAvailableAt'];
 $url     = $apiBase . $path;
 
 $method = $_SERVER['REQUEST_METHOD'];
