@@ -64,8 +64,10 @@ class APIInteractions
 
                 if (!$refreshToken)
                 {
+                    /*
                     echo 1;
                     die();
+                    */
                     $this->redirectToLogin();
                 }
             }
@@ -218,16 +220,20 @@ class APIInteractions
                 return $this->retryRequest();
             }
 
+            /*
             echo 2;
             die();
+            */
             $this->redirectToLogin();
         }
 
         // If we already tried refreshing, or it's a different error
         if ($statusCode === 401 && $this->requiresAuth)
         {
+            /*
             echo 3;
             die();
+            */
             $this->redirectToLogin();
         }
 
