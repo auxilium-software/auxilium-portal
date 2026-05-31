@@ -17,6 +17,17 @@ class AuthenticationController {
     }
 
 
+    async MigratePassword(token, rawPassword)
+    {
+        const passwordSha512 = await HashingUtilities.SHA512(rawPassword);
+
+        return await this.#APIInstance.API_POST('/api/v3/authentication/migrate-password', {
+            token: token,
+            passwordSha512: passwordSha512
+        });
+    }
+
+
     async Login(emailAddress, rawPassword, recaptchaToken)
     {
         return await this.#APIInstance.API_POST(
