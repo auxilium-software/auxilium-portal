@@ -45,15 +45,10 @@ class SetInitialPasswordFormHandler
         try
         {
             const authCtrl = new AuthenticationController();
-            const [statusCode, response] = await authCtrl.SetPassword(
+            await authCtrl.SetPassword(
                 this.token,
                 this.newPasswordField.value
             );
-
-            if(statusCode !== 200)
-            {
-                throw new GenericApiFailureException();
-            }
 
             new ToastNotification(
                 await Localisation.translate('Password set successfully. You can now log in.'),
