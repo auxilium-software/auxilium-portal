@@ -93,7 +93,7 @@ class UserController
             true,
             totpCode
         );
-        return statusCode === 204 ? payload : false;
+        return statusCode === 200 ? payload : false;
     }
 
     async SetUserBlocked(userID, blocked, totpCode) {
