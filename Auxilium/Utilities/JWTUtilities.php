@@ -83,7 +83,7 @@ final class JWTUtilities
     private static function refreshAccessToken(): JWTPayload
     {
         $response = APIInteractions::Post(
-            endpoint: '/authentication/refresh',
+            endpoint: '/api/v3/authentication/refresh',
             payload: ['refreshToken' => $_COOKIE[CookieKey::REFRESH_TOKEN->value]],
             requireAuth: false
         );
