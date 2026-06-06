@@ -377,7 +377,7 @@
             const avatar = document.getElementById('profileAvatar');
             avatar.textContent = getInitial(user.fullName);
             avatar.className = 'profile-header__avatar';
-            if (user.isAdmin)
+            if (user.isAdministrator)
                 avatar.classList.add('profile-header__avatar--admin');
             else if (user.isCaseWorkerManager)
                 avatar.classList.add('profile-header__avatar--caseworker-manager');
@@ -386,13 +386,13 @@
 
             // name + badges
             let nameHtml = escapeHtml(user.fullName || '{{ "Unnamed User"|translate }}');
-            if (user.isAdmin)
+            if (user.isAdministrator)
                 nameHtml += ' <span class="badge badge--admin">{{ "Admin"|translate }}</span>';
             if (user.isCaseWorker)
                 nameHtml += ' <span class="badge badge--moderator">{{ "Case Worker"|translate }}</span>';
             if (user.isCaseWorkerManager)
                 nameHtml += ' <span class="badge badge--moderator">{{ "Case Worker Manager"|translate }}</span>';
-            if (!user.isAdmin && !user.isCaseWorker)
+            if (!user.isAdministrator && !user.isCaseWorker)
                 nameHtml += ' <span class="badge badge--user">{{ "User"|translate }}</span>';
             document.getElementById('profileName').innerHTML = nameHtml;
 
@@ -529,7 +529,7 @@
         // =========================
         function renderPermissions(user)
         {
-            document.getElementById('permAdmin').checked = user.isAdmin === true;
+            document.getElementById('permAdmin').checked = user.isAdministrator === true;
             document.getElementById('permCaseWorker').checked = user.isCaseWorker === true;
             document.getElementById('permCaseWorkerManager').checked = user.isCaseWorkerManager === true;
         }
@@ -592,7 +592,7 @@
             if (!totpCode) return;
 
             const data = {
-                isAdmin: document.getElementById('permAdmin').checked,
+                isAdministrator: document.getElementById('permAdmin').checked,
                 isCaseWorkerManager: document.getElementById('permCaseWorkerManager').checked,
                 isCaseWorker: document.getElementById('permCaseWorker').checked,
             };
