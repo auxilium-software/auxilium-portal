@@ -9,7 +9,7 @@ use Auxilium\Utilities\SystemSettingsUtilities;
 use Composer\Config;
 use Exception;
 
-class CookieHandling
+final class CookieHandling
 {
     /**
      * Used for getting a cookie from the client with an optional fallback value.

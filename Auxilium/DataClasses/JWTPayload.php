@@ -2,7 +2,7 @@
 
 namespace Auxilium\DataClasses;
 
-class JWTPayload
+final class JWTPayload
 {
     public string $ID;
     public string $ExpiresAt;

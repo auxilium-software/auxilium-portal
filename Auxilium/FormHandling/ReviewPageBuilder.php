@@ -7,7 +7,7 @@ use Auxilium\Auxilium\AuxiliumScript;
 /**
  * Builds and processes review page components
  */
-class ReviewPageBuilder
+final class ReviewPageBuilder
 {
     /**
      * Retrieves and processes components for the review page

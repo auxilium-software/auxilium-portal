@@ -5,7 +5,7 @@ namespace Auxilium\DataClasses;
 /**
  * Wrapper class for API responses so both and only the Status Code and the Payload are available easily.
  */
-class APIResponsePayload
+final class APIResponsePayload
 {
     /**
      * @var int The response Status Code.

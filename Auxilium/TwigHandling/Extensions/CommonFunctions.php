@@ -12,7 +12,7 @@ use Auxilium\Utilities\SecurityUtilities;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class CommonFunctions extends AbstractExtension
+final class CommonFunctions extends AbstractExtension
 {
     public function getFunctions(): array
     {

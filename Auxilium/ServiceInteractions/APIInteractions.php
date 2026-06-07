@@ -13,7 +13,7 @@ use CurlHandle;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 
-class APIInteractions
+final class APIInteractions
 {
     private static bool $hasAttemptedRefresh = false;
 

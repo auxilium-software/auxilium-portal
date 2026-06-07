@@ -9,7 +9,7 @@ use SimpleXMLElement;
 /**
  * Handles parsing and processing of form submission payloads
  */
-class PayloadProcessor
+final class PayloadProcessor
 {
     /**
      * Parses payload data from XML format into a PHP array

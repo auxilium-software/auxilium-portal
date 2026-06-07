@@ -16,7 +16,7 @@ use Twig\TwigFilter;
 /**
  * Provides a set of custom Twig filters for use in templates.
  */
-class CommonFilters extends AbstractExtension
+final class CommonFilters extends AbstractExtension
 {
     public function getFilters(): array
     {

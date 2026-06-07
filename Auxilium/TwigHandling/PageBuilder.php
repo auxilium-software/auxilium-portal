@@ -17,7 +17,7 @@ use Throwable;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class PageBuilder
+final class PageBuilder
 {
     private Environment $twig;
 

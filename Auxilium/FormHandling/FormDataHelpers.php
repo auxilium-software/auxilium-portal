@@ -6,7 +6,7 @@ namespace Auxilium\FormHandling;
  * Helper functions for form data processing
  * These can be called from AuxiliumScript expressions
  */
-class FormDataHelpers
+final class FormDataHelpers
 {
     /**
      * Collects all selected checkbox values for a given field

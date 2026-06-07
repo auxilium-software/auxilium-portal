@@ -10,7 +10,7 @@ use JetBrains\PhpStorm\NoReturn;
 /**
  * Handles rendering of form pages and review pages
  */
-class FormRenderer
+final class FormRenderer
 {
     private ReviewPageBuilder $reviewPageBuilder;
     private PageNavigator $navigator;

@@ -2,7 +2,7 @@
 
 namespace Auxilium\FormHandling;
 
-class FormSubmissionActionResultWrapper
+final class FormSubmissionActionResultWrapper
 {
     public bool $Success;
     public string $Message;

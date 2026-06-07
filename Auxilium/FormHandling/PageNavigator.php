@@ -7,7 +7,7 @@ use Auxilium\Auxilium\AuxiliumScript;
 /**
  * Handles page navigation logic including visibility determination and page finding
  */
-class PageNavigator
+final class PageNavigator
 {
     /**
      * Builds a list of visible pages and their index mapping based on renderIf conditions

@@ -9,7 +9,7 @@ use JsonException;
 /**
  * Handles form submission actions and API request execution
  */
-class FormSubmissionHandler
+final class FormSubmissionHandler
 {
     private PayloadProcessor $payloadProcessor;
     private string $formInstanceID;

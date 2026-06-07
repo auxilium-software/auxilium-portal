@@ -16,7 +16,7 @@ use JsonException;
 /**
  * Main class for form handling
  */
-class FormHandler
+final class FormHandler
 {
     private string $formInstanceID;
     private array $formData;

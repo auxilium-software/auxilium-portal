@@ -2,7 +2,7 @@
 
 namespace Auxilium\Auxilium;
 
-class AuxiliumScript
+final class AuxiliumScript
 {
     public static function evaluate_expression(string $string, array $vars)
     {
