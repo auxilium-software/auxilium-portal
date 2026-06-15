@@ -22,20 +22,6 @@
     </head>
 
     <body>
-        <span id="auxilium_instance_uuid" style="display: none;">{{ INSTANCE_UUID }}</span>
-        <span id="auxilium_instance_fqdn" style="display: none;">{{ INSTANCE_DOMAIN_NAME }}</span>
-
-        {% if header_warning %}
-            <div>
-                <div class="inner-content">
-                    <h2>{{ header_warning_title }}</h2>
-                    <p>{{ header_warning_content }}</p>
-                    <div class="spacer"></div>
-                </div>
-            </div>
-        {% endif %}
-
-
         <nav>
             <div class="inner-content">
                 <a id="skip-to-content-link" href="#main-content">{{ "Skip to Content"|translate|capitalize }}</a>
