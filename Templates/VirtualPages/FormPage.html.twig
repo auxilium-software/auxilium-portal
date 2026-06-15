@@ -166,7 +166,7 @@
             {# Navigation buttons #}
             <div class="form-navigation">
                 {% if ShowBackButton %}
-                    <input type="button" value="Back" onclick="submitFormWithAction('back')" />
+                    <input class="button" type="button" value="Back" onclick="submitFormWithAction('back')" />
                 {% endif %}
 
                 {% if IsAbandonPage %}
@@ -175,7 +175,7 @@
                 {% elseif ShowReviewButton %}
                     <input type="button" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
                 {% elseif ShowNextButton %}
-                    <input type="submit" value="Continue" />
+                    <input class="button" type="submit" value="Continue" />
                 {% endif %}
             </div>
 
