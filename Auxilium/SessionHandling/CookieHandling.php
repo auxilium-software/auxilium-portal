@@ -41,7 +41,7 @@ final class CookieHandling
             path: '/',
             domain: SystemSettingsUtilities::GetFqdn(),
             secure: true,
-            httponly: false,
+            httponly: true,
         );
     }
 
@@ -53,7 +53,7 @@ final class CookieHandling
      * @return bool Whether it was successful.
      * @throws Exception Will be thrown if there was an issue with the config file.
      */
-    public static function SetCookie(CookieKey $targetCookie, string $value): bool
+    public static function SetCookie(CookieKey $targetCookie, string $value, bool $httpOnly = false): bool
     {
         $_COOKIE[$targetCookie->value] = $value;
 
@@ -64,7 +64,7 @@ final class CookieHandling
             path: '/',
             domain: SystemSettingsUtilities::GetFqdn(),
             secure: true,
-            httponly: false,
+            httponly: $httpOnly,
         );
     }
 
