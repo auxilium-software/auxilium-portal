@@ -11,12 +11,12 @@ class UserController
         let allUsers = [];
 
         let pageNumber = 1;
-        const perPage = 1000;
+        const pageSize = 1000;
 
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/users?page=${pageNumber}&pageSize=${perPage}`,
+                `/api/v3/users?page=${pageNumber}&pageSize=${pageSize}`,
                 true,
             );
             if(statusCode === 200)
@@ -41,9 +41,9 @@ class UserController
         return allUsers;
     }
 
-    async GetUsersPage(page = 1, perPage = 100, sortBy = 'fullName', sortOrder = 'asc', search = '')
+    async GetUsersPage(page = 1, pageSize = 100, sortBy = 'fullName', sortOrder = 'asc', search = '')
     {
-        let url = `/api/v3/users?page=${page}&pageSize=${perPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+        let url = `/api/v3/users?page=${page}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
 
         if (search) {
             url += `&search=${encodeURIComponent(search)}`;

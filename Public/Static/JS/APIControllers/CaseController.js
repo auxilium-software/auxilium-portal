@@ -10,12 +10,12 @@ class CaseController {
         let allCases = [];
 
         let pageNumber = 1;
-        const perPage = 100;
+        const pageSize = 1000;
 
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/cases?page=${pageNumber}&per_page=${perPage}`,
+                `/api/v3/cases?page=${pageNumber}&pageSize=${pageSize}`,
                 true,
             );
             if(statusCode === 200)
@@ -44,12 +44,12 @@ class CaseController {
         let allCases = [];
 
         let pageNumber = 1;
-        const perPage = 100;
+        const pageSize = 500;
 
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/cases/mine?page=${pageNumber}&per_page=${perPage}`,
+                `/api/v3/cases/mine?page=${pageNumber}&pageSize=${pageSize}`,
                 true,
             );
             if(statusCode === 200)
@@ -78,12 +78,12 @@ class CaseController {
         let allCases = [];
 
         let pageNumber = 1;
-        const perPage = 100;
+        const pageSize = 500;
 
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/cases/assigned?page=${pageNumber}&per_page=${perPage}`,
+                `/api/v3/cases/assigned?page=${pageNumber}&pageSize=${pageSize}`,
                 true,
             );
             if(statusCode === 200)

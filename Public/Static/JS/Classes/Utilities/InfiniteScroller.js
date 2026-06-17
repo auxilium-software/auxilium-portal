@@ -101,7 +101,7 @@ class InfiniteScroller
             const queryParams = new URLSearchParams({
                 ...this.#params,
                 page: this.#currentPage,
-                per_page: this.pageSize,
+                pageSize: this.pageSize,
             });
 
             const fullEndpoint = `${this.#endpoint}?${queryParams}`;
