@@ -11,17 +11,19 @@ class NewPropertyPopup
     #userId = null;
     #types = null;
     #floating = false;
+    #enumTypeId = null;
     /**
      * Possible types: 'dict', 'array', 'static'
      */
     #mode = null;
 
-    constructor(types = null, resourcePath = null, floating = false, userId = 'me')
+    constructor(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null)
     {
         this.#apiClient = new APIInteractions();
         this.#resourcePath = resourcePath;
         this.#userId = userId;
         this.#floating = floating;
+        this.#enumTypeId = enumTypeId;
 
         if (resourcePath)
         {
@@ -46,9 +48,9 @@ class NewPropertyPopup
         this.#types = this.#normalizeTypes(types);
     }
 
-    static async create(types = null, resourcePath = null, floating = false, userId = 'me')
+    static async create(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null)
     {
-        const instance = new NewPropertyPopup(types, resourcePath, floating, userId);
+        const instance = new NewPropertyPopup(types, resourcePath, floating, userId, enumTypeId);
         await instance.#initialize();
         return instance;
     }
@@ -188,7 +190,8 @@ class NewPropertyPopup
             'FILE_UPLOAD': () => this.#setupFileUpload(),
             'ICALENDAR_TODO': () => this.#setupICalTodo(),
             'ICALENDAR_JOURNAL': () => this.#setupICalJournal(),
-            'ICALENDAR_EVENT': () => this.#setupICalEvent()
+            'ICALENDAR_EVENT': () => this.#setupICalEvent(),
+            'ENUM': () => this.#setupEnum()
         };
 
         const handler = handlers[type];
@@ -208,7 +211,8 @@ class NewPropertyPopup
             'FILE_UPLOAD': {key: 'Upload a file', handler: () => this.#setupFileUpload(pageOne)},
             'ICALENDAR_TODO': {key: 'New todo note', handler: () => this.#setupICalTodo(pageOne)},
             'ICALENDAR_JOURNAL': {key: 'New timeline note', handler: () => this.#setupICalJournal(pageOne)},
-            'ICALENDAR_EVENT': {key: 'New calendar event', handler: () => this.#setupICalEvent(pageOne)}
+            'ICALENDAR_EVENT': {key: 'New calendar event', handler: () => this.#setupICalEvent(pageOne)},
+            'ENUM': {key: 'New selection', handler: () => this.#setupEnum(pageOne)}
         };
 
         for (const type of this.#types)
@@ -249,6 +253,141 @@ class NewPropertyPopup
             try
             {
                 const response = await this.#saveContent(textArea.value, 'text/plain', 'text_note');
+                this.#handleSuccess(response);
+            } catch (error)
+            {
+                this.#handleError(error);
+            }
+        });
+
+        this.#innerContainer.appendChild(this.#okButton);
+    }
+
+    async #setupEnum(pageToRemove = null)
+    {
+        if (pageToRemove) pageToRemove.remove();
+
+        // the value dropdown; populated once an enumerator is known
+        const valueSelect = document.createElement('select');
+        valueSelect.classList.add('property-input');
+        valueSelect.disabled = true;
+
+        const loadValues = async (enumTypeId) =>
+        {
+            valueSelect.innerHTML = '';
+            valueSelect.disabled = true;
+
+            if (!enumTypeId) return;
+
+            let values;
+            try
+            {
+                const [status, response] = await this.#apiClient.API_GET(
+                    `/api/v3/data-enumerators/${encodeURIComponent(enumTypeId)}/values?includeInactive=false`
+                );
+                if (status === null || status >= 400 || !Array.isArray(response))
+                {
+                    throw new Error(response?.message || response || 'Failed to load options');
+                }
+                values = response;
+            }
+            catch (error)
+            {
+                this.#handleError(error);
+                return;
+            }
+
+            // sort by sortOrder so the dropdown matches the admin ordering
+            const ordered = values.slice().sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+            for (const v of ordered)
+            {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                // label falls back to canonicalName until the values read path carries translations
+                opt.textContent = v.label || v.canonicalName || v.id;
+                valueSelect.appendChild(opt);
+            }
+            valueSelect.disabled = false;
+        };
+
+        if (this.#enumTypeId)
+        {
+            // enumerator fixed up-front (dedicated trigger): only the value dropdown is needed
+            await loadValues(this.#enumTypeId);
+            this.#innerContainer.appendChild(valueSelect);
+            valueSelect.focus();
+        }
+        else
+        {
+            // generic "add property": pick the enumerator first, then a value from it
+            let enumerators;
+            try
+            {
+                const [status, response] = await this.#apiClient.API_GET('/api/v3/data-enumerators');
+                if (status === null || status >= 400 || !Array.isArray(response))
+                {
+                    throw new Error(response?.message || response || 'Failed to load enumerators');
+                }
+                enumerators = response;
+            }
+            catch (error)
+            {
+                this.#handleError(error);
+                return;
+            }
+
+            if (enumerators.length === 0)
+            {
+                const warning = document.createElement('span');
+                warning.innerText = await Localisation.translate('No enumerators are available.');
+                this.#innerContainer.appendChild(warning);
+                return;
+            }
+
+            const enumSelect = document.createElement('select');
+            enumSelect.classList.add('property-input');
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = await Localisation.translate('Choose a type...');
+            placeholder.disabled = true;
+            placeholder.selected = true;
+            enumSelect.appendChild(placeholder);
+
+            const orderedEnums = enumerators.slice().sort((a, b) =>
+                (a.canonicalName || a.name || '').localeCompare(b.canonicalName || b.name || ''));
+            for (const en of orderedEnums)
+            {
+                const opt = document.createElement('option');
+                opt.value = en.id;
+                opt.textContent = en.canonicalName || en.name || en.id;
+                enumSelect.appendChild(opt);
+            }
+
+            enumSelect.addEventListener('change', () => loadValues(enumSelect.value));
+
+            this.#innerContainer.appendChild(enumSelect);
+            this.#innerContainer.appendChild(valueSelect);
+            enumSelect.focus();
+        }
+
+        this.#okButton.addEventListener('click', async (e) =>
+        {
+            e.preventDefault();
+
+            if (!valueSelect.value)
+            {
+                new ToastNotification(
+                    await Localisation.translate('Please choose a value'),
+                    'alert-circle',
+                    'error'
+                );
+                return;
+            }
+
+            try
+            {
+                const response = await this.#saveContent(valueSelect.value, window.ENUM_REF_CONTENT_TYPE, 'selection');
                 this.#handleSuccess(response);
             } catch (error)
             {
