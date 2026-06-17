@@ -240,16 +240,16 @@ final class APIInteractions
         // Handle other HTTP errors
         if ($statusCode >= 400)
         {
-            error_log("API Error: Status $statusCode, Response: $body");
+            error_log("API Error: Status $statusCode on {$this->lastMethod} {$this->lastEndpoint}, Response: $body");
         }
 
-        if($decodeAsJSON)
+        if($statusCode != 204 &&  $decodeAsJSON)
         {
             $responsePayload = json_decode($body, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 PageBuilder::Render(
-                    template: '/ErrorPage/ApiErrorPage.html.twig',
+                    template: '/ErrorPages/FatalApiFailureErrorPage.html.twig',
                     variables: [
                         'ErrorMessage' => json_last_error_msg(),
                     ],
