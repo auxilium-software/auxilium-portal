@@ -820,9 +820,9 @@
                 const entry = log[i];
                 html +=
                     '<li class="audit-list__item">'
-                        + '<span class="audit-list__time">' + formatDateTime(entry.timestamp) + '</span>'
+                        + '<span class="audit-list__time">' + formatDateTime(entry.createdAt) + '</span>'
                         + '<span class="audit-list__action">'
-                            + '<span class="audit-list__actor">' + escapeHtml(entry.actor || 'System') + '</span> '
+                            + '<span class="audit-list__actor">' + escapeHtml(entry.createdByName || 'unknown') + '</span> '
                             + escapeHtml(entry.description || entry.action || '')
                         + '</span>'
                     + '</li>';
