@@ -17,4 +17,10 @@ class CasePropertyManager extends BasePropertyManager
         const manager = new BasePropertyManager(`/api/v3/cases/${userId}/additional_properties`);
         return manager.deleteProperty(propertyKey, displayName);
     }
+
+    static async editEnumProperty(caseId, propertyKey, currentValueId, enumTypeId)
+    {
+        const manager = new BasePropertyManager(`/api/v3/cases/${caseId}/additional_properties`);
+        return manager.editEnumProperty(propertyKey, currentValueId, enumTypeId);
+    }
 }

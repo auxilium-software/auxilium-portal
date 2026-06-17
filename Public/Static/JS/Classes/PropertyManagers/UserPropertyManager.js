@@ -5,7 +5,6 @@ class UserPropertyManager extends BasePropertyManager
         super(`/api/v3/users/${userId}/additional_properties`);
     }
 
-
     static async editProperty(userId, propertyKey, currentContent)
     {
         const manager = new BasePropertyManager(`/api/v3/users/${userId}/additional_properties`);
@@ -16,5 +15,11 @@ class UserPropertyManager extends BasePropertyManager
     {
         const manager = new BasePropertyManager(`/api/v3/users/${userId}/additional_properties`);
         return manager.deleteProperty(propertyKey, displayName);
+    }
+
+    static async editEnumProperty(userId, propertyKey, currentValueId, enumTypeId)
+    {
+        const manager = new BasePropertyManager(`/api/v3/users/${userId}/additional_properties`);
+        return manager.editEnumProperty(propertyKey, currentValueId, enumTypeId);
     }
 }
