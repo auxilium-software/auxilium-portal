@@ -1,6 +1,4 @@
 
-window.ENUM_REF_CONTENT_TYPE = window.ENUM_REF_CONTENT_TYPE || 'application/x-auxilium-data-enumumerator-value-id';
-
 class BasePropertyManager
 {
     constructor(basePath)
