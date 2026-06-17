@@ -1,0 +1,206 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph ph-database"></i>
+            {{ "MariaDB"|translate }}
+            <span class="page-title__sub">{{ "Manage the MariaDB service"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button type="button" class="form-btn" onclick="loadAll()">
+                <i class="ph ph-arrow-clockwise"></i> {{ "Refresh"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-db-current">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Current Size"|translate }}</div>
+            <div class="stat-card__change" id="stat-db-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-db-oldest">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Oldest Reading"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-container__header">
+            {{ "Database Size Over Time"|translate }}
+        </div>
+        <div class="chart-container__body">
+            <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
+                <canvas id="dbChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-container__footer" id="dbChartFooter">
+            <span></span>
+            <span>{{ "Loading..."|translate }}</span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__header">
+            <span><i class="ph ph-database"></i> {{ "Size History"|translate }}</span>
+        </div>
+        <div class="panel__body" style="padding: 0; max-height: 400px; overflow-y: auto;">
+            <table class="admin-table admin-table--compact">
+                <thead>
+                <tr>
+                    <th>{{ "Recorded At"|translate }}</th>
+                    <th>{{ "Size"|translate }}</th>
+                    <th>{{ "Change"|translate }}</th>
+                </tr>
+                </thead>
+                <tbody id="dbTableBody">
+                <tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "Loading..."|translate }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/Static/JS/General/ChartJSConfig.js"></script>
+    <script>
+        const api = new SystemMetricController();
+
+        let dbChart = null;
+
+        function formatBytes(bytes)
+        {
+            if (bytes === null || bytes === undefined) return '-';
+            if (bytes >= 1_073_741_824) return (bytes / 1_073_741_824).toFixed(2) + ' GB';
+            if (bytes >= 1_048_576)     return (bytes / 1_048_576).toFixed(2) + ' MB';
+            if (bytes >= 1_024)         return (bytes / 1_024).toFixed(2) + ' KB';
+            return bytes + ' B';
+        }
+
+        function formatDate(iso)
+        {
+            if (!iso) return '-';
+            const d = new Date(iso);
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function changeBadge(current, previous)
+        {
+            if (previous === null || previous === undefined) return '-';
+            const delta = current - previous;
+            if (delta === 0) return '<span class="badge badge--user">{{ "No change"|translate }}</span>';
+            const sign = delta > 0 ? '+' : '';
+            const cls  = delta > 0 ? 'badge--inactive' : 'badge--active';
+            return `<span class="badge ${cls}">${sign}${formatBytes(delta)}</span>`;
+        }
+
+        async function loadAll()
+        {
+            try
+            {
+                const data = await api.GetDatabaseSizeMetrics();
+                const metrics = data.metrics;
+
+                // stat cards - API returns newest-first
+                const current = metrics[0]?.value ?? null;
+                const oldest  = metrics[metrics.length - 1]?.value ?? null;
+                const prev    = metrics[1]?.value ?? null;
+
+                document.getElementById('stat-db-current').textContent = formatBytes(current);
+                document.getElementById('stat-db-oldest').textContent  = formatBytes(oldest);
+
+                const changeEl = document.getElementById('stat-db-change');
+                if (current !== null && prev !== null)
+                {
+                    const delta = current - prev;
+                    if (delta > 0)
+                    {
+                        changeEl.className   = 'stat-card__change stat-card__change--up';
+                        changeEl.textContent = '▲ ' + formatBytes(delta) + ' {{ "since last reading"|translate }}';
+                    }
+                    else if (delta < 0)
+                    {
+                        changeEl.className   = 'stat-card__change stat-card__change--down';
+                        changeEl.textContent = '▼ ' + formatBytes(Math.abs(delta)) + ' {{ "since last reading"|translate }}';
+                    }
+                    else
+                    {
+                        changeEl.className   = 'stat-card__change';
+                        changeEl.textContent = '{{ "No change since last reading"|translate }}';
+                    }
+                }
+
+                // chart - reverse to chronological order
+                const ordered = [...metrics].reverse();
+                if (dbChart) dbChart.destroy();
+                dbChart = AdminChart.line(
+                        'dbChart',
+                        ordered.map(m => formatDate(m.createdAt)),
+                        [{
+                            label: '{{ "Size"|translate }}',
+                            data: ordered.map(m => m.value),
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                        }],
+                        {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => ' ' + formatBytes(ctx.parsed.y)
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: { callback: value => formatBytes(value) }
+                                }
+                            }
+                        }
+                );
+
+                document.getElementById('dbChartFooter').innerHTML =
+                        '<span>' + ordered.length + ' {{ "readings"|translate }}</span>' +
+                        '<span>{{ "Last updated"|translate }}: ' + formatDate(ordered[ordered.length - 1]?.createdAt) + '</span>';
+
+                // history table
+                const tbody = document.getElementById('dbTableBody');
+                if (!metrics.length)
+                {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "No data yet"|translate }}</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < metrics.length; i++)
+                {
+                    html += `<tr>
+                        <td>${formatDate(metrics[i].createdAt)}</td>
+                        <td>${formatBytes(metrics[i].value)}</td>
+                        <td>${changeBadge(metrics[i].value, metrics[i + 1]?.value ?? null)}</td>
+                    </tr>`;
+                }
+                tbody.innerHTML = html;
+            }
+            catch (err)
+            {
+                console.error('Failed to load MariaDB metrics:', err);
+                new ToastNotification(
+                        await Localisation.translate('Failed to load MariaDB metrics'),
+                        'warning-circle',
+                        'error'
+                );
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAll);
+    </script>
+{% endblock %}
