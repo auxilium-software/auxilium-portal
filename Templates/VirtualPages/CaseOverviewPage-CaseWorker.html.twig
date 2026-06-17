@@ -50,10 +50,12 @@
 
                                     e.preventDefault();
 
-                                    const type = trigger.dataset.type;
+                                    const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
                                     const resource = trigger.dataset.resource;
 
-                                    const win = await NewPropertyPopup.create(type, resource, true);
+                                    const enumTypeId = trigger.dataset.enumTypeId || null;
+
+                                    const win = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId);
                                     document.getElementById('main-content').after(win.render());
                                     win.focus();
                                     win.onSuccess(() => window.location.reload());
@@ -64,20 +66,31 @@
                         <dl id="properties-list">
                             {% for property_name, property_data in CaseDetails.additionalProperties %}
                                 {% if not (property_name in hidden_props) %}
-                                    <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name) }}</dt>
-                                    <dd data-property-key="{{ property_name }}">
-                                        <span class="property-content">{{ property_data.content }}</span>
-                                        <a class="edit-icon inline-icon"
-                                           title="Remove property"
-                                           href="javascript:void(0)"
-                                           onclick="CasePropertyManager.editProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
-                                        </a>
-                                        <a class="delete-icon inline-icon"
-                                           title="Remove property"
-                                           href="javascript:void(0)"
-                                           onclick="CasePropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
-                                        </a>
-                                    </dd>
+                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-reference' %}
+                                        <dt data-property-key="{{ property_name }}">{{ property_data.enumDisplayName|default(property_data.originalName|default(property_name)) }}</dt>
+                                        <dd data-property-key="{{ property_name }}">
+                                            <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
+                                            <a class="edit-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.originalName|default(property_name)|e('js') }}')"></a>
+                                        </dd>
+                                    {% else %}
+                                        <dt data-property-key="{{ property_name }}">{{ property_data.pretty_name|default(property_name) }}</dt>
+                                        <dd data-property-key="{{ property_name }}">
+                                            <span class="property-content">{{ property_data.content }}</span>
+                                            <a class="edit-icon inline-icon"
+                                               title="Remove property"
+                                               href="javascript:void(0)"
+                                               onclick="CasePropertyManager.editProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.content }}')">
+                                            </a>
+                                            <a class="delete-icon inline-icon"
+                                               title="Remove property"
+                                               href="javascript:void(0)"
+                                               onclick="CasePropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
+                                            </a>
+                                        </dd>
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </dl>
