@@ -1,102 +1,50 @@
 class APIInteractions
 {
-    #refreshPromise = null; // Prevent multiple simultaneous refresh attempts
-
-    #getHeaders(method, totpCode=null)
+    #getHeaders(method, totpCode = null)
     {
-        const headers = {
-            "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),
-            "credentials": 'include',
-        };
+        const headers = {};
 
         if (method === 'POST' || method === 'PATCH' || method === 'PUT')
         {
-            headers["Content-Type"] = "application/json";
+            headers['Content-Type'] = 'application/json';
         }
 
         if (totpCode !== null)
         {
-            headers['X-TOTP-Code'] =  totpCode;
+            headers['X-TOTP-Code'] = totpCode;
         }
 
         return headers;
     }
 
-    async #refreshAccessToken()
-    {
-        if (this.#refreshPromise)
-        {
-            return await this.#refreshPromise;
-        }
-
-        this.#refreshPromise = (async () => {
-            try
-            {
-                const response = await fetch(`/API/BFFAPIProxy/authentication/refresh`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok)
-                {
-                    window.location.href = '/login';
-                    throw new Error('Session expired');
-                }
-
-                const data = await response.json();
-                CookieUtilities.setCookie("access_token", data.accessToken, 30);
-
-                return true;
-            }
-            catch (error)
-            {
-                window.location.href = '/login';
-                throw error;
-            }
-            finally
-            {
-                this.#refreshPromise = null;
-            }
-        })();
-
-        return await this.#refreshPromise;
-    }
-
-    async #apiRequest(method, target, useAuth, payload = null, isRetry = false, totpCode = null)
+    async #apiRequest(method, target, payload = null, totpCode = null)
     {
         try
         {
             const options = {
-                method: method,
-                headers: this.#getHeaders(method, totpCode),
-                body: payload ? JSON.stringify(payload) : null,
+                method:      method,
+                headers:     this.#getHeaders(method, totpCode),
                 credentials: 'include',
             };
 
+            if (payload !== null)
+            {
+                options.body = JSON.stringify(payload);
+            }
+
             const response = await fetch(`/API/BFFAPIProxy${target}`, options);
 
-            if (response.status === 401 && useAuth && !isRetry)
+            // 401 means the BFF already attempted a refresh, and it failed, which means that the session has genuinely expired, so redirect to the login page
+            if (response.status === 401)
             {
-                await this.#refreshAccessToken();
-                return await this.#apiRequest(
-                    method,
-                    target,
-                    useAuth,
-                    payload,
-                    true,
-                    totpCode
-                );
+                window.location.href = '/login';
+                return [401, null];
             }
 
-            /*
-            if (!response.ok)
+            if(response.status === 204)
             {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return [response.status, null];
             }
-            */
 
             return [response.status, await response.json()];
         }
@@ -106,54 +54,57 @@ class APIInteractions
         }
     }
 
-    async API_PATCH(target, payload, useAuth = true, totpCode = null)
+    async API_GET(target, totpCode = null)
     {
-        return await this.#apiRequest('PATCH', target, useAuth, payload, false, totpCode);
+        return await this.#apiRequest('GET', target, null, totpCode);
     }
 
-    async API_PUT(target, payload, useAuth = true, totpCode = null)
+    async API_POST(target, payload, totpCode = null)
     {
-        return await this.#apiRequest('PUT', target, useAuth, payload, false, totpCode);
+        return await this.#apiRequest('POST', target, payload, totpCode);
     }
 
-
-    async API_POST(target, payload, useAuth = true, totpCode = null)
+    async API_PATCH(target, payload, totpCode = null)
     {
-        return await this.#apiRequest('POST', target, useAuth, payload, false, totpCode);
+        return await this.#apiRequest('PATCH', target, payload, totpCode);
     }
 
-    async API_GET(target, useAuth = true, totpCode = null)
+    async API_PUT(target, payload, totpCode = null)
     {
-        return await this.#apiRequest('GET', target, useAuth, false, totpCode);
+        return await this.#apiRequest('PUT', target, payload, totpCode);
     }
 
-    async API_DELETE(target, useAuth = true, totpCode = null)
+    async API_DELETE(target, totpCode = null)
     {
-        return await this.#apiRequest('DELETE', target, useAuth, {}, false, totpCode);
+        return await this.#apiRequest('DELETE', target, {}, totpCode);
     }
 
-    async API_FILE_UPLOAD(target, file, description = null, useAuth = true, isRetry = false)
+    async API_FILE_UPLOAD(target, file, description = null)
     {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('description', description);
-
-        const response = await fetch(`/API/BFFAPIFileProxy${target}`, {
-            method: 'POST',
-            headers: {
-                "Authorization": "Bearer " + CookieUtilities.getCookie("access_token"),
-                "credentials": 'include',
-            },
-            body: formData,
-            credentials: 'include'
-        });
-
-        if (response.status === 401 && useAuth && !isRetry)
+        try
         {
-            await this.#refreshAccessToken();
-            return await this.API_FILE_UPLOAD(target, file, description, useAuth, true);
-        }
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('description', description);
 
-        return [response.status, await response.json()];
+            const response = await fetch(`/API/BFFAPIFileProxy${target}`, {
+                method:      'POST',
+                credentials: 'include',
+                body:        formData,
+                // no Content-Type header - browser sets it with the correct multipart boundary
+            });
+
+            if (response.status === 401)
+            {
+                window.location.href = '/login';
+                return [401, null];
+            }
+
+            return [response.status, await response.json()];
+        }
+        catch (error)
+        {
+            return [null, error.message];
+        }
     }
 }
