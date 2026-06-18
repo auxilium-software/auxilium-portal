@@ -3,10 +3,11 @@
     <id>OnboardNewCase</id>
     <title>
         <translation xml:lang="en-GB">Onboard a New Case</translation>
+        <translation xml:lang="cy-GB"></translation>
     </title>
     <subtitle>
-        <translation xml:lang="en-GB">This form will guide you through creating an account and starting a new case with us.
-        </translation>
+        <translation xml:lang="en-GB">This form will guide you through creating an account and starting a new case with us.</translation>
+        <translation xml:lang="cy-GB"></translation>
     </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
@@ -21,6 +22,7 @@
             <id>who_is_case_about</id>
             <title>
                 <translation xml:lang="en-GB">Which best describes your situation?</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -32,15 +34,18 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am applying for help myself.</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>MYSELF</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am helping someone else with their application.</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <secondaryLabel>
                                 <translation xml:lang="en-GB">I need ongoing access to manage the case on behalf of someone else.</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
@@ -50,6 +55,7 @@
                             </primaryLabel>
                             <secondaryLabel>
                                 <translation xml:lang="en-GB">I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
@@ -75,6 +81,7 @@
                     and that you consent to us contacting you once your form has been received.
 
                     Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
@@ -112,6 +119,7 @@
                     and that you consent to us contacting you once your form has been received.
 
                     Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>
                 or(
@@ -128,12 +136,14 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">They consent</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">They do not consent</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
@@ -150,9 +160,11 @@
             <id>consent_not_given</id>
             <title>
                 <translation xml:lang="en-GB">Data processing consent is required</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Data consent is required.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
             <abandonForm>true</abandonForm>
@@ -168,6 +180,7 @@
             <id>contact_details</id>
             <title>
                 <translation xml:lang="en-GB">Your contact details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>
                 and(
@@ -182,6 +195,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Name</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -190,6 +204,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Telephone Number</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -199,6 +214,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -207,9 +223,11 @@
             <id>contact_details_for_individual_applying_behalf_of</id>
             <title>
                 <translation xml:lang="en-GB">Contact details for individual you are applying on behalf of</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Please enter as the contact details for the person you are applying on behalf of.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>
                 and(
@@ -227,6 +245,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Name</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -235,6 +254,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Telephone Number</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -244,6 +264,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -257,6 +278,7 @@
             <id>about_you</id>
             <title>
                 <translation xml:lang="en-GB">About You</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>
                 and(
@@ -273,18 +295,21 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Female</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Male</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Other</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>other</value>
                         </option>
@@ -296,6 +321,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Ethnic group</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -304,6 +330,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Date of birth</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -313,6 +340,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">How did you find out about our service?</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -321,10 +349,11 @@
             <id>about_individual_applying_behalf_of</id>
             <title>
                 <translation xml:lang="en-GB">About individual you are applying on behalf of</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <description>
-                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.
-                </translation>
+                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>
                 and(
@@ -344,18 +373,21 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Female</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Male</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Other</translation>
+                                <translation xml:lang="cy-GB"></translation>
                             </primaryLabel>
                             <value>other</value>
                         </option>
@@ -367,6 +399,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Ethnic group</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -375,6 +408,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Date of birth</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -384,6 +418,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">How did you find out about our service?</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -397,6 +432,7 @@
             <id>login_details</id>
             <title>
                 <translation xml:lang="en-GB">Create your Login details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
@@ -406,6 +442,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Email Address</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -414,6 +451,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Confirm Email Address</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -422,6 +460,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Password</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -430,6 +469,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Confirm Password</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -443,9 +483,11 @@
             <id>email_addresses_not_equal</id>
             <title>
                 <translation xml:lang="en-GB">Email addresses do not match.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Please ensure you enter the same email address into both fields.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>not(equals($formData["email_address"],$formData["email_address_confirm"]))</renderIf>
             <abandonForm>true</abandonForm>
@@ -456,9 +498,11 @@
             <id>passwords_not_equal</id>
             <title>
                 <translation xml:lang="en-GB">Passwords do not match.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Please ensure you enter the same password into both fields.</translation>
+                <translation xml:lang="cy-GB"></translation>
             </description>
             <renderIf>not(equals($formData["password"],$formData["password_confirm"]))</renderIf>
             <abandonForm>true</abandonForm>
@@ -474,6 +518,7 @@
             <id>case_details</id>
             <title>
                 <translation xml:lang="en-GB">Case details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
@@ -483,6 +528,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Case Title</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -492,6 +538,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Case Description</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -513,6 +560,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Beneficiary Details</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>who_is_case_about</jumpToPage>
                 <if>true</if>
@@ -524,24 +572,28 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">User</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$target</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Name</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["full_name"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Telephone Number</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["telephone_number"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Address</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["full_address"]</value>
                     </item>
@@ -556,6 +608,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Beneficiary Details</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>about_you</jumpToPage>
                 <if>true</if>
@@ -567,18 +620,21 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Gender</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["gender"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Ethic Group</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["ethnic_group"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Date of Birth</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["date_of_birth"]</value>
                     </item>
@@ -596,6 +652,7 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Name</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["full_name"]</value>
                     </item>
@@ -605,6 +662,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Case Description</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>case_details</jumpToPage>
                 <if>true</if>

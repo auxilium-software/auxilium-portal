@@ -17,7 +17,7 @@
   Icon: briefcase
   HREF: /admin-console/object-management/case-management
 
-- Label: Enumerator Management
+- Label: Data Enumerator Management
   Type: HREF
   Icon: gear
   HREF: /admin-console/object-management/enumerator-management

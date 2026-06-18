@@ -3,9 +3,11 @@
     <id>Survey-ScreeningUnmetLegalNeedsInVeterans-ProfessionalsAndCaseworkers</id>
     <title>
         <translation xml:lang="en-GB">Screening Unmet Legal Needs in Veterans - Professionals and Caseworkers</translation>
+        <translation xml:lang="cy-GB"></translation>
     </title>
     <subtitle>
         <translation xml:lang="en-GB">This screening tool is meant to explore whether a veteran has unmet legal issues, whether they realise it or not. You should submit the form whether you or the veteran need help or not.</translation>
+        <translation xml:lang="cy-GB"></translation>
     </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
@@ -20,6 +22,7 @@
             <id>organisation_details</id>
             <title>
                 <translation xml:lang="en-GB">Organisation Details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -29,6 +32,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Name of organisation referring</translation>
+                        <translation xml:lang="cy-GB">Enw'r sefydliad sy'n cyfeirio</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -36,9 +40,8 @@
                     <type>TEXT_FIELD</type>
                     <required>true</required>
                     <primaryLabel>
-                        <translation xml:lang="en-GB">When did you first start to have help from the referring
-                            organisation?
-                        </translation>
+                        <translation xml:lang="en-GB">When did you first start to have help from the referring organisation?</translation>
+                        <translation xml:lang="cy-GB">Pa bryd y gwnaethoch chi ddechrau cael help gan y sefydliad cyfeirio am y tro cyntaf?</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -48,9 +51,11 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Are you completing this form as part of a drop in?</translation>
+                        <translation xml:lang="cy-GB">Ydych chi'n llenwi'r ffurflen hon fel rhan o sesiwn alw heibio?</translation>
                     </primaryLabel>
                     <secondaryLabel>
                         <translation xml:lang="en-GB">If so, please tell us where your drop in is located.</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </secondaryLabel>
                 </component>
             </components>
@@ -61,6 +66,7 @@
             <id>your_details</id>
             <title>
                 <translation xml:lang="en-GB">Your Details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -70,6 +76,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Your year of birth.</translation>
+                        <translation xml:lang="cy-GB">Eich blwyddyn geni.</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -78,6 +85,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Your gender</translation>
+                        <translation xml:lang="cy-GB">Eich rhyw</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -86,23 +94,27 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Are you employed?</translation>
+                        <translation xml:lang="cy-GB">Ydych chi'n gyflogedig?</translation>
                     </primaryLabel>
                     <options>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Yes</translation>
+                                <translation xml:lang="cy-GB">Ydw</translation>
                             </primaryLabel>
                             <value>YES</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No</translation>
+                                <translation xml:lang="cy-GB">Nac ydw</translation>
                             </primaryLabel>
                             <value>NO</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No answer</translation>
+                                <translation xml:lang="cy-GB">Dim ateb</translation>
                             </primaryLabel>
                             <value>NO_ANSWER</value>
                         </option>
@@ -116,9 +128,11 @@
             <id>do_any_of_the_below_apply_to_you</id>
             <title>
                 <translation xml:lang="en-GB">Do any of the below apply to you?</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <subtitle>
                 <translation xml:lang="en-GB">You can click more than one answer</translation>
+                <translation xml:lang="cy-GB"></translation>
             </subtitle>
             <renderIf>true</renderIf>
             <components>
@@ -128,75 +142,84 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Do any of the below apply to you?</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                     <haveOtherOption>true</haveOtherOption>
                     <options>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I have been injured in the armed forces</translation>
+                                <translation xml:lang="cy-GB">Rydw i wedi cael fy anafu yn y lluoedd arfog</translation>
                             </primaryLabel>
                             <value>I have been injured in the armed forces</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am being stopped from having a relationship with my child or children who are under 16</translation>
+                                <translation xml:lang="cy-GB">Rwy'n cael fy atal rhag cael perthynas gyda fy mhlentyn neu blant sydd o dan 16</translation>
                             </primaryLabel>
                             <value>I am being stopped from having a relationship with my child or children who are under 16</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I have to go to court soon</translation>
+                                <translation xml:lang="cy-GB">Mae'n rhaid i mi fynd i'r llys cyn bo hir</translation>
                             </primaryLabel>
                             <value>I have to go to court soon</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I have experienced domestic violence or have been accused of domestic violence</translation>
+                                <translation xml:lang="cy-GB">Rwyf wedi dioddef trais domestig neu wedi cael fy nghyhuddo o drais domestig</translation>
                             </primaryLabel>
                             <value>I have experienced domestic violence or have been accused of domestic violence</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am separating from my partner or spouse, or am afraid this might happen soon</translation>
+                                <translation xml:lang="cy-GB">Rydw i’n gwahanu oddi wrth fy mhartner neu ŵr/gwraig, neu mae arnaf ofn y gallai hynny ddigwydd cyn bo hir</translation>
                             </primaryLabel>
                             <value>I am separating from my partner or spouse, or am afraid this might happen soon</value>
                         </option>
                         <option>
                             <primaryLabel>
-                                <translation xml:lang="en-GB">I have been arrested or accused of something and I am afraid of what might happen
-                                </translation>
+                                <translation xml:lang="en-GB">I have been arrested or accused of something and I am afraid of what might happen</translation>
+                                <translation xml:lang="cy-GB">Rydw i wedi cael fy arestio neu fy nghyhuddo o rywbeth ac mae arnaf ofn beth allai ddigwydd</translation>
                             </primaryLabel>
                             <value>I have been arrested or accused of something and I am afraid of what might happen</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">A company is sending me threatening letters and I don't know what to do</translation>
+                                <translation xml:lang="cy-GB">Mae cwmni yn anfon llythyrau bygythiol ataf ac nid wyf yn gwybod beth i'w wneud</translation>
                             </primaryLabel>
                             <value>A company is sending me threatening letters and I don't know what to do</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I might become homeless or am being made homeless</translation>
+                                <translation xml:lang="cy-GB">Mae posibilrwydd y byddaf yn dod yn ddigartref neu'n cael fy ngwneud yn ddigartref</translation>
                             </primaryLabel>
                             <value>I might become homeless or am being made homeless</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I have made a complaint about someone or something</translation>
+                                <translation xml:lang="cy-GB">Rydw i wedi gwneud cwyn am rywun neu rywbeth</translation>
                             </primaryLabel>
                             <value>I have made a complaint about someone or something</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I have another problem</translation>
+                                <translation xml:lang="cy-GB">Mae gen i broblem arall</translation>
                             </primaryLabel>
                             <value>I have another problem</value>
                         </option>
                         <option>
                             <primaryLabel>
-                                <translation xml:lang="en-GB">No, I do not believe I currently have any issues that I
-                                    need help with
-                                </translation>
+                                <translation xml:lang="en-GB">No, I do not believe I currently have any issues that I need help with</translation>
+                                <translation xml:lang="cy-GB">Na, dydw i ddim yn credu fy mod i angen cymorth gydag unrhyw faterion ar hyn o bryd</translation>
                             </primaryLabel>
                             <value>No, I do not believe I currently have any issues that I need help with</value>
                         </option>
@@ -210,6 +233,7 @@
             <id>issue_details</id>
             <title>
                 <translation xml:lang="en-GB">Issue Details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -219,6 +243,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">When did the issue / the issues start?</translation>
+                        <translation xml:lang="cy-GB">Pryd ddechreuodd y mater / y materion?</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -227,9 +252,11 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Have you had legal advice on the issue?</translation>
+                        <translation xml:lang="cy-GB">Ydych chi wedi cael cyngor cyfreithiol ar y mater?</translation>
                     </primaryLabel>
                     <secondaryLabel>
                         <translation xml:lang="en-GB">If multiple please include all you have gotten legal advice for.</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </secondaryLabel>
                 </component>
             </components>
@@ -240,6 +267,7 @@
             <id>did_you_know</id>
             <title>
                 <translation xml:lang="en-GB">Did you know?</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -249,23 +277,27 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Did you know that all of these are considered legal issues you could get legal advice for?</translation>
+                        <translation xml:lang="cy-GB">Oeddech chi'n gwybod bod pob un o'r rhain yn cael eu hystyried yn faterion cyfreithiol y gallech chi gael cyngor cyfreithiol arnynt?</translation>
                     </primaryLabel>
                     <options>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Yes</translation>
+                                <translation xml:lang="cy-GB">Ydw</translation>
                             </primaryLabel>
                             <value>YES</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No</translation>
+                                <translation xml:lang="cy-GB">Nac ydw</translation>
                             </primaryLabel>
                             <value>NO</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No answer</translation>
+                                <translation xml:lang="cy-GB">Dim ateb</translation>
                             </primaryLabel>
                             <value>NO_ANSWER</value>
                         </option>
@@ -276,9 +308,8 @@
                     <type>TEXT_FIELD</type>
                     <required>false</required>
                     <primaryLabel>
-                        <translation xml:lang="en-GB">If you said no, which ones didn't you know counted as potential
-                            legal issues?
-                        </translation>
+                        <translation xml:lang="en-GB">If you said no, which ones didn't you know counted as potential legal issues?</translation>
+                        <translation xml:lang="cy-GB">Os mai na yw eich ateb, pa faterion yw'r rhai nad oeddech chi'n gwybod eu bod yn cyfrif fel materion cyfreithiol posib?</translation>
                     </primaryLabel>
                     <secondaryLabel/>
                 </component>
@@ -290,6 +321,7 @@
             <id>issue_details</id>
             <title>
                 <translation xml:lang="en-GB">Issue Details</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -299,29 +331,34 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Would you like to talk in confidence with a legal charity about it, free of charge?</translation>
+                        <translation xml:lang="cy-GB">Hoffech chi siarad yn gyfrinachol ag elusen gyfreithiol am y mater, yn rhad ac am ddim?</translation>
                     </primaryLabel>
                     <options>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Yes</translation>
+                                <translation xml:lang="cy-GB">Ydw</translation>
                             </primaryLabel>
                             <value>YES</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No - I don't think I need this service</translation>
+                                <translation xml:lang="cy-GB">Na - dydw i ddim yn credu bod angen y gwasanaeth hwn arnaf</translation>
                             </primaryLabel>
                             <value>NO_DONT_NEED_SERVICE</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No - I don't think I need this service, but I think it would help other veterans</translation>
+                                <translation xml:lang="cy-GB">Na - dydw i ddim yn credu bod angen y gwasanaeth hwn arnaf, ond rwy'n credu y byddai'n helpu cyn-filwyr eraill</translation>
                             </primaryLabel>
                             <value>NO_DONT_NEED_SERVICE_BUT_MIGHT_HELP_OTHERS</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">No answer</translation>
+                                <translation xml:lang="cy-GB">Dim ateb</translation>
                             </primaryLabel>
                             <value>NO_ANSWER</value>
                         </option>
@@ -348,6 +385,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Organisation Details</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>organisation_details</jumpToPage>
                 <if>true</if>
@@ -359,18 +397,21 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Name of organisation referring</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["name_of_organisation_referring"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">When did you first start to have help from the referring organisation?</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["when_did_you_first_start_to_have_help_from_referring_organisation"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Are you completing this form as part of a drop in?</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["are_you_completing_this_form_as_part_of_a_drop_in"]</value>
                     </item>
@@ -381,6 +422,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Your Details</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>your_details</jumpToPage>
                 <if>true</if>
@@ -391,19 +433,22 @@
                 <dictionary>
                     <item>
                         <key>
-                            <translation xml:lang="en-GB">Your year of birth</translation>
+                            <translation xml:lang="en-GB">Your year of birth.</translation>
+                            <translation xml:lang="cy-GB">Eich blwyddyn geni.</translation>
                         </key>
                         <value>$formData["your_year_of_birth"]</value>
                     </item>
                     <item>
                         <key>
-                            <translation xml:lang="en-GB">Your gender</translation>
+                            <translation xml:lang="en-GB">Your gender.</translation>
+                            <translation xml:lang="cy-GB">Eich rhyw.</translation>
                         </key>
                         <value>$formData["your_gender"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Are you employed?</translation>
+                            <translation xml:lang="cy-GB">Ydych chi'n gyflogedig?</translation>
                         </key>
                         <value>$formData["are_you_employed"]</value>
                     </item>
@@ -414,6 +459,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Issues That Apply</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>do_any_of_the_below_apply_to_you</jumpToPage>
                 <if>true</if>
@@ -425,6 +471,7 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Do any of the below apply to you?</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>do_any_of_the_below_apply_to_you</value>
                     </item>
@@ -435,6 +482,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Issue Details</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>issue_details</jumpToPage>
                 <if>true</if>
@@ -446,12 +494,14 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">When did the issue / the issues start?</translation>
+                            <translation xml:lang="cy-GB">Pryd ddechreuodd y mater / y materion?</translation>
                         </key>
                         <value>$formData["when_did_the_issues_start"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Have you had legal advice on the issue?</translation>
+                            <translation xml:lang="cy-GB">Ydych chi wedi cael cyngor cyfreithiol ar y mater?</translation>
                         </key>
                         <value>$formData["have_you_had_legal_advice_on_the_issue"]</value>
                     </item>
@@ -462,6 +512,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Awareness</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>did_you_know</jumpToPage>
                 <if>true</if>
@@ -473,12 +524,14 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Did you know that all of these are considered legal issues you could get legal advice for?</translation>
+                            <translation xml:lang="cy-GB">Oeddech chi'n gwybod bod pob un o'r rhain yn cael eu hystyried yn faterion cyfreithiol y gallech chi gael cyngor cyfreithiol arnynt?</translation>
                         </key>
                         <value>$formData["did_you_know_that_all_of_these_are_considered_legal_issues_you_could_get_legal_advice_for"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">If you said no, which ones didn't you know counted as potential legal issues?</translation>
+                            <translation xml:lang="cy-GB">Os mai na yw eich ateb, pa faterion yw'r rhai nad oeddech chi'n gwybod eu bod yn cyfrif fel materion cyfreithiol posib?</translation>
                         </key>
                         <value>$formData["if_you_said_no_which_ones_didnt_you_know_counted_as_potential_legal_issues"]</value>
                     </item>
@@ -489,6 +542,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Next Steps</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </value>
                 <jumpToPage>issue_details</jumpToPage>
                 <if>true</if>
@@ -500,6 +554,7 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Would you like to talk in confidence with a legal charity about it free of charge?</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>$formData["would_you_like_to_talk_in_confidence_with_a_legal_charity_about_it_free_of_charge"]</value>
                     </item>

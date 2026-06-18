@@ -1,9 +1,6 @@
 
 ##################################################
 # A
-A company is sending me threatening letters and I don't know what to do:
-  cy-GB: Mae cwmni yn anfon llythyrau bygythiol ataf ac nid wyf yn gwybod beth i'w wneud
-
 About:
   cy-GB: Ynglŷn â
 
@@ -45,12 +42,6 @@ An unexpected error occurred. Please try again.:
 
 apply filters:
   cy-GB: defnyddio hidlwyr
-
-Are you completing this form as part of a drop in?:
-  cy-GB: Ydych chi'n llenwi'r ffurflen hon fel rhan o sesiwn alw heibio?
-
-Are you employed?:
-  cy-GB: Ydych chi'n gyflogedig?
 
 
 
@@ -144,9 +135,6 @@ Date of birth:
 Delete my Account:
   cy-GB: Dileu fy Nghyfrif
 
-Did you know that all of these are considered legal issues you could get legal advice for?:
-  cy-GB: Oeddech chi'n gwybod bod pob un o'r rhain yn cael eu hystyried yn faterion cyfreithiol y gallech chi gael cyngor cyfreithiol arnynt?
-
 
 
 ##################################################
@@ -217,9 +205,6 @@ Generate PDF:
 
 ##################################################
 # H
-Have you had legal advice on the issue?:
-  cy-GB: Ydych chi wedi cael cyngor cyfreithiol ar y mater?
-
 home:
   cy-GB: hafan
 
@@ -239,14 +224,8 @@ I've forgotten my password:
 I am applying for help myself.:
   cy-GB: Rwy'n gwneud cais am gymorth i mi fy hun.
 
-I am being stopped from having a relationship with my child or children who are under 16:
-  cy-GB: Rwy'n cael fy atal rhag cael perthynas gyda fy mhlentyn neu blant sydd o dan 16
-
 I am helping someone else with their application.:
   cy-GB: Rwy'n helpu rhywun arall gyda'u cais.
-
-I am separating from my partner or spouse, or am afraid this might happen soon:
-  cy-GB: Rydw i’n gwahanu oddi wrth fy mhartner neu ŵr/gwraig, neu mae arnaf ofn y gallai hynny ddigwydd cyn bo hir
 
 I am referring someone.:
   cy-GB: Rwy'n cyfeirio rhywun.
@@ -257,35 +236,11 @@ I consent:
 I do not consent:
   cy-GB: Nid wyf yn rhoi caniatâd
 
-I have another problem:
-  cy-GB: Mae gen i broblem arall
-
-I have made a complaint about someone or something:
-  cy-GB: Rydw i wedi gwneud cwyn am rywun neu rywbeth
-
-I have been arrested or accused of something and I am afraid of what might happen:
-  cy-GB: Rydw i wedi cael fy arestio neu fy nghyhuddo o rywbeth ac mae arnaf ofn beth allai ddigwydd
-
-I have been injured in the armed forces:
-  cy-GB: Rydw i wedi cael fy anafu yn y lluoedd arfog
-
-I have experienced domestic violence or have been accused of domestic violence:
-  cy-GB: Rwyf wedi dioddef trais domestig neu wedi cael fy nghyhuddo o drais domestig
-
-I have to go to court soon:
-  cy-GB: Mae'n rhaid i mi fynd i'r llys cyn bo hir
-
-I might become homeless or am being made homeless:
-  cy-GB: Mae posibilrwydd y byddaf yn dod yn ddigartref neu'n cael fy ngwneud yn ddigartref
-
 I need ongoing access to manage the case on behalf of someone else.:
   cy-GB: Mae angen mynediad parhaus arnaf er mwyn rheoli'r achos ar ran rhywun arall.
 
 I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.:
   cy-GB: Mae angen i mi wneud y cyswllt cyntaf ar ran rhywun arall, ond ni fyddaf yn rheoli'r achos hwn yn barhaus.
-
-If you said no, which ones didn't you know counted as potential legal issues?:
-  cy-GB: Os mai na yw eich ateb, pa faterion yw'r rhai nad oeddech chi'n gwybod eu bod yn cyfrif fel materion cyfreithiol posib?
 
 
 
@@ -348,32 +303,17 @@ My Messages:
 
 ##################################################
 # N
-Name of organisation referring:
-  cy-GB: Enw'r sefydliad sy'n cyfeirio
-
 New Clients:
   cy-GB: Cleientiaid Newydd
 
 No:
   cy-GB: Nac ydw
 
-No, I do not believe I currently have any issues that I need help with:
-  cy-GB: Na, dydw i ddim yn credu fy mod i angen cymorth gydag unrhyw faterion ar hyn o bryd
-
-No answer:
-  cy-GB: Dim ateb
-
 No cases found:
   cy-GB: Ni chanfuwyd unrhyw achosion
 
 No ToDo entries:
   cy-GB: Dim Tasgau wedi eu Cofnodi
-
-No - I don't think I need this service:
-  cy-GB: Na - dydw i ddim yn credu bod angen y gwasanaeth hwn arnaf
-
-No - I don't think I need this service, but I think it would help other veterans:
-  cy-GB: Na - dydw i ddim yn credu bod angen y gwasanaeth hwn arnaf, ond rwy'n credu y byddai'n helpu cyn-filwyr eraill
 
 NEW:
   cy-GB: NEWYDD
@@ -559,15 +499,6 @@ view details:
 We only use cookies to record your choices, and allow access to our web portal. For more information please see our {privacy_policy} (opens in new tab).  We only place these cookies on your browser after you sign up or log in. If you don't consent to our use of these functional cookies, please do not sign up or log in.:
   cy-GB: Dim ond i gofnodi eich dewisiadau rydym ni'n defnyddio cwcis, ac i ganiatáu mynediad i'n porth gwe. Am fwy o wybodaeth gweler ein {privacy_policy} (agor mewn tab newydd).  Dim ond ar ôl i chi gofrestru neu fewngofnodi y byddwn yn gosod y cwcis hyn ar eich porwr. Os nad ydych yn caniatáu i'n defnydd o'r cwcis gweithredol hyn, peidiwch â chofrestru na mewngofnodi.
 
-When did the issue / the issues start?:
-  cy-GB: Pryd ddechreuodd y mater / y materion?
-
-When did you first start to have help from the referring organisation?:
-  cy-GB: Pa bryd y gwnaethoch chi ddechrau cael help gan y sefydliad cyfeirio am y tro cyntaf?
-
-Would you like to talk in confidence with a legal charity about it, free of charge?:
-  cy-GB: Hoffech chi siarad yn gyfrinachol ag elusen gyfreithiol am y mater, yn rhad ac am ddim?
-
 
 
 ##################################################
@@ -582,13 +513,6 @@ Yes:
 
 You cannot progress further in the form.:
   cy-GB: Ni allwch barhau ymhellach yn y ffurflen.
-
-Your gender:
-  cy-GB: Eich rhyw
-
-Your year of birth.:
-  cy-GB: Eich blwyddyn geni.
-
 
 
 ##################################################

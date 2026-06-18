@@ -5,7 +5,7 @@
         <translation xml:lang="en-GB">New Case</translation>
     </title>
     <subtitle>
-        <translation xml:lang="en-GB">This form will guide you through creating an account and starting a new case with us.</translation>
+        <translation xml:lang="en-GB">This form will guide you through starting a new case with us.</translation>
     </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
@@ -36,8 +36,7 @@
                         </option>
                         <option>
                             <primaryLabel>
-                                <translation xml:lang="en-GB">I am helping someone else with their application.
-                                </translation>
+                                <translation xml:lang="en-GB">I am helping someone else with their application.</translation>
                             </primaryLabel>
                             <secondaryLabel>
                                 <translation xml:lang="en-GB">I need ongoing access to manage the case on behalf of someone else.</translation>
@@ -70,9 +69,7 @@
                     opening a case and considering the information that you have provided.
 
                     Please confirm that you are happy for your data to be used for these purposes,
-                    and that you consent to us contacting you once your form has been received.
-
-                    Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
+                    and that you consent to us contacting you once your form has been received.</translation>
             </description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
@@ -218,8 +215,7 @@
                 <translation xml:lang="en-GB">About individual you are applying on behalf of</translation>
             </title>
             <description>
-                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.
-                </translation>
+                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.</translation>
             </description>
             <renderIf>
                 and(

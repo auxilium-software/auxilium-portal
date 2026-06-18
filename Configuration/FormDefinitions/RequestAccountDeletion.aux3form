@@ -3,9 +3,11 @@
     <id>RequestAccountDeletion</id>
     <title>
         <translation xml:lang="en-GB">Request Account Deletion</translation>
+        <translation xml:lang="cy-GB"></translation>
     </title>
     <subtitle>
         <translation xml:lang="en-GB">This form will guide you through requesting the deletion of your account.</translation>
+        <translation xml:lang="cy-GB"></translation>
     </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
@@ -20,6 +22,7 @@
             <id>reason</id>
             <title>
                 <translation xml:lang="en-GB">Reason</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -30,6 +33,7 @@
                     <required>false</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Reason (optional)</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -39,6 +43,7 @@
             <id>current_password</id>
             <title>
                 <translation xml:lang="en-GB">Current Password</translation>
+                <translation xml:lang="cy-GB"></translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -48,6 +53,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Current Password</translation>
+                        <translation xml:lang="cy-GB"></translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -63,6 +69,7 @@
                 <type>PARAGRAPH</type>
                 <title>
                     <translation xml:lang="en-GB">Reason</translation>
+                    <translation xml:lang="cy-GB"></translation>
                 </title>
                 <value>$formData["reason"]</value>
                 <if>true</if>
@@ -74,6 +81,7 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Password</translation>
+                            <translation xml:lang="cy-GB"></translation>
                         </key>
                         <value>[REDACTED]</value>
                     </item>
