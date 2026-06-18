@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <auxForm>
     <id>RequestAccountDeletion</id>
-    <title>Request Account Deletion</title>
-    <subtitle>This form will guide you through requesting the deletion of your account.</subtitle>
+    <title>
+        <translation xml:lang="en-GB">Request Account Deletion</translation>
+    </title>
+    <subtitle>
+        <translation xml:lang="en-GB">This form will guide you through requesting the deletion of your account.</translation>
+    </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
     <showReviewPage>true</showReviewPage>
@@ -14,7 +18,9 @@
     <pages>
         <page>
             <id>reason</id>
-            <title>Reason</title>
+            <title>
+                <translation xml:lang="en-GB">Reason</translation>
+            </title>
             <renderIf>true</renderIf>
             <components>
                 <component>
@@ -22,21 +28,27 @@
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>4</rows>
                     <required>false</required>
-                    <primaryLabel>Reason (optional)</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Reason (optional)</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
 
         <page>
             <id>current_password</id>
-            <title>Current Password</title>
+            <title>
+                <translation xml:lang="en-GB">Current Password</translation>
+            </title>
             <renderIf>true</renderIf>
             <components>
                 <component>
                     <id>current_password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Current Password</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Current Password</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -49,7 +61,9 @@
         <components>
             <component>
                 <type>PARAGRAPH</type>
-                <title>Reason</title>
+                <title>
+                    <translation xml:lang="en-GB">Reason</translation>
+                </title>
                 <value>$formData["reason"]</value>
                 <if>true</if>
             </component>
@@ -58,7 +72,9 @@
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>Password</key>
+                        <key>
+                            <translation xml:lang="en-GB">Password</translation>
+                        </key>
                         <value>[REDACTED]</value>
                     </item>
                 </dictionary>

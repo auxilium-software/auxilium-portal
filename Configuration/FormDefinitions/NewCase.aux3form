@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <auxForm>
-    <id>OnboardNewCase</id>
-    <title>Onboard a New Case</title>
-    <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
+    <id>NewCase</id>
+    <title>
+        <translation xml:lang="en-GB">New Case</translation>
+    </title>
+    <subtitle>
+        <translation xml:lang="en-GB">This form will guide you through creating an account and starting a new case with us.</translation>
+    </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>true</requireAuthentication>
     <showReviewPage>true</showReviewPage>
@@ -14,7 +18,9 @@
     <pages>
         <page>
             <id>who_is_case_about</id>
-            <title>Which best describes your situation?</title>
+            <title>
+                <translation xml:lang="en-GB">Which best describes your situation?</translation>
+            </title>
             <renderIf>true</renderIf>
             <components>
                 <component>
@@ -23,12 +29,19 @@
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>I am applying for help myself.</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I am applying for help myself.</translation>
+                            </primaryLabel>
                             <value>MYSELF</value>
                         </option>
                         <option>
-                            <primaryLabel>I am helping someone else with their application.</primaryLabel>
-                            <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I am helping someone else with their application.
+                                </translation>
+                            </primaryLabel>
+                            <secondaryLabel>
+                                <translation xml:lang="en-GB">I need ongoing access to manage the case on behalf of someone else.</translation>
+                            </secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
                         <!--
@@ -49,15 +62,17 @@
 
         <page>
             <id>consent</id>
-            <title>Data processing consent</title>
+            <title>
+                <translation xml:lang="en-GB">Data processing consent</translation>
+            </title>
             <description>
-                By completing these questions you consent to us processing your data,
-                opening a case and considering the information that you have provided.
+                <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
+                    opening a case and considering the information that you have provided.
 
-                Please confirm that you are happy for your data to be used for these purposes,
-                and that you consent to us contacting you once your form has been received.
+                    Please confirm that you are happy for your data to be used for these purposes,
+                    and that you consent to us contacting you once your form has been received.
 
-                Alternatively, confirm that your service user or beneficiary consents to the above.
+                    Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
             </description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
@@ -67,11 +82,15 @@
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>I consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I consent</translation>
+                            </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
-                            <primaryLabel>I do not consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I do not consent</translation>
+                            </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
                     </options>
@@ -80,20 +99,22 @@
         </page>
         <page>
             <id>consent</id>
-            <title>Data processing consent</title>
+            <title>
+                <translation xml:lang="en-GB">Data processing consent</translation>
+            </title>
             <description>
-                By completing these questions you consent to us processing your data,
-                opening a case and considering the information that you have provided.
+                <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
+                    opening a case and considering the information that you have provided.
 
-                Please confirm that you are happy for your data to be used for these purposes,
-                and that you consent to us contacting you once your form has been received.
+                    Please confirm that you are happy for your data to be used for these purposes,
+                    and that you consent to us contacting you once your form has been received.
 
-                Alternatively, confirm that your service user or beneficiary consents to the above.
+                    Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
             </description>
             <renderIf>
                 or(
-                    equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
-                    equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
                 )
             </renderIf>
             <components>
@@ -103,11 +124,15 @@
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>They consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">They consent</translation>
+                            </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
-                            <primaryLabel>They do not consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">They do not consent</translation>
+                            </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
                     </options>
@@ -121,9 +146,11 @@
 
         <page>
             <id>consent_not_given</id>
-            <title>Data processing consent is required</title>
+            <title>
+                <translation xml:lang="en-GB">Data processing consent is required</translation>
+            </title>
             <description>
-                Data consent is required, sorry lol.
+                <translation xml:lang="en-GB">Data processing consent is required for case creation.</translation>
             </description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
             <abandonForm>true</abandonForm>
@@ -137,8 +164,12 @@
 
         <page>
             <id>contact_details_for_individual_applying_behalf_of</id>
-            <title>Contact details for individual you are applying on behalf of</title>
-            <description>Please enter as the contact details for the person you are applying on behalf of.</description>
+            <title>
+                <translation xml:lang="en-GB">Contact details for individual you are applying on behalf of</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please enter as the contact details for the person you are applying on behalf of.</translation>
+            </description>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -153,20 +184,26 @@
                     <id>full_name</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Full Name</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Name</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>telephone_number</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Telephone Number</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Telephone Number</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>full_address</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>5</rows>
                     <required>true</required>
-                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -177,8 +214,13 @@
 
         <page>
             <id>about_individual_applying_behalf_of</id>
-            <title>About individual you are applying on behalf of</title>
-            <description>Please enter information for the person you are applying on behalf of.</description>
+            <title>
+                <translation xml:lang="en-GB">About individual you are applying on behalf of</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.
+                </translation>
+            </description>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -195,15 +237,21 @@
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>Female</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Female</translation>
+                            </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
-                            <primaryLabel>Male</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Male</translation>
+                            </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
-                            <primaryLabel>Other</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Other</translation>
+                            </primaryLabel>
                             <value>other</value>
                         </option>
                     </options>
@@ -212,20 +260,26 @@
                     <id>ethnic_group</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Ethnic group</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Ethnic group</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>date_of_birth</id>
                     <type>DATE_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Date of birth</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Date of birth</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>how_did_you_find_out_about_our_service</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>4</rows>
                     <required>true</required>
-                    <primaryLabel>How did you find out about our service?</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">How did you find out about our service?</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -236,7 +290,9 @@
 
         <page>
             <id>login_details</id>
-            <title>Login details</title>
+            <title>
+                <translation xml:lang="en-GB">Login details</translation>
+            </title>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -251,13 +307,17 @@
                     <id>email_address</id>
                     <type>EMAIL_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Email Address</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Email Address</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>raw_password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Password</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Password</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -268,21 +328,27 @@
 
         <page>
             <id>case_details</id>
-            <title>Case details</title>
+            <title>
+                <translation xml:lang="en-GB">Case details</translation>
+            </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
                     <id>case_title</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Case Title</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Case Title</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>case_description</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>12</rows>
                     <required>true</required>
-                    <primaryLabel>Case Description</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Case Description</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -301,7 +367,9 @@
         <components>
             <component>
                 <type>SUBHEADING</type>
-                <value>Beneficiary Details</value>
+                <value>
+                    <translation xml:lang="en-GB">Beneficiary Details</translation>
+                </value>
                 <jumpToPage>who_is_case_about</jumpToPage>
                 <if>true</if>
             </component>
@@ -310,19 +378,27 @@
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>User</key>
+                        <key>
+                            <translation xml:lang="en-GB">User</translation>
+                        </key>
                         <value>$target</value>
                     </item>
                     <item>
-                        <key>Full Name</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Name</translation>
+                        </key>
                         <value>$formData["full_name"]</value>
                     </item>
                     <item>
-                        <key>Telephone Number</key>
+                        <key>
+                            <translation xml:lang="en-GB">Telephone Number</translation>
+                        </key>
                         <value>$formData["telephone_number"]</value>
                     </item>
                     <item>
-                        <key>Full Address</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Address</translation>
+                        </key>
                         <value>$formData["full_address"]</value>
                     </item>
                 </dictionary>
@@ -334,7 +410,9 @@
 
             <component>
                 <type>SUBHEADING</type>
-                <value>Beneficiary Details</value>
+                <value>
+                    <translation xml:lang="en-GB">Beneficiary Details</translation>
+                </value>
                 <jumpToPage>about_you</jumpToPage>
                 <if>true</if>
             </component>
@@ -343,15 +421,21 @@
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>Gender</key>
+                        <key>
+                            <translation xml:lang="en-GB">Gender</translation>
+                        </key>
                         <value>$formData["gender"]</value>
                     </item>
                     <item>
-                        <key>Ethic Group</key>
+                        <key>
+                            <translation xml:lang="en-GB">Ethic Group</translation>
+                        </key>
                         <value>$formData["ethnic_group"]</value>
                     </item>
                     <item>
-                        <key>Date of Birth</key>
+                        <key>
+                            <translation xml:lang="en-GB">Date of Birth</translation>
+                        </key>
                         <value>$formData["date_of_birth"]</value>
                     </item>
                 </dictionary>
@@ -366,14 +450,18 @@
                 <if>not(exists($target))</if>
                 <dictionary>
                     <item>
-                        <key>Full Name</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Name</translation>
+                        </key>
                         <value>$formData["full_name"]</value>
                     </item>
                 </dictionary>
             </component>
             <component>
                 <type>SUBHEADING</type>
-                <value>Case Description</value>
+                <value>
+                    <translation xml:lang="en-GB">Case Description</translation>
+                </value>
                 <jumpToPage>case_details</jumpToPage>
                 <if>true</if>
             </component>

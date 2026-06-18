@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <auxForm>
     <id>OnboardNewCase</id>
-    <title>Onboard a New Case</title>
-    <subtitle>This form will guide you through creating an account and starting a new case with us.</subtitle>
+    <title>
+        <translation xml:lang="en-GB">Onboard a New Case</translation>
+    </title>
+    <subtitle>
+        <translation xml:lang="en-GB">This form will guide you through creating an account and starting a new case with us.
+        </translation>
+    </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
     <showReviewPage>true</showReviewPage>
@@ -14,7 +19,9 @@
     <pages>
         <page>
             <id>who_is_case_about</id>
-            <title>Which best describes your situation?</title>
+            <title>
+                <translation xml:lang="en-GB">Which best describes your situation?</translation>
+            </title>
             <renderIf>true</renderIf>
             <components>
                 <component>
@@ -23,17 +30,27 @@
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>I am applying for help myself.</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I am applying for help myself.</translation>
+                            </primaryLabel>
                             <value>MYSELF</value>
                         </option>
                         <option>
-                            <primaryLabel>I am helping someone else with their application.</primaryLabel>
-                            <secondaryLabel>I need ongoing access to manage the case on behalf of someone else.</secondaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I am helping someone else with their application.</translation>
+                            </primaryLabel>
+                            <secondaryLabel>
+                                <translation xml:lang="en-GB">I need ongoing access to manage the case on behalf of someone else.</translation>
+                            </secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
                         <option>
-                            <primaryLabel>I am referring someone.</primaryLabel>
-                            <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I am referring someone.</translation>
+                            </primaryLabel>
+                            <secondaryLabel>
+                                <translation xml:lang="en-GB">I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</translation>
+                            </secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
                     </options>
@@ -47,14 +64,18 @@
 
         <page>
             <id>consent</id>
-            <title>Data processing consent</title>
-            <description>By completing these questions you consent to us processing your data,
-opening a case and considering the information that you have provided.
+            <title>
+                <translation xml:lang="en-GB">Data processing consent</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
+                    opening a case and considering the information that you have provided.
 
-Please confirm that you are happy for your data to be used for these purposes,
-and that you consent to us contacting you once your form has been received.
+                    Please confirm that you are happy for your data to be used for these purposes,
+                    and that you consent to us contacting you once your form has been received.
 
-Alternatively, confirm that your service user or beneficiary consents to the above.</description>
+                    Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
+            </description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
                 <component>
@@ -63,11 +84,15 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>I consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I consent</translation>
+                            </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
-                            <primaryLabel>I do not consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I do not consent</translation>
+                            </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
                     </options>
@@ -76,15 +101,17 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
         </page>
         <page>
             <id>consent</id>
-            <title>Data processing consent</title>
+            <title>
+                <translation xml:lang="en-GB">Data processing consent</translation>
+            </title>
             <description>
-                By completing these questions you consent to us processing your data,
-                opening a case and considering the information that you have provided.
+                <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
+                    opening a case and considering the information that you have provided.
 
-                Please confirm that you are happy for your data to be used for these purposes,
-                and that you consent to us contacting you once your form has been received.
+                    Please confirm that you are happy for your data to be used for these purposes,
+                    and that you consent to us contacting you once your form has been received.
 
-                Alternatively, confirm that your service user or beneficiary consents to the above.
+                    Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
             </description>
             <renderIf>
                 or(
@@ -99,11 +126,15 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>They consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">They consent</translation>
+                            </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
-                            <primaryLabel>They do not consent</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">They do not consent</translation>
+                            </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
                     </options>
@@ -117,8 +148,12 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>consent_not_given</id>
-            <title>Data processing consent is required</title>
-            <description>Data consent is required.</description>
+            <title>
+                <translation xml:lang="en-GB">Data processing consent is required</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Data consent is required.</translation>
+            </description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
             <abandonForm>true</abandonForm>
             <components>
@@ -131,7 +166,9 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>contact_details</id>
-            <title>Your contact details</title>
+            <title>
+                <translation xml:lang="en-GB">Your contact details</translation>
+            </title>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -143,27 +180,37 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <id>full_name</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Full Name</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Name</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>telephone_number</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Telephone Number</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Telephone Number</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>full_address</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>5</rows>
                     <required>true</required>
-                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
         <page>
             <id>contact_details_for_individual_applying_behalf_of</id>
-            <title>Contact details for individual you are applying on behalf of</title>
-            <description>Please enter as the contact details for the person you are applying on behalf of.</description>
+            <title>
+                <translation xml:lang="en-GB">Contact details for individual you are applying on behalf of</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please enter as the contact details for the person you are applying on behalf of.</translation>
+            </description>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -178,20 +225,26 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <id>full_name</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Full Name</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Name</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>telephone_number</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Telephone Number</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Telephone Number</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>full_address</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>5</rows>
                     <required>true</required>
-                    <primaryLabel>Full Address, County, and Postcode</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -202,7 +255,9 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>about_you</id>
-            <title>About You</title>
+            <title>
+                <translation xml:lang="en-GB">About You</translation>
+            </title>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -216,15 +271,21 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>Female</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Female</translation>
+                            </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
-                            <primaryLabel>Male</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Male</translation>
+                            </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
-                            <primaryLabel>Other</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Other</translation>
+                            </primaryLabel>
                             <value>other</value>
                         </option>
                     </options>
@@ -233,27 +294,38 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <id>ethnic_group</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Ethnic group</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Ethnic group</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>date_of_birth</id>
                     <type>DATE_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Date of birth</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Date of birth</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>how_did_you_find_out_about_our_service</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>4</rows>
                     <required>true</required>
-                    <primaryLabel>How did you find out about our service?</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">How did you find out about our service?</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
         <page>
             <id>about_individual_applying_behalf_of</id>
-            <title>About individual you are applying on behalf of</title>
-            <description>Please enter information for the person you are applying on behalf of.</description>
+            <title>
+                <translation xml:lang="en-GB">About individual you are applying on behalf of</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.
+                </translation>
+            </description>
             <renderIf>
                 and(
                     equals($formData["data_processing_consent"],"CONSENT_GIVEN"),
@@ -270,15 +342,21 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <required>true</required>
                     <options>
                         <option>
-                            <primaryLabel>Female</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Female</translation>
+                            </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
-                            <primaryLabel>Male</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Male</translation>
+                            </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
-                            <primaryLabel>Other</primaryLabel>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Other</translation>
+                            </primaryLabel>
                             <value>other</value>
                         </option>
                     </options>
@@ -287,20 +365,26 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                     <id>ethnic_group</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Ethnic group</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Ethnic group</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>date_of_birth</id>
                     <type>DATE_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Date of birth</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Date of birth</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>how_did_you_find_out_about_our_service</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>4</rows>
                     <required>true</required>
-                    <primaryLabel>How did you find out about our service?</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">How did you find out about our service?</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -311,32 +395,42 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>login_details</id>
-            <title>Create your Login details</title>
+            <title>
+                <translation xml:lang="en-GB">Create your Login details</translation>
+            </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
                     <id>email_address</id>
                     <type>EMAIL_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Email Address</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Email Address</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>email_address_confirm</id>
                     <type>EMAIL_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Confirm Email Address</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Confirm Email Address</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>password</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Password</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Password</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>password_confirm</id>
                     <type>PASSWORD_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Confirm Password</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Confirm Password</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -347,8 +441,12 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>email_addresses_not_equal</id>
-            <title>Email addresses do not match.</title>
-            <description>Please ensure you enter the same email address into both fields.</description>
+            <title>
+                <translation xml:lang="en-GB">Email addresses do not match.</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please ensure you enter the same email address into both fields.</translation>
+            </description>
             <renderIf>not(equals($formData["email_address"],$formData["email_address_confirm"]))</renderIf>
             <abandonForm>true</abandonForm>
             <components>
@@ -356,8 +454,12 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
         </page>
         <page>
             <id>passwords_not_equal</id>
-            <title>Passwords do not match.</title>
-            <description>Please ensure you enter the same password into both fields.</description>
+            <title>
+                <translation xml:lang="en-GB">Passwords do not match.</translation>
+            </title>
+            <description>
+                <translation xml:lang="en-GB">Please ensure you enter the same password into both fields.</translation>
+            </description>
             <renderIf>not(equals($formData["password"],$formData["password_confirm"]))</renderIf>
             <abandonForm>true</abandonForm>
             <components>
@@ -370,21 +472,27 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
         <page>
             <id>case_details</id>
-            <title>Case details</title>
+            <title>
+                <translation xml:lang="en-GB">Case details</translation>
+            </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
                 <component>
                     <id>case_title</id>
                     <type>TEXT_FIELD</type>
                     <required>true</required>
-                    <primaryLabel>Case Title</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Case Title</translation>
+                    </primaryLabel>
                 </component>
                 <component>
                     <id>case_description</id>
                     <type>LARGE_TEXT_FIELD</type>
                     <rows>12</rows>
                     <required>true</required>
-                    <primaryLabel>Case Description</primaryLabel>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Case Description</translation>
+                    </primaryLabel>
                 </component>
             </components>
         </page>
@@ -403,7 +511,9 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
         <components>
             <component>
                 <type>SUBHEADING</type>
-                <value>Beneficiary Details</value>
+                <value>
+                    <translation xml:lang="en-GB">Beneficiary Details</translation>
+                </value>
                 <jumpToPage>who_is_case_about</jumpToPage>
                 <if>true</if>
             </component>
@@ -412,19 +522,27 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>User</key>
+                        <key>
+                            <translation xml:lang="en-GB">User</translation>
+                        </key>
                         <value>$target</value>
                     </item>
                     <item>
-                        <key>Full Name</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Name</translation>
+                        </key>
                         <value>$formData["full_name"]</value>
                     </item>
                     <item>
-                        <key>Telephone Number</key>
+                        <key>
+                            <translation xml:lang="en-GB">Telephone Number</translation>
+                        </key>
                         <value>$formData["telephone_number"]</value>
                     </item>
                     <item>
-                        <key>Full Address</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Address</translation>
+                        </key>
                         <value>$formData["full_address"]</value>
                     </item>
                 </dictionary>
@@ -436,7 +554,9 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
 
             <component>
                 <type>SUBHEADING</type>
-                <value>Beneficiary Details</value>
+                <value>
+                    <translation xml:lang="en-GB">Beneficiary Details</translation>
+                </value>
                 <jumpToPage>about_you</jumpToPage>
                 <if>true</if>
             </component>
@@ -445,15 +565,21 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                 <if>true</if>
                 <dictionary>
                     <item>
-                        <key>Gender</key>
+                        <key>
+                            <translation xml:lang="en-GB">Gender</translation>
+                        </key>
                         <value>$formData["gender"]</value>
                     </item>
                     <item>
-                        <key>Ethic Group</key>
+                        <key>
+                            <translation xml:lang="en-GB">Ethic Group</translation>
+                        </key>
                         <value>$formData["ethnic_group"]</value>
                     </item>
                     <item>
-                        <key>Date of Birth</key>
+                        <key>
+                            <translation xml:lang="en-GB">Date of Birth</translation>
+                        </key>
                         <value>$formData["date_of_birth"]</value>
                     </item>
                 </dictionary>
@@ -468,14 +594,18 @@ Alternatively, confirm that your service user or beneficiary consents to the abo
                 <if>not(exists($target))</if>
                 <dictionary>
                     <item>
-                        <key>Full Name</key>
+                        <key>
+                            <translation xml:lang="en-GB">Full Name</translation>
+                        </key>
                         <value>$formData["full_name"]</value>
                     </item>
                 </dictionary>
             </component>
             <component>
                 <type>SUBHEADING</type>
-                <value>Case Description</value>
+                <value>
+                    <translation xml:lang="en-GB">Case Description</translation>
+                </value>
                 <jumpToPage>case_details</jumpToPage>
                 <if>true</if>
             </component>
