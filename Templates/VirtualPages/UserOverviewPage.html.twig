@@ -49,9 +49,11 @@
 
                                     e.preventDefault();
 
+                                    // data-type may list several types (e.g. "PLAIN_TEXT,ENUM"); an array makes NewPropertyPopup show its type-chooser menu.
                                     const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
                                     const resource = trigger.dataset.resource;
 
+                                    // optional: pin a specific enumerator for the ENUM type
                                     const enumTypeId = trigger.dataset.enumTypeId || null;
 
                                     const win = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId);
@@ -65,7 +67,7 @@
                         <dl id="properties-list">
                             {% for property_name, property_data in UserDetails.additionalProperties %}
                                 {% if not (property_name in hidden_props) %}
-                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-reference' %}
+                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
                                         <dt data-property-key="{{ property_name }}">{{ property_data.enumDisplayName|default(property_data.originalName|default(property_name)) }}</dt>
                                         <dd data-property-key="{{ property_name }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
