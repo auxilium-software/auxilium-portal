@@ -196,7 +196,7 @@
         let currentPage = 1;
         let totalPages = 1;
         let totalRecords = 0;
-        const perPage = 50;
+        const pageSize = 50;
 
         let currentSortBy = 'createdAt';
         let currentSortOrder = 'desc';
@@ -647,8 +647,8 @@
             const resultCount = document.getElementById('resultCount');
             if (resultCount)
             {
-                const start = ((currentPage - 1) * perPage) + 1;
-                const end = Math.min(currentPage * perPage, totalRecords);
+                const start = ((currentPage - 1) * pageSize) + 1;
+                const end = Math.min(currentPage * pageSize, totalRecords);
                 resultCount.textContent = await Localisation.translate(
                     "Showing {start}-{end} of {totalRecords}",
                     {
@@ -746,7 +746,7 @@
 
         async function goToPage(page)
         {
-            const result = await userController.GetUsersPage(page, perPage, currentSortBy, currentSortOrder, currentSearch);
+            const result = await userController.GetUsersPage(page, pageSize, currentSortBy, currentSortOrder, currentSearch);
             if (!result) return;
 
             currentPage = result.page;
