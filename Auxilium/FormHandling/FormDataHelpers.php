@@ -73,4 +73,29 @@ final class FormDataHelpers
     {
         return count(self::collectCheckboxValues($fieldName, $formData));
     }
+
+
+
+
+
+
+
+
+    public static function collectGridValues(string $fieldName, array $formData): array
+    {
+        $values = [];
+        $prefix = $fieldName . '-';
+
+        foreach($formData as $key => $value)
+        {
+            if($value === '' || $value === null || !str_starts_with($key, $prefix))
+            {
+                continue;
+            }
+            $statementId = substr($key, strlen($prefix));
+            $values[$statementId] = is_numeric($value) ? (int)$value : $value;
+        }
+
+        return $values;
+    }
 }

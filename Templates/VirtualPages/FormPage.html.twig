@@ -163,10 +163,43 @@
                         </select>
                     </div>
 
-                {% else %}
-                    <div class="alert alert-warning">
-                        <strong>{{ "Unknown component type:"|translate }}</strong> {{ componentDetails.type }}
-                    </div>
+                {% elseif componentDetails.type == 'LIKERT_GRID' %}
+                    {% set gridId = componentDetails.id %}
+                    {% set scaleOptions = componentDetails.scale.option %}
+                    <fieldset class="likert-grid">
+                        {% set gridLabel = componentDetails.primaryLabel|localise %}
+                        {% if gridLabel %}<legend>{{ gridLabel }}</legend>{% endif %}
+
+                        <div class="likert-grid-rows">
+
+                            {# header row - scale text, once, across the top #}
+                            <div class="likert-row likert-header" aria-hidden="true">
+                                <span class="likert-statement"></span>
+                                {% for scaleOption in scaleOptions %}
+                                    <span class="likert-scale-label">{{ scaleOption.primaryLabel|localise }}</span>
+                                {% endfor %}
+                            </div>
+
+                            {# statement rows - just the circles #}
+                            {% for statement in componentDetails.statements.statement %}
+                                {% set rowName = gridId ~ '-' ~ statement.id %}
+                                <div class="likert-row" role="radiogroup" aria-labelledby="{{ rowName }}-label">
+                                    <span class="likert-statement" id="{{ rowName }}-label">{{ statement.primaryLabel|localise }}</span>
+                                    {% for scaleOption in scaleOptions %}
+                                        <label class="likert-cell">
+                                            <input type="radio"
+                                                   name="{{ rowName }}"
+                                                   value="{{ scaleOption.value }}"
+                                                   {% if FormData.Data[rowName] == scaleOption.value %}checked{% endif %}
+                                                    {% if componentDetails.required and loop.first %}required{% endif %}>
+                                            <span class="likert-cell-label">{{ scaleOption.primaryLabel|localise }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </fieldset>
                 {% endif %}
             {% endfor %}
 

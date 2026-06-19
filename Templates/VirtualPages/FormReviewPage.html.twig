@@ -15,7 +15,7 @@
                 {% if component.type == 'SUBHEADING' %}
                     <div class="review-section">
                         <h2 class="review-subheading">
-                            {{ component.value }}
+                            {{ component.value|localise }}
                             {% if component.jumpToPage %}
                                 <button type="submit" name="jumpToPage" value="{{ component.jumpToPage }}" class="edit-button">
                                     Edit
@@ -29,14 +29,14 @@
                         <dl>
                             {% for item in component.dictionary.item %}
                                 <dt>{{ item.key }}</dt>
-                                <dd>{{ item.value|default('Not provided') }}</dd>
+                                <dd>{{ item.value|localise|default('Not provided') }}</dd>
                             {% endfor %}
                         </dl>
                     </div>
 
                 {% elseif component.type == 'PARAGRAPH' %}
                     <div class="review-paragraph">
-                        <p>{{ component.value|nl2br }}</p>
+                        <p>{{ component.value|localise|nl2br }}</p>
                     </div>
 
                 {% else %}
@@ -48,12 +48,11 @@
 
             {# Navigation buttons #}
             <div class="form-navigation review-navigation">
-                {% if ShowBackButton %}
-                    <input type="button" value="{{ "Back to Edit"|translate }}" onclick="submitFormWithAction('back')" class="back-button" />
-                {% endif %}
-
                 <div class="review-actions">
-                    <input type="button" value="{{ "Submit Application"|translate }}" onclick="submitFormWithAction('submit')" class="submit-button primary" />
+                    {% if ShowBackButton %}
+                        <input type="button" value="{{ "Back to Edit"|translate }}" onclick="submitFormWithAction('back')" class="back-button" />
+                    {% endif %}
+                    <input type="button" value="{{ "Submit"|translate }}" onclick="submitFormWithAction('submit')" class="submit-button primary" />
                 </div>
             </div>
 

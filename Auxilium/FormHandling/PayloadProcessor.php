@@ -84,6 +84,15 @@ final class PayloadProcessor
                     }
                 }
 
+                // handle the likert grid
+                if(str_contains($payload, 'collectGridValues'))
+                {
+                    if(preg_match('/collectGridValues\(["\']([^"\']+)["\']\)/', $payload, $matches))
+                    {
+                        return FormDataHelpers::collectGridValues($matches[1], $vars['formData']);
+                    }
+                }
+
                 return $result;
             }
             return $payload;

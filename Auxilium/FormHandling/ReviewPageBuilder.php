@@ -38,7 +38,7 @@ final class ReviewPageBuilder
             $processedComponent = $component;
 
             // evaluate dynamic values
-            if(isset($component['value']) && str_contains($component['value'], '$'))
+            if(isset($component['value']) && !is_array($component["value"]) && str_contains($component['value'], '$'))
             {
                 $processedComponent['value'] = AuxiliumScript::evaluate_expression($component['value'], $vars);
             }

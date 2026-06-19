@@ -13,10 +13,15 @@
 
             <h1>{{ "Account Management" | translate }}</h1>
 
-            <a href="/users/{{ AboutMe.id }}" class="navigational-link">{{ "My User Page" | translate | ndsentence }}</a><br />
-            <a href="/me/mfa-management" class="navigational-link">{{ "Setup Multifactor Authentication" | translate | ndsentence }}</a><br />
-            <a href="/me/change-password" class="navigational-link">{{ "Change my Password" | translate | ndsentence }}</a><br />
-            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a><br />
+            <a href="/users/{{ AboutMe.id }}" class="navigational-link">{{ "My User Page" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/wemwbs" class="navigational-link">{{ "WEMWBS" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/change-password" class="navigational-link">{{ "Change my Password" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a>
             {% if _IS_ADMIN_ %}
             {% endif %}
         </div>

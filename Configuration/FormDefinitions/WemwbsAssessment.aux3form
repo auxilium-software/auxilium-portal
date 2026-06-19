@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<auxForm>
+    <id>Wemwbs</id>
+    <title>
+        <translation xml:lang="en-GB">The Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS)</translation>
+    </title>
+    <subtitle>
+        <translation xml:lang="en-GB">This form will guide you through completing a WEMWBS assessment.</translation>
+    </subtitle>
+    <useReCAPTCHA>true</useReCAPTCHA>
+    <requireAuthentication>true</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
+
+
+    <pages>
+        <page>
+            <id>introduction</id>
+            <title>
+                <translation xml:lang="en-GB">Introduction</translation>
+            </title>
+            <renderIf>true</renderIf>
+            <description>
+                <translation xml:lang="en-GB">The next page contains 14 questions about your feelings and thoughts.
+                Please select the answer that best describes your experience over the last two weeks.
+                </translation>
+            </description>
+        </page>
+        <page>
+            <id>assessment</id>
+            <title>
+                <translation xml:lang="en-GB">Assessment</translation>
+            </title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>wemwbs</id>
+                    <type>LIKERT_GRID</type>
+                    <required>true</required>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Please select the answer that best describes your experience of each over the last 2 weeks.</translation>
+                    </primaryLabel>
+
+                    <scale>
+                        <option>
+                            <value type="integer">1</value>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">None of the time</translation>
+                            </primaryLabel>
+                        </option>
+                        <option>
+                            <value type="integer">2</value>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Rarely</translation>
+                            </primaryLabel>
+                        </option>
+                        <option>
+                            <value type="integer">3</value>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Some of the time</translation>
+                            </primaryLabel>
+                        </option>
+                        <option>
+                            <value type="integer">4</value>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">Often</translation>
+                            </primaryLabel>
+                        </option>
+                        <option>
+                            <value type="integer">5</value>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">All of the time</translation>
+                            </primaryLabel>
+                        </option>
+                    </scale>
+
+                    <statements>
+                        <statement>
+                            <id>optimismScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling optimistic about the future</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>usefulnessScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling useful</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>relaxedScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling relaxed</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>interestedInPeopleScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling interested in other people</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>spareEnergyScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've had energy to spare</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>problemHandlingScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been dealing with problems well</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>clearThoughtScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been thinking clearly</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>feelingGoodSelfScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling good about myself</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>feelingCloseToPeopleScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling close to other people</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>confidenceScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling confident</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>makingUpOwnMindScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been able to make up my own mind about things</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>feelingLovedScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling loved</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>interestedInNewThingsScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been interested in new things</translation>
+                            </primaryLabel>
+                        </statement>
+                        <statement>
+                            <id>feelingCheerfulScore</id>
+                            <primaryLabel>
+                                <translation xml:lang="en-GB">I've been feeling cheerful</translation>
+                            </primaryLabel>
+                        </statement>
+                    </statements>
+                </component>
+            </components>
+        </page>
+    </pages>
+
+
+    <reviewPage>
+        <components>
+            <component>
+                <type>SUBHEADING</type>
+                <value>
+                    <translation xml:lang="en-GB">Closing</translation>
+                </value>
+                <if>true</if>
+            </component>
+            <component>
+                <type>PARAGRAPH</type>
+                <value>
+                    <translation xml:lang="en-GB">Thank you for completing the WEMWBS Assessment, to submit it, please click "Submit".</translation>
+                </value>
+                <if>true</if>
+            </component>
+        </components>
+    </reviewPage>
+
+
+    <submissionActions>
+        <apiRequest>
+            <executeIf>true</executeIf>
+            <endpoint>/api/v3/wemwbs</endpoint>
+            <method>POST</method>
+            <payload>
+                <responses>$collectGridValues("wemwbs")</responses>
+            </payload>
+        </apiRequest>
+    </submissionActions>
+    <afterSubmissionRedirect>
+        <target>/me/wemwbs</target>
+    </afterSubmissionRedirect>
+</auxForm>
