@@ -13,6 +13,12 @@ use RuntimeException;
  */
 final class SecurityUtilities
 {
+    public static function IsLoggedIn(): bool
+    {
+        // this is NON-redirecting
+        return JWTUtilities::IsLoggedIn();
+    }
+
     /**
      * Makes sure that the current user is logged in.
      *
@@ -82,6 +88,26 @@ final class SecurityUtilities
 
         return $userDetails['FullName'] ?? null;
     }
+    public static function GetLanguagePreference(): ?string
+    {
+        $userDetails = self::getCachedUserDetails();
+
+        if (self::shouldRefreshUserDetails($userDetails))
+        {
+            $userDetails = self::fetchAndCacheUserDetails();
+        }
+
+        return $userDetails['LanguagePreference'] ?? null;
+    }
+
+
+
+
+
+
+
+
+
 
     /**
      * Retrieves user details from the Session.
@@ -123,17 +149,25 @@ final class SecurityUtilities
         $response = APIInteractions::Get(endpoint: '/api/v3/me');
 
         $userDetails = [
-            'LastUpdatedAt' => time(),
-            'UserID'        => $response->Payload['id'],
-            'EmailAddress'  => $response->Payload['emailAddress'],
-            'FullName'      => $response->Payload['fullName'],
-            'IsAdmin'       => $response->Payload['isAdmin'],
+            'LastUpdatedAt'         => time(),
+            'UserID'                => $response->Payload['id'],
+            'EmailAddress'          => $response->Payload['emailAddress'],
+            'FullName'              => $response->Payload['fullName'],
+            'IsAdmin'               => $response->Payload['isAdmin'],
+            'LanguagePreference'    => $response->Payload['languagePreference'],
         ];
 
         SessionUtilities::Set(SessionKey::USER_DETAILS, $userDetails);
 
         return $userDetails;
     }
+
+
+    public static function InvalidateUserDetailsCache(): void
+    {
+        SessionUtilities::Set(SessionKey::USER_DETAILS, false);
+    }
+
 
     /**
      * Generates a pseudo random string.
