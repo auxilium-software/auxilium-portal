@@ -8,14 +8,15 @@
             <input type="hidden" id="FormInstanceID" name="FormInstanceID" value="{{ FormInstanceID }}">
             <input type="hidden" id="action" name="action" value="continue">
 
-            <h1 class="no-lower-margin">{{ FormSpec.pages.page[ActualPageIndex].title|ndtitle }}</h1>
+            <h1 class="no-lower-margin">{{ FormSpec.pages.page[ActualPageIndex].title|localise }}</h1>
 
-            <p>{{ FormSpec.pages.page[ActualPageIndex].description|translate }}</p>
+            {% set pageDescription = FormSpec.pages.page[ActualPageIndex].description|localise %}
+            {% if pageDescription %}<p>{{ pageDescription }}</p>{% endif %}
 
             {% for componentDetails in FormSpec.pages.page[ActualPageIndex].components.component %}
 
                 {% if componentDetails.type == 'TEXT_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <input
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
@@ -25,7 +26,7 @@
                     >
 
                 {% elseif componentDetails.type == 'EMAIL_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <input
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
@@ -35,7 +36,7 @@
                     >
 
                 {% elseif componentDetails.type == 'PASSWORD_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <input
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
@@ -45,7 +46,7 @@
                     >
 
                 {% elseif componentDetails.type == 'DATE_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <input
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
@@ -55,16 +56,16 @@
                     >
 
                 {% elseif componentDetails.type == 'MULTILINE_TEXT_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <textarea
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
                             rows="4"
                             {% if componentDetails.required %}required{% endif %}
-                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>=
+                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
 
                 {% elseif componentDetails.type == 'LARGE_TEXT_FIELD' %}
-                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|translate }}</label>
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
                     <textarea
                             id="{{ componentDetails.id }}"
                             name="{{ componentDetails.id }}"
@@ -74,8 +75,10 @@
                     >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
 
                 {% elseif componentDetails.type == 'CHOICE_FIELD' %}
-                    <label>{{ componentDetails.primaryLabel|translate }}</label>
+                    <label>{{ componentDetails.primaryLabel|localise }}</label>
                     {% for optionDetails in componentDetails.options.option %}
+                        {% set optionPrimary = optionDetails.primaryLabel|localise %}
+                        {% set optionSecondary = optionDetails.secondaryLabel|localise %}
                         <div class="radio-button-holder">
                             <input
                                     type="radio"
@@ -87,8 +90,8 @@
                             >
                             <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
                                 <p>
-                                    {% if optionDetails.primaryLabel %}<strong>{{ optionDetails.primaryLabel|translate }}</strong><br/>{% endif %}
-                                    {% if optionDetails.secondaryLabel %}<span>{{ optionDetails.secondaryLabel|translate }}</span>{% endif %}
+                                    {% if optionPrimary %}<strong>{{ optionPrimary }}</strong><br/>{% endif %}
+                                    {% if optionSecondary %}<span>{{ optionSecondary }}</span>{% endif %}
                                 </p>
                             </label>
                         </div>
@@ -98,6 +101,8 @@
                     <div class="form-group">
                         <div class="checkbox-holder">
                             {% for optionDetails in componentDetails.options.option %}
+                                {% set optionPrimary = optionDetails.primaryLabel|localise %}
+                                {% set optionSecondary = optionDetails.secondaryLabel|localise %}
                                 <input
                                         type="checkbox"
                                         id="{{ componentDetails.id }}-{{ optionDetails.value }}"
@@ -106,8 +111,8 @@
                                 >
                                 <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
                                     <p>
-                                        {% if optionDetails.primaryLabel %}<strong>{{ optionDetails.primaryLabel|translate }}</strong><br/>{% endif %}
-                                        {% if optionDetails.secondaryLabel %}<span>{{ optionDetails.secondaryLabel|translate }}</span>{% endif %}
+                                        {% if optionPrimary %}<strong>{{ optionPrimary }}</strong><br/>{% endif %}
+                                        {% if optionSecondary %}<span>{{ optionSecondary }}</span>{% endif %}
                                     </p>
                                 </label>
                             {% endfor %}
@@ -136,21 +141,23 @@
 
                 {% elseif componentDetails.type == 'SELECT_FIELD' %}
                     <div class="form-group">
-                        {% if componentDetails.label %}
-                            <label for="{{ componentDetails.id }}">{{ componentDetails.label }}</label>
+                        {% set selectLabel = componentDetails.primaryLabel|localise %}
+                        {% if selectLabel %}
+                            <label for="{{ componentDetails.id }}">{{ selectLabel }}</label>
                         {% endif %}
                         <select
                                 id="{{ componentDetails.id }}"
                                 name="{{ componentDetails.id }}"
                                 {% if componentDetails.required %}required{% endif %}
                         >
-                            <option value="">-- Select --</option>
+                            <option value="">{{ "-- Select --"|translate }}</option>
                             {% for optionDetails in componentDetails.options.option %}
+                                {% set optionPrimary = optionDetails.primaryLabel|localise %}
                                 <option
                                         value="{{ optionDetails.value }}"
                                         {% if FormData.Data[componentDetails.id] == optionDetails.value %}selected{% endif %}
                                 >
-                                    {{ optionDetails.label|default(optionDetails.value) }}
+                                    {{ optionPrimary ?: optionDetails.value }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -163,19 +170,19 @@
                 {% endif %}
             {% endfor %}
 
-            {# Navigation buttons #}
+            {# navigation buttons #}
             <div class="form-navigation">
                 {% if ShowBackButton %}
-                    <input class="button" type="button" value="Back" onclick="submitFormWithAction('back')" />
+                    <input class="button" type="button" value="{{ "Back"|translate }}" onclick="submitFormWithAction('back')" />
                 {% endif %}
 
                 {% if IsAbandonPage %}
                     <p class="abandon-message">{{ "You cannot progress further in the form."|translate }}</p>
                     <a href="/" class="button">{{ "Return to Home"|translate }}</a>
                 {% elseif ShowReviewButton %}
-                    <input type="button" value="Review" onclick="submitFormWithAction('review')" class="review-button" />
+                    <input type="button" value="{{ "Review"|translate }}" onclick="submitFormWithAction('review')" class="review-button" />
                 {% elseif ShowNextButton %}
-                    <input class="button" type="submit" value="Continue" />
+                    <input class="button" type="submit" value="{{ "Continue"|translate }}" />
                 {% endif %}
             </div>
 
