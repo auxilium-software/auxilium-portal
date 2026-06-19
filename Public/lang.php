@@ -1,18 +1,17 @@
 <?php
 
-use Auxilium\Enumerators\CookieKey;
-use Auxilium\SessionHandling\CookieHandling;
+use Auxilium\Utilities\LocalisationUtilities;
 use Auxilium\Utilities\NavigationUtilities;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$languageToSetTo = $_GET['switch'];
+try
+{
+    LocalisationUtilities::SetLocale($_GET['switch'] ?? '');
+}
+catch (InvalidArgumentException)
+{
+    // ignore an unsupported/garbage ?switch value - fall through and just redirect
+}
 
-CookieHandling::SetCookie(
-    targetCookie: CookieKey::LANGUAGE,
-    value: $languageToSetTo
-);
-
-NavigationUtilities::Redirect(
-    target: $_SERVER['HTTP_REFERER']
-);
+NavigationUtilities::Redirect(target: $_SERVER['HTTP_REFERER']);
