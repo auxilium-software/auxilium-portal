@@ -79,15 +79,17 @@ final class CookieHandling
         return match ($targetCookie)
         {
             // 30 minutes
-            CookieKey::ACCESS_TOKEN     => (3600 / 2),
+            CookieKey::ACCESS_TOKEN     => 60 * ConfigurationUtilities::$UserConfiguration["JWT"]["AccessTokenExpirationInMinutes"],
 
             // 48 hours
-            CookieKey::SESSION_KEY      => (3600 * 48),
+            CookieKey::SESSION_KEY      => (60 * 60 * 48),
 
             // 30 days
             CookieKey::STYLE,
-            CookieKey::LANGUAGE,
-            CookieKey::REFRESH_TOKEN    => (3600 * 24 * 30),
+            CookieKey::LANGUAGE          => (60 * 60 * 24 * 30),
+
+
+            CookieKey::REFRESH_TOKEN     => 60 * 60 * 24 * ConfigurationUtilities::$UserConfiguration["JWT"]["RefreshTokenExpirationInDays"],
 
             default                     => 0,
         };
