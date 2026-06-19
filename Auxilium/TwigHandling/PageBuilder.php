@@ -9,6 +9,8 @@ use Auxilium\ServiceInteractions\APIInteractions;
 use Auxilium\SessionHandling\CookieHandling;
 use Auxilium\TwigHandling\Extensions\CommonFilters;
 use Auxilium\TwigHandling\Extensions\CommonFunctions;
+use Auxilium\TwigHandling\Extensions\FormLocalisationExtension;
+use Auxilium\Utilities\LocalisationUtilities;
 use Auxilium\Utilities\SecurityUtilities;
 use Auxilium\Utilities\SessionUtilities;
 use Auxilium\Utilities\SystemSettingsUtilities;
@@ -33,11 +35,11 @@ final class PageBuilder
         $this->twig->addGlobal('style_options', []);
         $this->twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $this->twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
-        $this->twig->addGlobal('_SELECTED_LANGUAGE_', CookieHandling::GetCookieValue(CookieKey::LANGUAGE));
         $this->twig->addGlobal('_SYSTEM_BULLETIN_', APIInteractions::Get('/api/v3/system-bulletin', [], false)->Payload);
         $this->twig->addGlobal('_INSTANCE_NAME_', SystemSettingsUtilities::GetInstanceName());
         $this->twig->addGlobal('_LOGO_PATH_', SystemSettingsUtilities::GetLogoPath());
         $this->twig->addGlobal('_LOGO_CONTRAST_PATH_', SystemSettingsUtilities::GetLogoContrastPath());
+        $this->twig->addGlobal('_SELECTED_LANGUAGE_', LocalisationUtilities::GetActiveLocale());
 
         if ($useAuth)
         {
@@ -60,6 +62,10 @@ final class PageBuilder
 
         $this->twig->addExtension(new CommonFilters());
         $this->twig->addExtension(new CommonFunctions());
+        $this->twig->addExtension(new FormLocalisationExtension(
+            fn() => LocalisationUtilities::GetActiveLocale(),
+            LocalisationUtilities::DEFAULT_LOCALE
+        ));
 
 
         $this->checkServerAccess();
@@ -117,7 +123,7 @@ final class PageBuilder
         $twig->addGlobal('style_options', []);
         $twig->addGlobal('_INLINE_NODE_EXPANDED_', false);
         $twig->addGlobal('_INLINE_NODE_NEW_TAB_', false);
-        $twig->addGlobal('_SELECTED_LANGUAGE_', CookieHandling::GetCookieValue(CookieKey::LANGUAGE));
+        $twig->addGlobal('_SELECTED_LANGUAGE_', LocalisationUtilities::GetActiveLocale());
         $twig->addGlobal('_SYSTEM_BULLETIN_',[]);
         $twig->addGlobal('_INSTANCE_NAME_', "");
         $twig->addGlobal('_LOGO_CONTRAST_PATH_', "");
