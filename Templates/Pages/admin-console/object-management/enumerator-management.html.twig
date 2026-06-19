@@ -1,0 +1,931 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-list-checks"></i> {{ "Data Enumerators"|translate }}
+            <span class="page-title__sub">{{ "Manage system-wide Data Enumerators"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button class="form-btn form-btn--primary" onclick="document.getElementById('createEnumeratorDialog').style.display='block'">
+                <i class="ph-duotone ph-plus-circle"></i> {{ "Create a new Data Enumerator"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Total">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Enumerators"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Active">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Active"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Inactive">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Inactive"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Search"|translate }}:</span>
+            <input type="text" class="form-input form-input--search" placeholder="{{ "Name or description..."|translate }}" id="enumSearch">
+        </div>
+
+        <div class="toolbar__separator"></div>
+
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Status"|translate }}:</span>
+            <select class="form-select" id="filterStatus">
+                <option value="">{{ "All"|translate }}</option>
+                <option value="active">{{ "Active"|translate }}</option>
+                <option value="inactive">{{ "Inactive"|translate }}</option>
+            </select>
+        </div>
+
+        <div class="toolbar__spacer"></div>
+
+        <div class="toolbar__group">
+            <button class="form-btn form-btn--sm" onclick="resetFilters()">✕ {{ "Clear"|translate }}</button>
+            <span class="toolbar__label" id="resultCount"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="enumTable">
+            <caption>{{ "Registered Data Enumerators"|translate }}</caption>
+            <thead>
+            <tr>
+                <th>{{ "Name"|translate }}</th>
+                <th>{{ "Description"|translate }}</th>
+                <th>{{ "Status"|translate }}</th>
+                <th>{{ "Controls"|translate }}</th>
+            </tr>
+            </thead>
+            <tbody id="EnumTableBody"></tbody>
+        </table>
+    </div>
+
+    {#
+        ==================================================
+        = CREATE ENUMERATOR
+    #}
+    <div id="createEnumeratorDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:440px;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span><i class="ph-duotone ph-plus-circle"></i> {{ "Create a new Enumerator"|translate }}</span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('createEnumeratorDialog')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" style="grid-template-columns: 110px 1fr;">
+                        <dt>{{ "Name"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newEnumName" style="width:100%;"></dd>
+
+                        <dt>{{ "Description"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newEnumDescription" style="width:100%;"></dd>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('createEnumeratorDialog')">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="createEnumerator()"><i class="ph-duotone ph-floppy-disk"></i> {{ "Create"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+        ==================================================
+        = EDIT ENUMERATOR
+    #}
+    <div id="editEnumeratorDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:440px;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span><i class="ph-duotone ph-pencil-simple"></i> {{ "Edit Enumerator"|translate }}</span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('editEnumeratorDialog')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body">
+                    <input type="hidden" id="editEnumId">
+                    <div class="detail-list" style="grid-template-columns: 110px 1fr;">
+                        <dt>{{ "Name"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="editEnumName" style="width:100%;"></dd>
+
+                        <dt>{{ "Description"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="editEnumDescription" style="width:100%;"></dd>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('editEnumeratorDialog')">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="saveEnumerator()"><i class="ph-duotone ph-floppy-disk"></i> {{ "Save"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+        ==================================================
+        = VALUE MANAGEMENT
+    #}
+    <div id="valuesDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:680px; max-width:94vw;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span><i class="ph-duotone ph-list-bullets"></i> <span id="valuesDialogTitle">{{ "Values"|translate }}</span></span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('valuesDialog')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body" style="max-height:60vh; overflow:auto;">
+                    <div class="toolbar" style="margin-bottom:8px;">
+                        <div class="toolbar__spacer"></div>
+                        <button class="form-btn form-btn--sm form-btn--primary" onclick="openValueDialog(null)">
+                            <i class="ph-duotone ph-plus"></i> {{ "Add value"|translate }}
+                        </button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th style="width:80px;">{{ "Order"|translate }}</th>
+                            <th>{{ "Canonical Name"|translate }}</th>
+                            <th>{{ "Status"|translate }}</th>
+                            <th>{{ "Controls"|translate }}</th>
+                        </tr>
+                        </thead>
+                        <tbody id="ValuesTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('valuesDialog')">{{ "Close"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+        ==================================================
+        = ADD / EDIT VALUE
+    #}
+    <div id="valueDialog" style="display:none; position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:460px;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span><i class="ph-duotone ph-tag"></i> <span id="valueDialogTitle">{{ "Add value"|translate }}</span></span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('valueDialog')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body">
+                    <input type="hidden" id="valueId">
+                    <div class="detail-list" style="grid-template-columns: 130px 1fr;">
+                        <dt>{{ "Canonical Name"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="valueCanonicalName" style="width:100%;"></dd>
+                    </div>
+                    <p class="page-title__sub" style="margin-top:8px;">
+                        {{ "The authoritative name for this value. Shown to administrators, and to users only where no translation exists for their language."|translate }}
+                    </p>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('valueDialog')">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="saveValue()"><i class="ph-duotone ph-floppy-disk"></i> {{ "Save"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+        ==================================================
+        = MANAGE TRANSLATIONS
+    #}
+    <div id="translationsDialog" style="display:none; position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:620px; max-width:94vw;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span><i class="ph-duotone ph-translate"></i> <span id="translationsDialogTitle">{{ "Translations"|translate }}</span></span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('translationsDialog')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body" style="max-height:60vh; overflow:auto;">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th style="width:140px;">{{ "Language"|translate }}</th>
+                            <th>{{ "Translation"|translate }}</th>
+                            <th style="width:120px;">{{ "Controls"|translate }}</th>
+                        </tr>
+                        </thead>
+                        <tbody id="TranslationsTableBody"></tbody>
+                    </table>
+
+                    <div class="panel" style="margin-top:12px; margin-bottom:0;">
+                        <div class="panel__header"><span><i class="ph-duotone ph-plus"></i> {{ "Add translation"|translate }}</span></div>
+                        <div class="panel__body" style="display:flex; gap:6px; align-items:center;">
+                            <input type="text" class="form-input" id="newTransLang" placeholder="cy-GB" style="width:130px;">
+                            <input type="text" class="form-input" id="newTransText" placeholder="{{ "Translation"|translate }}" style="flex:1;">
+                            <button class="form-btn form-btn--sm form-btn--primary" onclick="addTranslation()">{{ "Add"|translate }}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('translationsDialog')">{{ "Close"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+        ==================================================
+        = MESSAGE BOX
+    #}
+    <div class="confirm-overlay" id="msgBox" style="z-index:3200;">
+        <div class="confirm-dialog">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span id="msgBoxTitle">{{ "Message"|translate }}</span>
+                    <button class="chart-container__header-btn" id="msgBoxX" title="{{ "Close"|translate }}"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="panel__body">
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div id="msgBoxIcon" style="font-size:28px; line-height:1; flex-shrink:0;"></div>
+                        <div id="msgBoxMessage" style="flex:1; line-height:1.5; padding-top:2px;"></div>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;" id="msgBoxButtons"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const enumController = new DataEnumeratorController();
+
+        // ====================================================================================================
+        // STATE
+        let allEnumerators = [];
+        let currentEnum = null;
+        let currentValues = [];
+        let currentValue = null;
+        let translationScope = 'value'; // 'value' -OR- 'enumerator' -> which dialog opened the translations panel?
+
+        // ====================================================================================================
+        // MESSAGE BOX
+        const MESSAGEBOX_BUTTONS = {
+            ok:     { label: '{{ "OK"|translate }}',     primary: true  },
+            cancel: { label: '{{ "Cancel"|translate }}', primary: false },
+            yes:    { label: '{{ "Yes"|translate }}',    primary: true  },
+            no:     { label: '{{ "No"|translate }}',     primary: false },
+            retry:  { label: '{{ "Retry"|translate }}',  primary: true  },
+            close:  { label: '{{ "Close"|translate }}',  primary: false }
+        };
+
+        const MESSAGEBOX_ICONS = {
+            info:     { glyph: 'ph-info',           color: '#1941a5' },
+            success:  { glyph: 'ph-check-circle',   color: '#3d8b3d' },
+            warning:  { glyph: 'ph-warning',        color: '#c87f0a' },
+            error:    { glyph: 'ph-warning-circle', color: '#ac2925' },
+            question: { glyph: 'ph-question',       color: '#1941a5' }
+        };
+
+        let msgBoxResolver = null;
+        let msgBoxDismiss = null;
+
+        function messageBox(options)
+        {
+            options = options || {};
+            const title = options.title || '{{ "Message"|translate }}';
+            const message = options.message || '';
+            const icon = MESSAGEBOX_ICONS[options.icon] || MESSAGEBOX_ICONS.info;
+            const buttons = options.buttons || ['ok'];
+
+            // X / backdrop / Escape resolve to this; default to the most "negative" button present
+            let dismissValue = options.dismissValue;
+            if (dismissValue === undefined)
+            {
+                dismissValue = null;
+                const order = ['cancel', 'no', 'close', 'ok'];
+                for (let i = 0; i < order.length; i++)
+                {
+                    if (buttons.indexOf(order[i]) !== -1)
+                    {
+                        dismissValue = order[i]; break;
+                    }
+                }
+            }
+
+            document.getElementById('msgBoxTitle').textContent = title;
+            document.getElementById('msgBoxMessage').textContent = message;
+            document.getElementById('msgBoxIcon').innerHTML = '<i class="ph-duotone ' + icon.glyph + '" style="color:' + icon.color + ';"></i>';
+
+            const btnWrap = document.getElementById('msgBoxButtons');
+            btnWrap.innerHTML = '';
+            for (let i = 0; i < buttons.length; i++)
+            {
+                const id = buttons[i];
+                const def = MESSAGEBOX_BUTTONS[id] || { label: id, primary: false };
+                const btn = document.createElement('button');
+                btn.className = 'form-btn' + (def.primary ? ' form-btn--primary' : '');
+                btn.textContent = def.label;
+                btn.onclick = (function (clicked) {
+                    return function () { closeMessageBox(clicked); };
+                })(id);
+                btnWrap.appendChild(btn);
+            }
+
+            return new Promise(function (resolve)
+            {
+                msgBoxResolver = resolve;
+                msgBoxDismiss = dismissValue;
+                document.getElementById('msgBox').classList.add('is-visible');
+                const primary = btnWrap.querySelector('.form-btn--primary') || btnWrap.lastChild;
+                if (primary)
+                {
+                    primary.focus();
+                }
+            });
+        }
+
+        function closeMessageBox(result)
+        {
+            document.getElementById('msgBox').classList.remove('is-visible');
+            if (msgBoxResolver)
+            {
+                const r = msgBoxResolver;
+                msgBoxResolver = null;
+                r(result);
+            }
+        }
+
+        function showError(message)
+        {
+            return messageBox({ title: '{{ "Error"|translate }}', message: message, icon: 'error', buttons: ['ok'] });
+        }
+        function showInfo(message)
+        {
+            return messageBox({ title: '{{ "Information"|translate }}', message: message, icon: 'info', buttons: ['ok'] });
+        }
+        async function confirmDialog(message, title)
+        {
+            const r = await messageBox({
+                title: title || '{{ "Please confirm"|translate }}',
+                message: message,
+                icon: 'question',
+                buttons: ['yes', 'no'],
+                dismissValue: 'no'
+            });
+            return r === 'yes';
+        }
+
+        // ====================================================================================================
+        // HELPERS
+        function escapeHtml(str)
+        {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function closeDialog(id)
+        {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        }
+
+        // the controller returns the payload on success, or `false` on failure
+        function failed(result)
+        {
+            return result === false;
+        }
+
+        function statusBadge(isActive)
+        {
+            return isActive
+                    ? '<span class="badge badge--active">{{ "Active"|translate }}</span>'
+                    : '<span class="badge badge--inactive">{{ "Inactive"|translate }}</span>';
+        }
+
+        // ====================================================================================================
+        // ENUM LIST
+        async function loadEnumerators()
+        {
+            const result = await enumController.GetAllEnumerators(true);
+            if (failed(result))
+            {
+                await showError('{{ "Failed to load Data Enumerators."|translate }}');
+                return;
+            }
+            allEnumerators = Array.isArray(result) ? result : [];
+            renderStats();
+            renderEnumerators();
+        }
+
+        function renderStats()
+        {
+            const total = allEnumerators.length;
+            const active = allEnumerators.filter(function (e) { return e.isActive; }).length;
+            document.getElementById('StatCard-Total').textContent = total.toLocaleString();
+            document.getElementById('StatCard-Active').textContent = active.toLocaleString();
+            document.getElementById('StatCard-Inactive').textContent = (total - active).toLocaleString();
+        }
+
+        function getFilteredEnumerators() {
+            const search = document.getElementById('enumSearch').value.trim().toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            return allEnumerators.filter(function (e) {
+                if (statusFilter === 'active' && !e.isActive) return false;
+                if (statusFilter === 'inactive' && e.isActive) return false;
+                if (search)
+                {
+                    const hay = ((e.canonicalName || "") + ' ' + (e.description || "")).toLowerCase();
+                    if (hay.indexOf(search) === -1) return false;
+                }
+                return true;
+            });
+        }
+
+        function renderEnumerators() {
+            const body = document.getElementById('EnumTableBody');
+            body.innerHTML = "";
+
+            const list = getFilteredEnumerators();
+
+            const resultCount = document.getElementById('resultCount');
+            if (resultCount) resultCount.textContent = list.length + ' / ' + allEnumerators.length;
+
+            if (list.length === 0)
+            {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.style.cssText = 'text-align:center; padding:20px; color:#666;';
+                td.textContent = '{{ "No Data Enumerators found matching your criteria."|translate }}';
+                tr.appendChild(td);
+                body.appendChild(tr);
+                return;
+            }
+
+            for (let i = 0; i < list.length; i++)
+            {
+                const e = list[i];
+                const tr = document.createElement('tr');
+
+                const nameTd = document.createElement('td');
+                nameTd.innerHTML = '<strong>' + escapeHtml(e.canonicalName || e.name) + '</strong>';
+                tr.appendChild(nameTd);
+
+                const descTd = document.createElement('td');
+                descTd.textContent = e.description || '-';
+                tr.appendChild(descTd);
+
+                const statusTd = document.createElement('td');
+                statusTd.innerHTML = statusBadge(e.isActive);
+                tr.appendChild(statusTd);
+
+                const ctrlTd = document.createElement('td');
+                ctrlTd.className = 'cell-actions';
+                ctrlTd.innerHTML =
+                        '<button class="form-btn form-btn--sm" onclick="openValues(\'' + e.id + '\')"><i class="ph-duotone ph-list-bullets"></i> {{ "Values"|translate }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="openEnumeratorTranslations(\'' + e.id + '\')"><i class="ph-duotone ph-translate"></i> {{ "Translations"|translate }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="openEditEnumerator(\'' + e.id + '\')"><i class="ph-duotone ph-pencil-simple"></i> {{ "Edit"|translate }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="toggleEnumerator(\'' + e.id + '\')">'
+                        +       (e.isActive ? '<i class="ph-duotone ph-pause"></i> {{ "Deactivate"|translate }}' : '<i class="ph-duotone ph-play"></i> {{ "Activate"|translate }}')
+                        + '</button>';
+                tr.appendChild(ctrlTd);
+
+                body.appendChild(tr);
+            }
+        }
+
+        function resetFilters()
+        {
+            document.getElementById('enumSearch').value = '';
+            document.getElementById('filterStatus').value = '';
+            renderEnumerators();
+        }
+
+        function findEnum(id)
+        {
+            return allEnumerators.find(function (e) { return e.id === id; }) || null;
+        }
+
+        // ====================================================================================================
+        // CREATE / EDIT ENUM
+        async function createEnumerator()
+        {
+            const name = document.getElementById('newEnumName').value.trim();
+            const description = document.getElementById('newEnumDescription').value.trim();
+
+            if (!name)
+            {
+                await showError('{{ "Name is required."|translate }}');
+                return;
+            }
+
+            const result = await enumController.CreateEnumerator(name, description || null);
+            if (failed(result))
+            {
+                await showError('{{ "Failed to create Data Enumerator."|translate }}');
+                return;
+            }
+            closeDialog('createEnumeratorDialog');
+            document.getElementById('newEnumName').value = '';
+            document.getElementById('newEnumDescription').value = '';
+            await loadEnumerators();
+        }
+
+        function openEditEnumerator(id)
+        {
+            const e = findEnum(id);
+            if (!e) return;
+            document.getElementById('editEnumId').value = e.id;
+            document.getElementById('editEnumName').value = e.canonicalName || e.name || '';
+            document.getElementById('editEnumDescription').value = e.description || '';
+            document.getElementById('editEnumeratorDialog').style.display = 'block';
+        }
+
+        async function saveEnumerator()
+        {
+            const id = document.getElementById('editEnumId').value;
+            const name = document.getElementById('editEnumName').value.trim();
+            const description = document.getElementById('editEnumDescription').value.trim();
+
+            if (!name)
+            {
+                await showError('{{ "Name is required."|translate }}');
+                return;
+            }
+
+            const result = await enumController.UpdateEnumerator(id, name, description);
+            if (failed(result))
+            {
+                await showError('{{ "Failed to update Data Enumerator."|translate }}');
+                return;
+            }
+            closeDialog('editEnumeratorDialog');
+            await loadEnumerators();
+        }
+
+        async function toggleEnumerator(id)
+        {
+            const e = findEnum(id);
+            if (!e) return;
+            const ok = await enumController.SetEnumeratorActive(id, !e.isActive);
+            if (!ok)
+            {
+                await showError('{{ "Failed to change status."|translate }}');
+                return;
+            }
+            await loadEnumerators();
+        }
+
+        // ====================================================================================================
+        // VALUES
+        async function openValues(id)
+        {
+            currentEnum = findEnum(id);
+            if (!currentEnum)
+            {
+                return;
+            }
+
+            document.getElementById('valuesDialogTitle').textContent = await Localisation.translate("Values - {name}", { "{name}": currentEnum.canonicalName });
+
+            await loadValues();
+            document.getElementById('valuesDialog').style.display = 'block';
+        }
+
+        async function loadValues()
+        {
+            const result = await enumController.GetValues(currentEnum.id, true);
+            if (failed(result))
+            {
+                await showError('{{ "Failed to load values."|translate }}');
+                return;
+            }
+            currentValues = Array.isArray(result) ? result : [];
+            currentValues.sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+            renderValues();
+        }
+
+        function renderValues()
+        {
+            const body = document.getElementById('ValuesTableBody');
+            body.innerHTML = '';
+
+            if (currentValues.length === 0)
+            {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.style.cssText = 'text-align:center; padding:16px; color:#666;';
+                td.textContent = '{{ "No values yet."|translate }}';
+                tr.appendChild(td);
+                body.appendChild(tr);
+                return;
+            }
+
+            for (let i = 0; i < currentValues.length; i++)
+            {
+                const v = currentValues[i];
+                const tr = document.createElement('tr');
+
+                const orderTd = document.createElement('td');
+                orderTd.className = 'cell-actions';
+                orderTd.innerHTML =
+                        '<button class="form-btn form-btn--sm"   onclick="moveValue(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') +                        '><i class="ph-duotone ph-arrow-up"></i></button> '
+                        + '<button class="form-btn form-btn--sm" onclick="moveValue(' + i + ',1)"'  + (i === currentValues.length - 1 ? ' disabled' : '') + '><i class="ph-duotone ph-arrow-down"></i></button>';
+                tr.appendChild(orderTd);
+
+                const nameTd = document.createElement('td');
+                nameTd.textContent = v.canonicalName;
+                tr.appendChild(nameTd);
+
+                const statusTd = document.createElement('td');
+                statusTd.innerHTML = statusBadge(v.isActive);
+                tr.appendChild(statusTd);
+
+                const ctrlTd = document.createElement('td');
+                ctrlTd.className = 'cell-actions';
+                ctrlTd.innerHTML =
+                        '<button class="form-btn form-btn--sm" onclick="openTranslations(\'' + v.id + '\')"><i class="ph-duotone ph-translate"></i> {{ "Translations"|translate }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="openValueDialog(\'' + v.id + '\')"><i class="ph-duotone ph-pencil-simple"></i> {{ "Edit"|translate }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="toggleValue(\'' + v.id + '\')">'
+                        +   (v.isActive ? '<i class="ph-duotone ph-pause"></i>' : '<i class="ph-duotone ph-play"></i>')
+                        + '</button>';
+                tr.appendChild(ctrlTd);
+
+                body.appendChild(tr);
+            }
+        }
+
+        function openValueDialog(valueId)
+        {
+            currentValue = valueId ? currentValues.find(function (v) { return v.id === valueId; }) : null;
+
+            document.getElementById('valueDialogTitle').textContent = currentValue
+                    ? '{{ "Edit value"|translate }}'
+                    : '{{ "Add value"|translate }}';
+            document.getElementById('valueId').value = currentValue ? currentValue.id : '';
+            document.getElementById('valueCanonicalName').value = currentValue ? currentValue.canonicalName : '';
+
+            document.getElementById('valueDialog').style.display = 'block';
+        }
+
+        async function saveValue()
+        {
+            const valueId = document.getElementById('valueId').value;
+            const canonicalName = document.getElementById('valueCanonicalName').value.trim();
+            if (!canonicalName)
+            {
+                await showError('{{ "Canonical name is required."|translate }}');
+                return;
+            }
+
+            let result;
+            if (valueId)
+            {
+                result = await enumController.UpdateValue(currentEnum.id, valueId, canonicalName);
+            }
+            else
+            {
+                result = await enumController.CreateValue(currentEnum.id, canonicalName, null);
+            }
+
+            if (failed(result))
+            {
+                await showError('{{ "Failed to save value."|translate }}');
+                return;
+            }
+            closeDialog('valueDialog');
+            await loadValues();
+        }
+
+        async function toggleValue(valueId)
+        {
+            const v = currentValues.find(function (x) { return x.id === valueId; });
+            if (!v) return;
+            const ok = await enumController.SetValueActive(currentEnum.id, valueId, !v.isActive);
+            if (!ok)
+            {
+                await showError('{{ "Failed to change status."|translate }}');
+                return;
+            }
+            await loadValues();
+        }
+
+        async function moveValue(index, direction)
+        {
+            const target = index + direction;
+            if (target < 0 || target >= currentValues.length) return;
+
+            const tmp = currentValues[index];
+            currentValues[index] = currentValues[target];
+            currentValues[target] = tmp;
+            renderValues();
+
+            const orderedIds = currentValues.map(function (v) { return v.id; });
+            const ok = await enumController.ReorderValues(currentEnum.id, orderedIds);
+            if (!ok)
+            {
+                await showError('{{ "Failed to reorder - reloading."|translate }}');
+                await loadValues();
+            }
+        }
+
+        // ====================================================================================================
+        // TRANSLATIONS
+        async function openEnumeratorTranslations(id)
+        {
+            currentEnum = findEnum(id);
+            if (!currentEnum) return;
+            translationScope = 'enumerator';
+
+            document.getElementById('translationsDialogTitle').textContent = await Localisation.translate("Translations - {name}", { "{name}": currentEnum.canonicalName });
+
+            await loadTranslations();
+            document.getElementById('newTransLang').value = '';
+            document.getElementById('newTransText').value = '';
+            document.getElementById('translationsDialog').style.display = 'block';
+        }
+
+        async function openTranslations(valueId)
+        {
+            currentValue = currentValues.find(function (v) { return v.id === valueId; });
+            if (!currentValue) return;
+
+            translationScope = 'value';
+
+            document.getElementById('translationsDialogTitle').textContent = await Localisation.translate("Translations - {name}", { "{name}": currentValue.canonicalName });
+
+            await loadTranslations();
+            document.getElementById('newTransLang').value = '';
+            document.getElementById('newTransText').value = '';
+            document.getElementById('translationsDialog').style.display = 'block';
+        }
+
+        async function loadTranslations() {
+            const result = translationScope === 'enumerator'
+                    ? await enumController.GetEnumeratorTranslations(currentEnum.id)
+                    : await enumController.GetTranslations(currentEnum.id, currentValue.id);
+
+            if (failed(result))
+            {
+                await showError('{{ "Failed to load translations."|translate }}');
+                return;
+            }
+            renderTranslations(Array.isArray(result) ? result : []);
+        }
+
+        function renderTranslations(translations)
+        {
+            const body = document.getElementById('TranslationsTableBody');
+            body.innerHTML = '';
+
+            if (translations.length === 0)
+            {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 3;
+                td.style.cssText = 'text-align:center; padding:16px; color:#666;';
+                td.textContent = '{{ "No translations yet."|translate }}';
+                tr.appendChild(td);
+                body.appendChild(tr);
+                return;
+            }
+
+            for (let i = 0; i < translations.length; i++)
+            {
+                const t = translations[i];
+                const tr = document.createElement('tr');
+
+                const langTd = document.createElement('td');
+                langTd.innerHTML = '<span class="badge">' + escapeHtml(t.languageCode) + '</span>';
+                tr.appendChild(langTd);
+
+                const textTd = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-input';
+                input.style.width = '100%';
+                input.value = t.translation;
+                input.id = 'trans-' + t.id;
+                textTd.appendChild(input);
+                tr.appendChild(textTd);
+
+                const ctrlTd = document.createElement('td');
+                ctrlTd.className = 'cell-actions';
+                ctrlTd.innerHTML =
+                        '<button class="form-btn form-btn--sm form-btn--primary" onclick="saveTranslation(\'' + t.id + '\',\'' + escapeHtml(t.languageCode) + '\')"><i class="ph-duotone ph-floppy-disk"></i></button> '
+                        + '<button class="form-btn form-btn--sm" onclick="deleteTranslation(\'' + t.id + '\')"><i class="ph-duotone ph-trash"></i></button>';
+                tr.appendChild(ctrlTd);
+
+                body.appendChild(tr);
+            }
+        }
+
+        async function addTranslation()
+        {
+            const lang = document.getElementById('newTransLang').value.trim();
+            const text = document.getElementById('newTransText').value.trim();
+            if (!lang || !text)
+            {
+                await showError('{{ "Language code and translation are both required."|translate }}');
+                return;
+            }
+
+            const result = translationScope === 'enumerator'
+                    ? await enumController.CreateEnumeratorTranslation(currentEnum.id, lang, text)
+                    : await enumController.CreateTranslation(currentEnum.id, currentValue.id, lang, text);
+
+            if (failed(result))
+            {
+                await showError('{{ "Failed to add translation."|translate }}');
+                return;
+            }
+            document.getElementById('newTransLang').value = '';
+            document.getElementById('newTransText').value = '';
+            await loadTranslations();
+        }
+
+        async function saveTranslation(translationId, languageCode)
+        {
+            const input = document.getElementById('trans-' + translationId);
+            if (!input)
+            {
+                return;
+            }
+            const text = input.value.trim();
+            if (!text)
+            {
+                await showError('{{ "Translation cannot be empty."|translate }}');
+                return;
+            }
+
+            const result = translationScope === 'enumerator'
+                    ? await enumController.UpdateEnumeratorTranslation(currentEnum.id, translationId, languageCode, text)
+                    : await enumController.UpdateTranslation(currentEnum.id, currentValue.id, translationId, languageCode, text);
+
+            if (failed(result))
+            {
+                await showError('{{ "Failed to save translation."|translate }}');
+                return;
+            }
+            await loadTranslations();
+        }
+
+
+        async function deleteTranslation(translationId)
+        {
+            const ok = await confirmDialog(
+                '{{ "Delete this translation? This cannot be undone."|translate }}',
+                '{{ "Delete translation"|translate }}'
+            );
+            if (!ok)
+            {
+                return;
+            }
+
+            const result = translationScope === 'enumerator'
+                    ? await enumController.DeleteEnumeratorTranslation(currentEnum.id, translationId)
+                    : await enumController.DeleteTranslation(currentEnum.id, currentValue.id, translationId);
+
+            if (failed(result))
+            {
+                await showError('{{ "Failed to delete translation."|translate }}');
+                return;
+            }
+            await loadTranslations();
+        }
+
+        // ====================================================================================================
+        // INIT
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('enumSearch').addEventListener('input', renderEnumerators);
+            document.getElementById('filterStatus').addEventListener('change', renderEnumerators);
+
+            // message box: `X` button, backdrop click, and keyboard (`esc` dismisses, `enter` triggers primary)
+            document.getElementById('msgBoxX').addEventListener('click', function () { closeMessageBox(msgBoxDismiss); });
+            document.getElementById('msgBox').addEventListener('click', function (e) {
+                if (e.target === this) closeMessageBox(msgBoxDismiss);
+            });
+            document.addEventListener('keydown', function (e) {
+                if (!document.getElementById('msgBox').classList.contains('is-visible')) return;
+                if (e.key === 'Escape')
+                {
+                    e.preventDefault();
+                    closeMessageBox(msgBoxDismiss);
+                }
+                else if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    const primary = document.querySelector('#msgBoxButtons .form-btn--primary');
+                    if (primary) primary.click();
+                }
+            });
+
+            loadEnumerators();
+        });
+    </script>
+{% endblock %}
