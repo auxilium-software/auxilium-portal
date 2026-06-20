@@ -106,7 +106,9 @@
                         nodeBuilder.push({
                             id: "CASE@" + temp.id,
                             label: temp.title,
-                            group: 'case'
+                            group: 'case',
+                            x: Math.random() * 5000,
+                            y: Math.random() * 5000,
                         });
                         for (const temp2 of temp.workers)
                         {
@@ -134,11 +136,14 @@
                         nodeBuilder.push({
                             id: "PERSON@" + temp.id,
                             label: temp.fullName,
-                            group: 'person'
+                            group: 'person',
+                            x: Math.random() * 5000,
+                            y: Math.random() * 5000,
                         });
                     }
 
                     updateProgress(70, "{{ 'Rendering network...'|translate }}");
+                    setTimeout(() => {}, 500);
 
                     const nodes = new vis.DataSet(nodeBuilder);
                     const edges = new vis.DataSet(edgeBuilder);
@@ -146,24 +151,13 @@
                     const container = document.getElementById('graph');
                     const data = { nodes, edges };
                     const options = {
-                        nodes: {
-                            shape: 'dot',
-                            size: 16,
-                            font: { size: 14 }
-                        },
-                        edges: {
-                            font: { align: 'middle' }
-                        },
-                        physics: {
-                            enabled: true,
-                            solver: 'forceAtlas2Based'
-                        },
+                        physics: false,
+                        layout: { improvedLayout: false },
+                        nodes: { shape: 'dot', size: 16, font: { size: 14 } },
+                        edges: { smooth: false, font: { align: 'middle' } },
                         groups: {
-                            case: { color: { background: '#FFD700' }, shape: 'box' },
+                            case:   { color: { background: '#FFD700' }, shape: 'box' },
                             person: { color: { background: '#87CEEB' } }
-                        },
-                        layout: {
-                            improvedLayout: false,
                         }
                     };
 
@@ -171,12 +165,17 @@
 
                     updateProgress(85, "{{ 'Stabilising layout...'|translate }}");
 
+                    updateProgress(100, "{{ 'Complete!'|translate }}");
+                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300);
+
+                    /*
                     network.once("stabilized", function() {
                         updateProgress(100, "{{ 'Complete!'|translate }}");
                         setTimeout(() => {
                             loadingOverlay.style.display = 'none';
                         }, 300);
                     });
+                    */
 
                     network.on("click", function (params) {
                         if (params.nodes.length)
