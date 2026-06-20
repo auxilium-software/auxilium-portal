@@ -16,8 +16,7 @@ class UserController
         while (true)
         {
             const [statusCode, payload] = await this.#APIInstance.API_GET(
-                `/api/v3/users?page=${pageNumber}&pageSize=${pageSize}`,
-                true,
+                `/api/v3/users?page=${pageNumber}&pageSize=${pageSize}`
             );
             if(statusCode === 200)
             {

@@ -3,6 +3,27 @@
   Icon: house
   HREF: /admin-console
 
+
+
+
+
+
+
+
+- Label: Reporting
+  Type: Header
+
+- Label: WEMWBS
+  Type: HREF
+  Icon: brain
+  HREF: /admin-console/reporting/wemwbs
+
+
+
+
+
+
+
 - Label: Object Management
   Type: Header
   HREF: /admin-console/object-management
@@ -11,21 +32,21 @@
   Type: HREF
   Icon: users
   HREF: /admin-console/object-management/user-management
-
 - Label: Case Management
   Type: HREF
   Icon: briefcase
   HREF: /admin-console/object-management/case-management
-
 - Label: Data Enumerator Management
   Type: HREF
   Icon: gear
   HREF: /admin-console/object-management/enumerator-management
 
 
+
+
+
 - Label: System Administration
   Type: Header
-  HREF: /admin-console/system-administration
 
 - Label: Instance Management
   Type: Dropdown
@@ -50,8 +71,6 @@
       Type: HREF
       Icon: scroll
       HREF: /admin-console/system-administration/configuration/policy-management
-
-# - Type: Line
 
 - Label: Services
   Type: Dropdown

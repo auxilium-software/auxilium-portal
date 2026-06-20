@@ -1,0 +1,22 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-users"></i> {{ "WEMWBS"|translate }}
+            <span class="page-title__sub">{{ "View portal-wide WEMWBS statistics"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const wemwbsController = new WemwbsController();
+            const temp = await wemwbsController.GetAllAssessments_DontDoThisLol();
+            console.log(temp);
+        });
+    </script>
+{% endblock %}

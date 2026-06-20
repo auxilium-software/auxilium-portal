@@ -191,6 +191,7 @@
             <endpoint>/api/v3/wemwbs</endpoint>
             <method>POST</method>
             <payload>
+                <subjectUserId>$currentUser["id"]</subjectUserId>
                 <responses>$collectGridValues("wemwbs")</responses>
             </payload>
         </apiRequest>
