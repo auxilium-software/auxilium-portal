@@ -65,31 +65,25 @@
                         </h2>
                         <br />
                         <dl id="properties-list">
-                            {% for property_name, property_data in UserDetails.additionalProperties %}
-                                {% if not (property_name in hidden_props) %}
+                            {% for property_data in UserDetails.additionalProperties %}
+                                {% if not (property_data.displayName in hidden_props) %}
                                     {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
-                                        <dt data-property-key="{{ property_name }}">{{ property_data.enumDisplayName|default(property_data.originalName|default(property_name)) }}</dt>
-                                        <dd data-property-key="{{ property_name }}">
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.displayName) }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
                                             <a class="edit-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
                                             <a class="delete-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.originalName|default(property_name)|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
                                         </dd>
                                     {% else %}
-                                        <dt data-property-key="{{ property_name }}">{{ property_data.originalName|default(property_name) }}</dt>
-                                        <dd data-property-key="{{ property_name }}">
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.displayName }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.content }}</span>
-                                            <a class="edit-icon inline-icon"
-                                               title="Edit property"
-                                               href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.content|e('js') }}')">
-                                            </a>
-                                            <a class="delete-icon inline-icon"
-                                               title="Remove property"
-                                               href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_name }}', '{{ property_data.pretty_name|default(property_name)|e('js') }}')">
-                                            </a>
+                                            <a class="edit-icon inline-icon" title="Edit property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" title="Remove property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
                                         </dd>
                                     {% endif %}
                                 {% endif %}

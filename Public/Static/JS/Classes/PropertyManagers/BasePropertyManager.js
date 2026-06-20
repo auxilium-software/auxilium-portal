@@ -11,7 +11,7 @@ class BasePropertyManager
     // PLAIN TEXT PROPERTY
     async editProperty(propertyKey, currentContent)
     {
-        const newContent = prompt(`Edit property "${propertyKey}":`, currentContent);
+        const newContent = prompt(`Edit property "${displayName || propertyKey}":`, currentContent);
 
         if (newContent === null || newContent === currentContent)
         {
@@ -72,7 +72,7 @@ class BasePropertyManager
             return;
         }
 
-        const chosenId = await this._promptEnumChoice(propertyKey, values, currentValueId);
+        const chosenId = await this._promptEnumChoice(displayName || propertyKey, values, currentValueId);
         if (chosenId === null || chosenId === currentValueId)
         {
             return;

@@ -589,17 +589,25 @@ class NewPropertyPopup
 
     async #saveContent(content, contentType, defaultName = null)
     {
-        const [apiPath, originalName] = this.#calculateApiPathAndOriginalName(defaultName);
+        const apiPath = this.#collectionPath();
 
         let payload;
         if (contentType === 'multipart/form-data')
         {
+            // the name used to ride in the URL slug; with no slug, carry the
+            // (sanitised) filename in the form body for the upload handler to read.
+            if (content instanceof FormData && defaultName && !content.has('originalName'))
+            {
+                content.append('originalName', defaultName);
+            }
             payload = content;
         }
         else
         {
             payload = {
-                originalName: originalName,
+                // identity is the server-minted UUID now; originalName is just a display label.
+                // blank is allowed for enum refs — the API fills it from the canonical name.
+                originalName: this.#readTypedName(),
                 content: content,
                 contentType: contentType
             };
@@ -615,43 +623,20 @@ class NewPropertyPopup
         return response;
     }
 
-    #calculateApiPathAndOriginalName(defaultName = null)
+    #collectionPath()
     {
-        const nameInput = this.#innerContainer.querySelector('.property-name-input');
-
-        let propertyName = defaultName || 'untitled';
-
-        if (this.#mode === 'dict')
-        {
-            if (nameInput && nameInput.value.trim())
-            {
-                propertyName = this.#sanitizeName(nameInput.value.trim());
-            }
-            else if (!defaultName)
-            {
-                throw new Error('Property name is required');
-            }
-        }
-
-        if (this.#resourcePath)
-        {
-            if (this.#mode === 'dict')
-            {
-                return [this.#resourcePath.replace(/\/\*$/, '/' + propertyName), nameInput.value.trim()];
-            }
-            else if (this.#mode === 'array')
-            {
-                return [this.#resourcePath.replace(/\/#$/, ''), null];
-            }
-            else
-            {
-                return [this.#resourcePath, null];
-            }
-        }
-        else
+        if (!this.#resourcePath)
         {
             throw new Error('Resource path is required');
         }
+        return this.#resourcePath.replace(/\/[*#]$/, '');
+    }
+
+    // optional display name from the dict-mode header input ('' when absent/blank)
+    #readTypedName()
+    {
+        const nameInput = this.#innerContainer.querySelector('.property-name-input');
+        return nameInput ? nameInput.value.trim() : '';
     }
 
     #createICalendar(type, data)

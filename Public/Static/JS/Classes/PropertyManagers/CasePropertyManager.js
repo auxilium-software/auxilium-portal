@@ -9,7 +9,7 @@ class CasePropertyManager extends BasePropertyManager
     static async editProperty(userId, propertyKey, currentContent)
     {
         const manager = new BasePropertyManager(`/api/v3/cases/${userId}/additional_properties`);
-        return manager.editProperty(propertyKey, currentContent);
+        return manager.editProperty(propertyKey, currentContent, displayName);
     }
 
     static async deleteProperty(userId, propertyKey, displayName)
@@ -20,7 +20,7 @@ class CasePropertyManager extends BasePropertyManager
 
     static async editEnumProperty(caseId, propertyKey, currentValueId, enumTypeId)
     {
-        const manager = new BasePropertyManager(`/api/v3/cases/${caseId}/additional_properties`);
-        return manager.editEnumProperty(propertyKey, currentValueId, enumTypeId);
+        const manager = new BasePropertyManager(`/api/v3/cases/${userId}/additional_properties`);
+        return manager.editEnumProperty(propertyKey, currentValueId, enumTypeId, displayName);
     }
 }
