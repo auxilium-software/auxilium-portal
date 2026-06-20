@@ -3,20 +3,522 @@
 {% block content %}
     <div class="page-title">
         <div class="page-title__text">
-            <i class="ph-duotone ph-users"></i> {{ "WEMWBS"|translate }}
+            <i class="ph-duotone ph-brain"></i> {{ "WEMWBS"|translate }}
             <span class="page-title__sub">{{ "View portal-wide WEMWBS statistics"|translate }}</span>
         </div>
-        <div class="page-title__actions">
+        <div class="page-title__actions"></div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Total">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Assessments"|translate }}</div>
+            <div class="stat-card__change">{{ "Loading..."|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-People">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "People Assessed"|translate }}</div>
+            <div class="stat-card__change">{{ "Loading..."|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Average">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Average Score"|translate }}</div>
+            <div class="stat-card__change">{{ "Loading..."|translate }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Median">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Median Score"|translate }}</div>
+            <div class="stat-card__change">{{ "Loading..."|translate }}</div>
         </div>
     </div>
+
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Average Score over Time"|translate }}</div>
+            <div class="chart-container__body">
+                <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container__footer" id="trendChartFooter">
+                <span></span>
+                <span>{{ "Loading..."|translate }}</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Score Distribution"|translate }}</div>
+            <div class="chart-container__body">
+                <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container__footer" id="distributionChartFooter">
+                <span>{{ "Total score range: 14-70"|translate }}</span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__header">
+            <span><i class="ph-duotone ph-list-bullets"></i> {{ "Average Score by Item"|translate }}</span>
+        </div>
+        <div class="panel__body" id="ItemAverages">
+            <p class="page-title__sub">{{ "Loading..."|translate }}</p>
+        </div>
+        <div class="panel__footer">
+            {{ "Each item is scored 1 (none of the time) to 5 (all of the time). Lowest-scoring items are listed first."|translate }}
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="assessmentsTable">
+            <caption>{{ "Assessments"|translate }}</caption>
+            <thead>
+            <tr>
+                <th>{{ "Subject"|translate }}</th>
+                <th>{{ "Created By"|translate }}</th>
+                <th class="is-sortable is-sorted-desc" data-sort="createdAt">{{ "Created At"|translate }}</th>
+                <th class="is-sortable" data-sort="totalScore">{{ "Total Score"|translate }}</th>
+            </tr>
+            </thead>
+            <tbody id="AssessmentsTableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="Pagination"></div>
 {% endblock %}
 
 {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/Static/JS/General/ChartJSConfig.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-            const wemwbsController = new WemwbsController();
-            const temp = await wemwbsController.GetAllAssessments_DontDoThisLol();
-            console.log(temp);
+        const wemwbsController = new WemwbsController();
+
+        const WEMWBS_ITEMS = [
+            { key: 'optimismScore',                 label: "{{ "I've been feeling optimistic about the future"|translate }}" },
+            { key: 'usefulnessScore',               label: "{{ "I've been feeling useful"|translate }}" },
+            { key: 'relaxedScore',                  label: "{{ "I've been feeling relaxed"|translate }}" },
+            { key: 'interestedInPeopleScore',       label: "{{ "I've been feeling interested in other people"|translate }}" },
+            { key: 'spareEnergyScore',              label: "{{ "I've had energy to spare"|translate }}" },
+            { key: 'problemHandlingScore',          label: "{{ "I've been dealing with problems well"|translate }}" },
+            { key: 'clearThoughtScore',             label: "{{ "I've been thinking clearly"|translate }}" },
+            { key: 'feelingGoodSelfScore',          label: "{{ "I've been feeling good about myself"|translate }}" },
+            { key: 'feelingCloseToPeopleScore',     label: "{{ "I've been feeling close to other people"|translate }}" },
+            { key: 'confidenceScore',               label: "{{ "I've been feeling confident"|translate }}" },
+            { key: 'makingUpOwnMindScore',          label: "{{ "I've been able to make up my own mind about things"|translate }}" },
+            { key: 'feelingLovedScore',             label: "{{ "I've been feeling loved"|translate }}" },
+            { key: 'interestedInNewThingsScore',    label: "{{ "I've been interested in new things"|translate }}" },
+            { key: 'feelingCheerfulScore',          label: "{{ "I've been feeling cheerful"|translate }}" },
+        ];
+
+
+
+
+
+        // ====================================================================================================
+        // VARIABLES
+        let allAssessments = [];
+        let currentPage = 1;
+        const pageSize = 50;
+        let currentSortBy = 'createdAt';
+        let currentSortOrder = 'desc';
+
+        const tableBody = document.getElementById('AssessmentsTableBody');
+        const paginationContainer = document.getElementById('Pagination');
+
+
+
+
+
+        // ====================================================================================================
+        // HELPERS
+        function escapeHtml(str)
+        {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function formatDateTime(dateStr)
+        {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatMonth(monthKey)
+        {
+            // monthKey is "YYYY-MM"
+            const parts = monthKey.split('-');
+            const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+            return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // STAT CARDS
+        function renderStatCards(stats)
+        {
+            document.getElementById('StatCard-Total').textContent   = stats.totalAssessments.toLocaleString();
+            document.getElementById('StatCard-People').textContent  = stats.peopleAssessed.toLocaleString();
+            document.getElementById('StatCard-Average').textContent = stats.totalAssessments ? stats.averageScore.toFixed(1) : '-';
+            document.getElementById('StatCard-Median').textContent  = stats.totalAssessments ? stats.medianScore.toFixed(1) : '-';
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // CHARTS
+        function renderTrendChart(monthlyAverages)
+        {
+            AdminChart.line('trendChart',
+                    monthlyAverages.map(function (m) { return formatMonth(m.month); }),
+                    [{
+                        label: '{{ "Average Score"|translate }}',
+                        data: monthlyAverages.map(function (m) { return Math.round(m.average * 10) / 10; }),
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }],
+                    {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { min: 14, max: 70, ticks: { precision: 0 } },
+                        },
+                    }
+            );
+
+            const months = monthlyAverages.length;
+            document.getElementById('trendChartFooter').innerHTML =
+                    '<span>' + months.toLocaleString() + ' {{ "months of data"|translate }}</span>'
+                    + '<span>{{ "Possible range"|translate }}: 14-70</span>';
+        }
+
+        function renderDistributionChart(scoreBands)
+        {
+            AdminChart.doughnut('distributionChart',
+                    scoreBands.map(function (b) { return b.label; }),
+                    scoreBands.map(function (b) { return b.count; }),
+                    {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        },
+                    }
+            );
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // PER-ITEM AVERAGES
+        function renderItemAverages(itemAverages)
+        {
+            const container = document.getElementById('ItemAverages');
+            container.innerHTML = "";
+
+            // build {label, average} list and sort lowest-first
+            const rows = WEMWBS_ITEMS.map(function (item) {
+                return {
+                    label: item.label,
+                    average: itemAverages[item.key] || 0,
+                };
+            });
+            rows.sort(function (a, b) { return a.average - b.average; });
+
+            for (let i = 0; i < rows.length; i++)
+            {
+                const row = rows[i];
+                const pct = Math.max(0, Math.min(100, (row.average / 5) * 100));
+
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'display:grid; grid-template-columns: 1fr 160px; gap:10px; align-items:center; margin-bottom:6px;';
+
+                const label = document.createElement('div');
+                label.textContent = row.label;
+
+                const meter = document.createElement('div');
+                meter.className = 'progress-meter';
+                meter.innerHTML =
+                        '<div class="progress-meter__fill" style="width:' + pct.toFixed(1) + '%;"></div>'
+                        + '<div class="progress-meter__label">' + row.average.toFixed(1) + ' / 5</div>';
+
+                wrap.appendChild(label);
+                wrap.appendChild(meter);
+                container.appendChild(wrap);
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // TABLE
+        function sortAssessments()
+        {
+            allAssessments.sort(function (a, b) {
+                let cmp;
+                if (currentSortBy === 'totalScore')
+                {
+                    cmp = a.totalScore - b.totalScore;
+                }
+                else
+                {
+                    cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                }
+                return currentSortOrder === 'asc' ? cmp : -cmp;
+            });
+        }
+
+        function renderTablePage()
+        {
+            tableBody.innerHTML = '';
+
+            if (allAssessments.length === 0)
+            {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 4;
+                td.style.cssText = 'text-align:center; padding:20px; color:#666;';
+                td.textContent = '{{ "No assessments have been submitted yet."|translate }}';
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+            }
+
+            const start = (currentPage - 1) * pageSize;
+            const slice = allAssessments.slice(start, start + pageSize);
+
+            for (let i = 0; i < slice.length; i++)
+            {
+                const a = slice[i];
+                const tr = document.createElement('tr');
+
+                const subjectTd = document.createElement('td');
+                subjectTd.innerHTML = '<span title="' + escapeHtml(a.subject || a.createdBy) + '">' + escapeHtml(a.subject || a.createdBy) + '</span>';
+                tr.appendChild(subjectTd);
+
+                const createdByTd = document.createElement('td');
+                createdByTd.innerHTML = '<span title="' + escapeHtml(a.createdBy) + '">' + escapeHtml(a.createdBy) + '</span>';
+                tr.appendChild(createdByTd);
+
+                const createdAtTd = document.createElement('td');
+                createdAtTd.textContent = formatDateTime(a.createdAt);
+                tr.appendChild(createdAtTd);
+
+                const scoreTd = document.createElement('td');
+                scoreTd.className = 'cell-number';
+                scoreTd.textContent = a.totalScore + " / 70";
+                tr.appendChild(scoreTd);
+
+                tableBody.appendChild(tr);
+            }
+
+            renderPagination();
+        }
+
+        function renderPagination()
+        {
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.max(1, Math.ceil(allAssessments.length / pageSize));
+
+            const info = document.createElement('span');
+            info.className = 'pagination__info';
+            info.textContent = '{{ "Page"|translate }} ' + currentPage + ' {{ "of"|translate }} ' + totalPages + ' (' + allAssessments.length.toLocaleString() + ' {{ "total"|translate }})';
+            paginationContainer.appendChild(info);
+
+            addPageBtn('<i class="ph-duotone ph-skip-back"></i> {{ "Prev"|translate }}', currentPage - 1, currentPage === 1);
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+            for (let i = startPage; i <= endPage; i++)
+            {
+                const btn = document.createElement('button');
+                btn.className = 'pagination__btn';
+                if (i === currentPage) btn.classList.add('is-current');
+                btn.textContent = i;
+                btn.addEventListener('click', (function (page) {
+                    return function () { goToPage(page); };
+                })(i));
+                paginationContainer.appendChild(btn);
+            }
+
+            addPageBtn('{{ "Next"|translate }} <i class="ph-duotone ph-skip-forward"></i>', currentPage + 1, currentPage === totalPages);
+        }
+
+        function addPageBtn(label, page, disabled)
+        {
+            const btn = document.createElement('button');
+            btn.className = 'pagination__btn';
+            btn.innerHTML = label;
+            btn.disabled = disabled;
+            btn.addEventListener('click', function () { goToPage(page); });
+            paginationContainer.appendChild(btn);
+        }
+
+        function goToPage(page)
+        {
+            const totalPages = Math.max(1, Math.ceil(allAssessments.length / pageSize));
+            currentPage = Math.max(1, Math.min(page, totalPages));
+            renderTablePage();
+        }
+
+        function setupSortableHeaders()
+        {
+            const headers = document.querySelectorAll('#assessmentsTable thead th.is-sortable[data-sort]');
+            headers.forEach(function (th) {
+                th.addEventListener('click', function () {
+                    const field = th.dataset.sort;
+                    if (currentSortBy === field)
+                    {
+                        currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+                    }
+                    else
+                    {
+                        currentSortBy = field;
+                        currentSortOrder = 'desc';
+                    }
+
+                    headers.forEach(function (h) { h.classList.remove('is-sorted-asc', 'is-sorted-desc'); });
+                    th.classList.add(currentSortOrder === 'asc' ? 'is-sorted-asc' : 'is-sorted-desc');
+
+                    sortAssessments();
+                    goToPage(1);
+                });
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // AGGREGATION
+        const SCORE_KEYS = WEMWBS_ITEMS.map(function (item) { return item.key; });
+
+        function calculatePortalWideStatistics(assessments)
+        {
+            const totalAssessments = assessments.length;
+
+            // unique assessed people
+            const subjectSet = new Set();
+            assessments.forEach(function (a) { subjectSet.add(a.subject); });
+
+            // average + median total score
+            const totals = assessments.map(function (a) { return a.totalScore; });
+            const sum = totals.reduce(function (s, v) { return s + v; }, 0);
+            const averageScore = totalAssessments ? sum / totalAssessments : 0;
+
+            let medianScore = 0;
+            if (totalAssessments)
+            {
+                const sorted = totals.slice().sort(function (a, b) { return a - b; });
+                const mid = Math.floor(sorted.length / 2);
+                medianScore = (sorted.length % 2)
+                        ? sorted[mid]
+                        : (sorted[mid - 1] + sorted[mid]) / 2;
+            }
+
+            // score bands: four equal ranges across the 14-70 WEMWBS range
+            const bandDefs = [
+                { label: '14-27', min: 14, max: 27 },
+                { label: '28-41', min: 28, max: 41 },
+                { label: '42-55', min: 42, max: 55 },
+                { label: '56-70', min: 56, max: 70 },
+            ];
+            const scoreBands = bandDefs.map(function (b) {
+                return {
+                    label: b.label,
+                    count: totals.filter(function (t) { return t >= b.min && t <= b.max; }).length
+                };
+            });
+
+            // average total score per calendar month
+            const monthlyMap = {};
+            assessments.forEach(function (a) {
+                const d = new Date(a.createdAt);
+                if (isNaN(d.getTime())) return;
+                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                if (!monthlyMap[key]) monthlyMap[key] = { sum: 0, count: 0 };
+                monthlyMap[key].sum += a.totalScore;
+                monthlyMap[key].count += 1;
+            });
+            const monthlyAverages = Object.keys(monthlyMap).sort().map(function (key) {
+                return {
+                    month: key,
+                    average: monthlyMap[key].sum / monthlyMap[key].count,
+                    count: monthlyMap[key].count
+                };
+            });
+
+            // per-item mean (1..5)
+            const itemAverages = {};
+            SCORE_KEYS.forEach(function (key) {
+                if (!totalAssessments) { itemAverages[key] = 0; return; }
+                let s = 0;
+                for (const a of assessments)
+                {
+                    s += (a.scores ? a.scores[key] : 0) || 0;
+                }
+                itemAverages[key] = s / totalAssessments;
+            });
+
+            return {
+                totalAssessments: totalAssessments,
+                peopleAssessed: subjectSet.size,
+                averageScore: averageScore,
+                medianScore: medianScore,
+                scoreBands: scoreBands,
+                monthlyAverages: monthlyAverages,
+                itemAverages: itemAverages
+            };
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // INIT
+        document.addEventListener('DOMContentLoaded', async function () {
+            setupSortableHeaders();
+
+            const assessments = await wemwbsController.GetAllAssessments_DontDoThisLol();
+            if (assessments === false)
+            {
+                document.getElementById('ItemAverages').innerHTML = '<p class="page-title__sub">{{ "Failed to load WEMWBS statistics."|translate }}</p>';
+                return;
+            }
+
+            const stats = calculatePortalWideStatistics(assessments);
+
+            renderStatCards(stats);
+            renderTrendChart(stats.monthlyAverages);
+            renderDistributionChart(stats.scoreBands);
+            renderItemAverages(stats.itemAverages);
+
+            allAssessments = assessments;
+            sortAssessments();
+            renderTablePage();
         });
     </script>
 {% endblock %}
