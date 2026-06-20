@@ -11,13 +11,20 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 register_shutdown_function(function () {
     $error = error_get_last();
-    if ($error && $error['type'] === E_ERROR && str_contains($error['message'], 'Maximum execution time'))
+
+    if ($error === null || !in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true))
+    {
+        return;
+    }
+
+    if (str_contains($error['message'], 'Maximum execution time'))
     {
         PageBuilder::OfflineRender(
             template: '/ErrorPages/FatalApiFailureErrorPage.html.twig',
             variables: ['ErrorMessage' => 'The request to the API server timed out. The API server may be unavailable.'],
         );
     }
+
     PageBuilder::OfflineRender(
         template: '/ErrorPages/InternalSystemErrorErrorPage.html.twig',
         variables: [],
