@@ -34,7 +34,10 @@ h1, h2, h3, h4, h5, h6, legend {
 footer > div > h1, footer > div > h2, footer > div > h3, footer > div > h4, footer > div > h5, footer > div > h6, footer > div > legend {
     color: var(--brand-color-contrast);
 }
-
+.user-assignment-container > div {
+    padding: 0;
+    overflow: visible;
+}
 div, main, nav, footer, dialog {
     word-wrap: normal;
     overflow: hidden;

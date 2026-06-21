@@ -125,7 +125,7 @@ dd > .email-box {
         right: -1.5em;
         top: 0;
         font-size: 2rem;
-    } 
+    }
 }
 .email-box > p, .email-box > a {
     padding: 0.3em 0.7em 0.5em 0.7em;
@@ -178,7 +178,7 @@ dd > .email-box {
 }
 
 .email-quote-cutoff {
-    
+
 }
 
 .todo-box {
@@ -191,7 +191,7 @@ dd > .email-box {
     float: right;
 }
 .todo-box > h4 > .edit-icon-black {
-    float: none !important; 
+    float: none !important;
 }
 .todo-box > h4 {
     background-color: var(--neutral-badge-color);
@@ -226,7 +226,7 @@ dd > .email-box {
 
 #uploadFileProgressLocation {
     padding: 0;
-    
+
 }
 
 .uploading-file-entry {
@@ -539,7 +539,7 @@ dd > .email-box {
 }
 
 .download-box > .file-name {
-    
+
 }
 
 .download-box > .file-meta-info, .message-box > .file-meta-info {
@@ -621,7 +621,7 @@ dd > .email-box {
     width: 100%;
     max-width: 100vw;
     max-height: 80vh;
-    
+
     background-color: var(--background-color);
     z-index: 100;
     transition: transform 0.1s ease-out;
