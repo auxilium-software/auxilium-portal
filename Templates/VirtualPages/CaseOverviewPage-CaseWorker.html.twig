@@ -175,6 +175,38 @@
                             {% endfor %}
                         </ul>
                     </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Timeline" | translate }}
+                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add Entry" | translate }}"
+                            ></a>
+                        </h2>
+                        <ul class="collection-list timeline-list">
+                            {% for item in CaseDetails.timeline %}
+                                <li class="timeline-entry {{ item.isSystem ? 'timeline-entry-system' }}">
+                                    <time class="timeline-entry-time">{{ item.occurredAt|date("j M Y, H:i") }}</time><span class="timeline-entry-title">{{ item.title }}</span>{% if item.actor %}<span class="timeline-entry-meta">- {% include '/Partials/InlineUserField.html.twig' with {'_data': item.actor} %}</span>{% endif %}
+
+                                    {% if item.description %}
+                                        <p class="timeline-entry-description">{{ item.description }}</p>
+                                    {% endif %}
+
+                                    {% if not item.isSystem %}
+                                        <span class="timeline-entry-actions">
+                                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showEditModal('{{ item.id|e('js') }}', '{{ item.title|e('js') }}', '{{ item.description|e('js') }}');}"
+                                               class="action-link action-link-edit">{{ "Edit" | translate }}</a>
+                                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.deleteEntry('{{ item.id|e('js') }}').then(() => window.location.reload());}"
+                                               class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                        </span>
+                                    {% endif %}
+                                </li>
+                            {% else %}
+                                <li><em>{{ "No Timeline entries" | translate }}</em></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="right-preferential-box">
