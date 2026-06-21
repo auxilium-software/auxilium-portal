@@ -95,6 +95,7 @@
     <script src="/Static/JS/General/ChartJSConfig.js"></script>
     <script>
         const wemwbsController = new WemwbsController();
+        const userController = new UserController();
 
         const WEMWBS_ITEMS = [
             { key: 'optimismScore',                 label: "{{ "I've been feeling optimistic about the future"|translate }}" },
@@ -113,6 +114,8 @@
             { key: 'feelingCheerfulScore',          label: "{{ "I've been feeling cheerful"|translate }}" },
         ];
 
+        const BAND_COLOURS = ['#ac2925', '#e0a800', '#5cb85c', '#2e7d32'];
+        const USER_ADMIN_BASE = '/admin-console/object-management/user-management/';
 
 
 
@@ -120,6 +123,7 @@
         // ====================================================================================================
         // VARIABLES
         let allAssessments = [];
+        let userMap = {};
         let currentPage = 1;
         const pageSize = 50;
         let currentSortBy = 'createdAt';
@@ -157,6 +161,17 @@
             const parts = monthKey.split('-');
             const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
             return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+        }
+
+        function userLink(uuid)
+        {
+            if (!uuid) return '-';
+
+            const name = userMap[uuid];
+            const display = name ? escapeHtml(name) : escapeHtml(uuid);
+            const href = USER_ADMIN_BASE + encodeURIComponent(uuid);
+
+            return '<a href="' + href + '" title="' + escapeHtml(uuid) + '">' + display + '</a>';
         }
 
 
@@ -209,19 +224,29 @@
 
         function renderDistributionChart(scoreBands)
         {
-            AdminChart.doughnut('distributionChart',
-                    scoreBands.map(function (b) { return b.label; }),
-                    scoreBands.map(function (b) { return b.count; }),
-                    {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            }
-                        },
-                    }
-            );
+            const ctx = document.getElementById('distributionChart');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: scoreBands.map(function (b) { return b.label; }),
+                    datasets: [{
+                        data: scoreBands.map(function (b) { return b.count; }),
+                        backgroundColor: BAND_COLOURS,
+                        borderColor: '#ffffff',
+                        borderWidth: 1,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    },
+                }
+            });
         }
 
 
@@ -314,11 +339,11 @@
                 const tr = document.createElement('tr');
 
                 const subjectTd = document.createElement('td');
-                subjectTd.innerHTML = '<span title="' + escapeHtml(a.subject || a.createdBy) + '">' + escapeHtml(a.subject || a.createdBy) + '</span>';
+                subjectTd.innerHTML = userLink(a.subject || a.createdBy);
                 tr.appendChild(subjectTd);
 
                 const createdByTd = document.createElement('td');
-                createdByTd.innerHTML = '<span title="' + escapeHtml(a.createdBy) + '">' + escapeHtml(a.createdBy) + '</span>';
+                createdByTd.innerHTML = userLink(a.createdBy);
                 tr.appendChild(createdByTd);
 
                 const createdAtTd = document.createElement('td');
@@ -405,6 +430,30 @@
                     goToPage(1);
                 });
             });
+        }
+
+
+
+
+
+        async function loadUserMap()
+        {
+            const map = {};
+            let page = 1;
+            const size = 500;
+
+            while (true)
+            {
+                const result = await userController.GetUsersPage(page, size, 'createdAt', 'desc', '');
+                if (!result) break;
+
+                (result.users || []).forEach(function (u) { map[u.id] = u.fullName; });
+
+                if (!result.users || result.users.length === 0 || page >= result.totalPages) break;
+                page++;
+            }
+
+            return map;
         }
 
 
@@ -508,6 +557,8 @@
                 document.getElementById('ItemAverages').innerHTML = '<p class="page-title__sub">{{ "Failed to load WEMWBS statistics."|translate }}</p>';
                 return;
             }
+
+            userMap = await loadUserMap();
 
             const stats = calculatePortalWideStatistics(assessments);
 
