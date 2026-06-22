@@ -1,5 +1,12 @@
 
 ##################################################
+# SPECIAL CHARACTERS
+"{greeting}, {username}":
+  cy-GB: "{greeting}, {username}"
+
+
+
+##################################################
 # A
 About:
   cy-GB: Ynglŷn â
@@ -7,8 +14,20 @@ About:
 about me:
   cy-GB: amdanaf i
 
+AAC Dashboard:
+  cy-GB: Dangosfwrdd CGA
+
 Account Management:
   cy-GB: Rheoli Cyfrif
+
+Activate:
+  cy-GB: Ysgogi
+
+Active:
+  cy-GB: Gweithredol
+
+Add:
+  cy-GB: Ychwanegu
 
 Add Case Worker:
   cy-GB: Ychwanegu Gweithiwr Achos
@@ -22,8 +41,20 @@ Add Client:
 Add Entry:
   cy-GB: Ychwanegu Cofnod
 
+Add translation:
+  cy-GB: Ychwanegu cyfieithiad
+
+Add value:
+  cy-GB: Ychwanegu gwerth
+
 "Adding property to: {path}":
   cy-GB: "Ychwanegu eiddo at: {path}"
+
+Administrator Mode:
+  cy-GB: Modd Gweinyddwr
+
+All:
+  cy-GB: Y cyfan
 
 All Cases:
   cy-GB: Pob Achos
@@ -37,11 +68,20 @@ All cases:
 All Users:
   cy-GB: Pob Defnyddiwr
 
+An administrator has required you to set a new password before continuing.:
+  cy-GB: Mae gweinyddwr wedi gofyn i chi osod cyfrinair newydd cyn parhau.
+
 An unexpected error occurred. Please try again.:
   cy-GB: Bu gwall annisgwyl. Rhowch gynnig arall arni
 
 apply filters:
   cy-GB: defnyddio hidlwyr
+
+Auxilium Administration Console:
+  cy-GB: Consol Gweinyddu Auxilium
+
+Auxilium Home:
+  cy-GB: Hafan Auxilium
 
 
 
@@ -49,6 +89,9 @@ apply filters:
 # B
 Back to Edit:
   cy-GB: Yn ôl i Golygu
+
+Back to login:
+  cy-GB: Yn ôl i fewngofnodi
 
 By completing these questions you consent to us processing your data, opening a case and considering the information that you have provided.\n\nPlease confirm that you are happy for your data to be used for these purposes, and that you consent to us contacting you once your form has been received.\n\nAlternatively, confirm that your service user or beneficiary consents to the above.:
   cy-GB: Trwy ateb y cwestiynau hyn rydych yn rhoi caniatâd i ni brosesu eich data, agor achos ac ystyried y wybodaeth rydych chi wedi'i darparu.\n\nCadarnhewch eich bod yn hapus i'ch data gael ei ddefnyddio at y dibenion hyn, a'ch bod yn caniatáu i ni gysylltu â chi ar ôl inni dderbyn eich ffurflen.\n\nFel arall, cadarnhewch fod eich defnyddiwr gwasanaeth neu'ch buddiolwr yn cydsynio i'r uchod.
@@ -61,6 +104,12 @@ By completing these questions you consent to us processing your data, opening a 
 # C
 Cancel:
   cy-GB: Canslo
+
+Canonical Name:
+  cy-GB: Enw Canonaidd
+
+Canonical name is required.:
+  cy-GB: Mae angen enw canonaidd.
 
 Case:
   cy-GB: Achos
@@ -89,6 +138,17 @@ Case Workers:
 Change my Password:
   cy-GB: Newid fy Nghyfrinair
 
+Change Password:
+  cy-GB: Newid Cyfrinair
+
+Choose a type...:
+  cy-GB: Dewiswch fath…
+
+Clear:
+  cy-GB: Clir
+
+# Close: Cau
+
 Closed cases only:
   cy-GB: Achosion ar gau yn unig
 
@@ -98,11 +158,23 @@ Clients:
 Compose Message:
   cy-GB: Cyfansoddi Neges
 
+Configuration:
+  cy-GB: Ffurfweddiad
+
 Confirm New Password:
   cy-GB: Cadarnhau Cyfrinair Newydd
 
+Confirm Password:
+  cy-GB: Cadarnhau Cyfrinair
+
 Content type:
   cy-GB: Math o gynnwys
+
+Continue:
+  cy-GB: Parhau
+
+Controls:
+  cy-GB: Botymau Rheoli
 
 Cookie Notice:
   cy-GB: Hysbysiad Cwci
@@ -112,6 +184,12 @@ Copyright:
 
 Create a new account:
   cy-GB: Creu cyfrif newydd
+
+Create a new Data Enumerator:
+  cy-GB: Creu Rhifwr Data newydd
+
+Create:
+  cy-GB: Creu
 
 Created At:
   cy-GB: Crëwyd
@@ -129,16 +207,49 @@ Current Password:
 Data consent is required.:
   cy-GB: Mae angen caniatâd data.
 
+Data Enumerator Management:
+  cy-GB: Rheoli Rhifwr Data
+
+Data Enumerators:
+  cy-GB: Rhifwyr Data
+
 Date of birth:
   cy-GB: Dyddiad geni
 
+Deactivate:
+  cy-GB: Dadysgogi
+
+Delete this translation? This cannot be undone.:
+  cy-GB: Dileu'r cyfieithiad hwn? Ni ellir dadwneud hyn.
+
+Delete translation:
+  cy-GB: Dileu cyfieithiad
+
 Delete my Account:
   cy-GB: Dileu fy Nghyfrif
+
+Description:
+  cy-GB: Disgrifiad
+
+Doing so could give an attacker access to confidential case information.:
+  cy-GB: Gallai gwneud hynny roi mynediad i ymosodwr at wybodaeth achos gyfrinachol.
 
 
 
 ##################################################
 # E
+Edit:
+  cy-GB: Golygu
+
+Edit Enumerator:
+  cy-GB: Golygu Rhifwr
+
+"Edit property: {name}":
+  cy-GB: "Golygu priodwedd: {name}"
+
+Edit value:
+  cy-GB: Golygu gwerth
+
 Email Address:
   cy-GB: Cyfeiriad e-bost
 
@@ -147,6 +258,9 @@ Email address is required:
 
 Enter your text here...:
   cy-GB: Rhowch eich testun yma...
+
+Error:
+  cy-GB: Gwall
 
 Error loading cases:
   cy-GB: Gwall wrth lwytho achosion
@@ -161,6 +275,39 @@ Extended Properties:
 
 ##################################################
 # F
+Failed to add translation.:
+  cy-GB: Methwyd ag ychwanegu cyfieithiad.
+
+Failed to change status.:
+  cy-GB: Methwyd â newid statws.
+
+Failed to create Data Enumerator.:
+  cy-GB: Methwyd â chreu Rhifwr Data.
+
+Failed to delete translation.:
+  cy-GB: Methwyd â dileu’r cyfieithiad.
+
+Failed to load Data Enumerators.:
+  cy-GB: Methu llwytho Rhifwyr Data.
+
+Failed to load translations.:
+  cy-GB: Methwyd â llwytho cyfieithiadau.
+
+Failed to load values.:
+  cy-GB: Methwyd â llwytho gwerthoedd.
+
+Failed to reorder - reloading.:
+  cy-GB: Methwyd ag aildrefnu - ail-lwytho.
+
+Failed to save translation.:
+  cy-GB: Methwyd â chadw’r cyfieithiad.
+
+Failed to save value.:
+  cy-GB: Methwyd â chadw gwerth.
+
+Failed to update Data Enumerator.:
+  cy-GB: Methwyd â diweddaru’r Rhifwr Data.
+
 Female:
   cy-GB: Benyw
 
@@ -200,6 +347,12 @@ Full Name:
 # G
 Generate PDF:
   cy-GB: Creu PDF
+
+Good afternoon:
+  cy-GB: Prynhawn da
+
+Good evening:
+  cy-GB: Noswaith dda
 
 
 
@@ -242,6 +395,20 @@ I need ongoing access to manage the case on behalf of someone else.:
 I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.:
   cy-GB: Mae angen i mi wneud y cyswllt cyntaf ar ran rhywun arall, ond ni fyddaf yn rheoli'r achos hwn yn barhaus.
 
+If someone told you to copy and paste something here to enable a feature, "unlock" your account, or help someone else, it is a scam.:
+  cy-GB: Os oes rhywun wedi dweud wrthych am gopïo a gludo rhywbeth yma i alluogi nodwedd, "datgloi" eich cyfrif, neu helpu rhywun arall, sgam ydyw.
+
+If you don't know exactly what you're doing, close this window now.:
+  cy-GB: Os nad ydych chi'n gwybod yn union beth rydych chi'n ei wneud, caewch y ffenestr hon nawr.
+
+Inactive:
+  cy-GB: Anweithredol
+
+Information:
+  cy-GB: Gwybodaeth
+
+Instance Management:
+  cy-GB: Rheoli Enghreifftiau
 
 
 ##################################################
@@ -256,11 +423,20 @@ I need to make first contact on behalf of someone else, but will not be managing
 
 ##################################################
 # L
+Language:
+  cy-GB: Iaith
+
+Language code and translation are both required.:
+  cy-GB: Mae angen cod iaith a chyfieithiad.
+
 Last Updated At:
   cy-GB: Diweddarwyd Ddiwethaf
 
 Loading cases...:
   cy-GB: Llwytho achosion...
+
+Loading...:
+  cy-GB: Llwytho...
 
 "Logged in as: {username}":
   cy-GB: "Wedi mewngofnodi fel: {username}"
@@ -284,11 +460,20 @@ Male:
 Manage my Account:
   cy-GB: Rheoli fy Nghyfrif
 
+Manage system-wide Data Enumerators:
+  cy-GB: Rheoli Rhifwyr Data ar draws y system
+
 Map:
   cy-GB: Map
 
+MariaDB:
+  cy-GB: MariaDB
+
 Message ID:
   cy-GB: ID Neges
+
+Message:
+  cy-GB: Neges
 
 Messages:
   cy-GB: Negeseuon
@@ -299,10 +484,22 @@ My Cases:
 My Messages:
   cy-GB: Fy Negeseuon
 
+My User Page:
+  cy-GB: Fy Nhudalen Defnyddiwr
+
 
 
 ##################################################
 # N
+Name:
+  cy-GB: Enw
+
+Name is required.:
+  cy-GB: Mae angen enw.
+
+Name or description...:
+  cy-GB: Enw neu ddisgrifiad...
+
 New Clients:
   cy-GB: Cleientiaid Newydd
 
@@ -312,8 +509,17 @@ No:
 No cases found:
   cy-GB: Ni chanfuwyd unrhyw achosion
 
+No Data Enumerators found matching your criteria.:
+  cy-GB: Ni ddarganfuwyd unrhyw Rifwyr Data sy'n cyfateb i'ch meini prawf.
+
 No ToDo entries:
   cy-GB: Dim Tasgau wedi eu Cofnodi
+
+No translations yet.:
+  cy-GB: Dim cyfieithiadau eto.
+
+No values yet.:
+  cy-GB: Dim gwerthoedd eto.
 
 NEW:
   cy-GB: NEWYDD
@@ -324,12 +530,24 @@ New Case:
 New Password:
   cy-GB: Cyfrinair Newydd
 
+New selection:
+  cy-GB: Dewis newydd
+
+New text property:
+  cy-GB: Priodwedd testun newydd
+
 
 
 ##################################################
 # O
 Object ID:
   cy-GB: ID Gwrthrych
+
+Object Management:
+  cy-GB: Rheoli Gwrthrychau
+
+OK:
+  cy-GB: Iawn
 
 Open cases only:
   cy-GB: Achosion agored yn unig
@@ -342,6 +560,15 @@ Open a New Case:
 
 Opens in a new tab:
   cy-GB: Yn agor mewn tab newydd
+
+Operation failed:
+  cy-GB: Gweithred wedi methu
+
+Operational:
+  cy-GB: Gweithredol
+
+Order:
+  cy-GB: Trefn
 
 Other:
   cy-GB: Arall
@@ -359,8 +586,14 @@ Password is required:
 Pending cases only:
   cy-GB: Achosion arfaethedig yn unig
 
+Please confirm:
+  cy-GB: Cadarnhewch
+
 Please specify:
   cy-GB: Nodwch
+
+Policy Management:
+  cy-GB: Rheoli Polisi
 
 Preview not available for this file type:
   cy-GB: Nid yw'r rhagolwg ar gael ar gyfer y math hon o ffeil
@@ -386,11 +619,23 @@ property_name:
 
 ##################################################
 # R
+RabbitMQ:
+  cy-GB: RabbitMQ
+
+Recovery Code:
+  cy-GB: Cod Adfer
+
+Registered Data Enumerators:
+  cy-GB: Rhifwyr Data Cofrestredig
+
 Remove Person:
   cy-GB: Dileu Person
 
 required:
   cy-GB: gofynnol
+
+Retry:
+  cy-GB: Ail-gynnig
 
 Return to Home:
   cy-GB: Dychwelyd i'r Hafan
@@ -399,8 +644,14 @@ Return to Home:
 
 ##################################################
 # S
+Save:
+  cy-GB: Cadw
+
 Save data:
   cy-GB: Cadw data
+
+Search:
+  cy-GB: Chwilio
 
 search cases:
   cy-GB: chwilio achosion
@@ -408,26 +659,45 @@ search cases:
 Security Notice:
   cy-GB: Hysbysiad Diogelwch
 
-system management:
-  cy-GB: rheoli system
-
-System Management:
-  cy-GB: Rheoli System
-
 Search the Portal:
   cy-GB: Chwilio'r Porth
 
 See References:
   cy-GB: Gweld Cyfeiriadau  # This could also be "Gweler Cyfeiriadau" if it's meant to be the formal/imperative form meaning “please see” or “refer to.”
 
+Services:
+  cy-GB: Gwasanaethau
+
+Setup Multifactor Authentication:
+  cy-GB: Gosod Dilysu Aml-ffactor
+
 Skip to Content:
   cy-GB: Neidio i'r Cynnwys
+
+Status:
+  cy-GB: Statws
+
+Stop!:
+  cy-GB: Oedwch!
 
 Submit Application:
   cy-GB: Cyflwyno Cais
 
+System Administration:
+  cy-GB: Gweinyddwr System
+
+System Bulletins:
+  cy-GB: Bwletinau'r System
+
+system management:
+  cy-GB: rheoli system
+
+System Management:
+  cy-GB: Rheoli System
+
 System Settings:
   cy-GB: Gosodiadau System
+
 
 
 
@@ -442,11 +712,17 @@ Terms of Service:
 # Test:
 #   cy-GB: Prawf
 
+The authoritative name for this value. Shown to administrators, and to users only where no translation exists for their language.:
+  cy-GB: Yr enw awdurdodol ar gyfer y gwerth hwn. Dangosir i weinyddwyr, ac i ddefnyddwyr dim ond os nad oes cyfieithiad ar gyfer eu hiaith.
+
 They consent:
   cy-GB: Maent yn rhoi caniatâd
 
 They do not consent:
   cy-GB: Nid ydynt yn rhoi caniatâd
+
+# This is a browser feature intended for developers.:
+#   Mae hon yn nodwedd porwr sydd wedi'i anelu at ddatblygwyr.
 
 This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply.:
   cy-GB: Mae'r wefan hon wedi'i diogelu gan reCAPTCHA ac mae Google {privacy_link} a {terms_link} yn berthnasol.
@@ -460,6 +736,24 @@ Toggle Dark Mode:
 Toggle Large Fonts:
   cy-GB: Toglo Ffontiau Mawr
 
+Total Enumerators:
+  cy-GB: Cyfanswm Rhifwyr
+
+TOTP Token:
+  cy-GB: Tocyn TOTP
+
+Translation:
+  cy-GB: Cyfieithiad
+
+Translation cannot be empty.:
+  cy-GB: Ni all y cyfieithiad fod yn wag.
+
+Translations:
+  cy-GB: Cyfieithiadau
+
+Translations - {name}:
+  cy-GB: Cyfieithiadau - {name}
+
 
 
 ##################################################
@@ -472,6 +766,9 @@ Uploaded by:
 
 URGENT:
   cy-GB: PWYSIG
+
+Use recovery code instead:
+  cy-GB: Defnyddio cod adfer yn lle hynny
 
 User Management:
   cy-GB: Rheoli Defnyddwyr
@@ -489,6 +786,15 @@ Users:
 
 ##################################################
 # V
+Values:
+  cy-GB: Gwerthoedd
+
+Values - {name}:
+  cy-GB: Gwerthoedd - {name}
+
+Verify:
+  cy-GB: Dilysu
+
 view details:
   cy-GB: gweld manylion
 
@@ -499,6 +805,8 @@ view details:
 We only use cookies to record your choices, and allow access to our web portal. For more information please see our {privacy_policy} (opens in new tab).  We only place these cookies on your browser after you sign up or log in. If you don't consent to our use of these functional cookies, please do not sign up or log in.:
   cy-GB: Dim ond i gofnodi eich dewisiadau rydym ni'n defnyddio cwcis, ac i ganiatáu mynediad i'n porth gwe. Am fwy o wybodaeth gweler ein {privacy_policy} (agor mewn tab newydd).  Dim ond ar ôl i chi gofrestru neu fewngofnodi y byddwn yn gosod y cwcis hyn ar eich porwr. Os nad ydych yn caniatáu i'n defnydd o'r cwcis gweithredol hyn, peidiwch â chofrestru na mewngofnodi.
 
+Web Application Firewall:
+  cy-GB: Wal dân Rhaglen We
 
 
 ##################################################
@@ -513,6 +821,9 @@ Yes:
 
 You cannot progress further in the form.:
   cy-GB: Ni allwch barhau ymhellach yn y ffurflen.
+
+You must change your password:
+  cy-GB: Rhaid i chi newid eich cyfrinair
 
 
 ##################################################

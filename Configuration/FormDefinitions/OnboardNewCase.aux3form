@@ -22,7 +22,7 @@
             <id>who_is_case_about</id>
             <title>
                 <translation xml:lang="en-GB">Which best describes your situation?</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Pa un sy'n disgrifio eich sefyllfa orau?</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -34,31 +34,28 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am applying for help myself.</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Rwy'n gwneud cais am gymorth fy hun.</translation>
                             </primaryLabel>
                             <value>MYSELF</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I am helping someone else with their application.</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Rwy'n helpu rhywun arall gyda'u cais.</translation>
                             </primaryLabel>
                             <secondaryLabel>
                                 <translation xml:lang="en-GB">I need ongoing access to manage the case on behalf of someone else.</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Mae angen mynediad parhaus arnaf i reoli'r achos ar ran rhywun arall.</translation>
                             </secondaryLabel>
                             <value>SOMEONE_ELSE_MANAGED</value>
                         </option>
+                        <!--
                         <option>
-                            <primaryLabel>
-                                <translation xml:lang="en-GB">I am referring someone.</translation>
-                            </primaryLabel>
-                            <secondaryLabel>
-                                <translation xml:lang="en-GB">I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</translation>
-                                <translation xml:lang="cy-GB"></translation>
-                            </secondaryLabel>
+                            <primaryLabel>I am referring someone.</primaryLabel>
+                            <secondaryLabel>I need to make first contact on behalf of someone else, but will not be managing this case on an ongoing basis.</secondaryLabel>
                             <value>SOMEONE_ELSE</value>
                         </option>
+                        -->
                     </options>
                 </component>
             </components>
@@ -72,6 +69,7 @@
             <id>consent</id>
             <title>
                 <translation xml:lang="en-GB">Data processing consent</translation>
+                <translation xml:lang="en-GB">Caniatâd prosesu data</translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
@@ -81,7 +79,11 @@
                     and that you consent to us contacting you once your form has been received.
 
                     Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Trwy lenwi'r cwestiynau hyn rydych chi'n cydsynio i ni brosesu eich data, agor achos ac ystyried y wybodaeth rydych chi wedi'i darparu.
+
+                    Cadarnhewch eich bod yn hapus i'ch data gael ei ddefnyddio at y dibenion hyn, a'ch bod yn cydsynio i ni gysylltu â chi ar ôl i'ch ffurflen ddod i law.
+
+                    Fel arall, cadarnhewch fod defnyddiwr y gwasanaeth neu fuddiolwr yn cydsynio i'r uchod.</translation>
             </description>
             <renderIf>equals($formData["on_behalf_of"],"MYSELF")</renderIf>
             <components>
@@ -93,12 +95,14 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I consent</translation>
+                                <translation xml:lang="cy-GB">Rwy'n cydsynio</translation>
                             </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">I do not consent</translation>
+                                <translation xml:lang="cy-GB">Nid wyf yn cydsynio </translation>
                             </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
@@ -110,6 +114,7 @@
             <id>consent</id>
             <title>
                 <translation xml:lang="en-GB">Data processing consent</translation>
+                <translation xml:lang="cy-GB">OwO</translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,
@@ -119,12 +124,17 @@
                     and that you consent to us contacting you once your form has been received.
 
                     Alternatively, confirm that your service user or beneficiary consents to the above.</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Trwy lenwi'r cwestiynau hyn rydych chi'n cydsynio i ni brosesu eich data, agor achos ac ystyried y wybodaeth rydych chi wedi'i darparu.
+
+                    Cadarnhewch eich bod yn hapus i'ch data gael ei ddefnyddio at y dibenion hyn,
+                    a'ch bod yn cydsynio i ni gysylltu â chi ar ôl i'ch ffurflen ddod i law.
+
+                    Fel arall, cadarnhewch fod defnyddiwr y gwasanaeth neu fuddiolwr yn cydsynio i'r uchod.</translation>
             </description>
             <renderIf>
                 or(
-                    equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
-                    equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
+                equals($formData["on_behalf_of"],"SOMEONE_ELSE"),
+                equals($formData["on_behalf_of"],"SOMEONE_ELSE_MANAGED")
                 )
             </renderIf>
             <components>
@@ -136,14 +146,14 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">They consent</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Maen nhw'n cydsynio</translation>
                             </primaryLabel>
                             <value>CONSENT_GIVEN</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">They do not consent</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Nid ydynt yn cydsynio </translation>
                             </primaryLabel>
                             <value>NO_CONSENT</value>
                         </option>
@@ -160,11 +170,11 @@
             <id>consent_not_given</id>
             <title>
                 <translation xml:lang="en-GB">Data processing consent is required</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Mae angen caniatâd prosesu data</translation>
             </title>
             <description>
-                <translation xml:lang="en-GB">Data consent is required.</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="en-GB">Data processing consent is required for case creation.</translation>
+                <translation xml:lang="cy-GB">Mae angen caniatâd prosesu data i greu achos.</translation>
             </description>
             <renderIf>equals($formData["data_processing_consent"],"NO_CONSENT")</renderIf>
             <abandonForm>true</abandonForm>
@@ -195,7 +205,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Name</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Enw Llawn</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -204,7 +214,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Telephone Number</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Rhif ffôn</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -214,7 +224,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Cyfeiriad Llawn, Sir a Chod Post</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -223,11 +233,11 @@
             <id>contact_details_for_individual_applying_behalf_of</id>
             <title>
                 <translation xml:lang="en-GB">Contact details for individual you are applying on behalf of</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Manylion cyswllt ar gyfer unigolyn rydych chi'n gwneud cais ar eu rhan</translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Please enter as the contact details for the person you are applying on behalf of.</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Rhowch fanylion cyswllt ar gyfer unigolyn rydych chi'n gwneud cais ar eu rhan</translation>
             </description>
             <renderIf>
                 and(
@@ -245,7 +255,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Name</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Enw Llawn</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -254,7 +264,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Telephone Number</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Rhif ffôn</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -264,7 +274,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Full Address, County, and Postcode</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Cyfeiriad Llawn, Sir a Chod Post</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -295,21 +305,21 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Female</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Benyw</translation>
                             </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Male</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Gwryw</translation>
                             </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Other</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Arall </translation>
                             </primaryLabel>
                             <value>other</value>
                         </option>
@@ -321,7 +331,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Ethnic group</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Grŵp Ethnig </translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -330,7 +340,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Date of birth</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Dyddiad geni</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -340,7 +350,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">How did you find out about our service?</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Sut glywsoch chi am ein gwasanaeth?</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -349,11 +359,11 @@
             <id>about_individual_applying_behalf_of</id>
             <title>
                 <translation xml:lang="en-GB">About individual you are applying on behalf of</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Ynglŷn â’r unigolyn rydych chi'n gwneud cais ar eu rhan</translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">Please enter information for the person you are applying on behalf of.</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Rhowch wybodaeth ar gyfer unigolyn rydych chi'n gwneud cais ar eu rhan</translation>
             </description>
             <renderIf>
                 and(
@@ -373,21 +383,21 @@
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Female</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Benyw</translation>
                             </primaryLabel>
                             <value>female</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Male</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Gwryw</translation>
                             </primaryLabel>
                             <value>male</value>
                         </option>
                         <option>
                             <primaryLabel>
                                 <translation xml:lang="en-GB">Other</translation>
-                                <translation xml:lang="cy-GB"></translation>
+                                <translation xml:lang="cy-GB">Arall </translation>
                             </primaryLabel>
                             <value>other</value>
                         </option>
@@ -399,7 +409,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Ethnic group</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Grŵp Ethnig </translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -408,7 +418,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Date of birth</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Dyddiad geni</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -418,7 +428,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">How did you find out about our service?</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Sut glywsoch chi am ein gwasanaeth?</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -442,7 +452,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Email Address</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Cyfeiriad e-bost</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -460,7 +470,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Password</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Cyfrinair</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -469,7 +479,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Confirm Password</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Cadarnhau Cyfrinair</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -518,7 +528,7 @@
             <id>case_details</id>
             <title>
                 <translation xml:lang="en-GB">Case details</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Manylion yr achos</translation>
             </title>
             <renderIf>equals($formData["data_processing_consent"],"CONSENT_GIVEN")</renderIf>
             <components>
@@ -528,7 +538,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Case Title</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Teitl yr achos</translation>
                     </primaryLabel>
                 </component>
                 <component>
@@ -538,7 +548,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Case Description</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Disgrifiad o'r Achos</translation>
                     </primaryLabel>
                 </component>
             </components>
@@ -560,7 +570,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Beneficiary Details</translation>
-                    <translation xml:lang="cy-GB"></translation>
+                    <translation xml:lang="cy-GB">Manylion y Buddiolwr</translation>
                 </value>
                 <jumpToPage>who_is_case_about</jumpToPage>
                 <if>true</if>
@@ -572,28 +582,28 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">User</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Defnyddiwr</translation>
                         </key>
                         <value>$target</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Name</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Enw Llawn</translation>
                         </key>
                         <value>$formData["full_name"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Telephone Number</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Rhif ffôn</translation>
                         </key>
                         <value>$formData["telephone_number"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Address</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Cyfeiriad Llawn</translation>
                         </key>
                         <value>$formData["full_address"]</value>
                     </item>
@@ -608,7 +618,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Beneficiary Details</translation>
-                    <translation xml:lang="cy-GB"></translation>
+                    <translation xml:lang="cy-GB">Manylion y Buddiolwr</translation>
                 </value>
                 <jumpToPage>about_you</jumpToPage>
                 <if>true</if>
@@ -620,21 +630,21 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Gender</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Rhywedd</translation>
                         </key>
                         <value>$formData["gender"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Ethic Group</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Grŵp Ethnig</translation>
                         </key>
                         <value>$formData["ethnic_group"]</value>
                     </item>
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Date of Birth</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Dyddiad geni</translation>
                         </key>
                         <value>$formData["date_of_birth"]</value>
                     </item>
@@ -652,7 +662,7 @@
                     <item>
                         <key>
                             <translation xml:lang="en-GB">Full Name</translation>
-                            <translation xml:lang="cy-GB"></translation>
+                            <translation xml:lang="cy-GB">Enw Llawn</translation>
                         </key>
                         <value>$formData["full_name"]</value>
                     </item>
@@ -662,7 +672,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Case Description</translation>
-                    <translation xml:lang="cy-GB"></translation>
+                    <translation xml:lang="cy-GB">Disgrifiad o'r Achos</translation>
                 </value>
                 <jumpToPage>case_details</jumpToPage>
                 <if>true</if>

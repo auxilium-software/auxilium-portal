@@ -3,11 +3,11 @@
     <id>Survey-ScreeningUnmetLegalNeedsInVeterans-ProfessionalsAndCaseworkers</id>
     <title>
         <translation xml:lang="en-GB">Screening Unmet Legal Needs in Veterans - Professionals and Caseworkers</translation>
-        <translation xml:lang="cy-GB"></translation>
+        <translation xml:lang="cy-GB">Sgrinio anghenion cyfreithiol heb eu diwallu mewn cyn-filwyr - gweithwyr proffesiynol a gweithwyr achos</translation>
     </title>
     <subtitle>
         <translation xml:lang="en-GB">This screening tool is meant to explore whether a veteran has unmet legal issues, whether they realise it or not. You should submit the form whether you or the veteran need help or not.</translation>
-        <translation xml:lang="cy-GB"></translation>
+        <translation xml:lang="cy-GB">Diben yr adnodd sgrinio hwn yw pwyso a mesur a oes gan gyn-filwr ofynion cyfreithiol heb eu diwallu, p'un a ydynt yn sylweddoli hynny ai peidio. Dylech gyflwyno'r ffurflen p'un a oes angen cymorth arnoch chi neu'r cyn-filwr ai peidio.</translation>
     </subtitle>
     <useReCAPTCHA>true</useReCAPTCHA>
     <requireAuthentication>false</requireAuthentication>
@@ -22,7 +22,7 @@
             <id>organisation_details</id>
             <title>
                 <translation xml:lang="en-GB">Organisation Details</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Manylion y Sefydliad</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -55,7 +55,7 @@
                     </primaryLabel>
                     <secondaryLabel>
                         <translation xml:lang="en-GB">If so, please tell us where your drop in is located.</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Os felly, dywedwch wrthym ble mae lleoliad eich canolfan</translation>
                     </secondaryLabel>
                 </component>
             </components>
@@ -66,7 +66,7 @@
             <id>your_details</id>
             <title>
                 <translation xml:lang="en-GB">Your Details</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Eich Manylion</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -128,11 +128,11 @@
             <id>do_any_of_the_below_apply_to_you</id>
             <title>
                 <translation xml:lang="en-GB">Do any of the below apply to you?</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">A oes unrhyw rai o'r isod yn berthnasol i chi?</translation>
             </title>
             <subtitle>
                 <translation xml:lang="en-GB">You can click more than one answer</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Gallwch glicio ar fwy nag un ateb</translation>
             </subtitle>
             <renderIf>true</renderIf>
             <components>
@@ -142,7 +142,7 @@
                     <required>true</required>
                     <primaryLabel>
                         <translation xml:lang="en-GB">Do any of the below apply to you?</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">A oes unrhyw rai o'r isod yn berthnasol i chi?</translation>
                     </primaryLabel>
                     <haveOtherOption>true</haveOtherOption>
                     <options>
@@ -233,7 +233,7 @@
             <id>issue_details</id>
             <title>
                 <translation xml:lang="en-GB">Issue Details</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Manylion y Mater</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -256,7 +256,7 @@
                     </primaryLabel>
                     <secondaryLabel>
                         <translation xml:lang="en-GB">If multiple please include all you have gotten legal advice for.</translation>
-                        <translation xml:lang="cy-GB"></translation>
+                        <translation xml:lang="cy-GB">Os ydynt yn lluosog, dylech gynnwys popeth rydych chi wedi cael cyngor cyfreithiol ar ei gyfer.</translation>
                     </secondaryLabel>
                 </component>
             </components>
@@ -267,7 +267,7 @@
             <id>did_you_know</id>
             <title>
                 <translation xml:lang="en-GB">Did you know?</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Wyddoch chi?</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -321,7 +321,7 @@
             <id>issue_details</id>
             <title>
                 <translation xml:lang="en-GB">Issue Details</translation>
-                <translation xml:lang="cy-GB"></translation>
+                <translation xml:lang="cy-GB">Manylion y Mater</translation>
             </title>
             <renderIf>true</renderIf>
             <components>
@@ -482,7 +482,7 @@
                 <type>SUBHEADING</type>
                 <value>
                     <translation xml:lang="en-GB">Issue Details</translation>
-                    <translation xml:lang="cy-GB"></translation>
+                    <translation xml:lang="cy-GB">Manylion y Mater</translation>
                 </value>
                 <jumpToPage>issue_details</jumpToPage>
                 <if>true</if>
