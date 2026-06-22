@@ -77,6 +77,18 @@
   Icon: gear
   HREF: /admin-console/system-administration/services
   Children:
+    - Label: Aux::API
+      Type: HREF
+      Icon: circuitry
+      HREF: /admin-console/system-administration/services/api
+    - Label: Aux::LFS
+      Type: HREF
+      Icon: hard-drive
+      HREF: /admin-console/system-administration/services/lfs
+    - Label: Aux::TaskRunner
+      Type: HREF
+      Icon: checks
+      HREF: /admin-console/system-administration/services/task-runner
     - Label: MariaDB
       Type: HREF
       Icon: database
@@ -85,7 +97,3 @@
       Type: HREF
       Icon: envelope
       HREF: /admin-console/system-administration/services/rabbitmq
-    - Label: Aux::LFS
-      Type: HREF
-      Icon: database
-      HREF: /admin-console/system-administration/services/lfs
