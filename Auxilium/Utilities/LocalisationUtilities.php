@@ -8,6 +8,7 @@ use Auxilium\SessionHandling\CookieHandling;
 use Exception;
 use InvalidArgumentException;
 use JsonException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Utilities to help with Localisation.
@@ -31,7 +32,7 @@ final class LocalisationUtilities
     public const SUPPORTED_LOCALES = ['en-GB', 'cy-GB'];
     public const DEFAULT_LOCALE = 'en-GB';
 
-    public static ?array $LanguagePackCache = null;
+    public static ?array $DictionaryCache = null;
 
     /**
      * Memoised active locale for this request.
@@ -282,21 +283,19 @@ final class LocalisationUtilities
 
         if ($language !== self::DEFAULT_LOCALE)
         {
-            if (self::$LanguagePackCache === null)
+            if (self::$DictionaryCache === null)
             {
-                self::$LanguagePackCache = json_decode(
-                    file_get_contents(
-                        __DIR__ . "/../../Configuration/Localisation/LanguagePacks/$language.json"
-                    ),
-                    true,
-                    512,
-                    JSON_THROW_ON_ERROR
+                self::$DictionaryCache = Yaml::parseFile(
+                    filename: __DIR__ . "/../../Configuration/Localisation/Dictionary.yaml"
                 );
             }
 
-            if (array_key_exists($text, self::$LanguagePackCache))
+            if (
+                array_key_exists($text, self::$DictionaryCache)
+                && array_key_exists($language, self::$DictionaryCache[$text])
+            )
             {
-                $translatedText = self::$LanguagePackCache[$text];
+                $translatedText = self::$DictionaryCache[$text][$language];
             }
             else
             {

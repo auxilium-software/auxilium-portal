@@ -677,8 +677,8 @@ Skip to Content:
 Status:
   cy-GB: Statws
 
-Stop!:
-  cy-GB: Oedwch!
+"Stop!":
+  cy-GB: "Oedwch!"
 
 Submit Application:
   cy-GB: Cyflwyno Cais
@@ -721,8 +721,8 @@ They consent:
 They do not consent:
   cy-GB: Nid ydynt yn rhoi caniatâd
 
-# This is a browser feature intended for developers.:
-#   Mae hon yn nodwedd porwr sydd wedi'i anelu at ddatblygwyr.
+This is a browser feature intended for developers.:
+  cy-GB: Mae hon yn nodwedd porwr sydd wedi'i anelu at ddatblygwyr.
 
 This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply.:
   cy-GB: Mae'r wefan hon wedi'i diogelu gan reCAPTCHA ac mae Google {privacy_link} a {terms_link} yn berthnasol.
