@@ -7,7 +7,7 @@ use Auxilium\ServiceInteractions\APIInteractions;
 
 final class SystemSettingsUtilities
 {
-    private const CACHE_TTL_SECONDS = 300;
+    private const CACHE_TTL_SECONDS = 10;
 
     public static function GetAll(bool $forceRefresh = false): array
     {

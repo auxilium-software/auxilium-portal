@@ -73,7 +73,8 @@ final class LocalisationUtilities
                 {
                     CookieHandling::SetCookie(CookieKey::LANGUAGE, $dbLocale);
                 }
-                return self::$resolvedLocale = $dbLocale;
+                self::$resolvedLocale = $dbLocale;
+                return self::$resolvedLocale;
             }
         }
 
@@ -171,9 +172,6 @@ final class LocalisationUtilities
     private static function persistLocaleToAccount(string $canonicalLocale): void
     {
         APIInteractions::Patch('/api/v3/me', ['languagePreference' => $canonicalLocale]);
-
-        // drop the cached `/me` snapshot so the new value is read back immediately rather than after the cache TTL.
-        SecurityUtilities::InvalidateUserDetailsCache();
     }
 
 

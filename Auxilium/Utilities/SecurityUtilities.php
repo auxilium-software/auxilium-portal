@@ -38,14 +38,7 @@ final class SecurityUtilities
      */
     public static function IsAdmin(): bool
     {
-        $userDetails = self::getCachedUserDetails();
-
-        if (self::shouldRefreshUserDetails($userDetails))
-        {
-            $userDetails = self::fetchAndCacheUserDetails();
-        }
-
-        return $userDetails['IsAdmin'] ?? false;
+        return self::fetchUserDetails()['IsAdmin'] ?? false;
     }
 
     public static function RequireAdmin(): void
@@ -68,56 +61,21 @@ final class SecurityUtilities
 
     public static function GetUserId(): ?string
     {
-        $userDetails = self::getCachedUserDetails();
-
-        if (self::shouldRefreshUserDetails($userDetails))
-        {
-            $userDetails = self::fetchAndCacheUserDetails();
-        }
-
-        return $userDetails['Id'] ?? null;
+        return self::fetchUserDetails()['Id'] ?? null;
     }
     public static function GetUserName(): ?string
     {
-        $userDetails = self::getCachedUserDetails();
-
-        if (self::shouldRefreshUserDetails($userDetails))
-        {
-            $userDetails = self::fetchAndCacheUserDetails();
-        }
-
-        return $userDetails['FullName'] ?? null;
+        return self::fetchUserDetails()['FullName'] ?? null;
     }
     public static function GetLanguagePreference(): ?string
     {
-        $userDetails = self::getCachedUserDetails();
-
-        if (self::shouldRefreshUserDetails($userDetails))
-        {
-            $userDetails = self::fetchAndCacheUserDetails();
-        }
-
-        return $userDetails['LanguagePreference'] ?? null;
+        return self::fetchUserDetails()['LanguagePreference'] ?? null;
     }
 
 
 
 
 
-
-
-
-
-
-    /**
-     * Retrieves user details from the Session.
-     *
-     * @return array|false Either user details as an associative array, or false denoting that the user details weren't successfully gotten.
-     */
-    private static function getCachedUserDetails(): array|false
-    {
-        return SessionUtilities::Get(SessionKey::USER_DETAILS, false);
-    }
 
     /**
      * Checks to see whether it's time to refresh the user details.
@@ -144,11 +102,11 @@ final class SecurityUtilities
      *
      * @return array The new user details.
      */
-    private static function fetchAndCacheUserDetails(): array
+    private static function fetchUserDetails(): array
     {
         $response = APIInteractions::Get(endpoint: '/api/v3/me');
 
-        $userDetails = [
+        return [
             'LastUpdatedAt'         => time(),
             'UserID'                => $response->Payload['id'],
             'EmailAddress'          => $response->Payload['emailAddress'],
@@ -156,16 +114,6 @@ final class SecurityUtilities
             'IsAdmin'               => $response->Payload['isAdmin'],
             'LanguagePreference'    => $response->Payload['languagePreference'],
         ];
-
-        SessionUtilities::Set(SessionKey::USER_DETAILS, $userDetails);
-
-        return $userDetails;
-    }
-
-
-    public static function InvalidateUserDetailsCache(): void
-    {
-        SessionUtilities::Set(SessionKey::USER_DETAILS, false);
     }
 
 
