@@ -5,35 +5,21 @@ class SystemMetricController {
         this.#APIInstance = new APIInteractions();
     }
 
+    async GetMetricSeries(metricKey, label = null)
+    {
+        let url = `/api/v3/system-metrics/series/${encodeURIComponent(metricKey)}`;
+        if (label !== null && label !== undefined)
+        {
+            url += `?label=${encodeURIComponent(label)}`;
+        }
 
-    async GetDatabaseSizeMetrics()
-    {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/database-size');
+        const [statusCode, response] = await this.#APIInstance.API_GET(url);
         return response;
     }
-    async GetLfsSizeMetrics()
+
+    async GetLatestSnapshot()
     {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/lfs-size');
-        return response;
-    }
-    async GetApiCpuUsageMetrics()
-    {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/api-cpu-usage');
-        return response;
-    }
-    async GetApiRamUsageMetrics()
-    {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/api-ram-usage');
-        return response;
-    }
-    async GetTaskRunnerCpuUsageMetrics()
-    {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/task-runner-cpu-usage');
-        return response;
-    }
-    async GetTaskRunnerRamUsageMetrics()
-    {
-        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/task-runner-ram-usage');
+        const [statusCode, response] = await this.#APIInstance.API_GET('/api/v3/system-metrics/latest');
         return response;
     }
 }
