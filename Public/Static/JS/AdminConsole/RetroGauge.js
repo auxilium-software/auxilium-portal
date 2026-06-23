@@ -12,13 +12,13 @@ class RetroGauge
     {
         this.#cfg = Object.assign({min: 0, unit: '', minorPerMajor: 2, caption: ''}, cfg);
         host.innerHTML =
-            `<div class="rg__title">${this.#cfg.title}</div>${this.#buildSvg()}`
-            + `<div class="rg__lcd"><span class="rg__lcd-value">--</span>`
-            + (this.#cfg.unit ? `<span class="rg__lcd-unit">${this.#cfg.unit}</span>` : '')
+            `<div class="analogue_gauge__title">${this.#cfg.title}</div>${this.#buildSvg()}`
+            + `<div class="analogue_gauge__lcd"><span class="analogue_gauge__lcd-value">--</span>`
+            + (this.#cfg.unit ? `<span class="analogue_gauge__lcd-unit">${this.#cfg.unit}</span>` : '')
             + `</div>`;
         this.#needle = host.querySelector('.rg-needle');
-        this.#lcd = host.querySelector('.rg__lcd');
-        this.#lcdValue = host.querySelector('.rg__lcd-value');
+        this.#lcd = host.querySelector('.analogue_gauge__lcd');
+        this.#lcdValue = host.querySelector('.analogue_gauge__lcd-value');
     }
 
     static #polar(cx, cy, r, deg)
