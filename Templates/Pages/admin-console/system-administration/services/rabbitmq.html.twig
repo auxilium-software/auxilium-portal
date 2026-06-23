@@ -1,0 +1,132 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph ph-envelope"></i>
+            {{ "RabbitMQ"|translate }}
+            <span class="page-title__sub">{{ "Monitor the RabbitMQ message broker"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button type="button" class="form-btn" onclick="loadAll()">
+                <i class="ph ph-arrow-clockwise"></i> {{ "Refresh"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-status">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Status"|translate }}</div>
+            <div class="stat-card__change" id="stat-status-sub">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-ready">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Messages Ready (total)"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-dlq">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Dead Letter Depth"|translate }}</div>
+            <div class="stat-card__change" id="stat-dlq-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-probe">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Probe Latency"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Messages Ready By Queue"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="readyChart"></canvas></div></div>
+            <div class="chart-container__footer" id="readyFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Dead Letter Depth Over Time"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="dlqChart"></canvas></div></div>
+            <div class="chart-container__footer" id="dlqFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Probe Latency"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="probeChart"></canvas></div></div>
+            <div class="chart-container__footer" id="probeFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Reachability"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="reachChart"></canvas></div></div>
+            <div class="chart-container__footer" id="reachFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__header"><span><i class="ph ph-envelope"></i> {{ "Current Queue Depths"|translate }}</span></div>
+        <div class="panel__body" style="padding: 0; max-height: 300px; overflow-y: auto;">
+            <table class="admin-table admin-table--compact">
+                <thead><tr>
+                    <th>{{ "Queue"|translate }}</th>
+                    <th>{{ "Messages Ready"|translate }}</th>
+                    <th>{{ "Last Reading"|translate }}</th>
+                </tr></thead>
+                <tbody id="queueBody">
+                <tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "Loading..."|translate }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const dash = new ServiceMetricsDashboard();
+
+        async function loadAll()
+        {
+            try
+            {
+                const m = await dash.load([
+                    'RabbitMq_IsReachable', 'RabbitMq_ProbeLatencyInMs',
+                    'RabbitMq_MessagesReadyCount', 'RabbitMq_DeadLetterDepth',
+                ]);
+
+                const readyByQueue = dash.groupByLabel(m.RabbitMq_MessagesReadyCount);
+                const totalReady = readyByQueue.reduce((sum, q) => sum + (dash.latest(q.metrics) ?? 0), 0);
+
+                dash.statStatus('stat-status', dash.latest(m.RabbitMq_IsReachable), '{{ "Reachable"|translate }}', '{{ "Unreachable"|translate }}');
+                dash.statSub('stat-status-sub', '{{ "Probe"|translate }}: ' + MetricFmt.ms(dash.latest(m.RabbitMq_ProbeLatencyInMs)));
+                dash.statValue('stat-ready', totalReady, MetricFmt.count);
+                dash.statValue('stat-dlq', dash.latest(m.RabbitMq_DeadLetterDepth), MetricFmt.count);
+                dash.statChange('stat-dlq-change', m.RabbitMq_DeadLetterDepth, MetricFmt.count, '{{ "since last reading"|translate }}', '{{ "No change"|translate }}');
+                dash.statValue('stat-probe', dash.latest(m.RabbitMq_ProbeLatencyInMs), MetricFmt.ms);
+
+                dash.multiLineChart('readyChart',
+                        readyByQueue.map(q => ({ label: q.label, metrics: q.metrics })),
+                        { fmt: MetricFmt.count, y: MetricAxis.count }
+                );
+                dash.lineChart('dlqChart', m.RabbitMq_DeadLetterDepth, { label: '{{ "Dead Letters"|translate }}', fmt: MetricFmt.count, color: '#ff0000', y: MetricAxis.count });
+                dash.lineChart('probeChart', m.RabbitMq_ProbeLatencyInMs, { label: '{{ "Latency"|translate }}', fmt: MetricFmt.ms, color: '#0000ff', y: MetricAxis.ms });
+                dash.lineChart('reachChart', m.RabbitMq_IsReachable, { label: '{{ "Reachable"|translate }}', fmt: v => v === 1 ? '{{ "Up"|translate }}' : '{{ "Down"|translate }}', color: '#00ff00', y: { min: 0, max: 1, ticks: { stepSize: 1, callback: v => v === 1 ? '{{ "Up"|translate }}' : '{{ "Down"|translate }}' } } });
+
+                dash.footer('readyFooter', m.RabbitMq_MessagesReadyCount, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('dlqFooter', m.RabbitMq_DeadLetterDepth, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('probeFooter', m.RabbitMq_ProbeLatencyInMs, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('reachFooter', m.RabbitMq_IsReachable, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+
+                const tbody = document.getElementById('queueBody');
+                if (!readyByQueue.length)
+                {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "No data yet"|translate }}</td></tr>';
+                }
+                else
+                {
+                    tbody.innerHTML = readyByQueue.map(q =>
+                            `<tr><td>${q.label}</td><td>${MetricFmt.count(dash.latest(q.metrics))}</td><td>${MetricFmt.date(dash.lastAt(q.metrics))}</td></tr>`
+                    ).join('');
+                }
+            }
+            catch (err) { await dash.fail(err, 'RabbitMQ metrics'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAll);
+    </script>
+{% endblock %}

@@ -2,9 +2,9 @@
 {% block content %}
     <div class="page-title">
         <div class="page-title__text">
-            <i class="ph ph-database"></i>
-            {{ "LFS"|translate }}
-            <span class="page-title__sub">{{ "Manage Auxilium Large File System (AUX::LFS)"|translate }}</span>
+            <i class="ph ph-hard-drive"></i>
+            {{ "Aux::LFS"|translate }}
+            <span class="page-title__sub">{{ "Monitor the Large File System (AUX::LFS)"|translate }}</span>
         </div>
         <div class="page-title__actions">
             <button type="button" class="form-btn" onclick="loadAll()">
@@ -15,47 +15,62 @@
 
     <div class="stat-cards">
         <div class="stat-card">
-            <div class="stat-card__value" id="stat-db-current">{{ "Loading..."|translate }}</div>
-            <div class="stat-card__label">{{ "Current Size"|translate }}</div>
-            <div class="stat-card__change" id="stat-db-change">&nbsp;</div>
+            <div class="stat-card__value" id="stat-status">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Status"|translate }}</div>
+            <div class="stat-card__change" id="stat-status-sub">&nbsp;</div>
         </div>
         <div class="stat-card">
-            <div class="stat-card__value" id="stat-db-oldest">{{ "Loading..."|translate }}</div>
-            <div class="stat-card__label">{{ "Oldest Reading"|translate }}</div>
+            <div class="stat-card__value" id="stat-size">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "LFS Size"|translate }}</div>
+            <div class="stat-card__change" id="stat-size-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-probe">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Write Probe Latency"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-volumes">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Volumes Monitored"|translate }}</div>
             <div class="stat-card__change">&nbsp;</div>
         </div>
     </div>
 
-    <div class="chart-container">
-        <div class="chart-container__header">
-            {{ "LFS Size Over Time"|translate }}
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "LFS Size Over Time"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="sizeChart"></canvas></div></div>
+            <div class="chart-container__footer" id="sizeFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
         </div>
-        <div class="chart-container__body">
-            <div class="chart-canvas-wrapper chart-canvas-wrapper--md">
-                <canvas id="dbChart"></canvas>
-            </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Disk Free By Volume"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="diskChart"></canvas></div></div>
+            <div class="chart-container__footer" id="diskFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
         </div>
-        <div class="chart-container__footer" id="dbChartFooter">
-            <span></span>
-            <span>{{ "Loading..."|translate }}</span>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Write Probe Latency"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="probeChart"></canvas></div></div>
+            <div class="chart-container__footer" id="probeFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Writable Status"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="writableChart"></canvas></div></div>
+            <div class="chart-container__footer" id="writableFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
         </div>
     </div>
 
     <div class="panel">
-        <div class="panel__header">
-            <span><i class="ph ph-database"></i> {{ "Size History"|translate }}</span>
-        </div>
-        <div class="panel__body" style="padding: 0; max-height: 400px; overflow-y: auto;">
+        <div class="panel__header"><span><i class="ph ph-hard-drive"></i> {{ "Volume Free Space"|translate }}</span></div>
+        <div class="panel__body" style="padding: 0; max-height: 300px; overflow-y: auto;">
             <table class="admin-table admin-table--compact">
-                <thead>
-                <tr>
-                    <th>{{ "Recorded At"|translate }}</th>
-                    <th>{{ "Size"|translate }}</th>
-                    <th>{{ "Change"|translate }}</th>
-                </tr>
-                </thead>
-                <tbody id="dbTableBody">
-                <tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "Loading..."|translate }}</td></tr>
+                <thead><tr>
+                    <th>{{ "Volume"|translate }}</th>
+                    <th>{{ "Free"|translate }}</th>
+                    <th>{{ "Total"|translate }}</th>
+                    <th>{{ "Used"|translate }}</th>
+                </tr></thead>
+                <tbody id="volumeBody">
+                <tr><td colspan="4" style="text-align:center;color:#666;padding:20px;">{{ "Loading..."|translate }}</td></tr>
                 </tbody>
             </table>
         </div>
@@ -63,142 +78,58 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/Static/JS/General/ChartJSConfig.js"></script>
     <script>
-        const api = new SystemMetricController();
-
-        let dbChart = null;
-
-        function formatBytes(bytes)
-        {
-            if (bytes === null || bytes === undefined) return '-';
-            if (bytes >= 1_073_741_824) return (bytes / 1_073_741_824).toFixed(2) + ' GB';
-            if (bytes >= 1_048_576)     return (bytes / 1_048_576).toFixed(2) + ' MB';
-            if (bytes >= 1_024)         return (bytes / 1_024).toFixed(2) + ' KB';
-            return bytes + ' B';
-        }
-
-        function formatDate(iso)
-        {
-            if (!iso) return '-';
-            const d = new Date(iso);
-            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-                    + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function changeBadge(current, previous)
-        {
-            if (previous === null || previous === undefined) return '-';
-            const delta = current - previous;
-            if (delta === 0) return '<span class="badge badge--user">{{ "No change"|translate }}</span>';
-            const sign = delta > 0 ? '+' : '';
-            const cls  = delta > 0 ? 'badge--inactive' : 'badge--active';
-            return `<span class="badge ${cls}">${sign}${formatBytes(delta)}</span>`;
-        }
+        const dash = new ServiceMetricsDashboard();
 
         async function loadAll()
         {
             try
             {
-                const data = await api.GetLfsSizeMetrics();
-                const metrics = data.metrics;
+                const m = await dash.load([
+                    'Lfs_IsWritable', 'Lfs_ProbeLatencyInMs', 'Lfs_SizeInBytes',
+                    'Host_DiskFreeInBytes', 'Host_DiskTotalInBytes',
+                ]);
 
-                // stat cards - API returns newest-first
-                const current = metrics[0]?.value ?? null;
-                const oldest  = metrics[metrics.length - 1]?.value ?? null;
-                const prev    = metrics[1]?.value ?? null;
+                dash.statStatus('stat-status', dash.latest(m.Lfs_IsWritable), '{{ "Writable"|translate }}', '{{ "Read-only"|translate }}');
+                dash.statSub('stat-status-sub', '{{ "Probe"|translate }}: ' + MetricFmt.ms(dash.latest(m.Lfs_ProbeLatencyInMs)));
+                dash.statValue('stat-size', dash.latest(m.Lfs_SizeInBytes), MetricFmt.bytes);
+                dash.statChange('stat-size-change', m.Lfs_SizeInBytes, MetricFmt.bytes, '{{ "since last reading"|translate }}', '{{ "No change"|translate }}');
+                dash.statValue('stat-probe', dash.latest(m.Lfs_ProbeLatencyInMs), MetricFmt.ms);
 
-                document.getElementById('stat-db-current').textContent = formatBytes(current);
-                document.getElementById('stat-db-oldest').textContent  = formatBytes(oldest);
+                const freeByVolume = dash.groupByLabel(m.Host_DiskFreeInBytes);
+                dash.statValue('stat-volumes', freeByVolume.length, MetricFmt.count);
 
-                const changeEl = document.getElementById('stat-db-change');
-                if (current !== null && prev !== null)
-                {
-                    const delta = current - prev;
-                    if (delta > 0)
-                    {
-                        changeEl.className   = 'stat-card__change stat-card__change--up';
-                        changeEl.textContent = '▲ ' + formatBytes(delta) + ' {{ "since last reading"|translate }}';
-                    }
-                    else if (delta < 0)
-                    {
-                        changeEl.className   = 'stat-card__change stat-card__change--down';
-                        changeEl.textContent = '▼ ' + formatBytes(Math.abs(delta)) + ' {{ "since last reading"|translate }}';
-                    }
-                    else
-                    {
-                        changeEl.className   = 'stat-card__change';
-                        changeEl.textContent = '{{ "No change since last reading"|translate }}';
-                    }
-                }
-
-                // chart - reverse to chronological order
-                const ordered = [...metrics].reverse();
-                if (dbChart) dbChart.destroy();
-                dbChart = AdminChart.line(
-                        'dbChart',
-                        ordered.map(m => formatDate(m.createdAt)),
-                        [{
-                            label: '{{ "Size"|translate }}',
-                            data: ordered.map(m => m.value),
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                        }],
-                        {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    callbacks: {
-                                        label: ctx => ' ' + formatBytes(ctx.parsed.y)
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    ticks: { callback: value => formatBytes(value) }
-                                }
-                            }
-                        }
+                dash.lineChart('sizeChart', m.Lfs_SizeInBytes, { label: '{{ "Size"|translate }}', fmt: MetricFmt.bytes, y: MetricAxis.bytes });
+                dash.multiLineChart('diskChart',
+                        freeByVolume.map(v => ({ label: v.label, metrics: v.metrics })),
+                        { fmt: MetricFmt.bytes, y: MetricAxis.bytes }
                 );
+                dash.lineChart('probeChart', m.Lfs_ProbeLatencyInMs, { label: '{{ "Latency"|translate }}', fmt: MetricFmt.ms, color: '#16a085', y: MetricAxis.ms });
+                dash.lineChart('writableChart', m.Lfs_IsWritable, { label: '{{ "Writable"|translate }}', fmt: v => v === 1 ? '{{ "Yes"|translate }}' : '{{ "No"|translate }}', color: '#5cb85c', y: { min: 0, max: 1, ticks: { stepSize: 1, callback: v => v === 1 ? '{{ "Yes"|translate }}' : '{{ "No"|translate }}' } } });
 
-                document.getElementById('dbChartFooter').innerHTML =
-                        '<span>' + ordered.length + ' {{ "readings"|translate }}</span>' +
-                        '<span>{{ "Last updated"|translate }}: ' + formatDate(ordered[ordered.length - 1]?.createdAt) + '</span>';
+                dash.footer('sizeFooter', m.Lfs_SizeInBytes, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('diskFooter', m.Host_DiskFreeInBytes, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('probeFooter', m.Lfs_ProbeLatencyInMs, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('writableFooter', m.Lfs_IsWritable, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
 
-                // history table
-                const tbody = document.getElementById('dbTableBody');
-                if (!metrics.length)
+                const totalByLabel = {};
+                dash.groupByLabel(m.Host_DiskTotalInBytes).forEach(v => totalByLabel[v.label] = dash.latest(v.metrics));
+                const tbody = document.getElementById('volumeBody');
+                if (!freeByVolume.length)
                 {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;padding:20px;">{{ "No data yet"|translate }}</td></tr>';
-                    return;
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#666;padding:20px;">{{ "No data yet"|translate }}</td></tr>';
                 }
-
-                let html = '';
-                for (let i = 0; i < metrics.length; i++)
+                else
                 {
-                    html += `<tr>
-                        <td>${formatDate(metrics[i].createdAt)}</td>
-                        <td>${formatBytes(metrics[i].value)}</td>
-                        <td>${changeBadge(metrics[i].value, metrics[i + 1]?.value ?? null)}</td>
-                    </tr>`;
+                    tbody.innerHTML = freeByVolume.map(v => {
+                        const free = dash.latest(v.metrics);
+                        const total = totalByLabel[v.label] ?? null;
+                        const usedPct = (free !== null && total) ? (((total - free) / total) * 100).toFixed(1) + '%' : '-';
+                        return `<tr><td>${v.label}</td><td>${MetricFmt.bytes(free)}</td><td>${MetricFmt.bytes(total)}</td><td>${usedPct}</td></tr>`;
+                    }).join('');
                 }
-                tbody.innerHTML = html;
             }
-            catch (err)
-            {
-                console.error('Failed to load MariaDB metrics:', err);
-                new ToastNotification(
-                        await Localisation.translate('Failed to load MariaDB metrics'),
-                        'warning-circle',
-                        'error'
-                );
-            }
+            catch (err) { await dash.fail(err, 'LFS metrics'); }
         }
 
         document.addEventListener('DOMContentLoaded', loadAll);
