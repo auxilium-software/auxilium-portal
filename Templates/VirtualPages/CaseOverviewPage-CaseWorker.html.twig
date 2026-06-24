@@ -186,14 +186,14 @@
                         </h2>
                         <ul class="collection-list timeline-list">
                             {% for item in CaseDetails.timeline %}
-                                <li class="timeline-entry {{ item.isSystem ? 'timeline-entry-system' }}">
-                                    <time class="timeline-entry-time">{{ item.occurredAt|date("j M Y, H:i") }}</time><span class="timeline-entry-title">{{ item.title }}</span>{% if item.actor %}<span class="timeline-entry-meta">- {% include '/Partials/InlineUserField.html.twig' with {'_data': item.actor} %}</span>{% endif %}
+                                <li class="timeline-entry {{ item.entryType == "note.system" ? 'timeline-entry-system' }}">
+                                    <time class="timeline-entry-time">{{ item.occurredAtUtc|date("j M Y, H:i") }}</time><span class="timeline-entry-title">{{ item.title }}</span>{% if item.actor %}<span class="timeline-entry-meta">- {% include '/Partials/InlineUserField.html.twig' with {'_data': item.actor} %}</span>{% endif %}
 
                                     {% if item.description %}
                                         <p class="timeline-entry-description">{{ item.description }}</p>
                                     {% endif %}
 
-                                    {% if not item.isSystem %}
+                                    {% if item.entryType != "note.system" %}
                                         <span class="timeline-entry-actions">
                                             <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showEditModal('{{ item.id|e('js') }}', '{{ item.title|e('js') }}', '{{ item.description|e('js') }}');}"
                                                class="action-link action-link-edit">{{ "Edit" | translate }}</a>
