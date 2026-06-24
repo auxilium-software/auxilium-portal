@@ -9,7 +9,7 @@ class BasePropertyManager
 
     // ==================================================
     // PLAIN TEXT PROPERTY
-    async editProperty(propertyKey, currentContent)
+    async editProperty(propertyKey, currentContent, displayName)
     {
         const newContent = prompt(`Edit property "${displayName || propertyKey}":`, currentContent);
 
@@ -46,7 +46,7 @@ class BasePropertyManager
 
     // ==================================================
     // DATA ENUMERATOR PROPERTY
-    async editEnumProperty(propertyKey, currentValueId, enumTypeId)
+    async editEnumProperty(propertyKey, currentValueId, enumTypeId, displayName = null)
     {
         let values;
         try
