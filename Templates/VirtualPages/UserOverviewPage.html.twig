@@ -72,7 +72,7 @@
                                         <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
                                             <a class="edit-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
                                             <a class="delete-icon inline-icon" href="javascript:void(0)"
                                                onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
                                         </dd>

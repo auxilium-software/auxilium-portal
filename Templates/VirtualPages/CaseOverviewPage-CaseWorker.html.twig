@@ -64,25 +64,25 @@
                         </h2>
                         <br />
                         <dl id="properties-list">
-                            {% for property_data in UserDetails.additionalProperties %}
+                            {% for property_data in CaseDetails.additionalProperties %}
                                 {% if not (property_data.originalName in hidden_props) %}
                                     {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
                                         <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.originalName) }}</dt>
                                         <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
                                             <a class="edit-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.editEnumProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
                                             <a class="delete-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
                                         </dd>
                                     {% else %}
                                         <dt data-property-key="{{ property_data.id }}">{{ property_data.originalName }}</dt>
                                         <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.content }}</span>
                                             <a class="edit-icon inline-icon" title="Edit property" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.editProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}')"></a>
                                             <a class="delete-icon inline-icon" title="Remove property" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                               onclick="UserPropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
                                         </dd>
                                     {% endif %}
                                 {% endif %}
