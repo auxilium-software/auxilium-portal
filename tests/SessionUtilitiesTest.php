@@ -45,9 +45,9 @@ class SessionUtilitiesTest extends TestCase
 
     public function testGetReturnsArrayValue(): void
     {
-        $_SESSION[SessionKey::USER_DETAILS->value] = ['Id' => '123-ABC', 'FullName' => 'Cerys'];
+        $_SESSION[SessionKey::SYSTEM_SETTINGS->value] = ['Id' => '123-ABC', 'FullName' => 'Cerys'];
 
-        $result = SessionUtilities::Get(SessionKey::USER_DETAILS);
+        $result = SessionUtilities::Get(SessionKey::SYSTEM_SETTINGS);
 
         $this->assertIsArray($result);
         $this->assertSame('123-ABC', $result['Id']);
@@ -73,9 +73,9 @@ class SessionUtilitiesTest extends TestCase
     public function testSetStoresArrayValue(): void
     {
         $data = ['key' => 'value'];
-        SessionUtilities::Set(SessionKey::USER_DETAILS, $data);
+        SessionUtilities::Set(SessionKey::SYSTEM_SETTINGS, $data);
 
-        $this->assertSame($data, $_SESSION[SessionKey::USER_DETAILS->value]);
+        $this->assertSame($data, $_SESSION[SessionKey::SYSTEM_SETTINGS->value]);
     }
     // </editor-fold>
 
