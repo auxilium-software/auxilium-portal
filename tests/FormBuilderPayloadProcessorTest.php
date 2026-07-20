@@ -12,6 +12,59 @@ class FormBuilderPayloadProcessorTest extends TestCase
         $this->processor = new PayloadProcessor();
     }
 
+    // <editor-fold defaultstate="collapsed" desc="parseFromXML">
+    public function testParseFromXmlNull(): void
+    {
+        $result = $this->processor->parseFromXML(null);
+        $this->assertSame([], $result);
+    }
+
+    public function testParseFromXmlFalse(): void
+    {
+        $result = $this->processor->parseFromXML(false);
+        $this->assertSame([], $result);
+    }
+
+    public function testParseFromXmlJsonString(): void
+    {
+        $json = '{"name": "Cerys", "role": "developer"}';
+        $result = $this->processor->parseFromXML($json);
+
+        $this->assertSame(['name' => 'Cerys', 'role' => 'developer'], $result);
+    }
+
+    public function testParseFromXmlInvalidJsonReturnsOriginalString(): void
+    {
+        $result = $this->processor->parseFromXML('"just a plain string"');
+        $this->assertSame('just a plain string', $result);
+    }
+
+    public function testParseFromXmlSimpleXmlElement(): void
+    {
+        $xml = new SimpleXMLElement('<root><name>Cerys</name><role>developer</role></root>');
+        $result = $this->processor->parseFromXML($xml);
+
+        $this->assertSame('Cerys', $result['name']);
+        $this->assertSame('developer', $result['role']);
+    }
+
+    public function testParseFromXmlNestedSimpleXmlElement(): void
+    {
+        $xml = new SimpleXMLElement('<root><user><name>Cerys</name></user></root>');
+        $result = $this->processor->parseFromXML($xml);
+
+        $this->assertIsArray($result['user']);
+        $this->assertSame('Cerys', $result['user']['name']);
+    }
+
+    public function testParseFromXmlScalarPassthrough(): void
+    {
+        $this->assertSame(42, $this->processor->parseFromXML(42));
+        $this->assertSame(3.14, $this->processor->parseFromXML(3.14));
+        $this->assertTrue($this->processor->parseFromXML(true));
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="process">
     public function testProcessPlainString(): void
     {
