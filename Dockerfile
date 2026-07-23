@@ -62,9 +62,7 @@ RUN apk add --no-cache \
         zip
 
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
-
 COPY docker/php/app.ini ${PHP_INI_DIR}/conf.d/10-app.ini
-
 COPY docker/supervisord.conf /etc/supervisord.conf
 
 WORKDIR /var/www/html
@@ -83,14 +81,10 @@ RUN apk add --no-cache \
     && apk del \
         ${PHPIZE_DEPS} \
         linux-headers \
-    && rm -rf \
-        /tmp/pear
+    && rm -rf /tmp/pear
 
-COPY docker/php/xdebug.ini \
-    ${PHP_INI_DIR}/conf.d/20-xdebug.ini
-
-COPY --from=vendor /usr/bin/composer \
-    /usr/bin/composer
+COPY docker/php/xdebug.ini ${PHP_INI_DIR}/conf.d/20-xdebug.ini
+COPY --from=vendor /usr/bin/composer /usr/bin/composer
 
 RUN mkdir -p \
         Public \
@@ -103,12 +97,7 @@ RUN mkdir -p \
 
 EXPOSE 80
 
-CMD [
-    "/usr/bin/supervisord",
-    "-n",
-    "-c",
-    "/etc/supervisord.conf"
-]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
 
 # ==================================================
@@ -116,11 +105,8 @@ CMD [
 # ==================================================
 FROM base AS prod
 
-COPY docker/php/opcache.ini \
-    ${PHP_INI_DIR}/conf.d/20-opcache.ini
-
+COPY docker/php/opcache.ini ${PHP_INI_DIR}/conf.d/20-opcache.ini
 COPY --from=vendor /build/vendor ./vendor
-
 COPY . .
 
 RUN mkdir -p \
@@ -135,9 +121,4 @@ RUN mkdir -p \
 
 EXPOSE 80
 
-CMD [
-    "/usr/bin/supervisord",
-    "-n",
-    "-c",
-    "/etc/supervisord.conf"
-]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
