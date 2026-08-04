@@ -1,0 +1,84 @@
+{
+    "name": "auxilium-software/auxilium-portal",
+    "description": "CRM and Case Management Portal",
+    "type": "project",
+    "license": "Apache-2.0",
+    "version": "v3-dev",
+
+  "authors": [
+        {
+          "name": "Cerys Lewis",
+          "email": "cerys.lewis@aber.ac.uk",
+          "role": "Developer"
+        },
+        {
+            "name": "Hannah Baldwin",
+            "email": "contact@hannahbaldwin.net",
+            "role": "Developer"
+        }
+    ],
+
+    "support": {
+        "email": "info@auxiliumsoftware.co.uk"
+    },
+
+    "require": {
+        "php": "^8.2",
+
+        "ext-curl": "*",
+        "ext-bcmath": "*",
+        "ext-gd": "*",
+        "ext-openssl": "*",
+        "ext-dom": "*",
+        "ext-sodium": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+
+        "ext-zip": "*",
+        "ext-simplexml": "*",
+
+        "phpunit/phpunit": "11.5.50",
+
+        "twig/twig": "^3.15.0",
+        "fpdf/fpdf": "^1.83",
+
+        "endroid/qr-code-bundle": "^6.0",
+        "bigfish/pdf417": "^0.3.0",
+
+        "zbateson/mail-mime-parser": "^3.0",
+        "phpmailer/phpmailer": "^6.6",
+        "webklex/php-imap": "^6.1",
+
+        "firebase/php-jwt": "7.0.0",
+        "lcobucci/jwt": "^3.4.6 || ^4.0.4",
+
+        "aws/aws-sdk-php": "^3.277",
+
+        "ezyang/htmlpurifier": "^4.14",
+
+        "zircote/swagger-php": "~4.8.7",
+
+        "unional/jsonc": "~1.0.1",
+        "symfony/yaml": "~6.3",
+
+        "chillerlan/php-qrcode": "~5.0.5"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "phpdocumentor/shim": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "endroid/installer": true,
+            "phpdocumentor/shim": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Auxilium\\": "Auxilium/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}

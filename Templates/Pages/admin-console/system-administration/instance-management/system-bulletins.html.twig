@@ -1,0 +1,323 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph ph-megaphone"></i>
+            {{ "System Bulletins"|translate }}
+            <span class="page-title__sub">{{ "Manage system-wide announcements"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button class="form-btn form-btn--primary" onclick="document.getElementById('createBulletinDialog').style.display='block'">
+                <i class="ph ph-plus-circle"></i>
+                {{ "Create a Bulletin"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="activeBulletinsTable">
+            <caption>{{ "Active Bulletins"|translate }}</caption>
+            <thead>
+                <tr>
+                    <th>{{ "Severity"|translate }}</th>
+                    <th>{{ "Title"|translate }}</th>
+                    <th>{{ "Content"|translate }}</th>
+                    <th>{{ "Is Dismissable?"|translate }}</th>
+                    <th>{{ "Starts At"|translate }}</th>
+                    <th>{{ "Ends At"|translate }}</th>
+                    <th>{{ "Target Audience"|translate }}</th>
+                    <th>{{ "Specific User ID"|translate }}</th>
+                    <th>{{ "Controls"|translate }}</th>
+                </tr>
+            </thead>
+            <tbody id="activeBulletinsTableBody">
+                <tr><td colspan="9"><em>{{ "Loading..."|translate }}</em></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="scheduledBulletinsTable">
+            <caption>{{ "Scheduled Bulletins"|translate }}</caption>
+            <thead>
+                <tr>
+                    <th>{{ "Severity"|translate }}</th>
+                    <th>{{ "Title"|translate }}</th>
+                    <th>{{ "Content"|translate }}</th>
+                    <th>{{ "Is Dismissable?"|translate }}</th>
+                    <th>{{ "Starts At"|translate }}</th>
+                    <th>{{ "Ends At"|translate }}</th>
+                    <th>{{ "Target Audience"|translate }}</th>
+                    <th>{{ "Specific User ID"|translate }}</th>
+                    <th>{{ "Controls"|translate }}</th>
+                </tr>
+            </thead>
+            <tbody id="scheduledBulletinsTableBody">
+                <tr><td colspan="9"><em>{{ "Loading..."|translate }}</em></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="previousBulletinsTable">
+            <caption>{{ "Previous Bulletins"|translate }}</caption>
+            <thead>
+                <tr>
+                    <th>{{ "Severity"|translate }}</th>
+                    <th>{{ "Title"|translate }}</th>
+                    <th>{{ "Content"|translate }}</th>
+                    <th>{{ "Is Dismissable?"|translate }}</th>
+                    <th>{{ "Starts At"|translate }}</th>
+                    <th>{{ "Ends At"|translate }}</th>
+                    <th>{{ "Target Audience"|translate }}</th>
+                    <th>{{ "Specific User ID"|translate }}</th>
+                    <th>{{ "Controls"|translate }}</th>
+                </tr>
+            </thead>
+            <tbody id="previousBulletinsTableBody">
+                <tr><td colspan="9"><em>{{ "Loading..."|translate }}</em></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="createBulletinDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:400px;">
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph ph-plus-circle"></i>
+                        {{ "Create a New System Bulletin"|translate }}
+                    </span>
+                    <button class="chart-container__header-btn" onclick="document.getElementById('createBulletinDialog').style.display='none'">✕</button>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" style="grid-template-columns: 100px 1fr;">
+                        <dt>{{ "Severity"|translate }}</dt>
+                        <dd>
+                            <select class="form-select" id="newSystemBulletinSeverity" style="width:100%;">
+                                <option value="informational">{{ "Informational"|translate }}</option>
+                                <option value="warning">{{ "Warning"|translate }}</option>
+                                <option value="critical">{{ "Critical"|translate }}</option>
+                            </select>
+                        </dd>
+
+                        <dt>{{ "Title"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newSystemBulletinTitle" style="width:100%;"></dd>
+
+                        <dt>{{ "Content"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newSystemBulletinContent" style="width:100%;"></dd>
+
+                        <dt>{{ "Is Dismissible?"|translate }}</dt>
+                        <dd><input type="checkbox" class="form-input" id="newSystemBulletinIsDismissible"></dd>
+
+                        <dt>{{ "Due to Start At"|translate }}</dt>
+                        <dd><input type="datetime-local" class="form-input" id="newSystemBulletinDueToStartAt" style="width:100%;"></dd>
+
+                        <dt>{{ "Due to End At"|translate }}</dt>
+                        <dd><input type="datetime-local" class="form-input" id="newSystemBulletinDueToEndAt" style="width:100%;"></dd>
+
+                        <dt>{{ "Target Audience Group"|translate }}</dt>
+                        <dd>
+                            <select class="form-select" id="newSystemBulletinTargetAudienceGroup" style="width:100%;">
+                                <option value="everyone">{{ "Everyone"|translate }}</option>
+                                <option value="logged_in_users_only">{{ "Logged In Users Only"|translate }}</option>
+                                <option value="public_only">{{ "Public Only"|translate }}</option>
+                                <option value="single_user_only">{{ "Single User Only"|translate }}</option>
+                            </select>
+                        </dd>
+
+                        <dt>{{ "Specific User ID"|translate }}</dt>
+                        <dd><input type="text" class="form-input" id="newSystemBulletinSpecificUserId" style="width:100%;" placeholder="{{ "Only for \"Single User Only\""|translate }}"></dd>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="document.getElementById('createBulletinDialog').style.display='none'">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="createBulletin()">
+                        <i class="ph ph-floppy-disk"></i>
+                        {{ "Create Bulletin"|translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const api = new BulletinController();
+
+        function formatDate(dateStr)
+        {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function severityBadge(severity)
+        {
+            const classes = {
+                'critical': 'badge badge--critical',
+                'warning': 'badge badge--warning',
+                'informational': 'badge badge--info'
+            };
+            const label = severity.charAt(0).toUpperCase() + severity.slice(1);
+            return `<span class="${classes[severity] || 'badge'}">${label}</span>`;
+        }
+
+        function renderBulletinRow(bulletin, showControls = true)
+        {
+            const controls = showControls
+                ? `<button class="form-btn form-btn--danger form-btn--sm"
+                           onclick="deactivateBulletin('${bulletin.id}')">
+                       <i class="ph ph-trash"></i> {{ "Deactivate"|translate }}
+                   </button>`
+                : '-';
+
+            return `
+                <tr>
+                    <td>${severityBadge(bulletin.severity)}</td>
+                    <td>${bulletin.title}</td>
+                    <td>${bulletin.content}</td>
+                    <td>${bulletin.isDismissible ? '✓' : '✗'}</td>
+                    <td>${formatDate(bulletin.startsAt)}</td>
+                    <td>${formatDate(bulletin.endsAt)}</td>
+                    <td>${bulletin.targetAudience || '-'}</td>
+                    <td>${bulletin.specificUserId || '-'}</td>
+                    <td>${controls}</td>
+                </tr>
+            `;
+        }
+
+        function renderEmptyRow(message)
+        {
+            return `<tr><td colspan="9"><em>${message}</em></td></tr>`;
+        }
+
+        async function loadBulletins()
+        {
+            try
+            {
+                const bulletins = await api.Admin_GetAllBulletins();
+                const now = new Date();
+
+                const active = [];
+                const scheduled = [];
+                const previous = [];
+
+                for (const b of bulletins)
+                {
+                    const startsAt = b.startsAt ? new Date(b.startsAt) : null;
+                    const endsAt = b.endsAt ? new Date(b.endsAt) : null;
+
+                    if (!b.isActive || (endsAt && endsAt < now))
+                    {
+                        previous.push(b);
+                    }
+                    else if (startsAt && startsAt > now)
+                    {
+                        scheduled.push(b);
+                    }
+                    else
+                    {
+                        active.push(b);
+                    }
+                }
+
+                const activeBody = document.getElementById('activeBulletinsTableBody');
+                activeBody.innerHTML = active.length
+                    ? active.map(b => renderBulletinRow(b, true)).join('')
+                    : renderEmptyRow('{{ "No active bulletins"|translate }}');
+
+                const scheduledBody = document.getElementById('scheduledBulletinsTableBody');
+                scheduledBody.innerHTML = scheduled.length
+                    ? scheduled.map(b => renderBulletinRow(b, true)).join('')
+                    : renderEmptyRow('{{ "No scheduled bulletins"|translate }}');
+
+                const previousBody = document.getElementById('previousBulletinsTableBody');
+                previousBody.innerHTML = previous.length
+                    ? previous.map(b => renderBulletinRow(b, false)).join('')
+                    : renderEmptyRow('{{ "No previous bulletins"|translate }}');
+            }
+            catch (error)
+            {
+                console.error('Failed to load bulletins:', error);
+                document.getElementById('activeBulletinsTableBody').innerHTML
+                    = renderEmptyRow('{{ "Failed to load bulletins"|translate }}');
+                document.getElementById('scheduledBulletinsTableBody').innerHTML
+                    = renderEmptyRow('{{ "Failed to load bulletins"|translate }}');
+                document.getElementById('previousBulletinsTableBody').innerHTML
+                    = renderEmptyRow('{{ "Failed to load bulletins"|translate }}');
+            }
+        }
+
+        async function createBulletin()
+        {
+            try
+            {
+                await api.Admin_CreateBulletin(
+                    document.getElementById('newSystemBulletinSeverity').value,
+                    document.getElementById('newSystemBulletinTitle').value,
+                    document.getElementById('newSystemBulletinContent').value,
+                    document.getElementById('newSystemBulletinIsDismissible').checked,
+                    document.getElementById('newSystemBulletinDueToStartAt').value || null,
+                    document.getElementById('newSystemBulletinDueToEndAt').value || null,
+                    document.getElementById('newSystemBulletinTargetAudienceGroup').value,
+                    document.getElementById('newSystemBulletinSpecificUserId').value || null,
+                );
+
+                document.getElementById('createBulletinDialog').style.display = 'none';
+
+                // reset form
+                document.getElementById('newSystemBulletinSeverity').value = 'informational';
+                document.getElementById('newSystemBulletinTitle').value = '';
+                document.getElementById('newSystemBulletinContent').value = '';
+                document.getElementById('newSystemBulletinIsDismissible').checked = false;
+                document.getElementById('newSystemBulletinDueToStartAt').value = '';
+                document.getElementById('newSystemBulletinDueToEndAt').value = '';
+                document.getElementById('newSystemBulletinTargetAudienceGroup').value = 'everyone';
+                document.getElementById('newSystemBulletinSpecificUserId').value = '';
+
+                await loadBulletins();
+            }
+            catch (error)
+            {
+                console.error('Failed to create bulletin:', error);
+                new ToastNotification(
+                    await Localisation.translate('Failed to create bulletin'),
+                    'alert-circle',
+                    'error'
+                );
+            }
+        }
+
+        async function deactivateBulletin(id)
+        {
+            if (!confirm('{{ "Are you sure you want to deactivate this bulletin?"|translate }}'))
+            {
+                return;
+            }
+
+            try
+            {
+                await api.Admin_DeleteBulletin(id);
+                await loadBulletins();
+            }
+            catch (error)
+            {
+                console.error('Failed to deactivate bulletin:', error);
+                new ToastNotification(
+                    await Localisation.translate('Failed to deactivate bulletin'),
+                    'alert-circle',
+                    'error'
+                );
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadBulletins();
+        });
+    </script>
+{% endblock %}

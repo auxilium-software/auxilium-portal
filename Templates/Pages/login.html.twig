@@ -1,0 +1,135 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "Login"|translate }}{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="inner-content">
+            <h1>{{ "Login"|translate }}</h1>
+
+            <div id="SuccessMessage" class="success-toast" style="display:none;">
+                <span id="SuccessText"></span>
+            </div>
+
+            <form method="POST" id="LoginForm">
+                <label for="email_address">{{ "Email Address"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                <input type="text" name="email_address" placeholder="{{ "Email Address"|translate }}" id="email_address" />
+                <p id="ErrorReadout-EmailAddress" class="error-toast" style="display:none;">
+                </p>
+
+                <label for="raw_password">{{ "Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                <input type="password" name="raw_password" placeholder="{{ "Password"|translate }}" id="raw_password" />
+                <p id="ErrorReadout-Password" class="error-toast" style="display:none;">
+                </p>
+
+                <button type="submit" id="LoginButton" class="button">
+                    <span class="button-text">{{ "Login"|translate }}</span>
+                    <span class="loading-spinner" style="display:none;">⏳</span>
+                </button>
+
+
+                {% for openIDConfig in _OPEN_ID_CONFIGS_ %}
+                    <a href="/api/v2/outbound-oauth-login/{{ openIDConfig.unique_name }}" class="button">
+                        {{ ("Login with"|translate~openIDConfig.display_name)|format_as_sentence }}
+                    </a>
+                {% endfor %}
+                <a href="/onboard-new-case" class="button">{{ "Create a new account"|translate }}</a>
+
+                <div class="separator"></div>
+                <a href="/forgot-password">{{ "I've forgotten my password"|translate }}</a>
+
+                <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
+            </form>
+
+            <form method="POST" id="MfaForm" style="display:none;">
+                <!-- TOTP input -->
+                <div id="TotpInputSection">
+                    <label for="totp_token">{{ "TOTP Token"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                    <input type="text" name="totp_token" placeholder="XXXXXX" id="totp_token"
+                           inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" />
+                    <p id="ErrorReadout-TotpToken" class="error-toast" style="display:none;"></p>
+                </div>
+
+                <!-- Recovery code input -->
+                <div id="RecoveryCodeSection" style="display:none;">
+                    <label for="recovery_code">{{ "Recovery Code"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                    <input type="text" name="recovery_code" placeholder="{{ "Recovery Code"|translate }}" id="recovery_code" autocomplete="off" />
+                    <p id="ErrorReadout-RecoveryCode" class="error-toast" style="display:none;"></p>
+                </div>
+
+                <button type="submit" id="MfaSubmitButton" class="button">
+                    <span class="button-text">{{ "Verify"|translate }}</span>
+                    <span class="loading-spinner" style="display:none;">⏳</span>
+                </button>
+
+                <div class="separator"></div>
+
+                <a href="#" id="ToggleMfaMode">{{ "Use recovery code instead"|translate }}</a>
+                <br/>
+                <a href="#" id="BackToLogin">{{ "Back to login"|translate }}</a>
+            </form>
+
+            <form method="POST" id="PasswordChangeForm" style="display:none;">
+                <h2>{{ "You must change your password"|translate }}</h2>
+                <p>{{ "An administrator has required you to set a new password before continuing."|translate }}</p>
+
+                <label for="new_password">{{ "New Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                <input type="password" name="new_password" placeholder="{{ "New Password"|translate }}" id="new_password" />
+                <p id="ErrorReadout-NewPassword" class="error-toast" style="display:none;"></p>
+
+                <label for="confirm_password">{{ "Confirm Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
+                <input type="password" name="confirm_password" placeholder="{{ "Confirm Password"|translate }}" id="confirm_password" />
+                <p id="ErrorReadout-ConfirmPassword" class="error-toast" style="display:none;"></p>
+
+                <button type="submit" id="PasswordChangeButton" class="button">
+                    <span class="button-text">{{ "Change Password"|translate }}</span>
+                    <span class="loading-spinner" style="display:none;">⏳</span>
+                </button>
+
+                <div class="separator"></div>
+                <a href="#" id="BackToLoginFromPwChange">{{ "Back to login"|translate }}</a>
+            </form>
+
+
+            <h2>{{ "Security Notice"|translate }}</h2>
+            <p>
+                {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                    '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                    '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                }) }}
+            </p>
+
+            <h2>{{ "Cookie Notice"|translate }}</h2>
+            <p>
+                {{ "We only use cookies to record your choices, and allow access to our web portal. For more information please see our {privacy_policy} (opens in new tab).  We only place these cookies on your browser after you sign up or log in. If you don't consent to our use of these functional cookies, please do not sign up or log in."|translate({
+                    '{privacy_policy}': '<a href="/privacy-policy">' ~ "Privacy Policy"|translate ~ '</a>',
+                    '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                }) }}
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function hideGlobalError()
+        {
+            const errorContainer = document.getElementById('GlobalErrorMessage');
+            if (errorContainer)
+                errorContainer.style.display = 'none';
+        }
+
+        function hideSuccessMessage()
+        {
+            const successContainer = document.getElementById('SuccessMessage');
+            if (successContainer)
+                successContainer.style.display = 'none';
+        }
+    </script>
+    <script src="/Static/JS/Handlers/LoginFormHandler.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new LoginFormHandler();
+        });
+    </script>
+
+{% endblock %}

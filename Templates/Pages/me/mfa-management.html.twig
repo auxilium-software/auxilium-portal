@@ -1,0 +1,337 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "MFA Management"|translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home"|translate }}</a>
+                <a class="navigation-breadcrumb" href="/me">{{ "User Overview"|translate }}</a>
+                <a class="navigation-breadcrumb" href="/me/mfa-management">{{ "MFA Management"|translate }}</a>
+            </div>
+
+            <h1>{{ "Multi-Factor Authentication"|translate }}</h1>
+
+            <div class="separator"></div>
+
+            <div id="errorBanner" class="warning-note" style="display:none;"></div>
+
+            <div id="managementView">
+                <div class="marked-section">
+                    <h2>
+                        {{ "Authenticator App (TOTP)"|translate }}
+                        <sup>
+                            {% if TotpEnabled %}
+                                <span class="tag-badge-inline-large positive-badge">{{ "Enabled"|translate }}</span>
+                            {% else %}
+                                <span class="tag-badge-inline-large negative-badge">{{ "Not Enabled"|translate }}</span>
+                            {% endif %}
+                        </sup>
+                    </h2>
+
+                    {% if TotpEnabled %}
+                        <p>
+                            {{ "Your account is protected with an authenticator app. You will be asked for a verification code when performing sensitive actions."|translate }}
+                        </p>
+
+                        {#
+                            =========================
+                            = RECOVERY CODES
+                            =========================
+                        #}
+
+                        <h3>{{ "Recovery Codes"|translate }}</h3>
+
+                        <div id="recoveryCountDisplay">
+                            {% if RemainingCodes == 0 %}
+                                <div class="warning-note" style="position:relative;">
+                                    <strong>{{ "You have no recovery codes remaining."|translate }}</strong>
+                                    <p>{{ "Generate new ones now to avoid being locked out."|translate }}</p>
+                                </div>
+                            {% elseif RemainingCodes <= 2 %}
+                                <div class="warning-note" style="position:relative;">
+                                    {{ "You only have"|translate }} <strong>{{ RemainingCodes }}</strong> {{ "recovery code(s) remaining."|translate }}
+                                    {{ "Consider generating new ones."|translate }}
+                                </div>
+                            {% else %}
+                                <p>{{ "You have"|translate }} <strong>{{ RemainingCodes }}</strong> {{ "recovery code(s) remaining."|translate }}</p>
+                            {% endif %}
+                        </div>
+
+                        <p style="font-size:0.85em; opacity:0.7;">
+                            {{ "Regenerating will revoke all existing codes and create 8 new ones. You will need your current authenticator code to confirm."|translate }}
+                        </p>
+
+                        <div style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:2rem;">
+                            <input
+                                    type="text"
+                                    id="regenerateCodeInput"
+                                    maxlength="6"
+                                    placeholder="000000"
+                                    inputmode="numeric"
+                                    style="width:12em; font-family:'IBM Plex Mono',monospace; font-size:1.2em; text-align:center; letter-spacing:0.3em;"
+                            >
+                            <a class="button" href="javascript:void(0)" id="regenerateBtn" onclick="regenerateCodes()" style="margin:0; margin-top:0.2rem;">
+                                {{ "Regenerate Recovery Codes"|translate }}
+                            </a>
+                        </div>
+
+                        {#
+                            =========================
+                            = DISABLE
+                            =========================
+                        #}
+
+
+                        <h3>{{ "Disable TOTP"|translate }}</h3>
+
+                        <p>
+                            {{ "Disabling two-factor authentication will remove the authenticator requirement and delete all recovery codes."|translate }}
+                        </p>
+
+                        <div style="display:flex; gap:1rem; align-items:flex-start;">
+                            <input
+                                    type="text"
+                                    id="disableCodeInput"
+                                    maxlength="6"
+                                    placeholder="000000"
+                                    inputmode="numeric"
+                                    style="width:12em; font-family:'IBM Plex Mono',monospace; font-size:1.2em; text-align:center; letter-spacing:0.3em;"
+                            >
+                            <a class="button" href="javascript:void(0)" id="disableBtn" onclick="disableTotp()" style="margin:0; margin-top:0.2rem; background-color:var(--error-color); color:var(--error-color-contrast);">
+                                {{ "Disable TOTP"|translate }}
+                            </a>
+                        </div>
+
+                    {% else %}
+                        <p>
+                            {{ "Add an extra layer of security to your account by setting up an authenticator app. You will need to enter a verification code from your app when performing sensitive actions."|translate }}
+                        </p>
+                        <a class="button" href="/me/mfa-management/new">
+                            {{ "Set Up Authenticator"|translate }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {#
+                =========================
+                = DISPLAY RECOVERY CODES
+                =========================
+            #}
+
+            <div id="recoveryCodesView" style="display:none;">
+                <div class="marked-section">
+                    <h2>{{ "New Recovery Codes"|translate }}</h2>
+
+                    <div class="warning-note" style="position:relative;">
+                        <strong>{{ "Important"|translate }}</strong>
+                        <p>{{ "Your previous codes have been revoked. Save these new codes somewhere safe. You will not be able to see them again."|translate }}</p>
+                    </div>
+
+                    <div id="codesGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 2rem; margin-bottom:1.5rem;"></div>
+
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+                        <a class="button" href="javascript:void(0)" onclick="copyCodes()" id="copyCodesBtn" style="margin:0;">
+                            {{ "Copy to Clipboard"|translate }}
+                        </a>
+                        <a class="button" href="javascript:void(0)" onclick="downloadCodes()" style="margin:0;">
+                            {{ "Download as File"|translate }}
+                        </a>
+                        <a class="button" href="javascript:void(0)" onclick="window.print()" style="margin:0;">
+                            {{ "Print"|translate }}
+                        </a>
+                    </div>
+
+                    <a class="button" href="javascript:void(0)" onclick="dismissRecoveryCodes()">
+                        {{ "I've saved my codes - Continue"|translate }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @media print {
+            .navigation-breadcrumb-container,
+            .separator,
+            #managementView { display: none !important; }
+        }
+
+        @media only screen and (max-width: 128mm) {
+            #codesGrid { grid-template-columns: 1fr !important; }
+        }
+    </style>
+
+    <script>
+        let recoveryCodes = [];
+
+        function showError(message)
+        {
+            const el = document.getElementById('errorBanner');
+            el.textContent = message;
+            el.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function hideError()
+        {
+            document.getElementById('errorBanner').style.display = 'none';
+        }
+
+        function validateCodeInput(inputId)
+        {
+            const input = document.getElementById(inputId);
+            const code = input.value.replace(/\D/g, '');
+            if (code.length !== 6)
+            {
+                showError('{{ "Please enter a valid 6-digit code from your authenticator app."|translate }}');
+                input.focus();
+                input.select();
+                return null;
+            }
+            return code;
+        }
+
+        function setButtonLoading(btn, loading, originalText)
+        {
+            if (loading)
+            {
+                btn.style.opacity = '0.5';
+                btn.style.pointerEvents = 'none';
+                btn.textContent = originalText + '...';
+            }
+            else
+            {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.textContent = originalText;
+            }
+        }
+
+        async function disableTotp()
+        {
+            hideError();
+
+            const code = validateCodeInput('disableCodeInput');
+            if (!code)
+                return;
+
+            const btn = document.getElementById('disableBtn');
+            setButtonLoading(btn, true, '{{ "Disable TOTP"|translate }}');
+
+            try
+            {
+                const userController = new UserController();
+                const result = await userController.DisableTotp(code);
+
+                if (result)
+                {
+                    window.location.href = '/me/mfa-management';
+                }
+                else
+                {
+                    showError('{{ "Invalid code. Please check your authenticator app and try again."|translate }}');
+                    setButtonLoading(btn, false, '{{ "Disable TOTP"|translate }}');
+                }
+            }
+            catch (err)
+            {
+                showError('{{ "Something went wrong. Please try again."|translate }}');
+                setButtonLoading(btn, false, '{{ "Disable TOTP"|translate }}');
+            }
+        }
+
+        async function regenerateCodes()
+        {
+            hideError();
+
+            const code = validateCodeInput('regenerateCodeInput');
+            if (!code) return;
+
+            const btn = document.getElementById('regenerateBtn');
+            setButtonLoading(btn, true, '{{ "Regenerate Recovery Codes"|translate }}');
+
+            try
+            {
+                const userController = new UserController();
+                const result = await userController.RegenerateRecoveryCodes(code);
+
+                if (result && result.recoveryCodes)
+                {
+                    recoveryCodes = result.recoveryCodes;
+                    showRecoveryCodes(recoveryCodes);
+                }
+                else
+                {
+                    showError('{{ "Invalid code. Please check your authenticator app and try again."|translate }}');
+                    setButtonLoading(btn, false, '{{ "Regenerate Recovery Codes"|translate }}');
+                }
+            }
+            catch (err)
+            {
+                showError('{{ "Something went wrong. Please try again."|translate }}');
+                setButtonLoading(btn, false, '{{ "Regenerate Recovery Codes"|translate }}');
+            }
+        }
+
+        function showRecoveryCodes(codes)
+        {
+            const grid = document.getElementById('codesGrid');
+            grid.innerHTML = '';
+            codes.forEach(function(code) {
+                const el = document.createElement('code');
+                el.style.fontFamily = "'IBM Plex Mono', monospace";
+                el.style.fontSize = '1.2em';
+                el.style.fontWeight = 'bold';
+                el.style.letterSpacing = '0.1em';
+                el.style.padding = '0.4em 0.6em';
+                el.style.border = 'var(--outline-width) solid var(--foreground-color-outlines)';
+                el.style.textAlign = 'center';
+                el.textContent = code;
+                grid.appendChild(el);
+            });
+
+            document.getElementById('managementView').style.display = 'none';
+            document.getElementById('recoveryCodesView').style.display = 'block';
+            hideError();
+        }
+
+        function dismissRecoveryCodes()
+        {
+            window.location.href = '/me/mfa-management';
+        }
+
+
+
+
+
+        function copyCodes()
+        {
+            let text = "Auxilium Admin - Recovery Codes\n";
+            text += "================================\n\n";
+            recoveryCodes.forEach(function(code) { text += code + "\n"; });
+            text += "\nKeep these codes safe. Each can only be used once.";
+            navigator.clipboard.writeText(text);
+        }
+
+        function downloadCodes()
+        {
+            let text = "Auxilium Admin - Recovery Codes\r\n";
+            text += "================================\r\n\r\n";
+            recoveryCodes.forEach(function(code) { text += code + "\r\n"; });
+            text += "\r\nKeep these codes safe. Each can only be used once.\r\n";
+            text += "Generated: " + new Date().toISOString() + "\r\n";
+
+            const blob = new Blob([text], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'auxilium-recovery-codes.txt';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+    </script>
+
+{% endblock %}

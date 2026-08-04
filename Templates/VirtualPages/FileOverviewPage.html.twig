@@ -1,0 +1,87 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "file overview" | translate }}{% endblock %}
+
+{% block content %}
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ FileDetails|json_encode }}
+        </code>
+    {% endif %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/file/{{ CaseID }}">{{ "File Overview" | translate }}</a>
+            </div>
+
+            <h1>
+                <span class="inline-icon-shift-left inline-icon-low-margin file-present-icon" title="{{ "File details" | translate }}"></span>
+                {{ "File Overview" | translate }}
+            </h1>
+
+            <div class="separator"></div>
+
+            <div>
+                <div id="main-content" class="reference-element"></div>
+
+                <div class="left-preferential-box">
+                    {% if FileDetails.contentType starts with 'image' %}
+                        <img src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render"
+                             alt="{{ FileDetails.filename }}"
+                             style="max-width: 100%; height: auto;" />
+                    {% elseif FileDetails.contentType starts with 'video' %}
+                        <video width="auto" height="500" controls>
+                            <source src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render">
+                            Your browser does not support the video tag.
+                        </video>
+
+                    {% elseif FileDetails.contentType starts with 'audio' %}
+                        <audio controls src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render"></audio>
+
+                    {% elseif FileDetails.contentType == 'application/pdf' %}
+                        <iframe src="/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render" sandbox style="width: 100%; height: 600px; border: none;">
+                        </iframe>
+
+                    {% elseif FileDetails.contentType starts with 'text' %}
+                        <pre>
+                            <code id="text-preview" style="max-width: 100%; overflow-x: auto; white-space: pre-wrap;">
+                            </code>
+                        </pre>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', async function() {
+                                const response = await fetch('/{{ ParentType }}/{{ ParentId }}/files/{{ FileDetails.id }}/render');
+                                document.getElementById('text-preview').textContent = await response.text();
+                            });
+                        </script>
+
+                    {% else %}
+                        <p>{{ "Preview not available for this file type" | translate }}</p>
+                        <p>{{ "File type" | translate }}: {{ FileDetails.contentType }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="right-preferential-box">
+                    <h3>{{ "File Information" | translate }}</h3>
+                    <dl>
+                        <dt>{{ "Filename" | translate }}:</dt>
+                        <dd>{{ FileDetails.filename }}</dd>
+
+                        <dt>{{ "File size" | translate }}:</dt>
+                        <dd>{{ FileDetails.human_filesize }}</dd>
+
+                        <dt>{{ "Content type" | translate }}:</dt>
+                        <dd>{{ FileDetails.contentType }}</dd>
+
+                        <dt>{{ "Uploaded at" | translate }}:</dt>
+                        <dd>{{ FileDetails.createdAt|date('Y-m-d H:i:s') }}</dd>
+
+                        <dt>{{ "Uploaded by" | translate }}:</dt>
+                        <dd>{% include '/Partials/InlineUserField.html.twig' with {'_personType': 'GENERIC', '_data': FileDetails.createdBy} %}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

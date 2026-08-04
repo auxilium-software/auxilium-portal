@@ -1,0 +1,91 @@
+{% extends '/Bases/StandardWebPage.html.twig' %}
+
+{% block content %}
+
+    <div class="inner-content">
+        <form id="{{ FormSpec.id }}-review" action="/form/{{ FormInstanceID }}" method="POST">
+
+            <input type="hidden" id="FormInstanceID" name="FormInstanceID" value="{{ FormInstanceID }}">
+            <input type="hidden" id="action" name="action" value="continue">
+
+            <h1 class="no-lower-margin">Review Your Information</h1>
+            <p>Please review the information below before submitting your application.</p>
+
+            {% for component in ReviewComponents %}
+                {% if component.type == 'SUBHEADING' %}
+                    <div class="review-section">
+                        <h2 class="review-subheading">
+                            {{ component.value|localise }}
+                            {% if component.jumpToPage %}
+                                <button type="submit" name="jumpToPage" value="{{ component.jumpToPage }}" class="edit-button">
+                                    Edit
+                                </button>
+                            {% endif %}
+                        </h2>
+                    </div>
+
+                {% elseif component.type == 'DESCRIPTION_LIST' %}
+                    <div class="review-description-list">
+                        <dl>
+                            {% for item in component.dictionary.item %}
+                                <dt>{{ item.key }}</dt>
+                                <dd>{{ item.value|localise|default('Not provided') }}</dd>
+                            {% endfor %}
+                        </dl>
+                    </div>
+
+                {% elseif component.type == 'PARAGRAPH' %}
+                    <div class="review-paragraph">
+                        <p>{{ component.value|localise|nl2br }}</p>
+                    </div>
+
+                {% else %}
+                    <div class="alert alert-warning">
+                        <strong>{{ "Unknown review component type:"|translate }}</strong> {{ component.type }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {# Navigation buttons #}
+            <div class="form-navigation review-navigation">
+                <div class="review-actions">
+                    {% if ShowBackButton %}
+                        <input type="button" value="{{ "Back to Edit"|translate }}" onclick="submitFormWithAction('back')" class="back-button" />
+                    {% endif %}
+                    <input type="button" value="{{ "Submit"|translate }}" onclick="submitFormWithAction('submit')" class="submit-button primary" />
+                </div>
+            </div>
+
+            {% if FormSpec.useReCAPTCHA %}
+                <div class="recaptcha-info">
+                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                    }) }}
+                </div>
+                <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
+            {% endif %}
+        </form>
+    </div>
+
+    {% if FormSpec.useReCAPTCHA %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
+    {% endif %}
+
+    <script>
+        async function submitFormWithAction(action) {
+            const actionInput = document.getElementById('action');
+            actionInput.value = action;
+
+            {% if FormSpec.useReCAPTCHA %}
+                const token = await grecaptcha.execute('{{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}', {
+                    action: action === 'submit' ? 'submit' : 'form_interaction'
+                });
+                document.getElementById('ReCAPTCHAToken').value = token;
+            {% endif %}
+            document.querySelector('form').submit();
+
+        }
+    </script>
+
+{% endblock %}

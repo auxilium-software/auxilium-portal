@@ -1,83 +1,124 @@
-FROM debian:bookworm
-WORKDIR /app
 
-SHELL ["/bin/bash", "-c"]
+# ==================================================
+# composer dependencies
+# ==================================================
+FROM php:8.4-alpine AS vendor
 
-# install packages
-RUN apt-get update
-RUN apt-get -y install supervisor wget grep curl openjdk-17-jre-headless
-RUN apt-get -y install nginx
-RUN apt-get -y install mariadb-server mariadb-client
-RUN apt-get -y install php8.2 php8.2-fpm
-RUN apt-get -y install php8.2-gd php8.2-mysql php8.2-simplexml php8.2-mysql php8.2-curl php8.2-bcmath php-json php8.2-imap php8.2-mbstring php8.2-zip
-RUN apt-get -y install composer ssl-cert git jq
-RUN apt-get -y install iputils-ping nano
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-#RUN export PHP_VER=`dpkg -l 'php*' | grep ^ii | grep -oP "php[0-9]+\\.[0-9]*" | cut -c 4- | head -1 | tr -d $'\n'`; a2enmod php$PHP_VER;
-#RUN a2enmod headers
-#RUN a2enmod rewrite
-#RUN a2enmod ssl
-#RUN a2enmod mime
-#RUN chmod +x /etc/apache2/envvars
+RUN apk add --no-cache \
+        freetype-dev \
+        libjpeg-turbo-dev \
+        libpng-dev \
+        libzip-dev \
+    && docker-php-ext-configure \
+        gd \
+        --with-freetype \
+        --with-jpeg \
+    && docker-php-ext-install \
+        bcmath \
+        gd \
+        zip
 
-RUN useradd deegraph -d /store/deegraph
+WORKDIR /build
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --prefer-dist \
+    --optimize-autoloader
 
 
+# ==================================================
+# shared runtime base
+# ==================================================
+FROM php:8.4-fpm-alpine AS base
 
-# copy over the nginx config
-RUN rm /etc/nginx/sites-enabled/*
-RUN rm /etc/nginx/sites-available/*
-COPY Config/nginx /etc/nginx
-RUN for f in /etc/nginx/sites-available/*; do \
-      ln -s "$f" /etc/nginx/sites-enabled/$(basename "$f"); \
-    done
+RUN apk add --no-cache \
+        curl-dev \
+        freetype-dev \
+        icu-dev \
+        libjpeg-turbo-dev \
+        libpng-dev \
+        libzip-dev \
+        nginx \
+        oniguruma-dev \
+        supervisor \
+    && docker-php-ext-configure \
+        gd \
+        --with-freetype \
+        --with-jpeg \
+    && docker-php-ext-install \
+        bcmath \
+        curl \
+        gd \
+        intl \
+        mbstring \
+        opcache \
+        pdo_mysql \
+        zip
 
-# copy over the php config
-COPY Config/php.ini /etc/php/php.ini
-#RUN export PHP_VER=`dpkg -l 'php*' | grep ^ii | grep -oP "php[0-9]+\\.[0-9]*" | cut -c 4- | head -1 | tr -d $'\n'`; mv /etc/php/php.ini.tmp /etc/php/$PHP_VER/apache2/php.ini;
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+COPY docker/php/app.ini ${PHP_INI_DIR}/conf.d/10-app.ini
+COPY docker/supervisord.conf /etc/supervisord.conf
 
-# copy over composer config
-#COPY Auxilium/composer.json /srv/Auxilium/composer.json
-#COPY Auxilium/composer.lock /srv/Auxilium/composer.lock
+WORKDIR /var/www/html
 
-COPY Auxilium /srv/Auxilium
 
-# set web perms on the auxilium directory
-RUN chown www-data:www-data /srv -R
+# ==================================================
+# development
+# ==================================================
+FROM base AS dev
 
-# cd & su
-WORKDIR /srv/Auxilium
-USER www-data
+RUN apk add --no-cache \
+        ${PHPIZE_DEPS} \
+        linux-headers \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk del \
+        ${PHPIZE_DEPS} \
+        linux-headers \
+    && rm -rf /tmp/pear
 
-# install composer packages
-ENV COMPOSER_HOME=/tmp/composer
-RUN mkdir -p $COMPOSER_HOME
-RUN composer config allow-plugins.endroid/installer true
-RUN composer install
+COPY docker/php/xdebug.ini ${PHP_INI_DIR}/conf.d/20-xdebug.ini
+COPY --from=vendor /usr/bin/composer /usr/bin/composer
 
-COPY ConfigTemplates/Environment-Docker.php /srv/Auxilium/Configuration/Configuration/Environment.php
+RUN mkdir -p \
+        Public \
+        var \
+        /var/auxilium/formdata \
+        /var/auxilium/auxlfs \
+    && chown -R www-data:www-data \
+        /var/www/html \
+        /var/auxilium
 
-USER root
-WORKDIR /app
+EXPOSE 80
 
-COPY Scripts/new-keys.php /app/new-keys.php
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
-COPY Config/mariadb-50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
-COPY Config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY bin/deegraph.jar /app/deegraph.jar
-COPY Config/launch.sh /app/launch.sh
 
-RUN chmod +x /app/deegraph.jar
-RUN chmod +x /app/launch.sh
+# ==================================================
+# production
+# ==================================================
+FROM base AS prod
 
-RUN mkdir /var/EphemeralCredentialsStore
-RUN chown www-data:www-data /var/EphemeralCredentialsStore -R
+COPY docker/php/opcache.ini ${PHP_INI_DIR}/conf.d/20-opcache.ini
+COPY --from=vendor /build/vendor ./vendor
+COPY . .
 
-RUN mkdir /store
-RUN chown www-data:www-data /store -R
+RUN mkdir -p \
+        var \
+        /var/auxilium/formdata \
+        /var/auxilium/auxlfs \
+    && chown -R www-data:www-data \
+        /var/www/html/var \
+        /var/auxilium \
+    && find Public -type d -exec chmod 755 {} \; \
+    && find Public -type f -exec chmod 644 {} \;
 
-RUN usermod -d /var/lib/mysql/ mysql
+EXPOSE 80
 
-ENTRYPOINT ["/usr/bin/supervisord"]
-
-STOPSIGNAL SIGQUIT
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]

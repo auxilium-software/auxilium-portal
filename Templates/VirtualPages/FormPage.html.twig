@@ -1,0 +1,277 @@
+{% extends '/Bases/StandardWebPage.html.twig' %}
+
+{% block content %}
+
+    <div class="inner-content">
+        <form id="{{ FormSpec.id }}" action="/form/{{ FormInstanceID }}" method="POST">
+
+            <input type="hidden" id="FormInstanceID" name="FormInstanceID" value="{{ FormInstanceID }}">
+            <input type="hidden" id="action" name="action" value="continue">
+
+            <h1 class="no-lower-margin">{{ FormSpec.pages.page[ActualPageIndex].title|localise }}</h1>
+
+            {% set pageDescription = FormSpec.pages.page[ActualPageIndex].description|localise %}
+            {% if pageDescription %}<p>{{ pageDescription }}</p>{% endif %}
+
+            {% for componentDetails in FormSpec.pages.page[ActualPageIndex].components.component %}
+
+                {% if componentDetails.type == 'TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="text"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required and componentDetails.required == "true" %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'EMAIL_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="email"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'PASSWORD_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="password"
+                            value=""
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'DATE_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <input
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            type="date"
+                            value="{{ FormData.Data[componentDetails.id]|default('') }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >
+
+                {% elseif componentDetails.type == 'MULTILINE_TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <textarea
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            rows="4"
+                            {% if componentDetails.required %}required{% endif %}
+                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
+
+                {% elseif componentDetails.type == 'LARGE_TEXT_FIELD' %}
+                    <label for="{{ componentDetails.id }}">{{ componentDetails.primaryLabel|localise }}</label>
+                    <textarea
+                            id="{{ componentDetails.id }}"
+                            name="{{ componentDetails.id }}"
+                            class="fullwidth-text-input"
+                            rows="{{ componentDetails.rows }}"
+                            {% if componentDetails.required %}required{% endif %}
+                    >{{ FormData.Data[componentDetails.id]|default('') }}</textarea>
+
+                {% elseif componentDetails.type == 'CHOICE_FIELD' %}
+                    <label>{{ componentDetails.primaryLabel|localise }}</label>
+                    {% for optionDetails in componentDetails.options.option %}
+                        {% set optionPrimary = optionDetails.primaryLabel|localise %}
+                        {% set optionSecondary = optionDetails.secondaryLabel|localise %}
+                        <div class="radio-button-holder">
+                            <input
+                                    type="radio"
+                                    id="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                    name="{{ componentDetails.id }}"
+                                    value="{{ optionDetails.value }}"
+                                    {% if FormData.Data[componentDetails.id] == optionDetails.value %}checked{% endif %}
+                                    {% if componentDetails.required and loop.first %}required{% endif %}
+                            >
+                            <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
+                                <p>
+                                    {% if optionPrimary %}<strong>{{ optionPrimary }}</strong><br/>{% endif %}
+                                    {% if optionSecondary %}<span>{{ optionSecondary }}</span>{% endif %}
+                                </p>
+                            </label>
+                        </div>
+                    {% endfor %}
+
+                {% elseif componentDetails.type == 'CHECKBOX_FIELD' %}
+                    <div class="form-group">
+                        <div class="checkbox-holder">
+                            {% for optionDetails in componentDetails.options.option %}
+                                {% set optionPrimary = optionDetails.primaryLabel|localise %}
+                                {% set optionSecondary = optionDetails.secondaryLabel|localise %}
+                                <input
+                                        type="checkbox"
+                                        id="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                        name="{{ componentDetails.id }}-{{ optionDetails.value }}"
+                                        value="{{ optionDetails.value }}"
+                                >
+                                <label for="{{ componentDetails.id }}-{{ optionDetails.value }}" class="long-form-label-for-radio-button">
+                                    <p>
+                                        {% if optionPrimary %}<strong>{{ optionPrimary }}</strong><br/>{% endif %}
+                                        {% if optionSecondary %}<span>{{ optionSecondary }}</span>{% endif %}
+                                    </p>
+                                </label>
+                            {% endfor %}
+                            {% if componentDetails.haveOtherOption == "true" %}
+                                <input
+                                        type="checkbox"
+                                        id="{{ componentDetails.id }}-other"
+                                        name="{{ componentDetails.id }}-other"
+                                        value="TRUE"
+                                >
+                                <label for="{{ componentDetails.id }}-other" class="long-form-label-for-radio-button">
+                                    <p>
+                                        <strong>{{ "Other"|translate }}</strong><br/>
+                                        <span>{{ "Please specify"|translate }}</span>
+                                    </p>
+                                </label>
+                                <input
+                                        type="text"
+                                        id="{{ componentDetails.id }}-other-text"
+                                        name="{{ componentDetails.id }}-other-text"
+                                        class="other-text-input"
+                                >
+                            {% endif %}
+                        </div>
+                    </div>
+
+                {% elseif componentDetails.type == 'SELECT_FIELD' %}
+                    <div class="form-group">
+                        {% set selectLabel = componentDetails.primaryLabel|localise %}
+                        {% if selectLabel %}
+                            <label for="{{ componentDetails.id }}">{{ selectLabel }}</label>
+                        {% endif %}
+                        <select
+                                id="{{ componentDetails.id }}"
+                                name="{{ componentDetails.id }}"
+                                {% if componentDetails.required %}required{% endif %}
+                        >
+                            <option value="">{{ "-- Select --"|translate }}</option>
+                            {% for optionDetails in componentDetails.options.option %}
+                                {% set optionPrimary = optionDetails.primaryLabel|localise %}
+                                <option
+                                        value="{{ optionDetails.value }}"
+                                        {% if FormData.Data[componentDetails.id] == optionDetails.value %}selected{% endif %}
+                                >
+                                    {{ optionPrimary ?: optionDetails.value }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                {% elseif componentDetails.type == 'LIKERT_GRID' %}
+                    {% set gridId = componentDetails.id %}
+                    {% set scaleOptions = componentDetails.scale.option %}
+                    <fieldset class="likert-grid">
+                        {% set gridLabel = componentDetails.primaryLabel|localise %}
+                        {% if gridLabel %}<legend>{{ gridLabel }}</legend>{% endif %}
+
+                        <div class="likert-grid-rows">
+
+                            {# header row - scale text, once, across the top #}
+                            <div class="likert-row likert-header" aria-hidden="true">
+                                <span class="likert-statement"></span>
+                                {% for scaleOption in scaleOptions %}
+                                    <span class="likert-scale-label">{{ scaleOption.primaryLabel|localise }}</span>
+                                {% endfor %}
+                            </div>
+
+                            {# statement rows - just the circles #}
+                            {% for statement in componentDetails.statements.statement %}
+                                {% set rowName = gridId ~ '-' ~ statement.id %}
+                                <div class="likert-row" role="radiogroup" aria-labelledby="{{ rowName }}-label">
+                                    <span class="likert-statement" id="{{ rowName }}-label">{{ statement.primaryLabel|localise }}</span>
+                                    {% for scaleOption in scaleOptions %}
+                                        <label class="likert-cell">
+                                            <input type="radio"
+                                                   name="{{ rowName }}"
+                                                   value="{{ scaleOption.value }}"
+                                                   {% if FormData.Data[rowName] == scaleOption.value %}checked{% endif %}
+                                                    {% if componentDetails.required and loop.first %}required{% endif %}>
+                                            <span class="likert-cell-label">{{ scaleOption.primaryLabel|localise }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </fieldset>
+                {% endif %}
+            {% endfor %}
+
+            {# navigation buttons #}
+            <div class="form-navigation">
+                {% if ShowBackButton %}
+                    <input class="button" type="button" value="{{ "Back"|translate }}" onclick="submitFormWithAction('back')" />
+                {% endif %}
+
+                {% if IsAbandonPage %}
+                    <p class="abandon-message">{{ "You cannot progress further in the form."|translate }}</p>
+                    <a href="/" class="button">{{ "Return to Home"|translate }}</a>
+                {% elseif ShowReviewButton %}
+                    <input type="button" value="{{ "Review"|translate }}" onclick="submitFormWithAction('review')" class="review-button" />
+                {% elseif ShowNextButton %}
+                    <input class="button" type="submit" value="{{ "Continue"|translate }}" />
+                {% endif %}
+            </div>
+
+            {% if FormSpec.useReCAPTCHA %}
+                <div class="recaptcha-info">
+                    {{ "This site is protected by reCAPTCHA and the Google {privacy_link} and {terms_link} apply."|translate({
+                        '{privacy_link}': '<a href="https://policies.google.com/privacy">' ~ "Privacy Policy"|translate ~ '</a>',
+                        '{terms_link}': '<a href="https://policies.google.com/terms">' ~ "Terms of Service"|translate ~ '</a>'
+                    }) }}
+                </div>
+                <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
+            {% endif %}
+        </form>
+    </div>
+
+    {% if FormSpec.useReCAPTCHA %}
+        <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
+    {% endif %}
+
+    <script>
+        async function submitFormWithAction(action)
+        {
+            const actionInput = document.getElementById('action');
+            const form = document.querySelector('form');
+
+            actionInput.value = action;
+
+            if (action === 'back') {
+                const requiredElements = form.querySelectorAll('[required]');
+                requiredElements.forEach(el => {
+                    el.removeAttribute('required');
+                });
+            }
+
+            {% if FormSpec.useReCAPTCHA %}
+                document.getElementById('ReCAPTCHAToken').value = await grecaptcha.execute('{{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}', {action: 'register'});
+            {% endif %}
+            form.submit();
+        }
+    </script>
+
+    <style>
+        .review-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .review-button:hover {
+            background: #0056b3;
+        }
+    </style>
+
+{% endblock %}

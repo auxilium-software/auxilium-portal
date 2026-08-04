@@ -1,0 +1,120 @@
+<?php
+
+namespace Auxilium\Utilities;
+
+use Auxilium\Enumerators\EnvironmentVariable;
+use Exception;
+use SimpleXMLElement;
+use Symfony\Component\Yaml\Yaml;
+
+final class ConfigurationUtilities
+{
+    public static array $SystemConfiguration;
+    public static array $UserConfiguration;
+
+
+    public static function GetSystemConfiguration(): array
+    {
+        if(isset(self::$SystemConfiguration))
+        {
+            return self::$SystemConfiguration;
+        }
+
+        $filePath = __DIR__ . "/../../Configuration/System/System.yaml";
+
+        if($filePath !== false)
+        {
+            $filePath = str_replace(search: '"', replace: '', subject: $filePath);
+            if(file_exists($filePath))
+            {
+                $temp = file_get_contents($filePath);
+                self::$SystemConfiguration = Yaml::parse($temp);
+                return self::$SystemConfiguration;
+            }
+            throw new Exception("Configuration file not found at " . $filePath);
+        }
+        throw new Exception("Configuration file not specified");
+    }
+    public static function GetUserConfiguration(): array
+    {
+        if(isset(self::$UserConfiguration))
+        {
+            return self::$UserConfiguration;
+        }
+
+        $filePath = getenv(EnvironmentVariable::CONFIG_FILE_LOCATION->value);
+
+        if($filePath !== false)
+        {
+            $filePath = str_replace(search: '"', replace: '', subject: $filePath);
+            if(file_exists($filePath))
+            {
+                $temp = file_get_contents($filePath);
+                self::$UserConfiguration = Yaml::parse($temp);
+                return self::$UserConfiguration;
+            }
+            throw new Exception("Configuration file not found at " . $filePath);
+        }
+        throw new Exception("Configuration file not specified");
+    }
+
+
+    public static function GetFormDefinition(string $target): array
+    {
+        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
+        $temp = new SimpleXMLElement($temp);
+        $temp = json_decode(json_encode($temp), true);
+
+        $temp["id"] = "AuxiliumFormDefinition" . $temp["id"];
+
+        // if there's only one wizard page
+        if(!array_is_list($temp["pages"]["page"]))
+        {
+            $temp["pages"]["page"] = [$temp["pages"]["page"]];
+        }
+
+        foreach($temp["pages"]["page"] as &$page)
+        {
+            // Ensure components.component is a list
+            if(
+                isset($page["components"]["component"]) &&
+                !array_is_list($page["components"]["component"])
+            )
+            {
+                $page["components"]["component"] = [$page["components"]["component"]];
+            }
+        }
+        unset($page);
+
+
+        // sorts out the options
+        foreach($temp["pages"]["page"] as $iValue)
+        {
+            if(
+                array_key_exists("components", $iValue)
+                && array_key_exists("component", $iValue['components'])
+                && is_array($iValue["components"]["component"])
+            )
+            {
+                for($ii = 0, $iiMax = count($iValue["components"]["component"]); $ii < $iiMax; $ii++)
+                {
+                }
+            }
+        }
+
+        return $temp;
+    }
+
+    public static function GetAdminConsoleNavigationTree(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleNavigation.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
+    public static function GetAdminConsoleQuickActions(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleQuickActions.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
+}

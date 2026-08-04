@@ -1,0 +1,102 @@
+
+.message-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.message-item {
+    padding: 1em;
+    margin-bottom: 0.75em;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    border-left: 3px solid #ccc;
+}
+
+.message-item.unread {
+    background: #f8f9fa;
+    border-left-color: #0066cc;
+    font-weight: 500;
+}
+
+.message-item.urgent {
+    border-left-color: #dc3545;
+    background: #fff5f5;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75em;
+}
+
+.message-sender-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-date {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.urgent-badge {
+    background: #dc3545;
+    color: white;
+    padding: 0.25em 0.5em;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.unread-badge {
+    background: #0066cc;
+    color: white;
+    padding: 0.25em 0.5em;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.message-subject {
+    margin-bottom: 0.5em;
+    font-size: 1.05em;
+}
+
+.message-recipient {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 0.5em;
+}
+
+.message-content {
+    padding: 0.75em;
+    background: #fafafa;
+    border-radius: 3px;
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+}
+
+.message-meta {
+    font-size: 0.85em;
+    color: #999;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.message-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    margin-top: 0.75em;
+    padding-top: 0.75em;
+    border-top: 1px solid #e0e0e0;
+}
+
+.message-actions .action-link {
+    display: inline-block;
+    font-size: 0.9em;
+}
+

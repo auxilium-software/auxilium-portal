@@ -1,0 +1,31 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "MFA Management"|translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home"|translate }}</a>
+                <a class="navigation-breadcrumb" href="/me">{{ "User Overview"|translate }}</a>
+                <a class="navigation-breadcrumb" href="/me/wemwbs">{{ "WEMWBS"|translate }}</a>
+            </div>
+
+            <h1>{{ "The Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS)"|translate }}</h1>
+
+            <div class="separator"></div>
+
+            <code>
+                {{ Assessments|json_encode }}
+            </code>
+        </div>
+    </div>
+
+    <style>
+    </style>
+
+    <script>
+    </script>
+
+{% endblock %}

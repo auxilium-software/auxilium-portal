@@ -1,0 +1,113 @@
+
+.warning-note {
+    color: var(--error-color);
+    background-color: transparent;
+    border: 0.2rem solid var(--error-color);
+    padding: 0.8rem 1rem 1rem 1rem;
+    margin: 1rem 0 1rem 0;
+}
+
+.critical-note {
+    color: var(--error-color-contrast);
+    background-color: var(--error-color);
+    border: 0.2rem solid var(--error-color);
+    padding: 2rem 1rem 1rem 1rem;
+    margin: 1rem 0 1rem 0;
+}
+
+.critical-note::before {
+    content: "";
+    display: block;
+    position: absolute;
+    background-image: url("/Static/Images/Backgrounds/CrossHatch-White.svg");
+    background-repeat: repeat no-repeat;
+    background-size: auto 100%;
+    background-position: left top;
+    width: 100%;
+    height: 1.25rem;
+    top: 0;
+    left: 0;
+}
+
+.info-note {
+    color: var(--brand-color-alternate-contrast);
+    background-color: var(--brand-color-alternate);
+    border: 0.2rem solid var(--brand-color-alternate);
+    padding: 0.8rem 1rem 1rem 1rem;
+    margin: 1rem 0 1rem 0;
+}
+
+.note-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+}
+
+
+.note-warning {
+    background-color: var(--warning-color);
+    color: var(--warning-color-contrast);
+}
+.note-warning > h2 {
+    color: var(--warning-color-contrast);
+}
+.note-warning::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    vertical-align: bottom;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.2;
+    top: 120%;
+    margin: -16rem 0 0 0;
+    right: 0rem;
+    transform: rotate(15deg);
+    height: 0;
+    width: 0;
+    box-sizing: border-box;
+    padding: 12rem 12rem 0 0;
+    background-image: url("/Static/Icons/warning_black_48dp.svg");
+}
+
+
+.note-info {
+    background-color: var(--information-color);
+    color: var(--information-color-contrast);
+}
+.note-info > h2 {
+    color: var(--information-color-contrast);
+}
+.note-info::before {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    vertical-align: bottom;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.2;
+    top: 120%;
+    margin: -16rem 0 0 0;
+    right: 0rem;
+    transform: rotate(15deg);
+    height: 0;
+    width: 0;
+    box-sizing: border-box;
+    padding: 12rem 12rem 0 0;
+    background-image: url("/Static/Icons/info_black_48dp.svg");
+}
+
+
+
+
+.side-note {
+    padding: 1rem 1rem 1rem 1rem !important;
+}
+.side-note > *:first-child {
+    margin-top: 0;
+}
+.side-note > *:last-child {
+    margin-bottom: 0;
+}

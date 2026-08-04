@@ -1,0 +1,48 @@
+
+{% if item.Type == 'Header' %}
+    {# ===== HEADER ===== #}
+    <div class="nav-item nav-item--header">
+        {{ item.Label|translate }}
+    </div>
+
+    {% if item.Children is defined and item.Children|length > 0 %}
+        {% for child in item.Children %}
+            {% include '/Partials/AdminConsoleNavigationItem.html.twig' with {'item': child, 'depth': depth + 1} %}
+        {% endfor %}
+    {% endif %}
+
+{% elseif item.Type == 'Line' %}
+    {# ===== LINE SEPARATOR ===== #}
+    <div class="nav-item nav-item--line"></div>
+
+{% elseif item.Type == 'HREF' %}
+    {# ===== CLICKABLE OPTION ===== #}
+    <a href="{{ item.HREF }}" class="{% if item.IsActive %}active{% endif %}">
+        <div class="nav-item nav-item--option" data-depth="{{ depth }}">
+            {% if item.Icon %}
+                <span class="nav-item__icon"><i class="ph-duotone ph-{{ item.Icon }}"></i></span>
+            {% endif %}
+            <span class="nav-item__label">{{ item.Label|translate }}</span>
+        </div>
+    </a>
+
+{% elseif item.Type == 'Dropdown' %}
+    {# ===== DROPDOWN WITH CHILDREN ===== #}
+    <div class="nav-item nav-item--dropdown {% if item.IsExpanded %}open{% endif %}" data-depth="{{ depth }}">
+        <div class="nav-item__toggle">
+            <span class="nav-item__expand-icon">►</span>
+            {% if item.Icon %}
+                <span class="nav-item__icon"><i class="ph-duotone ph-{{ item.Icon }}"></i></span>
+            {% endif %}
+            <span class="nav-item__label">{{ item.Label|translate }}</span>
+        </div>
+
+        {% if item.Children is defined and item.Children|length > 0 %}
+            <div class="nav-item__children">
+            {% for child in item.Children %}
+                {% include '/Partials/AdminConsoleNavigationItem.html.twig' with {'item': child, 'depth': depth + 1} %}
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

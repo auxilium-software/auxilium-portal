@@ -1,0 +1,132 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="welcome-box">
+        <div class="welcome-box__title">
+            {{ "Welcome to the Auxilium Administration Console"|translate }}
+        </div>
+        <div class="welcome-box__text" id="selectedDisplay">
+            {{ "Select an option from the navigation panel to get started."|translate }}
+        </div>
+    </div>
+
+    <div class="info-boxes">
+        <div class="info-box">
+            <div class="info-box__header">{{ "System Status"|translate }}</div>
+            <div class="info-box__content">
+                <div class="status-row">
+                    <span>{{ "Portal"|translate }}</span>
+                    <span class="status-row__value status-row__value--good">{{ "online"|translate }}</span>
+                </div>
+                <div class="status-row">
+                    <span>{{ "API Server"|translate }}</span>
+                    <span class="status-row__value status-row__value--good">{{ "online"|translate }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-box__header">
+                {{ "Quick Actions"|translate }}
+            </div>
+            <div class="info-box__content">
+                {% for quickAction in QuickActions %}
+                    <button class="quick-button" onclick="window.location.href = '{{ quickAction.HREF }}';">
+                        <i class="ph-duotone ph-{{ quickAction.Icon }}"></i> {{ quickAction.Label|translate }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="info-boxes">
+        <div class="info-box">
+            <div class="info-box__header">
+                {{ "System Metrics"|translate }}
+            </div>
+            <div class="info-box__content">
+                <div class="chart-grid chart-grid--4col" style="margin-top:12px;">
+                    <div class="analogue_gauge" id="gaugeApiCpu"></div>
+                    <div class="analogue_gauge" id="gaugeTrCpu"></div>
+                    <div class="analogue_gauge" id="gaugeApiMem"></div>
+                    <div class="analogue_gauge" id="gaugeTrMem"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const api = new SystemMetricController();
+
+        const MEM_FULL_SCALE_BYTES = 1 * 1024 * 1024 * 1024;
+
+        function formatBytes(bytes)
+        {
+            if (bytes === null || bytes === undefined) return '-';
+            if (bytes >= 1_073_741_824) return (bytes / 1_073_741_824).toFixed(2) + ' GB';
+            if (bytes >= 1_048_576)     return (bytes / 1_048_576).toFixed(0) + ' MB';
+            if (bytes >= 1_024)         return (bytes / 1_024).toFixed(0) + ' KB';
+            return bytes + ' B';
+        }
+
+        const GREEN = '#5cb85c', AMBER = '#f0ad4e', RED = '#d9534f';
+
+        function cpuGaugeCfg(title)
+        {
+            return {
+                title, min: 0, max: 100, unit: '%', majorCount: 5, minorPerMajor: 2,
+                zones: [[0, 0.6, GREEN], [0.6, 0.85, AMBER], [0.85, 1, RED]],
+                tickLabel: v => Math.round(v),
+                lcd: v => v.toFixed(0),
+                caption: '%',
+            };
+        }
+
+        function memGaugeCfg(title)
+        {
+            return {
+                title, min: 0, max: MEM_FULL_SCALE_BYTES, unit: '', majorCount: 4, minorPerMajor: 2,
+                zones: [[0, 0.7, GREEN], [0.7, 0.88, AMBER], [0.88, 1, RED]],
+                tickLabel: v => Math.round(v / 1_048_576),
+                lcd: v => formatBytes(v),
+                caption: 'MB',
+            };
+        }
+
+        const gApiCpu = new RetroGauge(document.getElementById('gaugeApiCpu'), cpuGaugeCfg('{{ "API - CPU"|translate }}'));
+        const gApiMem = new RetroGauge(document.getElementById('gaugeApiMem'), memGaugeCfg('{{ "API - Memory"|translate }}'));
+        const gTrCpu  = new RetroGauge(document.getElementById('gaugeTrCpu'),  cpuGaugeCfg('{{ "Task Runner - CPU"|translate }}'));
+        const gTrMem  = new RetroGauge(document.getElementById('gaugeTrMem'),  memGaugeCfg('{{ "Task Runner - Memory"|translate }}'));
+
+        async function loadSystemMetrics()
+        {
+            try
+            {
+                const [apiCpu, apiMem, trCpu, trMem] = await Promise.all([
+                    api.GetApiCpuUsageMetrics(),
+                    api.GetApiRamUsageMetrics(),
+                    api.GetTaskRunnerCpuUsageMetrics(),
+                    api.GetTaskRunnerRamUsageMetrics(),
+                ]);
+
+                const latest = r => r?.metrics?.[0]?.value ?? 0; // newest-first
+
+                gApiCpu.setValue(latest(apiCpu));
+                gApiMem.setValue(latest(apiMem));
+                gTrCpu.setValue(latest(trCpu));
+                gTrMem.setValue(latest(trMem));
+            }
+            catch (err)
+            {
+                console.error('Failed to load system metrics:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSystemMetrics);
+    </script>
+{% endblock %}

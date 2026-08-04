@@ -1,0 +1,133 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph ph-database"></i>
+            {{ "MariaDB"|translate }}
+            <span class="page-title__sub">{{ "Monitor the MariaDB service"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button type="button" class="form-btn" onclick="loadAll()">
+                <i class="ph ph-arrow-clockwise"></i> {{ "Refresh"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-status">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Status"|translate }}</div>
+            <div class="stat-card__change" id="stat-status-sub">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-size">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Database Size"|translate }}</div>
+            <div class="stat-card__change" id="stat-size-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-conns">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Active Connections"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-qps">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Queries / sec"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-bufferpool">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Buffer Pool Hit"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Database Size Over Time"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="sizeChart"></canvas></div></div>
+            <div class="chart-container__footer" id="sizeFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Queries Per Second"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="qpsChart"></canvas></div></div>
+            <div class="chart-container__footer" id="qpsFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Active Connections"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="connsChart"></canvas></div></div>
+            <div class="chart-container__footer" id="connsFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Buffer Pool Hit Ratio"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="bpChart"></canvas></div></div>
+            <div class="chart-container__footer" id="bpFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__header"><span><i class="ph ph-pulse"></i> {{ "Reading History"|translate }}</span></div>
+        <div class="panel__body" style="padding: 0; max-height: 400px; overflow-y: auto;">
+            <table class="admin-table admin-table--compact">
+                <thead><tr>
+                    <th>{{ "Recorded At"|translate }}</th>
+                    <th>{{ "Size"|translate }}</th>
+                    <th>{{ "Connections"|translate }}</th>
+                    <th>{{ "QPS"|translate }}</th>
+                    <th>{{ "Slow / hr"|translate }}</th>
+                </tr></thead>
+                <tbody id="historyBody">
+                <tr><td colspan="5" style="text-align:center;color:#666;padding:20px;">{{ "Loading..."|translate }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const dash = new ServiceMetricsDashboard();
+
+        async function loadAll()
+        {
+            try
+            {
+                const m = await dash.load([
+                    'Db_IsReachable', 'Db_ProbeLatencyInMs', 'Db_SizeInBytes',
+                    'Db_ActiveConnectionsCount', 'Db_QueriesPerSecond',
+                    'Db_BufferPoolHitRatio', 'Db_SlowQueriesPerHour',
+                ]);
+
+                dash.statStatus('stat-status', dash.latest(m.Db_IsReachable), '{{ "Reachable"|translate }}', '{{ "Unreachable"|translate }}');
+                dash.statSub('stat-status-sub', '{{ "Probe"|translate }}: ' + MetricFmt.ms(dash.latest(m.Db_ProbeLatencyInMs)));
+                dash.statValue('stat-size', dash.latest(m.Db_SizeInBytes), MetricFmt.bytes);
+                dash.statChange('stat-size-change', m.Db_SizeInBytes, MetricFmt.bytes, '{{ "since last reading"|translate }}', '{{ "No change"|translate }}');
+                dash.statValue('stat-conns', dash.latest(m.Db_ActiveConnectionsCount), MetricFmt.count);
+                dash.statValue('stat-qps', dash.latest(m.Db_QueriesPerSecond), MetricFmt.decimal);
+                dash.statValue('stat-bufferpool', dash.latest(m.Db_BufferPoolHitRatio), MetricFmt.percent);
+
+                dash.lineChart('sizeChart',  m.Db_SizeInBytes,            { label: '{{ "Size"|translate }}', fmt: MetricFmt.bytes, y: MetricAxis.bytes });
+                dash.lineChart('qpsChart',   m.Db_QueriesPerSecond,       { label: '{{ "QPS"|translate }}', fmt: MetricFmt.decimal, y: MetricAxis.count });
+                dash.lineChart('connsChart', m.Db_ActiveConnectionsCount, { label: '{{ "Connections"|translate }}', fmt: MetricFmt.count, y: MetricAxis.count });
+                dash.lineChart('bpChart',    m.Db_BufferPoolHitRatio,     { label: '{{ "Hit Ratio"|translate }}', fmt: MetricFmt.percent, y: MetricAxis.percent });
+
+                dash.footer('sizeFooter',  m.Db_SizeInBytes, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('qpsFooter',   m.Db_QueriesPerSecond, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('connsFooter', m.Db_ActiveConnectionsCount, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('bpFooter',    m.Db_BufferPoolHitRatio, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+
+                dash.historyTable('historyBody', {
+                    size: m.Db_SizeInBytes, conns: m.Db_ActiveConnectionsCount,
+                    qps: m.Db_QueriesPerSecond, slow: m.Db_SlowQueriesPerHour,
+                }, [
+                    { key: 'size',  fmt: MetricFmt.bytes },
+                    { key: 'conns', fmt: MetricFmt.count },
+                    { key: 'qps',   fmt: MetricFmt.decimal },
+                    { key: 'slow',  fmt: MetricFmt.count },
+                ], '{{ "No data yet"|translate }}');
+            }
+            catch (err) { await dash.fail(err, 'MariaDB metrics'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAll);
+    </script>
+{% endblock %}

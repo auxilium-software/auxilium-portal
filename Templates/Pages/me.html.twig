@@ -1,0 +1,29 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "about me" | translate }}{% endblock %}
+
+{% block content %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/me">{{ "Account Management" | translate }}</a>
+            </div>
+
+            <h1>{{ "Account Management" | translate }}</h1>
+
+            <a href="/users/{{ AboutMe.id }}" class="navigational-link">{{ "My User Page" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/wemwbs" class="navigational-link">{{ "WEMWBS" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/change-password" class="navigational-link">{{ "Change my Password" | translate | ndsentence }}</a>
+            <br />
+            <a href="/me/delete-account" class="navigational-link">{{ "Delete my Account" | translate | ndsentence }}</a>
+            {% if _IS_ADMIN_ %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,233 @@
+
+@import url("/Static/CSS/Unorganised/Main.css");
+@import url("/Static/CSS/Unorganised/Auxiliary.css");
+
+@import url("/Static/CSS/Branding/Core.css");
+@import url("/Static/CSS/Icons/LightMode.css");
+
+@import url("/Static/CSS/Elements/Badges.css");
+@import url("/Static/CSS/Elements/Bulletins.css");
+@import url("/Static/CSS/Elements/DescriptionLists.css");
+@import url("/Static/CSS/Elements/Inputs.css");
+@import url("/Static/CSS/Elements/LikertGrid.css");
+@import url("/Static/CSS/Elements/LinkList.css");
+@import url("/Static/CSS/Elements/Loading.css");
+@import url("/Static/CSS/Elements/MarkedSection.css");
+@import url("/Static/CSS/Elements/Messages.css");
+@import url("/Static/CSS/Elements/Navigation.css");
+@import url("/Static/CSS/Elements/Notes.css");
+@import url("/Static/CSS/Elements/Timeline.css");
+@import url("/Static/CSS/Elements/ToastNotification.css");
+@import url("/Static/CSS/Elements/ToDos.css");
+
+@font-face {
+    font-family: "Atkinson Hyperlegible";
+    font-display: swap;
+    src: url("/Static/Fonts/AtkinsonHyperlegible-Regular.ttf") format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "Atkinson Hyperlegible";
+    font-display: swap;
+    src: url("/Static/Fonts/AtkinsonHyperlegible-Bold.ttf") format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "IBM Plex Mono";
+    font-display: swap;
+    src: url("/Static/Fonts/IBMPlexMono-Regular.ttf") format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "IBM Plex Mono";
+    font-display: swap;
+    src: url("/Static/Fonts/IBMPlexMono-Bold.ttf") format('truetype');
+    font-weight: bold;
+}
+
+:root {
+    --brand-color: var(--brand-color-override, #152133);
+    --brand-color-ui-highlight: var(--brand-color-ui-highlight-override, #e08910);
+    --brand-color-contrast: var(--brand-color-contrast-override, #ffffff);
+    --brand-color-alternate: var(--brand-color-alternate-override, #090e17);
+    --brand-color-alternate-contrast: var(--brand-color-alternate-contrast-override, #ffffff);
+
+    --background-color: #ffffff;
+    --foreground-color: #000000;
+    --foreground-color-headings: #000000;
+    --foreground-color-outlines: #000000;
+
+    --error-color: #cc2200;
+    --error-color-contrast: #ffffff;
+    --warning-color: #ffaa00;
+    --warning-color-contrast: #000000;
+    --information-color: #007adc;
+    --information-color-contrast: #000000;
+
+    --positive-badge-color: #336600;
+    --positive-badge-color-contrast: #ffffff;
+
+    --neutral-badge-color: #ffaa00;
+    --neutral-badge-color-contrast: #000000;
+
+    --negative-badge-color: #cc2200;
+    --negative-badge-color-contrast: #ffffff;
+
+    --outline-width: 0.2rem;
+    --outline-width-negative: -0.2rem;
+
+    --form-max-width-small: 128mm;
+    --form-max-width-small-fieldset: 122mm;
+    /* --form-max-width-small-fieldset: 116mm; */
+
+    --large-shadow-blur: 30mm;
+    --large-shadow-spread: -10mm;
+
+    --padding-level-one: 5mm;
+    --button-padding: 3mm;
+    --button-padding-inv: -3mm;
+
+    font-size: 5mm;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.case-item {
+    transition: box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.case-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.case-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.case-title {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.case-title a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.case-title a:hover {
+    text-decoration: underline;
+}
+
+.case-status,
+.case-sensitivity {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.status-open, .status-staging { background: #d4edda; color: #155724; }
+.status-closed { background: #f8d7da; color: #721c24; }
+.status-pending { background: #fff3cd; color: #856404; }
+
+.sensitivity-public { background: #d4edda; color: #155724; }
+.sensitivity-internal { background: #fff3cd; color: #856404; }
+.sensitivity-confidential, .sensitivity-restricted { background: #f8d7da; color: #721c24; }
+
+.case-meta {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.case-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-small {
+    padding: 5px 15px;
+    font-size: 0.9em;
+}
+
+.filters-container {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 150px;
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.error-message button {
+    margin-left: 10px;
+    padding: 2px 8px;
+    background: #721c24;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+

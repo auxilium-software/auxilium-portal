@@ -1,0 +1,142 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph ph-circuitry"></i>
+            {{ "Aux::API"|translate }}
+            <span class="page-title__sub">{{ "Monitor the Auxilium API service"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button type="button" class="form-btn" onclick="loadAll()">
+                <i class="ph ph-arrow-clockwise"></i> {{ "Refresh"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-status">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Status"|translate }}</div>
+            <div class="stat-card__change" id="stat-status-sub">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-uptime">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Uptime"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-cpu">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "CPU Usage"|translate }}</div>
+            <div class="stat-card__change" id="stat-cpu-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-mem">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Memory (RSS)"|translate }}</div>
+            <div class="stat-card__change" id="stat-mem-change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="stat-p95">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "p95 Response"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="chart-grid chart-grid--2col">
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "CPU Usage Over Time"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="cpuChart"></canvas></div></div>
+            <div class="chart-container__footer" id="cpuFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Memory Usage Over Time"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="memChart"></canvas></div></div>
+            <div class="chart-container__footer" id="memFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Request Rate (per minute)"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="reqChart"></canvas></div></div>
+            <div class="chart-container__footer" id="reqFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Response Time Percentiles"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="latChart"></canvas></div></div>
+            <div class="chart-container__footer" id="latFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "GC Collections (per minute)"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="gcChart"></canvas></div></div>
+            <div class="chart-container__footer" id="gcFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-container__header">{{ "Time In GC / Thread Pool Queue"|translate }}</div>
+            <div class="chart-container__body"><div class="chart-canvas-wrapper chart-canvas-wrapper--md"><canvas id="runtimeChart"></canvas></div></div>
+            <div class="chart-container__footer" id="runtimeFooter"><span></span><span>{{ "Loading..."|translate }}</span></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const dash = new ServiceMetricsDashboard();
+
+        async function loadAll()
+        {
+            try
+            {
+                const m = await dash.load([
+                    'Api_IsReachable', 'Api_ProbeLatencyInMs', 'Api_UptimeInSeconds',
+                    'Api_CpuUsageAsPercentage', 'Api_MemoryUsageInBytes',
+                    'Api_RequestsPerMinute', 'Api_Http5xxPerMinute', 'Api_ExceptionsPerMinute',
+                    'Api_ResponseTimeP50InMs', 'Api_ResponseTimeP95InMs', 'Api_ResponseTimeP99InMs',
+                    'Api_Gen0CollectionsPerMinute', 'Api_Gen1CollectionsPerMinute', 'Api_Gen2CollectionsPerMinute',
+                    'Api_TimeInGcAsPercentage', 'Api_ThreadPoolQueueLength',
+                ]);
+
+                dash.statStatus('stat-status', dash.latest(m.Api_IsReachable), '{{ "Reachable"|translate }}', '{{ "Unreachable"|translate }}');
+                dash.statSub('stat-status-sub', '{{ "Probe"|translate }}: ' + MetricFmt.ms(dash.latest(m.Api_ProbeLatencyInMs)));
+                dash.statValue('stat-uptime', dash.latest(m.Api_UptimeInSeconds), MetricFmt.duration);
+                dash.statValue('stat-cpu', dash.latest(m.Api_CpuUsageAsPercentage), MetricFmt.percent);
+                dash.statChange('stat-cpu-change', m.Api_CpuUsageAsPercentage, MetricFmt.percent, '{{ "since last reading"|translate }}', '{{ "No change"|translate }}');
+                dash.statValue('stat-mem', dash.latest(m.Api_MemoryUsageInBytes), MetricFmt.bytes);
+                dash.statChange('stat-mem-change', m.Api_MemoryUsageInBytes, MetricFmt.bytes, '{{ "since last reading"|translate }}', '{{ "No change"|translate }}');
+                dash.statValue('stat-p95', dash.latest(m.Api_ResponseTimeP95InMs), MetricFmt.ms);
+
+                dash.lineChart('cpuChart', m.Api_CpuUsageAsPercentage, { label: '{{ "CPU"|translate }}', fmt: MetricFmt.percent, y: MetricAxis.percent });
+                dash.lineChart('memChart', m.Api_MemoryUsageInBytes,   { label: '{{ "Memory"|translate }}', fmt: MetricFmt.bytes, y: MetricAxis.bytes });
+
+                dash.multiLineChart('reqChart', [
+                    { label: '{{ "Requests"|translate }}',   metrics: m.Api_RequestsPerMinute,   color: '#0056ff' },
+                    { label: '{{ "HTTP 5xx"|translate }}',   metrics: m.Api_Http5xxPerMinute,    color: '#ff0000' },
+                    { label: '{{ "Exceptions"|translate }}', metrics: m.Api_ExceptionsPerMinute, color: '#ff9600' },
+                ], { fmt: MetricFmt.count, y: MetricAxis.count });
+
+                dash.multiLineChart('latChart', [
+                    { label: 'p50', metrics: m.Api_ResponseTimeP50InMs, color: '#00ff00' },
+                    { label: 'p95', metrics: m.Api_ResponseTimeP95InMs, color: '#ff9600' },
+                    { label: 'p99', metrics: m.Api_ResponseTimeP99InMs, color: '#ff0000' },
+                ], { fmt: MetricFmt.ms, y: MetricAxis.ms });
+
+                dash.multiLineChart('gcChart', [
+                    { label: 'Gen 0', metrics: m.Api_Gen0CollectionsPerMinute },
+                    { label: 'Gen 1', metrics: m.Api_Gen1CollectionsPerMinute },
+                    { label: 'Gen 2', metrics: m.Api_Gen2CollectionsPerMinute },
+                ], { fmt: MetricFmt.count, y: MetricAxis.count });
+
+                dash.multiLineChart('runtimeChart', [
+                    { label: '{{ "Time in GC %"|translate }}', metrics: m.Api_TimeInGcAsPercentage, color: '#8e44ad' },
+                    { label: '{{ "Thread Pool Queue"|translate }}', metrics: m.Api_ThreadPoolQueueLength, color: '#16a085' },
+                ], { fmt: MetricFmt.decimal, y: { beginAtZero: true } });
+
+                dash.footer('cpuFooter', m.Api_CpuUsageAsPercentage, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('memFooter', m.Api_MemoryUsageInBytes, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('reqFooter', m.Api_RequestsPerMinute, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('latFooter', m.Api_ResponseTimeP95InMs, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('gcFooter', m.Api_Gen0CollectionsPerMinute, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+                dash.footer('runtimeFooter', m.Api_TimeInGcAsPercentage, '{{ "readings"|translate }}', '{{ "Last updated"|translate }}');
+            }
+            catch (err) { await dash.fail(err, 'API metrics'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAll);
+    </script>
+{% endblock %}

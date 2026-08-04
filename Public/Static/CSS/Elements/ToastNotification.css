@@ -1,0 +1,62 @@
+
+.toast-notification {
+    position: fixed;
+    z-index: 64;
+    bottom: 10mm;
+    left: 50%;
+    transform: translate(-50%, 100mm);
+    border-radius:15mm;
+    background-color: var(--background-color);
+    border: var(--outline-width) solid var(--foreground-color);
+    /*box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);*/
+    display: inline-block;
+    transition: transform .15s ease-in-out;
+    width: auto;
+    height: auto;
+}
+
+.toast-notification-success {
+    position: fixed;
+    z-index: 64;
+    bottom: 10mm;
+    left: 50%;
+    transform: translate(-50%, 100mm);
+    border-radius:15mm;
+    color: var(--positive-badge-color-contrast);
+    background-color: var(--positive-badge-color);
+    border: var(--outline-width) solid var(--positive-badge-color);
+    /*box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);*/
+    display: inline-block;
+    transition: transform .15s ease-in-out;
+    width: auto;
+    height: auto;
+}
+
+.toast-notification-error {
+    position: fixed;
+    z-index: 64;
+    bottom: 10mm;
+    left: 50%;
+    transform: translate(-50%, 100mm);
+    border-radius:15mm;
+    color: var(--error-color-contrast);
+    background-color: var(--error-color);
+    border: var(--outline-width) solid var(--error-color);
+    /*box-shadow: 0 5mm var(--large-shadow-blur) -5mm var(--foreground-color);*/
+    display: inline-block;
+    transition: transform .15s ease-in-out;
+    width: auto;
+    height: auto;
+}
+
+.toast-notification-error > span {
+    display: inline-block;
+}
+
+.toast-notification-show {
+    transform: translate(-50%, 0mm);
+}
+
+.toast-notification > span {
+    display: inline-block;
+}

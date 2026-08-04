@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<auxForm>
+    <id>RequestAccountDeletion</id>
+    <title>
+        <translation xml:lang="en-GB">Request Account Deletion</translation>
+        <translation xml:lang="cy-GB">Cais i Ddileu Cyfrif</translation>
+    </title>
+    <subtitle>
+        <translation xml:lang="en-GB">This form will guide you through requesting the deletion of your account.</translation>
+        <translation xml:lang="cy-GB">Bydd y ffurflen hon yn eich tywys drwy’r broses o wneud cais i ddileu eich cyfrif.</translation>
+    </subtitle>
+    <useReCAPTCHA>true</useReCAPTCHA>
+    <requireAuthentication>true</requireAuthentication>
+    <showReviewPage>true</showReviewPage>
+
+
+
+
+
+    <pages>
+        <page>
+            <id>reason</id>
+            <title>
+                <translation xml:lang="en-GB">Reason</translation>
+                <translation xml:lang="cy-GB">Rheswm</translation>
+            </title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>reason</id>
+                    <type>LARGE_TEXT_FIELD</type>
+                    <rows>4</rows>
+                    <required>false</required>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Reason (optional)</translation>
+                        <translation xml:lang="cy-GB">Rheswm (dewisol)</translation>
+                    </primaryLabel>
+                </component>
+            </components>
+        </page>
+
+        <page>
+            <id>current_password</id>
+            <title>
+                <translation xml:lang="en-GB">Current Password</translation>
+                <translation xml:lang="cy-GB">Cyfrinair Cyfredol</translation>
+            </title>
+            <renderIf>true</renderIf>
+            <components>
+                <component>
+                    <id>current_password</id>
+                    <type>PASSWORD_FIELD</type>
+                    <required>true</required>
+                    <primaryLabel>
+                        <translation xml:lang="en-GB">Current Password</translation>
+                        <translation xml:lang="cy-GB">Cyfrinair Cyfredol</translation>
+                    </primaryLabel>
+                </component>
+            </components>
+        </page>
+    </pages>
+
+
+
+
+    <reviewPage>
+        <components>
+            <component>
+                <type>PARAGRAPH</type>
+                <title>
+                    <translation xml:lang="en-GB">Reason</translation>
+                    <translation xml:lang="cy-GB">Rheswm</translation>
+                </title>
+                <value>$formData["reason"]</value>
+                <if>true</if>
+            </component>
+            <component>
+                <type>DESCRIPTION_LIST</type>
+                <if>true</if>
+                <dictionary>
+                    <item>
+                        <key>
+                            <translation xml:lang="en-GB">Password</translation>
+                            <translation xml:lang="cy-GB">Cyfrinair</translation>
+                        </key>
+                        <value>[REDACTED]</value>
+                    </item>
+                </dictionary>
+            </component>
+        </components>
+    </reviewPage>
+
+
+
+
+
+
+
+
+
+
+    <submissionActions>
+        <apiRequest>
+            <executeIf>true</executeIf>
+            <endpoint>/api/v3/me/request-account-deletion</endpoint>
+            <method>POST</method>
+            <payload>
+                <reason>$formData["reason"]</reason>
+                <currentPasswordSha512>$formData["current_password"]</currentPasswordSha512>
+            </payload>
+        </apiRequest>
+    </submissionActions>
+    <afterSubmissionRedirect>
+        <target>/me</target>
+    </afterSubmissionRedirect>
+</auxForm>

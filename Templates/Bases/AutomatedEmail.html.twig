@@ -1,0 +1,10 @@
+{% extends "/Bases/Email.html.twig" %}
+
+{% block content %}
+    <p style="{{ default_text_style }}">Hi {% if recipient_name %}{{ recipient_name }}{% else %}{{ recipient.displayName }}{% endif %},</p>
+    {% block message %}{% endblock %}
+    <p style="{{ default_text_style }}">Best Regards,</p>
+    <p style="{{ default_text_style }}">{{ GetUserConfiguration("Instance", "Branding", "Name") }}</p>
+    <p style="{{ small_text_style }}">This is an automated message sent by {{ GetUserConfiguration("Instance", "Branding", "Name") }}. If you have any queries or concerns regarding this message please reply to this email.</p>
+{% endblock %}
+

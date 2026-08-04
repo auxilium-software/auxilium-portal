@@ -1,0 +1,144 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "user overview" | translate }}{% endblock %}
+
+{% block content %}
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ UserDetails|json_encode }}
+        </code>
+    {% endif %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/users">{{ "Users" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/users/{{ UserDetails.id }}">{{ "User Overview" | translate }}</a>
+            </div>
+
+            <h1>
+                <span class="inline-icon-shift-left inline-icon-low-margin account-box-icon" title="User account"></span>
+                {% if UserDetails.fullName %}
+                    {{ UserDetails.fullName }}
+                {% else %}
+                    {{ "{" ~ UserDetails.id ~ "}" }}
+                {% endif %}
+            </h1>
+
+            <div class="separator"></div>
+
+            <div>
+                <div id="main-content" class="reference-element"></div>
+
+                <div class="left-preferential-box">
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Properties" | translate }}
+                            <a href="javascript:void(0)"
+                               class="inline-icon add-icon add-property-trigger"
+                               data-type="PLAIN_TEXT,ENUM"
+                               data-resource="/api/v3/users/{{ UserDetails.id }}/additional_properties/*"
+                               title="{{ "Add Entry" | translate }}"
+                            ></a>
+                            <script>
+                                document.addEventListener('click', async (e) => {
+                                    const trigger = e.target.closest('.add-property-trigger');
+                                    if (!trigger) return;
+
+                                    e.preventDefault();
+
+                                    // data-type may list several types (e.g. "PLAIN_TEXT,ENUM"); an array makes NewPropertyPopup show its type-chooser menu.
+                                    const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
+                                    const resource = trigger.dataset.resource;
+
+                                    // optional: pin a specific enumerator for the ENUM type
+                                    const enumTypeId = trigger.dataset.enumTypeId || null;
+
+                                    const win = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId);
+                                    document.getElementById('main-content').after(win.render());
+                                    win.focus();
+                                    win.onSuccess(() => window.location.reload());
+                                });
+                            </script>
+                        </h2>
+                        <br />
+                        <dl id="properties-list">
+                            {% for property_data in UserDetails.additionalProperties %}
+                                {% if not (property_data.displayName in hidden_props) %}
+                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.displayName) }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
+                                            <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
+                                            <a class="edit-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
+                                        </dd>
+                                    {% else %}
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.displayName }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
+                                            <span class="property-content">{{ property_data.content }}</span>
+                                            <a class="edit-icon inline-icon" title="Edit property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" title="Remove property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
+                                        </dd>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </dl>
+
+                        <a href="javascript:toggle_hidden_box('ext_props');"><strong>{{ "Extended Properties" | translate }}</strong><span id="hidden_box_ext_props_toggle_button" class="inline-icon-low-margin inline-icon-shift-right expand-more-icon" style="display: none;"></span></a>
+                        <div class="small-spacer"></div>
+                        <div id="hidden_box_ext_props" class="logical-box">
+                            <dl>
+                                <dt>{{ "Object ID" | translate }}</dt>
+                                <dd>{{ UserDetails.id }}</dd>
+
+                                <dt>{{ "Created At" | translate }}</dt>
+                                <dd>{{ UserDetails.created_at | date("jS F Y, g:ia T") }}</dd>
+
+                                <dt>{{ "Last Updated At" | translate }}</dt>
+                                <dd>{{ UserDetails.last_updated_at | date("jS F Y, g:ia T") }}</dd>
+                            </dl>
+                        </div>
+
+                        <script>toggle_hidden_box("ext_props");</script>
+                    </div>
+                </div>
+
+                <div class="right-preferential-box">
+                    <div class="marked-section">
+                        <h2>{{ "Files" | translate }}
+                            <a href="javascript:{const cm = new FileManager('USER', '{{ UserDetails.id }}'); cm.showUploadModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add File" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% for fileDetails in UserDetails.files %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails, '_fileParentId': UserDetails.id} %}
+                            {% else %}
+                                <li><em>File list empty</em></li>
+                            {% endfor %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+
+                    {#
+                    <div class="marked-section">
+                        <h2>{{ "User Management" | translate }}</h2><br />
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@references?{{ url_metadata }}">{{ "See References" | translate }}</a>
+                        <br>
+                        <a class="navigational-link" href="/graph/{{ primary_string_path | raw }}/@pdf?{{ url_metadata }}">{{ "Generate PDF" | translate }}</a>
+                    </div>
+                    #}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

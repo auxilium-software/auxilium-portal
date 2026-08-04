@@ -1,0 +1,53 @@
+
+.note-warning,
+.note-info {
+    position: relative;
+    overflow: hidden;
+}
+
+.system-bulletin {
+    margin-bottom: 0;
+}
+
+.system-bulletin .inner-content {
+    padding-top: var(--padding-level-one);
+    padding-bottom: 0;
+}
+
+.critical-note a {
+    color: var(--error-color-contrast);
+    text-decoration: underline;
+}
+
+.info-note a {
+    color: var(--brand-color-alternate-contrast);
+    text-decoration: underline;
+}
+
+.note-warning a,
+.note-info a {
+    color: var(--warning-color-contrast);
+    text-decoration: underline;
+}
+
+.system-bulletin-dismissible {
+    position: relative;
+    padding-right: 3rem;
+}
+
+.system-bulletin-dismiss {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    color: inherit;
+}
+
+.system-bulletin-dismiss:hover {
+    opacity: 1;
+}

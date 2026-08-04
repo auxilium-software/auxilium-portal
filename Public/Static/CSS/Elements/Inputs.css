@@ -1,0 +1,322 @@
+
+input[type=button],
+input[type=submit] {
+    display: block;
+    margin-top: 0.2rem;
+    margin-bottom: 1rem;
+    padding: 0.5em;
+    font-size: inherit;
+    text-align: left;
+    border: none;
+    -webkit-appearance: none; /* needed to stop iOS breaking style */
+    border-radius: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.button,
+input[type=button],
+input[type=submit],
+.file-input-holder,
+.inline-button {
+    color: var(--brand-color-contrast);
+    background-color: var(--brand-color);
+    display: inline-block;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    padding: var(--button-padding);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
+input[type="file"] {
+    display: none;
+}
+input[type=text],
+input[type=number],
+input[type=date],
+input[type=datetime-local],
+input[type=password],
+input[type=email],
+input[type=file],
+textarea,
+select {
+    display: block;
+    margin-top: 0.2rem;
+    margin-bottom: 1rem;
+    padding: 0.5em;
+    font-size: inherit;
+    font-family: inherit;
+    background-color: var(--background-color);
+    color: var(--foreground-color);
+    border: var(--outline-width) solid var(--foreground-color-outlines);
+    border-radius: 0;
+    -webkit-appearance: none; /* needed to stop iOS breaking style */
+    width: var(--form-max-width-small);
+    max-width: 100%;
+    box-sizing: border-box;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+.timestamp-input-box {
+    margin-top: 0.2rem;
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0em;
+    width: var(--form-max-width-small);
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+}
+.timestamp-input-box > div > input {
+    display: inline-block;
+}
+.timestamp-input-box > .logical-box:nth-child(1) {
+    display: inline-block;
+    width: 13em;
+}
+.timestamp-input-box > .logical-box:nth-child(2) {
+    display: inline-block;
+    width: 7em;
+}
+.timestamp-input-box > div > .ts-box-year {
+    width: 3.8em;
+}
+.timestamp-input-box > div > .ts-box-month, .timestamp-input-box > div > .ts-box-day, .timestamp-input-box > div > .ts-box-hour, .timestamp-input-box > div > .ts-box-minute {
+    width: 3em;
+}
+input[type=date] {
+    min-height: 2.4rem; /* needed to stop iOS breaking style */
+}
+fieldset > input[type=text],
+fieldset > input[type=date],
+fieldset > input[type=datetime-local],
+fieldset > input[type=password],
+fieldset > input[type=email],
+fieldset > input[type=file],
+fieldset > textarea,
+fieldset > select {
+    width: var(--form-max-width-small-fieldset);
+}
+textarea {
+    resize: vertical;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+}
+.inline-input {
+    display: inline-block;
+    margin: 0 0.2em 0 0.2em;
+}
+input:disabled, input:hover:disabled, input:focus:disabled, textarea:disabled, textarea:hover:disabled, textarea:focus:disabled {
+    opacity: 0.5;
+}
+.fullwidth-text-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+}
+select {
+    background-color: var(--background-color);
+    color: var(--foreground-color);
+    position: relative;
+    background: url("/Static/Icons/arrow_drop_down_black_48dp.svg") no-repeat right var(--background-color);
+    background-size: contain;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.checkbox-holder, .radio-button-holder {
+    padding: 0;
+    margin-bottom: 0.75rem;
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+}
+.checkbox-holder > label, .radio-button-holder > label {
+    padding-left: 3.5rem;
+    margin-top: -2.7rem;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    float: right;
+    min-height: 3rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.checkbox-holder > label > p, .radio-button-holder > label > p {
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.radio-button-scale-holder {
+    padding: 1rem 0 1rem 0;
+    display: flex;
+    overflow: visible;
+    width: var(--form-max-width-small);
+    max-width: 100%;
+    justify-content: space-between;
+}
+.radio-button-scale-holder > div {
+    padding: 0;
+    width: 2.5rem;
+    position: relative;
+    overflow: visible;
+    display: inline-block;
+}
+.radio-button-scale-holder > div > input {
+    padding: 0;
+    box-sizing: border-box;
+    display: block;
+    position: relative;
+}
+.radio-button-scale-holder > div > label {
+    padding: 0 0 1rem 0;
+    top: 0.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    width: 2.5rem;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+    position: relative;
+}
+
+input[type=checkbox], .fake-checkbox-false, .fake-checkbox-true {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: 0 0 0 0;
+    display: inline-block;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: inherit;
+    border: var(--outline-width) solid var(--foreground-color-outlines);
+    border-radius: 0;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    float: left;
+}
+input[type=radio] {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: 0 0 0 0;
+    display: inline-block;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: inherit;
+    border: var(--outline-width) solid var(--foreground-color-outlines);
+    border-radius: 2.5rem;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    float: left;
+}
+input[type=checkbox]:active, input[type=checkbox]:checked:active, input[type=radio]:active, input[type=radio]:checked:active {
+    background-color: #eeeeee;
+}
+input[type=checkbox]:checked, input[type=radio]:checked, .fake-checkbox-true  {
+    background-color: var(--brand-color);
+    border-color: var(--brand-color);
+}
+input[type=checkbox]:checked::after, .fake-checkbox-true::after {
+    content: "";
+    background-image: url("/Static/Icons/check_white_48dp.svg");
+    background-size: contain;
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    color: var(--brand-color-contrast);
+}
+input[type=radio]:checked::after {
+    content: "";
+    background-image: url("/Static/Icons/check_white_48dp.svg");
+    background-size: contain;
+    position: absolute;
+    top: 0.25rem;
+    left: 0.2rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    color: var(--brand-color-contrast);
+}
+
+
+input[type=checkbox].slider {
+    width: 5rem;
+    height: 2.5rem;
+    margin: 0 0 0 0;
+    display: inline-block;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: inherit;
+    border: var(--outline-width) solid var(--foreground-color-outlines);
+    border-radius: 0;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    float: left;
+    transition: background-color 0.2s;
+}
+input[type=checkbox].slider:active, input[type=checkbox].slider:checked:active {
+    background-color: #eeeeee;
+}
+input[type=checkbox].slider:checked {
+    background-color: var(--brand-color);
+    border-color: var(--brand-color);
+}
+input[type=checkbox].slider::after {
+    content: "";
+    background-size: contain;
+    position: absolute;
+    top: 0.25rem;
+    left: 2.75rem;
+    z-index: 1;
+    background-image: url("/Static/Icons/close_black_48dp.svg");
+    height: 1.75rem;
+    width: 1.75rem;
+    color: var(--brand-color-contrast);
+}
+input[type=checkbox].slider:checked::after {
+    top: 0.2rem;
+    left: 0.2rem;
+    background-image: url("/Static/Icons/check_white_48dp.svg");
+}
+input[type=checkbox].slider::before {
+    content: "";
+    z-index: 2;
+    background-color: var(--background-color);
+    border: var(--outline-width) solid var(--foreground-color-outlines);
+    box-sizing: border-box;
+    background-image: none;
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    transition: left 0.2s, border 0.2s;
+    transition-timing-function: ease-in-out;
+    color: var(--brand-color-contrast);
+}
+input[type=checkbox].slider:checked::before {
+    content: "";
+    background-color: var(--brand-color-contrast);
+    border: var(--outline-width) solid var(--brand-color);
+    background-image: none;
+    position: absolute;
+    top: 0.25rem;
+    left: 2.75rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    color: var(--brand-color-contrast);
+}
+

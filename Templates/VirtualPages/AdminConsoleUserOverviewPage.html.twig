@@ -1,0 +1,912 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% block content %}
+    {# ===== PAGE TITLE ===== #}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-user"></i> {{ "User Details"|translate }}
+            <span class="page-title__sub" id="pageSubtitle">{{ "Loading"|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <a href="/admin-console/object-management/user-management" class="form-btn">
+                <i class="ph-duotone ph-arrow-left"></i> {{ "Back to Users"|translate }}
+            </a>
+        </div>
+    </div>
+
+    {# ===== PROFILE HEADER ===== #}
+    <div class="profile-header" id="profileHeader">
+        <div class="profile-header__avatar" id="profileAvatar">
+            <i class="ph-duotone ph-question-mark"></i>
+        </div>
+        <div class="profile-header__info">
+            <div class="profile-header__name" id="profileName">
+                {{ "Loading..."|translate }}
+            </div>
+            <div class="profile-header__email" id="profileEmail">&nbsp;</div>
+            <div class="profile-header__meta" id="profileMeta"></div>
+        </div>
+        <div class="profile-header__actions">
+            <button class="form-btn form-btn--primary" onclick="toggleEditMode()">
+                <i class="ph-duotone ph-pencil"></i>
+                {{ "Edit User"|translate }}
+            </button>
+            <button class="form-btn form-btn--danger" id="btnDelete" onclick="confirmAction('delete')">
+                <i class="ph-duotone ph-trash"></i>
+                {{ "Delete User"|translate }}
+            </button>
+        </div>
+    </div>
+
+    {# ===== MAIN DETAIL GRID ===== #}
+    <div class="detail-grid">
+        {# ---- LEFT COLUMN ---- #}
+        <div>
+            {# Personal Details #}
+            <div class="panel" id="panelPersonal">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-clipboard"></i>
+                    {{ "Personal Details"|translate }}
+                    <button class="chart-container__header-btn" id="btnSavePersonal" style="display:none;" onclick="savePersonalDetails()">
+                        <i class="ph-duotone ph-floppy-disk"></i>
+                        {{ "Save"|translate }}
+                    </button>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" id="personalDetails">
+                        <dt>{{ "Full Name"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="fullName">-</span>
+                            <input type="text" class="form-input field-edit" data-field="fullName" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Email Address"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="emailAddress">-</span>
+                            <input type="email" class="form-input field-edit" data-field="emailAddress" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Telephone"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="telephoneNumber">-</span>
+                            <input type="tel" class="form-input field-edit" data-field="telephoneNumber" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Full Address"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="fullAddress">-</span>
+                            <input type="text" class="form-input field-edit" data-field="fullAddress" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Gender"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="gender">-</span>
+                            <input type="text" class="form-input field-edit" data-field="gender" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Date of Birth"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="dateOfBirth">-</span>
+                            <input type="date" class="form-input field-edit" data-field="dateOfBirth" style="display:none; width:100%;">
+                        </dd>
+
+                        <dt>{{ "Language"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="languagePreference">-</span>
+                            <select class="form-select field-edit" data-field="languagePreference" style="display:none; width:100%;">
+                                <option value="en">English</option>
+                                <option value="cy">Cymraeg</option>
+                            </select>
+                        </dd>
+
+                        <dt>{{ "Referral Source"|translate }}</dt>
+                        <dd>
+                            <span class="field-display" data-field="howDidYouFindOutAboutOurService">-</span>
+                            <input type="text" class="form-input field-edit" data-field="howDidYouFindOutAboutOurService" style="display:none; width:100%;">
+                        </dd>
+                    </div>
+                </div>
+            </div>
+
+            {# Additional Properties #}
+            <div class="panel" id="panelAdditional">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-paperclip"></i>
+                    {{ "Additional Properties"|translate }}
+                    <span class="chart-container__header-btn" id="additionalCount">0</span>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" id="additionalProperties">
+                        <dt colspan="2" style="grid-column: 1 / -1; text-align: center; color: #666; padding: 12px;">
+                            {{ "Loading..."|translate }}
+                        </dt>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ---- RIGHT COLUMN ---- #}
+        <div>
+            {# Account Info #}
+            <div class="panel">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-key"></i>
+                    {{ "Account Information"|translate }}
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" id="accountDetails">
+                        <dt>{{ "User ID"|translate }}</dt>
+                        <dd id="fieldUserId" style="font-family: monospace; font-size: 10px;">-</dd>
+
+                        <dt>{{ "Status"|translate }}</dt>
+                        <dd id="fieldStatus">-</dd>
+
+                        <dt>{{ "Created At"|translate }}</dt>
+                        <dd id="fieldCreatedAt">-</dd>
+
+                        <dt>{{ "Created By"|translate }}</dt>
+                        <dd id="fieldCreatedBy">-</dd>
+
+                        <dt>{{ "Last Updated"|translate }}</dt>
+                        <dd id="fieldUpdatedAt">-</dd>
+
+                        <dt>{{ "Updated By"|translate }}</dt>
+                        <dd id="fieldUpdatedBy">-</dd>
+                    </div>
+                </div>
+            </div>
+
+            {# Permissions #}
+            <div class="panel" id="panelPermissions">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-shield-checkered"></i>
+                    {{ "Permissions"|translate }}
+                    <button class="chart-container__header-btn" id="btnSavePermissions" style="display:none;" onclick="savePermissions()">
+                        <i class="ph-duotone ph-floppy-disk"></i>
+                        {{ "Save"|translate }}
+                    </button>
+                </div>
+                <div class="panel__body">
+                    <div class="action-card">
+                        <div class="action-card__info">
+                            <div class="action-card__title">{{ "Administrator"|translate }}</div>
+                            <div class="action-card__desc">{{ "Full system access."|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <label class="toggle">
+                                <input type="checkbox" id="permAdmin" onchange="onPermissionChange()">
+                                <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-card__info">
+                            <div class="action-card__title">{{ "Case Worker Manager"|translate }}</div>
+                            <div class="action-card__desc">{{ "Can manage cases"|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <label class="toggle">
+                                <input type="checkbox" id="permCaseWorkerManager" onchange="onPermissionChange()">
+                                <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-card__info">
+                            <div class="action-card__title">{{ "Case Worker"|translate }}</div>
+                            <div class="action-card__desc">{{ "Can write to cases."|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <label class="toggle">
+                                <input type="checkbox" id="permCaseWorker" onchange="onPermissionChange()">
+                                <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Security Actions #}
+            <div class="panel">
+                <div class="panel__header">
+                    <i class="ph-duotone ph-warning"></i>
+                    {{ "Security Actions"|translate }}
+                </div>
+                <div class="panel__body">
+                    <div class="action-card">
+                        <div class="action-card__info">
+                            <div class="action-card__title">{{ "Block Login"|translate }}</div>
+                            <div class="action-card__desc">{{ "Prevent this user from signing in. Active sessions will be terminated."|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <label class="toggle" id="toggleBlock">
+                                <input type="checkbox" id="chkBlockLogin" onchange="confirmAction('toggleBlock')">
+                                <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                                <span class="toggle__label--off" id="blockLabel">{{ "Allowed"|translate }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-card__info">
+                            <div class="action-card__title">{{ "Force Password Reset"|translate }}</div>
+                            <div class="action-card__desc">{{ "User will be required to change their password on next login."|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <button class="form-btn form-btn--sm" onclick="confirmAction('forcePasswordReset')">
+                                <i class="ph-duotone ph-lock"></i>
+                                {{ "Send Reset"|translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Danger Zone #}
+            <div class="panel">
+                <div class="panel__header" style="background: linear-gradient(180deg, #d9534f 0%, #ac2925 100%);">
+                    <i class="ph-duotone ph-warning-octagon"></i>
+                    {{ "Danger Zone"|translate }}
+                </div>
+                <div class="panel__body">
+                    <div class="action-card" style="border-color: #f5c6cb;">
+                        <div class="action-card__info">
+                            <div class="action-card__title" style="color: #ac2925;">{{ "Delete User Account"|translate }}</div>
+                            <div class="action-card__desc">{{ "Permanently remove this user and all associated data. This action cannot be undone."|translate }}</div>
+                        </div>
+                        <div class="action-card__control">
+                            <button class="form-btn form-btn--danger form-btn--sm" onclick="confirmAction('delete')">
+                                <i class="ph-duotone ph-trash"></i>
+                                {{ "Delete"|translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ===== AUDIT LOG ===== #}
+    <div class="panel">
+        <div class="panel__header">
+            <i class="ph-duotone ph-scroll"></i>
+            {{ "Recent Activity"|translate }}
+            <button class="chart-container__header-btn" onclick="loadAuditLog()">
+                <i class="ph-duotone ph-arrows-counter-clockwise"></i>
+                {{ "Refresh"|translate }}
+            </button>
+        </div>
+        <div class="panel__body" id="auditLogBody">
+            <ul class="audit-list" id="auditLog">
+                <li class="audit-list__item" style="justify-content:center; color:#666; padding:12px;">
+                    {{ "Loading activity log..."|translate }}
+                </li>
+            </ul>
+        </div>
+        <div class="panel__footer" id="auditLogFooter">
+            {{ "Showing most recent activity"|translate }}
+        </div>
+    </div>
+
+    {# ===== CONFIRMATION DIALOG ===== #}
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-dialog">
+            <div class="panel">
+                <div class="panel__header" id="confirmHeader">
+                    <i class="ph-duotone ph-warning"></i>
+                    {{ "Confirm Action"|translate }}
+                </div>
+                <div class="panel__body">
+                    <div style="display:flex; gap:12px; margin-bottom:12px;">
+                        <div style="font-size:28px; flex-shrink:0;" id="confirmIcon"><i class="ph-duotone ph-warning"></i></div>
+                        <div>
+                            <div style="font-weight:bold; margin-bottom:6px;" id="confirmTitle"></div>
+                            <div style="font-size:10px; color:#666;" id="confirmDesc"></div>
+                        </div>
+                    </div>
+                    <div style="background:#ffffcc; border:1px solid #e6d600; padding:8px 10px; margin-bottom:10px; font-size:10px;">
+                        <i class="ph-duotone ph-key"></i>
+                        {{ "This action requires two-factor authentication."|translate }}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label for="totpInput" style="font-weight:bold; white-space:nowrap;">{{ "Authenticator Code"|translate }}:</label>
+                        <input type="text"
+                               id="totpInput"
+                               class="form-input"
+                               maxlength="6"
+                               placeholder="000000"
+                               autocomplete="one-time-code"
+                               inputmode="numeric"
+                               pattern="[0-9]{6}"
+                               style="width:100px; font-size:14px; text-align:center; letter-spacing:4px; font-family:monospace;">
+                    </div>
+                    <div id="totpError" style="color:#ac2925; font-size:10px; margin-top:4px; display:none;"></div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeConfirm()">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--danger" id="confirmBtn" onclick="executeConfirmedAction()">{{ "Confirm"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const api = new UserController();
+
+        // get user id from the URL path
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const userId = pathParts[pathParts.length - 1];
+
+        let userData = null;
+        let isEditMode = false;
+        let pendingAction = null;
+
+        // =========================
+        // DATA LOADING
+        // =========================
+        async function loadUser()
+        {
+            const user = await api.GetSingleUser(userId);
+            if (!user)
+            {
+                document.getElementById('pageSubtitle').textContent = '- {{ "User not found"|translate }}';
+                return;
+            }
+
+            userData = user;
+            renderProfile(user);
+            renderPersonalDetails(user);
+            renderAccountDetails(user);
+            renderAdditionalProperties(user);
+            renderPermissions(user);
+        }
+
+        // =========================
+        // RENDER: PROFILE HEADER
+        // =========================
+        function renderProfile(user)
+        {
+            // subtitle
+            document.getElementById('pageSubtitle').textContent = '- ' + (user.fullName || user.emailAddress || userId);
+
+            // avatar
+            const avatar = document.getElementById('profileAvatar');
+            avatar.textContent = getInitial(user.fullName);
+            avatar.className = 'profile-header__avatar';
+            if (user.isAdministrator)
+                avatar.classList.add('profile-header__avatar--admin');
+            else if (user.isCaseWorkerManager)
+                avatar.classList.add('profile-header__avatar--caseworker-manager');
+            else if (user.isCaseWorker)
+                avatar.classList.add('profile-header__avatar--caseworker');
+
+            // name + badges
+            let nameHtml = escapeHtml(user.fullName || '{{ "Unnamed User"|translate }}');
+            if (user.isAdministrator)
+                nameHtml += ' <span class="badge badge--admin">{{ "Admin"|translate }}</span>';
+            if (user.isCaseWorker)
+                nameHtml += ' <span class="badge badge--moderator">{{ "Case Worker"|translate }}</span>';
+            if (user.isCaseWorkerManager)
+                nameHtml += ' <span class="badge badge--moderator">{{ "Case Worker Manager"|translate }}</span>';
+            if (!user.isAdministrator && !user.isCaseWorker)
+                nameHtml += ' <span class="badge badge--user">{{ "User"|translate }}</span>';
+            document.getElementById('profileName').innerHTML = nameHtml;
+
+            // email
+            const email = user.emailAddress || '-';
+            if (email !== '-' && email !== '[REDACTED]')
+                document.getElementById('profileEmail').innerHTML = '<i class="ph-duotone ph-envelope"></i> <a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>';
+            else
+                document.getElementById('profileEmail').innerHTML = '<i class="ph-duotone ph-envelope"></i> ' + escapeHtml(email);
+
+            // meta line
+            const metaItems = [];
+            if (user.telephoneNumber && user.telephoneNumber !== '[REDACTED]')
+                metaItems.push('<i class="ph-duotone ph-phone"></i> ' + escapeHtml(user.telephoneNumber));
+            if (user.languagePreference && user.languagePreference !== '[REDACTED]')
+                metaItems.push('<i class="ph-duotone ph-globe"></i> ' + escapeHtml(user.languagePreference));
+            if (user.createdAt)
+                metaItems.push('<i class="ph-duotone ph-calendar"></i> {{ "Joined"|translate }} ' + formatDate(user.createdAt));
+
+            const metaEl = document.getElementById('profileMeta');
+            metaEl.innerHTML = metaItems.map(function(item) {
+                return '<span class="profile-header__meta-item">' + item + '</span>';
+            }).join('');
+        }
+
+        // =========================
+        // RENDER: PERSONAL DETAILS
+        // =========================
+        function renderPersonalDetails(user)
+        {
+            const fields = {
+                fullName: user.fullName,
+                emailAddress: user.emailAddress,
+                telephoneNumber: user.telephoneNumber,
+                fullAddress: user.fullAddress,
+                gender: user.gender,
+                dateOfBirth: user.dateOfBirth ? formatDate(user.dateOfBirth) : null,
+                languagePreference: user.languagePreference,
+                howDidYouFindOutAboutOurService: user.howDidYouFindOutAboutOurService,
+            };
+
+            for (const key in fields)
+            {
+                const display = document.querySelector('.field-display[data-field="' + key + '"]');
+                const edit = document.querySelector('.field-edit[data-field="' + key + '"]');
+
+                if (display)
+                    display.textContent = fields[key] || '-';
+
+                if (edit)
+                {
+                    if (edit.tagName === 'SELECT')
+                        edit.value = user[key] || '';
+                    else if (edit.type === 'date' && user[key])
+                        edit.value = user[key].substring(0, 10); // set raw iso date for the date input
+                    else
+                        edit.value = user[key] || '';
+                }
+            }
+        }
+
+        // =========================
+        // RENDER: ACCOUNT DETAILS
+        // =========================
+        function renderAccountDetails(user)
+        {
+            document.getElementById('fieldUserId').textContent = user.id || '-';
+            document.getElementById('fieldCreatedAt').textContent = formatDateTime(user.createdAt);
+            document.getElementById('fieldCreatedBy').textContent = user.createdBy || '-';
+            document.getElementById('fieldUpdatedAt').textContent = user.lastUpdatedAt ? formatDateTime(user.lastUpdatedAt) : '{{ "Never"|translate }}';
+            document.getElementById('fieldUpdatedBy').textContent = user.lastUpdatedBy || '-';
+
+            // Login status from API's allowLogin field
+            const isBlocked = user.allowLogin === false;
+            document.getElementById('chkBlockLogin').checked = isBlocked;
+            updateBlockLabel(isBlocked);
+
+            // ●
+            if (isBlocked)
+                document.getElementById('fieldStatus').innerHTML = '<span class="status-indicator status-indicator--blocked"><i class="ph-duotone ph-circle"></i> {{ "Blocked"|translate }}</span>';
+            else
+                document.getElementById('fieldStatus').innerHTML = '<span class="status-indicator status-indicator--active"><i class="ph-duotone ph-circle"></i> {{ "Active"|translate }}</span>';
+
+            // email verification
+            if (user.isEmailVerified === true)
+            {
+                let statusHtml = document.getElementById('fieldStatus').innerHTML;
+                statusHtml += ' <span class="badge badge--active" style="margin-left:4px;">{{ "Email Verified"|translate }}</span>';
+                document.getElementById('fieldStatus').innerHTML = statusHtml;
+            }
+            else if (user.isEmailVerified === false)
+            {
+                let statusHtml2 = document.getElementById('fieldStatus').innerHTML;
+                statusHtml2 += ' <span class="badge badge--pending" style="margin-left:4px;">{{ "Unverified"|translate }}</span>';
+                document.getElementById('fieldStatus').innerHTML = statusHtml2;
+            }
+        }
+
+        // =========================
+        // RENDER: ADDITIONAL PROPERTIES
+        // =========================
+        function renderAdditionalProperties(user)
+        {
+            const container = document.getElementById('additionalProperties');
+            const countEl = document.getElementById('additionalCount');
+            const props = user.additionalProperties;
+
+            if (!props || typeof props !== 'object' || Object.keys(props).length === 0)
+            {
+                container.innerHTML = '<dt style="grid-column:1/-1; text-align:center; color:#666; padding:12px;">{{ "No additional properties"|translate }}</dt>';
+                countEl.textContent = '0';
+                return;
+            }
+
+            const keys = Object.keys(props);
+            countEl.textContent = keys.length;
+
+            let html = '';
+            for (let i = 0; i < keys.length; i++)
+            {
+                const prop = props[keys[i]];
+                const name = prop.prettyName || prop.originalName || keys[i];
+                const content = prop.content || '-';
+
+                html += '<dt>' + escapeHtml(name) + '</dt>';
+                html += '<dd>' + escapeHtml(content) + '</dd>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // =========================
+        // RENDER: PERMISSIONS
+        // =========================
+        function renderPermissions(user)
+        {
+            document.getElementById('permAdmin').checked = user.isAdministrator === true;
+            document.getElementById('permCaseWorker').checked = user.isCaseWorker === true;
+            document.getElementById('permCaseWorkerManager').checked = user.isCaseWorkerManager === true;
+        }
+
+        function onPermissionChange()
+        {
+            document.getElementById('btnSavePermissions').style.display = '';
+        }
+
+        // =========================
+        // EDIT MODE
+        // =========================
+        function toggleEditMode()
+        {
+            isEditMode = !isEditMode;
+
+            const displays = document.querySelectorAll('.field-display');
+            const edits = document.querySelectorAll('.field-edit');
+            const saveBtn = document.getElementById('btnSavePersonal');
+
+            displays.forEach(function(el) { el.style.display = isEditMode ? 'none' : ''; });
+            edits.forEach(function(el) { el.style.display = isEditMode ? 'block' : 'none'; });
+            saveBtn.style.display = isEditMode ? '' : 'none';
+        }
+
+        // =========================
+        // SAVE ACTIONS
+        // =========================
+        async function savePersonalDetails()
+        {
+            const totpCode = prompt('{{ "Enter your 6-digit authenticator code to save changes:"|translate }}');
+            if (!totpCode) return;
+
+            const data = {};
+            const edits = document.querySelectorAll('.field-edit');
+
+            edits.forEach(function(el) {
+                const field = el.dataset.field;
+                data[field] = el.value;
+            });
+
+            const result = await api.UpdateUser(userId, data, totpCode);
+            if (result)
+            {
+                userData = result;
+                toggleEditMode();
+                renderProfile(result);
+                renderPersonalDetails(result);
+                renderAccountDetails(result);
+            }
+            else
+            {
+                alert('{{ "Failed to save changes. Check your authenticator code and try again."|translate }}');
+            }
+        }
+
+        async function savePermissions()
+        {
+            const totpCode = prompt('{{ "Enter your 6-digit authenticator code to update permissions:"|translate }}');
+            if (!totpCode) return;
+
+            const data = {
+                isAdministrator: document.getElementById('permAdmin').checked,
+                isCaseWorkerManager: document.getElementById('permCaseWorkerManager').checked,
+                isCaseWorker: document.getElementById('permCaseWorker').checked,
+            };
+
+            const result = await api.UpdateUserPermissions(userId, data, totpCode);
+            if (result)
+            {
+                userData = result;
+                document.getElementById('btnSavePermissions').style.display = 'none';
+                renderProfile(result);
+                renderPermissions(result);
+            }
+            else
+            {
+                alert('{{ "Failed to update permissions. Check your authenticator code and try again."|translate }}');
+            }
+        }
+
+        // =========================
+        // SECURITY ACTIONS
+        // =========================
+        const confirmMessages = {
+            toggleBlock: {
+                icon: '🚫',
+                title: '{{ "Block/Unblock User Login"|translate }}',
+                desc: '{{ "This will immediately prevent or allow the user from signing in. Any active sessions will be affected."|translate }}',
+                btn: '{{ "Confirm"|translate }}',
+            },
+            forcePasswordReset: {
+                icon: '🔒',
+                title: '{{ "Force Password Reset"|translate }}',
+                desc: '{{ "The user will be required to set a new password on their next login attempt."|translate }}',
+                btn: '{{ "Force Reset"|translate }}',
+            },
+            sendResetEmail: {
+                icon: '✉️',
+                title: '{{ "Send Password Reset Email"|translate }}',
+                desc: '{{ "An email will be sent to the user with a link to reset their password."|translate }}',
+                btn: '{{ "Send Email"|translate }}',
+            },
+            delete: {
+                icon: '🗑️',
+                title: '{{ "Delete User Account"|translate }}',
+                desc: '{{ "This will permanently delete the user account and all associated data. This action cannot be undone. Are you absolutely sure?"|translate }}',
+                btn: '{{ "Delete Permanently"|translate }}',
+            },
+        };
+
+        function confirmAction(action) {
+            pendingAction = action;
+            let confirmMessage = confirmMessages[action];
+            if (!confirmMessage)
+                return;
+
+            // If it's the block toggle and user unchecked it, revert until confirmed
+            if (action === 'toggleBlock')
+            {
+                var chk = document.getElementById('chkBlockLogin');
+                confirmMessage = Object.assign({}, confirmMessage);
+                confirmMessage.title = chk.checked
+                    ? '{{ "Block User Login"|translate }}'
+                    : '{{ "Unblock User Login"|translate }}';
+            }
+
+            document.getElementById('confirmIcon').textContent = confirmMessage.icon;
+            document.getElementById('confirmTitle').textContent = confirmMessage.title;
+            document.getElementById('confirmDesc').textContent = confirmMessage.desc;
+            document.getElementById('confirmBtn').textContent = confirmMessage.btn;
+
+            // Style the confirm button as danger for destructive actions
+            const buttonElement = document.getElementById('confirmBtn');
+            if (action === 'delete')
+                buttonElement.className = 'form-btn form-btn--danger';
+            else
+                buttonElement.className = 'form-btn form-btn--primary';
+
+            document.getElementById('confirmOverlay').classList.add('is-visible');
+
+            // reset and focus the TOTP input
+            const totpInput = document.getElementById('totpInput');
+            totpInput.value = '';
+            document.getElementById('totpError').style.display = 'none';
+            setTimeout(function() { totpInput.focus(); }, 100);
+        }
+
+        function closeConfirm()
+        {
+            document.getElementById('confirmOverlay').classList.remove('is-visible');
+            document.getElementById('totpInput').value = '';
+            document.getElementById('totpError').style.display = 'none';
+
+            // revert the block toggle if user cancelled
+            if (pendingAction === 'toggleBlock' && userData)
+            {
+                document.getElementById('chkBlockLogin').checked = userData.allowLogin === false;
+            }
+
+            pendingAction = null;
+        }
+
+        async function executeConfirmedAction() {
+            const action = pendingAction;
+            const totpInput = document.getElementById('totpInput');
+            const totpError = document.getElementById('totpError');
+            const totpCode = totpInput.value.replace(/\s/g, '');
+
+            // validate TOTP input before proceeding
+            if (!totpCode || totpCode.length !== 6 || !/^\d{6}$/.test(totpCode))
+            {
+                totpError.textContent = '{{ "Please enter a valid 6-digit code from your authenticator app."|translate }}';
+                totpError.style.display = 'block';
+                totpInput.focus();
+                totpInput.select();
+                return;
+            }
+
+            // disable the confirm button while processing
+            const confirmBtn = document.getElementById('confirmBtn');
+            const originalText = confirmBtn.textContent;
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '{{ "Verifying..."|translate }}';
+
+            closeConfirm();
+            if (!action) return;
+
+            let result;
+
+            switch (action)
+            {
+                case 'toggleBlock':
+                    const shouldBlock = document.getElementById('chkBlockLogin').checked;
+                    result = await api.SetUserBlocked(userId, shouldBlock, totpCode);
+                    if (result)
+                    {
+                        userData.allowLogin = !shouldBlock;
+                        updateBlockLabel(shouldBlock);
+                    }
+                    else
+                    {
+                        // revert
+                        document.getElementById('chkBlockLogin').checked = !shouldBlock;
+                        showTotpFailure('{{ "Failed to update login status. Check your authenticator code and try again."|translate }}');
+                    }
+                    break;
+
+                case 'forcePasswordReset':
+                    result = await api.ForcePasswordReset(userId, totpCode);
+                    if (result) {
+                        alert('{{ "Password reset has been enforced. The user must change their password on next login."|translate }}');
+                    } else {
+                        showTotpFailure('{{ "Failed to force password reset. Check your authenticator code and try again."|translate }}');
+                    }
+                    break;
+
+                case 'delete':
+                    result = await api.DeleteUser(userId, totpCode);
+                    if (result)
+                    {
+                        alert('{{ "User has been deleted."|translate }}');
+                        window.location.href = '/admin-console/object-management/user-management';
+                    }
+                    else
+                    {
+                        showTotpFailure('{{ "Failed to delete user. Check your authenticator code and try again.  Also make sure that this user does not belong to any cases."|translate }}');
+                    }
+                    break;
+            }
+
+            // re-enable confirm button
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = originalText;
+
+            await loadAuditLog();
+        }
+
+        function showTotpFailure(message)
+        {
+            alert(message);
+        }
+
+        function updateBlockLabel(isBlocked) {
+            const label = document.getElementById('blockLabel');
+            if (isBlocked)
+            {
+                label.className = 'toggle__label--off';
+                label.textContent = '{{ "Blocked"|translate }}';
+            }
+            else
+            {
+                label.className = 'toggle__label--on';
+                label.textContent = '{{ "Allowed"|translate }}';
+            }
+
+            // Update status indicator
+            const statusEl = document.getElementById('fieldStatus');
+            if (isBlocked)
+            {
+                statusEl.innerHTML = '<span class="status-indicator status-indicator--blocked">● {{ "Blocked"|translate }}</span>';
+            }
+            else
+            {
+                statusEl.innerHTML = '<span class="status-indicator status-indicator--active">● {{ "Active"|translate }}</span>';
+            }
+        }
+
+        // =========================
+        // AUDIT LOG
+        // =========================
+        async function loadAuditLog() {
+            const log = await api.GetUserAuditLog(userId);
+            const listEl = document.getElementById('auditLog');
+
+            if (!log || !log.length)
+            {
+                listEl.innerHTML =
+                    '<li class="audit-list__item" style="justify-content:center; color:#666; padding:12px;">' +
+                    '{{ "No recent activity recorded."|translate }}' +
+                    '</li>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 0; i < log.length; i++)
+            {
+                const entry = log[i];
+                html +=
+                    '<li class="audit-list__item">'
+                        + '<span class="audit-list__time">' + formatDateTime(entry.createdAt) + '</span>'
+                        + '<span class="audit-list__action">'
+                            + '<span class="audit-list__actor">' + escapeHtml(entry.createdByName || 'unknown') + '</span> '
+                            + escapeHtml(entry.description || entry.action || '')
+                        + '</span>'
+                    + '</li>';
+            }
+
+            listEl.innerHTML = html;
+        }
+
+        // =========================
+        // UTILITIES
+        // =========================
+        function getInitial(name)
+        {
+            return name ? name.charAt(0).toUpperCase() : '?';
+        }
+
+        function escapeHtml(str)
+        {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr)
+        {
+            if (!dateStr) return '-';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+            catch (e)
+            {
+                return dateStr;
+            }
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            try
+            {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    + ' '
+                    + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            }
+            catch (e)
+            {
+                return dateStr;
+            }
+        }
+
+        // =========================
+        // INIT
+        // =========================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!userId || userId === 'user-management')
+            {
+                document.getElementById('pageSubtitle').textContent = '- {{ "No user ID provided"|translate }}';
+                return;
+            }
+
+            loadUser();
+            loadAuditLog();
+
+            // close confirm dialog on escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeConfirm();
+            });
+
+            // submit on Enter in TOTP input
+            document.getElementById('totpInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    executeConfirmedAction();
+                }
+            });
+
+            // close confirm on overlay click
+            document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeConfirm();
+            });
+        });
+    </script>
+{% endblock %}

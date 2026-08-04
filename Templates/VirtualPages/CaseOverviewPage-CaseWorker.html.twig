@@ -1,0 +1,306 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "case overview" | translate }}{% endblock %}
+
+{% block content %}
+    {% if _IS_ADMIN_ %}
+        <code>
+            {{ CaseDetails|json_encode }}
+        </code>
+    {% endif %}
+
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/case/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
+            </div>
+
+            <h1>
+                <span class="inline-icon-shift-left inline-icon-low-margin cases-icon" title="User account"></span>
+                {{ CaseDetails.title }}
+            </h1>
+
+            <div class="separator"></div>
+
+            <div>
+                <div id="main-content" class="reference-element"></div>
+
+                <div class="left-preferential-box">
+
+                    <div class="marked-section">
+                        <h2>{{ "Case Description" | translate }}</h2>
+                        <br>
+                        {% include '/Partials/InlineTextField.html.twig' with {'_data': CaseDetails.description, '_editJS': '{const cm = new CaseManager("' ~ CaseDetails.id ~'"); cm.modifyCaseDescription();}' } %}
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Properties" | translate }}
+                            <a href="javascript:void(0)"
+                               class="inline-icon add-icon add-property-trigger"
+                               data-type="PLAIN_TEXT"
+                               data-resource="/api/v3/cases/{{ CaseDetails.id }}/additional_properties/*"
+                               title="{{ "Add Entry" | translate }}"
+                            ></a>
+                            <script>
+                                document.addEventListener('click', async (e) => {
+                                    const trigger = e.target.closest('.add-property-trigger');
+                                    if (!trigger) return;
+
+                                    e.preventDefault();
+
+                                    const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
+                                    const resource = trigger.dataset.resource;
+
+                                    const enumTypeId = trigger.dataset.enumTypeId || null;
+
+                                    const win = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId);
+                                    document.getElementById('main-content').after(win.render());
+                                    win.focus();
+                                    win.onSuccess(() => window.location.reload());
+                                });
+                            </script>
+                        </h2>
+                        <br />
+                        <dl id="properties-list">
+                            {% for property_data in CaseDetails.additionalProperties %}
+                                {% if not (property_data.originalName in hidden_props) %}
+                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.originalName) }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
+                                            <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
+                                            <a class="edit-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editEnumProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                        </dd>
+                                    {% else %}
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.originalName }}</dt>
+                                        <dd data-property-key="{{ property_data.id }}">
+                                            <span class="property-content">{{ property_data.content }}</span>
+                                            <a class="edit-icon inline-icon" title="Edit property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.editProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}')"></a>
+                                            <a class="delete-icon inline-icon" title="Remove property" href="javascript:void(0)"
+                                               onclick="UserPropertyManager.deleteProperty('{{ CaseDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
+                                        </dd>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </dl>
+
+                        <a href="javascript:toggle_hidden_box('ext_props');"><strong>{{ "Extended Properties" | translate }}</strong><span id="hidden_box_ext_props_toggle_button" class="inline-icon-low-margin inline-icon-shift-right expand-more-icon" style="display: none;"></span></a>
+                        <div class="small-spacer"></div>
+                        <div id="hidden_box_ext_props" class="logical-box">
+                            <dl>
+                                <dt>{{ "Object ID" | translate }}</dt>
+                                <dd>{{ CaseDetails.id }}</dd>
+
+                                <dt>{{ "Created At" | translate }}</dt>
+                                <dd>{{ CaseDetails.createdAt | date("jS F Y, g:ia T") }}</dd>
+
+                                <dt>{{ "Last Updated At" | translate }}</dt>
+                                <dd>{{ CaseDetails.lastUpdatedAt | date("jS F Y, g:ia T") }}</dd>
+
+                                <dt>{{ "Last Updated By" | translate }}</dt>
+                                <dd>{{ CaseDetails.lastUpdatedBy }}</dd>
+                            </dl>
+                        </div>
+
+                        <script>toggle_hidden_box("ext_props");</script>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "ToDo List" | translate }}
+                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add Entry" | translate }}"
+                            ></a>
+                        </h2>
+                        <ul class="collection-list todo-list">
+                            {% for toDoID, toDoItemDetails in CaseDetails.todos %}
+                                <li class="todo-item status-{{ toDoItemDetails.status|lower }}">
+                                    <div class="todo-header">
+                                        <span class="todo-summary">{{ toDoItemDetails.summary }}</span>
+                                        {% if toDoItemDetails.priority %}
+                                            <span class="todo-priority priority-{{ toDoItemDetails.priority|lower }}">{{ toDoItemDetails.priority|capitalize }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div>
+                                        {% if toDoItemDetails.due_date %}
+                                            <span>
+                                                {{ "Due" | translate }}: {{ toDoItemDetails.due_date|date("Y-m-d H:i") }}
+                                            </span>
+                                        {% endif %}
+                                        <br>
+                                        {% if toDoItemDetails.created_at %}
+                                            <span>
+                                                {{ "Created" | translate }}: {{ toDoItemDetails.created_at|date("Y-m-d H:i") }}
+                                                by
+                                                {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.created_by} %}
+                                            </span>
+                                        {% endif %}
+                                        <br>
+                                        {% if toDoItemDetails.assigned_to %}
+                                            <span>
+                                                {{ "Assigned To" | translate }}:
+                                                {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.assigned_to} %}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if toDoItemDetails.description %}
+                                        <div>
+                                            {{ toDoItemDetails.description }}
+                                        </div>
+                                    {% endif %}
+
+                                    <div>
+                                        {% if toDoItemDetails.status == "NEEDS-ACTION" %}
+                                            <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.updateStatus('{{ toDoID }}', 'COMPLETE').then(() => window.location.reload());}"
+                                               class="action-link action-link-complete">{{ "Mark Complete" | translate }}</a>
+                                            <br>
+                                        {% endif %}
+                                        <a href="/cases/{{ CaseDetails.id }}/todos/{{ toDoID }}"
+                                           class="action-link action-link-edit">{{ "Edit" | translate }}</a>
+                                        <br>
+                                        <a href="javascript:{const tm = new TodoManager('{{ CaseDetails.id }}'); tm.deleteTodo('{{ toDoID }}').then(() => window.location.reload());}"
+                                           class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li><em>{{ "No ToDo entries" | translate }}</em></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Timeline" | translate }}
+                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add Entry" | translate }}"
+                            ></a>
+                        </h2>
+                        <ul class="collection-list timeline-list">
+                            {% for item in CaseDetails.timeline %}
+                                <li class="timeline-entry {{ item.entryType == "note.system" ? 'timeline-entry-system' }}">
+                                    <time class="timeline-entry-time">{{ item.occurredAtUtc|date("j M Y, H:i") }}</time><span class="timeline-entry-title">{{ item.title }}</span>{% if item.actor %}<span class="timeline-entry-meta">- {% include '/Partials/InlineUserField.html.twig' with {'_data': item.actor} %}</span>{% endif %}
+
+                                    {% if item.description %}
+                                        <p class="timeline-entry-description">{{ item.description }}</p>
+                                    {% endif %}
+
+                                    {% if item.entryType != "note.system" %}
+                                        <span class="timeline-entry-actions">
+                                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showEditModal('{{ item.id|e('js') }}', '{{ item.title|e('js') }}', '{{ item.description|e('js') }}');}"
+                                               class="action-link action-link-edit">{{ "Edit" | translate }}</a>
+                                            <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.deleteEntry('{{ item.id|e('js') }}').then(() => window.location.reload());}"
+                                               class="action-link action-link-delete">{{ "Delete" | translate }}</a>
+                                        </span>
+                                    {% endif %}
+                                </li>
+                            {% else %}
+                                <li><em>{{ "No Timeline entries" | translate }}</em></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="right-preferential-box">
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Clients" | translate }}
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddClientModal();}"
+                               class="inline-icon group-add-icon"
+                               title="{{ "Add Client" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% for clientDetails in CaseDetails.clients %}
+                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'CLIENT', '_data': clientDetails} %}
+                            {% else %}
+                                <li><em>Client list empty</em></li>
+                            {% endfor %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Case Workers" | translate }}
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.showAddWorkerModal();}"
+                               class="inline-icon group-add-icon"
+                               title="{{ "Add Case Worker" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% for workerDetails in CaseDetails.workers %}
+                                {% include '/Partials/InlineUserField.html.twig' with {'_personType': 'WORKER', '_data': workerDetails} %}
+                            {% else %}
+                                <li><em>{{ "Case Worker list empty"|translate }}</em></li>
+                            {% endfor %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+
+                    {#
+                    <div class="marked-section">
+                        <h2>{{ "Case Management" | translate }}</h2><br />
+                        {% if _IS_ADMIN_ %}
+
+                            <a href="javascript:{const cm = new CaseManager('{{ CaseDetails.id }}'); cm.deleteCase();}" class="action-link action-link-delete">
+                                {{ "Delete Case" | translate }}
+                            </a>
+                            <br />
+                        {% endif %}
+                        <a class="navigational-link" href="/map?document-type=CASE&document-id={{ CaseDetails.id }}">{{ "See References" | translate }}</a>
+                        <br>
+                        <a class="navigational-link" href="/cases/{{ CaseDetails.id }}/pdf">{{ "Generate PDF" | translate }}</a>
+                    </div>
+                    #}
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Files" | translate }}
+                            <a href="javascript:{const cm = new FileManager('CASE', '{{ CaseDetails.id }}'); cm.showUploadModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Add File" | translate }}"></a>
+                        </h2>
+                        <br />
+                        <ul class="collection-list">
+                            {% set inline_node_expanded = true %}
+                            {% for fileDetails in CaseDetails.files %}
+                                {% include '/Partials/InlineFileField.html.twig' with {'_data': fileDetails, '_fileParentId': CaseDetails.id} %}
+                            {% else %}
+                                <li><em>{{ "File list empty"|translate }}</em></li>
+                            {% endfor %}
+                            {% set inline_node_expanded = false %}
+                        </ul>
+                    </div>
+
+                    <div class="marked-section">
+                        <h2>
+                            {{ "Messages" | translate }}
+                            <a href="javascript:{const mm = new MessageManager('{{ CaseDetails.id }}'); mm.showCreateModal();}"
+                               class="inline-icon add-icon"
+                               title="{{ "Compose Message" | translate }}"></a>
+                        </h2>
+                        <div id="messages-container">
+                            <ul class="collection-list message-list">
+                                {% for messageURL in CaseDetails.messages %}
+                                    {% include '/Partials/MessageField.html.twig' with {'_data': messageURL} %}
+                                {% else %}
+                                    <li><em>{{ "No messages" | translate }}</em></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

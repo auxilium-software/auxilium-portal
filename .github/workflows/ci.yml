@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: php-actions/composer@v6
+        with:
+          php_version: "8.4"
+          php_extensions: bcmath gd zip
+
+      - uses: php-actions/phpunit@v4
+        with:
+          php_version: "8.4"
+          php_extensions: bcmath gd zip

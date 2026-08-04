@@ -1,0 +1,18 @@
+{% extends '/Bases/OfflineFatalErrorPage.html.twig' %}
+{% block content %}
+    <div class="inner-content">
+        <div class="critical-note">
+            <span class="note-heading">{{ "404"|translate }}</span>
+            <div class="side-note">
+                <p>
+                    {{ "The page you have requested does not exist."|translate }}
+                </p>
+                {#
+                <p>
+                    {{ "If you think this is an error, please reach out to us" }}
+                </p>
+                #}
+            </div>
+        </div>
+    </div>
+{% endblock %}
