@@ -59,21 +59,21 @@ class DataEnumeratorController
         return false;
     }
 
-    async CreateValue(enumId, displayName, sortOrder)
+    async CreateValue(enumId, displayName, colourHex, sortOrder)
     {
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/data-enumerators/${enumId}/values`,
-            { displayName: displayName, sortOrder: sortOrder }
+            { displayName: displayName, colourHex: colourHex, sortOrder: sortOrder }
         );
         if (statusCode === 201) return payload;
         return false;
     }
 
-    async UpdateValue(enumId, valueId, displayName)
+    async UpdateValue(enumId, valueId, displayName, colourHex)
     {
         const [statusCode, payload] = await this.#APIInstance.API_PATCH(
             `/api/v3/data-enumerators/${enumId}/values/${valueId}`,
-            { displayName: displayName }
+            { displayName: displayName, colourHex: colourHex }
         );
         if (statusCode === 200) return payload;
         return false;
