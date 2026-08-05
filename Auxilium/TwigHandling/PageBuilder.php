@@ -47,6 +47,7 @@ final class PageBuilder
 
             $this->twig->addGlobal('_IS_LOGGED_IN_', true);
             $this->twig->addGlobal('_IS_ADMIN_', SecurityUtilities::IsAdmin());
+            $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_USER_ID_', SecurityUtilities::GetUserId());
             $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_FULL_NAME_', SecurityUtilities::GetUserName());
         }
         else
