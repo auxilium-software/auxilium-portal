@@ -2,17 +2,18 @@ class Localisation
 {
     static async translate(text, substitutions = {})
     {
+        const cacheKey = JSON.stringify({ text, substitutions });
+        if (Localisation._cache && Localisation._cache[cacheKey])
+        {
+            return Localisation._cache[cacheKey];
+        }
+
         try
         {
             const response = await fetch('/API/Translate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: text,
-                    substitutions: substitutions
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, substitutions }),
             });
 
             if (!response.ok)
@@ -22,17 +23,15 @@ class Localisation
             }
 
             const data = await response.json();
-
             if (data.success)
             {
+                if (!Localisation._cache) Localisation._cache = {};
+                Localisation._cache[cacheKey] = data.translated;
                 return data.translated;
             }
-            else
-            {
-                console.error('Translation error:', data.error);
-                return text;
-            }
 
+            console.error('Translation error:', data.error);
+            return text;
         }
         catch (error)
         {
