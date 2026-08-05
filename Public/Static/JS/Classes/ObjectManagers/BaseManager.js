@@ -7,12 +7,11 @@ class BaseManager {
 
     closeModal()
     {
-        if (this._escHandler)
+        if (this.modalElement)
         {
-            document.removeEventListener('keydown', this._escHandler);
-            this._escHandler = null;
+            this.modalElement.remove();
+            this.modalElement = null;
         }
-        super.closeModal();
     }
 
     showError(message)
