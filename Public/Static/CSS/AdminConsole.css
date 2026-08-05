@@ -2633,3 +2633,36 @@ body {
     color: #ff5b5b;
     text-shadow: 0 0 5px rgba(255, 91, 91, 0.6);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*  ==================================================
+    COLOUR SWATCH (Data Enumerator values)
+    ================================================== */
+.color-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #808080;
+    box-shadow:
+            inset 1px 1px 0 rgba(255, 255, 255, 0.4),
+            inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+    vertical-align: middle;
+}
