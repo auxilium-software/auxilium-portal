@@ -46,7 +46,7 @@ footer > div > legend {
 }
 
 
-/* div:where(:not(.calendar):not(.calendar-tooltip):not(.calendar-tooltip-event):not(.calendar-context-menu):not(.calendar-dialog):not(.calendar-notification):not(.calendar-widget)), */
+div,
 main,
 nav,
 footer,
@@ -56,15 +56,13 @@ dialog {
     margin: 0;
     position: relative;
     box-sizing: border-box;
+}
+
+div:not(:where(.calendar, .calendar-tooltip, .calendar-tooltip-event, .calendar-context-menu, .calendar-dialog, .calendar-notification, .calendar-widget)):not(:where(.calendar, .calendar-tooltip, .calendar-tooltip-event, .calendar-context-menu, .calendar-dialog, .calendar-notification, .calendar-widget) *),
+main, nav, footer, dialog {
     width: 100%;
     padding: var(--padding-level-one);
 }
-
-/*
-.calendar .side-menu [class^="ib-"] {
-    padding: 0 !important;
-}
-*/
 
 
 dialog {
