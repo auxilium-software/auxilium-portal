@@ -9,6 +9,8 @@ use Symfony\Component\Yaml\Yaml;
 
 final class ConfigurationUtilities
 {
+    private const XML_NS = 'http://www.w3.org/XML/1998/namespace';
+
     public static array $SystemConfiguration;
     public static array $UserConfiguration;
 
@@ -61,9 +63,9 @@ final class ConfigurationUtilities
 
     public static function GetFormDefinition(string $target): array
     {
-        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
-        $temp = new SimpleXMLElement($temp);
-        $temp = json_decode(json_encode($temp), true);
+        $xmlString = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
+        $xml = new SimpleXMLElement($xmlString);
+        $temp = self::xmlToArray($xml);
 
         $temp["id"] = "AuxiliumFormDefinition" . $temp["id"];
 
@@ -86,23 +88,60 @@ final class ConfigurationUtilities
         }
         unset($page);
 
+        return $temp;
+    }
 
-        // sorts out the options
-        foreach($temp["pages"]["page"] as $iValue)
+    private static function xmlToArray(SimpleXMLElement $node): array|string
+    {
+        $attributes = [];
+        foreach($node->attributes() as $key => $value)
         {
-            if(
-                array_key_exists("components", $iValue)
-                && array_key_exists("component", $iValue['components'])
-                && is_array($iValue["components"]["component"])
-            )
+            $attributes[$key] = (string) $value;
+        }
+        foreach($node->attributes(self::XML_NS) as $key => $value)
+        {
+            $attributes[$key] = (string) $value;
+        }
+
+        $children = $node->children();
+
+        if(count($children) === 0)
+        {
+            $text = trim((string) $node);
+
+            if(empty($attributes))
             {
-                for($ii = 0, $iiMax = count($iValue["components"]["component"]); $ii < $iiMax; $ii++)
+                return $text;
+            }
+
+            return ['@attributes' => $attributes, '#text' => $text];
+        }
+
+        $result = [];
+        if(!empty($attributes))
+        {
+            $result['@attributes'] = $attributes;
+        }
+
+        foreach($children as $childName => $child)
+        {
+            $childValue = self::xmlToArray($child);
+
+            if(isset($result[$childName]))
+            {
+                if(!is_array($result[$childName]) || !array_is_list($result[$childName]))
                 {
+                    $result[$childName] = [$result[$childName]];
                 }
+                $result[$childName][] = $childValue;
+            }
+            else
+            {
+                $result[$childName] = $childValue;
             }
         }
 
-        return $temp;
+        return $result;
     }
 
     public static function GetAdminConsoleNavigationTree(): array
