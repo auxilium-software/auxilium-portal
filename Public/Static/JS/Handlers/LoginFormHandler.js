@@ -27,7 +27,30 @@ class LoginFormHandler
         this.passwordChangeToken = null;
         this.isRecoveryCodeMode = false;
 
+        this.loginForm.dataset.loginHandlerInitialised = 'true';
+        this.loginErrorSummary = this.createLoginErrorSummary();
         this.initialiseForm();
+    }
+
+    createLoginErrorSummary()
+    {
+        let errorSummary = document.getElementById('LoginErrorSummary');
+
+        if (errorSummary)
+        {
+            return errorSummary;
+        }
+
+        errorSummary = document.createElement('div');
+        errorSummary.id = 'LoginErrorSummary';
+        errorSummary.className = 'form-error-summary';
+        errorSummary.setAttribute('role', 'alert');
+        errorSummary.setAttribute('aria-live', 'assertive');
+        errorSummary.setAttribute('tabindex', '-1');
+        errorSummary.hidden = true;
+
+        this.loginForm.prepend(errorSummary);
+        return errorSummary;
     }
 
     initialiseForm()
@@ -38,8 +61,14 @@ class LoginFormHandler
         this.loginForm.addEventListener('submit', (e) => this.handleLoginSubmit(e));
         this.emailField.addEventListener('blur', () => this.validateEmail());
         this.passwordField.addEventListener('blur', () => this.validatePassword());
-        this.emailField.addEventListener('input', () => this.clearFieldError('EmailAddress'));
-        this.passwordField.addEventListener('input', () => this.clearFieldError('Password'));
+        this.emailField.addEventListener('input', () => {
+            this.clearFieldError('EmailAddress');
+            this.clearLoginError();
+        });
+        this.passwordField.addEventListener('input', () => {
+            this.clearFieldError('Password');
+            this.clearLoginError();
+        });
 
         this.mfaForm.addEventListener('submit', (e) => this.handleMfaSubmit(e));
         this.totpField.addEventListener('input', () => this.clearFieldError('TotpToken'));
@@ -74,15 +103,27 @@ class LoginFormHandler
         {
             const recaptchaToken = await this.getReCaptchaToken();
             const authCtrl = new AuthenticationController();
-            const [statusCode, response] = await authCtrl.Login(
+            const result = await authCtrl.Login(
                 this.emailField.value.trim(),
                 this.passwordField.value,
                 recaptchaToken
             );
+            const [statusCode, response] = Array.isArray(result)
+                ? result
+                : [200, result];
 
-            if (statusCode === 401)
+            if (statusCode < 200 || statusCode >= 300)
             {
-                await this.handleLoginError(response);
+                await this.handleLoginError(response, statusCode);
+                return;
+            }
+
+            if (!response || typeof response !== 'object')
+            {
+                await this.handleLoginError(
+                    'The server returned an invalid response. Please try again.',
+                    statusCode
+                );
                 return;
             }
 
@@ -110,7 +151,18 @@ class LoginFormHandler
         }
         catch (error)
         {
-            await this.handleLoginError(error);
+            const statusCode =
+                error?.statusCode ??
+                error?.status ??
+                error?.response?.status ??
+                null;
+
+            const response =
+                error?.response?.data ??
+                error?.body ??
+                error;
+
+            await this.handleLoginError(response, statusCode);
         }
         finally
         {
@@ -338,26 +390,91 @@ class LoginFormHandler
         setTimeout(() => { window.location.href = '/dashboard'; }, 50);
     }
 
-    async handleLoginError(error)
+    async handleLoginError(error, statusCode = null)
     {
         console.error('Login error:', error);
 
+        const detail = typeof error === 'string'
+            ? error
+            : error?.detail ?? error?.message;
+
         if (error?.fieldErrors)
         {
-            Object.keys(error.fieldErrors).forEach(field => {
-                this.showFieldError(field, error.fieldErrors[field]);
-            });
+            for (const [field, message] of Object.entries(error.fieldErrors))
+            {
+                this.showFieldError(field, message);
+            }
+
+            this.showLoginError(
+                await Localisation.translate('Please correct the highlighted fields and try again.')
+            );
+        }
+        else if (detail === 'PasswordResetRequired')
+        {
+            this.showLoginError(
+                await Localisation.translate(
+                    'You need to reset your password before signing in. We have sent instructions to your email address.'
+                )
+            );
+        }
+        else if (statusCode === 401 || detail === 'Invalid credentials')
+        {
+            const message = await Localisation.translate(
+                'The email address or password you entered is incorrect.'
+            );
+
+            this.showLoginError(message);
+            this.showFieldError('Password', message);
+            this.passwordField.focus();
+            this.passwordField.select();
+        }
+        else if (statusCode === 403)
+        {
+            this.showLoginError(
+                detail ?? await Localisation.translate(
+                    'This account is not currently permitted to sign in. Please contact support.'
+                )
+            );
+        }
+        else if (statusCode === 429)
+        {
+            this.showLoginError(
+                await Localisation.translate(
+                    'There have been too many login attempts. Please wait a moment and try again.'
+                )
+            );
+        }
+        else if (statusCode >= 500)
+        {
+            this.showLoginError(
+                await Localisation.translate(
+                    'The login service is temporarily unavailable. Please try again shortly.'
+                )
+            );
         }
         else
         {
-            new ToastNotification(
-                error?.message ?? error?.detail ?? await Localisation.translate('An unexpected error occurred. Please try again.'),
-                'alert-circle',
-                'error'
+            this.showLoginError(
+                detail ?? await Localisation.translate(
+                    'An unexpected error occurred. Please try again.'
+                )
             );
         }
 
         this.resetReCaptcha();
+    }
+
+    showLoginError(message)
+    {
+        this.loginErrorSummary.textContent = message;
+        this.loginErrorSummary.hidden = false;
+        this.loginErrorSummary.focus();
+    }
+
+    clearLoginError()
+    {
+        this.loginErrorSummary.hidden = true;
+        this.loginErrorSummary.textContent = '';
     }
 
     async handleMfaError(error)
@@ -532,9 +649,7 @@ class LoginFormHandler
     showFieldError(fieldName, message)
     {
         const errorElement = document.getElementById(`ErrorReadout-${fieldName}`);
-        const inputElement = document.getElementById(
-            fieldName.toLowerCase().replace(/([A-Z])/g, '_$1').replace(/^_/, '')
-        );
+        const inputElement = this.getFieldElement(fieldName);
 
         if (errorElement)
         {
@@ -552,9 +667,7 @@ class LoginFormHandler
     clearFieldError(fieldName)
     {
         const errorElement = document.getElementById(`ErrorReadout-${fieldName}`);
-        const inputElement = document.getElementById(
-            fieldName.toLowerCase().replace(/([A-Z])/g, '_$1').replace(/^_/, '')
-        );
+        const inputElement = this.getFieldElement(fieldName);
 
         if (errorElement)
         {
@@ -569,14 +682,37 @@ class LoginFormHandler
         }
     }
 
+    getFieldElement(fieldName)
+    {
+        const fields = {
+            EmailAddress: this.emailField,
+            Password: this.passwordField,
+            TotpToken: this.totpField,
+            RecoveryCode: this.recoveryCodeField,
+            NewPassword: this.newPasswordField,
+            ConfirmPassword: this.confirmPasswordField
+        };
+
+        return fields[fieldName] ?? null;
+    }
+
     clearAllErrors()
     {
         this.clearFieldError('EmailAddress');
         this.clearFieldError('Password');
         this.clearFieldError('TotpToken');
         this.clearFieldError('RecoveryCode');
-        hideGlobalError();
-        hideSuccessMessage();
+        this.clearLoginError();
+
+        if (typeof hideGlobalError === 'function')
+        {
+            hideGlobalError();
+        }
+
+        if (typeof hideSuccessMessage === 'function')
+        {
+            hideSuccessMessage();
+        }
     }
 
 
@@ -613,4 +749,25 @@ class LoginFormHandler
             form.classList.toggle(formClass, loading);
         }
     }
+}
+
+function initialiseLoginFormHandler()
+{
+    const loginForm = document.getElementById('LoginForm');
+
+    if (!loginForm || loginForm.dataset.loginHandlerInitialised === 'true')
+    {
+        return;
+    }
+
+    new LoginFormHandler();
+}
+
+if (document.readyState === 'loading')
+{
+    document.addEventListener('DOMContentLoaded', initialiseLoginFormHandler, { once: true });
+}
+else
+{
+    initialiseLoginFormHandler();
 }
