@@ -2,6 +2,8 @@
 
 namespace Auxilium\FormHandling;
 
+use RuntimeException;
+
 /**
  * Helper functions for form data processing
  * These can be called from AuxiliumScript expressions
@@ -74,16 +76,15 @@ final class FormDataHelpers
         return count(self::collectCheckboxValues($fieldName, $formData));
     }
 
-
-
-
-
-
-
-
-    public static function collectGridValues(string $fieldName, array $formData): array
+    public static function collectGridValues(
+        string $fieldName,
+        array  $formData,
+        ?array $validValues = null,
+        ?array &$invalidStatements = null
+    ): array
     {
         $values = [];
+        $invalidStatements = [];
         $prefix = $fieldName . '-';
 
         foreach($formData as $key => $value)
@@ -92,8 +93,45 @@ final class FormDataHelpers
             {
                 continue;
             }
+
             $statementId = substr($key, strlen($prefix));
-            $values[$statementId] = is_numeric($value) ? (int)$value : $value;
+
+            if(is_array($value))
+            {
+                $invalidStatements[$statementId] = $value;
+                continue;
+            }
+
+            $normalisedValue = is_numeric($value) ? (int)$value : $value;
+
+            if($validValues !== null && !in_array($normalisedValue, $validValues, true))
+            {
+                $invalidStatements[$statementId] = $value;
+                continue;
+            }
+
+            $values[$statementId] = $normalisedValue;
+        }
+
+        return $values;
+    }
+
+    public static function collectGridValuesOrFail(string $fieldName, array $formData, array $validValues): array
+    {
+        $invalidStatements = null;
+        $values = self::collectGridValues($fieldName, $formData, $validValues, $invalidStatements);
+
+        if(!empty($invalidStatements))
+        {
+            $details = [];
+            foreach($invalidStatements as $statementId => $rawValue)
+            {
+                $details[] = $statementId . '=' . (is_scalar($rawValue) ? (string)$rawValue : gettype($rawValue));
+            }
+
+            throw new RuntimeException(
+                "Invalid grid values for field '$fieldName': " . implode(', ', $details)
+            );
         }
 
         return $values;

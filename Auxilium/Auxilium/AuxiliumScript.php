@@ -14,8 +14,15 @@ final class AuxiliumScript
             return null;
         }
 
-        // Handle variables
-        if(str_starts_with($string, "\$"))
+        $isDollarPrefixedFunctionCall = false;
+        if(str_starts_with($string, "\$") && preg_match('/^\$[A-Za-z_][A-Za-z0-9_]*\s*\(/', $string))
+        {
+            $string = substr($string, 1);
+            $isDollarPrefixedFunctionCall = true;
+        }
+
+        // Handle variables (only if NOT a $-prefixed function call)
+        if(!$isDollarPrefixedFunctionCall && str_starts_with($string, "\$"))
         {
             return self::evaluate_variable_path($string, $vars);
         }

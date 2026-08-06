@@ -10,6 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 final class ConfigurationUtilities
 {
     private const XML_NS = 'http://www.w3.org/XML/1998/namespace';
+    private const REPEATABLE_ELEMENT_NAMES = ['page', 'component', 'option', 'statement', 'item', 'translation'];
 
     public static array $SystemConfiguration;
     public static array $UserConfiguration;
@@ -69,29 +70,39 @@ final class ConfigurationUtilities
 
         $temp["id"] = "AuxiliumFormDefinition" . $temp["id"];
 
-        // if there's only one wizard page
-        if(!array_is_list($temp["pages"]["page"]))
-        {
-            $temp["pages"]["page"] = [$temp["pages"]["page"]];
-        }
-
-        foreach($temp["pages"]["page"] as &$page)
-        {
-            // Ensure components.component is a list
-            if(
-                isset($page["components"]["component"]) &&
-                !array_is_list($page["components"]["component"])
-            )
-            {
-                $page["components"]["component"] = [$page["components"]["component"]];
-            }
-        }
-        unset($page);
+        $temp = self::normalizeRepeatableElements($temp);
 
         return $temp;
     }
 
-    private static function xmlToArray(SimpleXMLElement $node): array|string
+    private static function normalizeRepeatableElements(mixed $node): mixed
+    {
+        if(!is_array($node))
+        {
+            return $node;
+        }
+
+        $result = [];
+
+        foreach($node as $key => $value)
+        {
+            if(is_array($value))
+            {
+                $value = self::normalizeRepeatableElements($value);
+
+                if(in_array($key, self::REPEATABLE_ELEMENT_NAMES, true) && !array_is_list($value))
+                {
+                    $value = [$value];
+                }
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
+
+    private static function xmlToArray(SimpleXMLElement $node): array|string|int|float|bool
     {
         $attributes = [];
         foreach($node->attributes() as $key => $value)
@@ -112,6 +123,11 @@ final class ConfigurationUtilities
             if(empty($attributes))
             {
                 return $text;
+            }
+
+            if(count($attributes) === 1 && isset($attributes['type']))
+            {
+                return self::castTypedValue($text, $attributes['type']);
             }
 
             return ['@attributes' => $attributes, '#text' => $text];
@@ -142,6 +158,17 @@ final class ConfigurationUtilities
         }
 
         return $result;
+    }
+
+    private static function castTypedValue(string $text, string $type): int|float|bool|string
+    {
+        return match(strtolower($type))
+        {
+            'integer', 'int' => (int) $text,
+            'float', 'double', 'decimal' => (float) $text,
+            'boolean', 'bool' => filter_var($text, FILTER_VALIDATE_BOOLEAN),
+            default => $text,
+        };
     }
 
     public static function GetAdminConsoleNavigationTree(): array

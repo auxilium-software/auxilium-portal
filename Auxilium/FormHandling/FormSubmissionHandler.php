@@ -4,6 +4,7 @@ namespace Auxilium\FormHandling;
 
 use Auxilium\Auxilium\AuxiliumScript;
 use Auxilium\ServiceInteractions\APIInteractions;
+use Auxilium\Utilities\JWTUtilities;
 use JsonException;
 
 /**
@@ -49,7 +50,7 @@ final class FormSubmissionHandler
         }
 
         $results = [];
-        $vars = ['formData' => $formData['Data'] ?? []];
+        $vars = $this->buildVars($formData);
 
         // normalize API requests to always be an array
         $apiRequests = $this->payloadProcessor->normalizeToArray(
@@ -85,6 +86,22 @@ final class FormSubmissionHandler
             message: 'All submission actions completed successfully',
             results: $results
         );
+    }
+
+    private function buildVars(array $formData): array
+    {
+        $vars = ['formData' => $formData['Data'] ?? []];
+
+        if($this->formSpec['requireAuthentication'] === 'true' && JWTUtilities::IsLoggedIn())
+        {
+            $vars['currentUser'] = ['id' => JWTUtilities::GetJwtInfo()->Sub];
+        }
+        else
+        {
+            $vars['currentUser'] = ['id' => $formData['UserID'] ?? null];
+        }
+
+        return $vars;
     }
 
     /**

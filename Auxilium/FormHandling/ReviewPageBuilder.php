@@ -23,7 +23,7 @@ final class ReviewPageBuilder
             return [];
         }
 
-        $components = $formSpec['reviewPage']['components']['component'];
+        $components = $this->normalizeToList($formSpec['reviewPage']['components']['component']);
         $visibleComponents = [];
 
         foreach($components as $component)
@@ -56,6 +56,20 @@ final class ReviewPageBuilder
         }
 
         return $visibleComponents;
+    }
+
+    private function normalizeToList(mixed $value): array
+    {
+        if(!is_array($value))
+        {
+            return [];
+        }
+
+        if(array_is_list($value))
+        {
+            return $value;
+        }
+
     }
 
     /**

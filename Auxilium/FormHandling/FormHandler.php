@@ -91,7 +91,7 @@ final class FormHandler
         // if form is assigned to a specific user, verify that the current user is that user
         if($targetUserID !== "*")
         {
-            $currentUserID = JWTUtilities::GetJwtInfo()->ID;
+            $currentUserID = JWTUtilities::GetJwtInfo()->Sub;
             if($targetUserID !== $currentUserID)
             {
                 NavigationUtilities::Redirect(target: '/');
