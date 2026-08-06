@@ -70,6 +70,7 @@ final class ReviewPageBuilder
             return $value;
         }
 
+        return [$value];
     }
 
     /**
