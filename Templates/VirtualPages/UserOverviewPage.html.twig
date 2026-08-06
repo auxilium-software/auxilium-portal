@@ -4,16 +4,18 @@
 
 {% block content %}
     {% if _IS_ADMIN_ %}
+        {#
         <code>
             {{ UserDetails|json_encode }}
         </code>
+        #}
     {% endif %}
 
     <div>
         <div class="inner-content">
             <div class="navigation-breadcrumb-container">
                 <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
-                <a class="navigation-breadcrumb" href="/users">{{ "Users" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/all-users">{{ "Users" | translate }}</a>
                 <a class="navigation-breadcrumb" href="/users/{{ UserDetails.id }}">{{ "User Overview" | translate }}</a>
             </div>
 
