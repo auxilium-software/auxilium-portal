@@ -27,7 +27,7 @@ final class PageBuilder
     {
         $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
         $this->twig = new Environment($loader, [
-            'debug' => true,
+            'debug' => false,
             'cache' => false,
         ]);
 
@@ -118,7 +118,7 @@ final class PageBuilder
     {
         $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
         $twig = new Environment($loader, [
-            'debug' => true,
+            'debug' => false,
             'cache' => false,
         ]);
         $twig->addGlobal('style_options', []);
