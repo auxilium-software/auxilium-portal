@@ -46,22 +46,17 @@ footer > div > legend {
 }
 
 
-div, main, nav, footer, dialog {
-    word-wrap: normal;
-    overflow: hidden;
-    /* width: 100%; */ /* REMOVED AS IT BROKE THE CALENDAR */
-    margin: 0;
-    position: relative;
-    box-sizing: border-box;
-}
-div,
-/*
-div:not(.calendar):not(.calendar-tooltip):not(.calendar-tooltip-event):not(.calendar-context-menu):not(.calendar-dialog):not(.calendar-notification):not(.calendar-widget),
- */
+div:where(:not(.calendar):not(.calendar-tooltip):not(.calendar-tooltip-event):not(.calendar-context-menu):not(.calendar-dialog):not(.calendar-notification):not(.calendar-widget)),
 main,
 nav,
 footer,
 dialog {
+    word-wrap: normal;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
     padding: var(--padding-level-one);
 }
 
@@ -72,7 +67,7 @@ div.calendar-context-menu *,
 div.calendar-dialog *,
 div.calendar-notification *,
 div.calendar-widget * {
-    padding: 0; !important;
+    padding: 0 !important;
 }
 
 
