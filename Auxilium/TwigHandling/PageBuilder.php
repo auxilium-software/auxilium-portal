@@ -148,10 +148,9 @@ final class PageBuilder
                 $_SERVER['REQUEST_URI']
             );
 
-            self::Render(
+            self::OfflineRender(
                 template: '/ErrorPages/InternalSystemErrorErrorPage.html.twig',
                 variables: ['technical_details' => $technicalDetails],
-                useAuth: false
             );
         }
 
