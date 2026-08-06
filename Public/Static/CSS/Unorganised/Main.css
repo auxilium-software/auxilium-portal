@@ -31,22 +31,51 @@ p, a, h1, h2, h3, h4, h5, h6, span, input {
 h1, h2, h3, h4, h5, h6, legend {
     color: var(--foreground-color-headings);
 }
-footer > div > h1, footer > div > h2, footer > div > h3, footer > div > h4, footer > div > h5, footer > div > h6, footer > div > legend {
+footer > div > h1,
+footer > div > h2,
+footer > div > h3,
+footer > div > h4,
+footer > div > h5,
+footer > div > h6,
+footer > div > legend {
     color: var(--brand-color-contrast);
 }
 .user-assignment-container > div {
     padding: 0;
     overflow: visible;
 }
+
+
 div, main, nav, footer, dialog {
     word-wrap: normal;
     overflow: hidden;
-    width: 100%;
+    /* width: 100%; */ /* REMOVED AS IT BROKE THE CALENDAR */
     margin: 0;
-    padding: var(--padding-level-one);
     position: relative;
     box-sizing: border-box;
 }
+div,
+/*
+div:not(.calendar):not(.calendar-tooltip):not(.calendar-tooltip-event):not(.calendar-context-menu):not(.calendar-dialog):not(.calendar-notification):not(.calendar-widget),
+ */
+main,
+nav,
+footer,
+dialog {
+    padding: var(--padding-level-one);
+}
+
+div.calendar *,
+div.calendar-tooltip *,
+div.calendar-tooltip-event *,
+div.calendar-context-menu *,
+div.calendar-dialog *,
+div.calendar-notification *,
+div.calendar-widget * {
+    padding: 0; !important;
+}
+
+
 
 dialog {
     word-wrap: normal;
@@ -484,7 +513,7 @@ fieldset > .error-toast {
     position: absolute;
     height: 1px;
     margin: -1px;
-    width: 1px; 
+    width: 1px;
 }
 .loading-bar-container {
     height: 1em;
@@ -593,11 +622,11 @@ fieldset > .error-toast {
         padding-right: 1rem;
         float: left;
     }
-    
+
     .left-preferential-box > :first-child, .right-preferential-box > :first-child {
         margin-top: 0;
     }
-    
+
     .left-preferential-box > :first-child > :first-child , .right-preferential-box > :first-child > :first-child {
         margin-top: 0;
     }
