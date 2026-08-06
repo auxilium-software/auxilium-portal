@@ -1,0 +1,37 @@
+{% extends "/Bases/StandardWebPage.html.twig" %}
+
+{% block title %}{{ "calendar" | translate }}{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="inner-content">
+            <div class="navigation-breadcrumb-container">
+                <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/calendar">{{ "Calendar" | translate }}</a>
+            </div>
+
+            <h1>{{ "Calendar" | translate }}</h1>
+
+            <div
+                    id="calendar-app"
+                    data-current-user-id="{{ _CURRENTLY_LOGGED_IN_USER_USER_ID_ }}"
+                    data-timezone="{{ Timmezone }}"
+            >
+                <div class="cal-toprow">
+                    <button type="button" class="cal-toprow__btn button" id="cal-new-event-btn">
+                        <span id="cal-new-event-btn-label">New Event</span>
+                    </button>
+                    <button type="button" class="cal-toprow__btn button" id="cal-sharing-btn">
+                        <span id="cal-sharing-btn-label">Sharing</span>
+                        <span class="cal-toprow__badge" id="cal-pending-invite-badge" hidden>0</span>
+                    </button>
+                </div>
+
+                <div id="calendar-widget"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/Static/JS/ThirdParty/Calendar.js"></script>
+    <script src="/Static/JS/Handlers/CalendarPageHandler.js"></script>
+{% endblock %}
