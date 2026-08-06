@@ -11,7 +11,6 @@ class CalendarEventManager extends BaseManager
         this.containerEl = containerEl;
         this.basePath = '/api/v3/calendar-events';
 
-        this.caseUrlTemplate = containerEl.dataset.caseUrlTemplate || '/cases/{caseId}';
         this.currentUserId = containerEl.dataset.currentUserId || '';
 
         this.categories = [];
@@ -179,7 +178,7 @@ class CalendarEventManager extends BaseManager
                 const caseId = event.customTags.caseId;
                 if (caseId && window.confirm("This event comes from a case. Open the case instead?"))
                 {
-                    window.location.href = this.caseUrlTemplate.replace('{caseId}', encodeURIComponent(caseId));
+                    window.location.href = '/cases/{caseId}'.replace('{caseId}', encodeURIComponent(caseId));
                 }
                 return;
             }
