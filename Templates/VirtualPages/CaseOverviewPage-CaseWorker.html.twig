@@ -69,7 +69,7 @@
                             {% for property_data in CaseDetails.additionalProperties %}
                                 {% if not (property_data.originalName in hidden_props) %}
                                     {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
-                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.originalName) }}</dt>
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.dataEnumeratorDisplayName|default(property_data.originalName) }}</dt>
                                         <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
                                             <a class="edit-icon inline-icon" href="javascript:void(0)"
@@ -131,13 +131,13 @@
                                     </div>
 
                                     <div>
-                                        {% if toDoItemDetails.due_date %}
+                                        {% if toDoItemDetails.dueDate %}
                                             <span>
                                                 {{ "Due" | translate }}: {{ toDoItemDetails.due_date|date("Y-m-d H:i") }}
                                             </span>
                                         {% endif %}
                                         <br>
-                                        {% if toDoItemDetails.created_at %}
+                                        {% if toDoItemDetails.createdAt %}
                                             <span>
                                                 {{ "Created" | translate }}: {{ toDoItemDetails.created_at|date("Y-m-d H:i") }}
                                                 by
@@ -145,7 +145,7 @@
                                             </span>
                                         {% endif %}
                                         <br>
-                                        {% if toDoItemDetails.assigned_to %}
+                                        {% if toDoItemDetails.assignedTo %}
                                             <span>
                                                 {{ "Assigned To" | translate }}:
                                                 {% include '/Partials/InlineUserField.html.twig' with {'_data': toDoItemDetails.assigned_to} %}
@@ -195,7 +195,7 @@
                                         <p class="timeline-entry-description">{{ item.description }}</p>
                                     {% endif %}
 
-                                    {% if item.entryType != "note.system" %}
+                                    {% if item.entryType != "Note.System" %}
                                         <span class="timeline-entry-actions">
                                             <a href="javascript:{const tm = new TimelineManager('{{ CaseDetails.id }}'); tm.showEditModal('{{ item.id|e('js') }}', '{{ item.title|e('js') }}', '{{ item.description|e('js') }}');}"
                                                class="action-link action-link-edit">{{ "Edit" | translate }}</a>
