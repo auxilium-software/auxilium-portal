@@ -3,7 +3,7 @@ class Localisation
     static async translate(text, substitutions = {})
     {
         const cacheKey = JSON.stringify({ text, substitutions });
-        if (Localisation._cache && Localisation._cache[cacheKey])
+        if (Localisation._cache && cacheKey in Localisation._cache)
         {
             return Localisation._cache[cacheKey];
         }
@@ -19,7 +19,7 @@ class Localisation
             if (!response.ok)
             {
                 console.error('Translation request failed:', response.status);
-                return text;
+                return Localisation.substitute(text, substitutions);
             }
 
             const data = await response.json();
@@ -31,13 +31,23 @@ class Localisation
             }
 
             console.error('Translation error:', data.error);
-            return text;
+            return Localisation.substitute(text, substitutions);
         }
         catch (error)
         {
             console.error('Translation fetch error:', error);
-            return text;
+            return Localisation.substitute(text, substitutions);
         }
+    }
+
+    static substitute(text, substitutions = {})
+    {
+        let result = text;
+        for (const key in substitutions)
+        {
+            result = result.split(key).join(String(substitutions[key]));
+        }
+        return result;
     }
 
     static translateSync(text)
