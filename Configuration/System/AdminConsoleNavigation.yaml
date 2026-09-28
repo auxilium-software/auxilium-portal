@@ -29,13 +29,29 @@
   HREF: /admin-console/object-management
 
 - Label: User Management
-  Type: HREF
+  Type: Dropdown
   Icon: users
-  HREF: /admin-console/object-management/user-management
+  Children:
+    - Label: All Users
+      Type: HREF
+      Icon: users
+      HREF: /admin-console/object-management/user-management
+    - Label: Merge Users
+      Type: HREF
+      Icon: git-merge
+      HREF: /admin-console/object-management/user-management/merge-tools
 - Label: Case Management
-  Type: HREF
+  Type: Dropdown
   Icon: briefcase
-  HREF: /admin-console/object-management/case-management
+  Children:
+    - Label: All Cases
+      Type: HREF
+      Icon: briefcase
+      HREF: /admin-console/object-management/case-management
+    - Label: Merge Cases
+      Type: HREF
+      Icon: git-merge
+      HREF: /admin-console/object-management/case-management/merge-tools
 - Label: Data Enumerator Management
   Type: HREF
   Icon: gear
