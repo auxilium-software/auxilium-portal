@@ -70,7 +70,7 @@
                             {% for property_data in UserDetails.additionalProperties %}
                                 {% if not (property_data.displayName in hidden_props) %}
                                     {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
-                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.enumDisplayName|default(property_data.displayName) }}</dt>
+                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.dataEnumeratorDisplayName|default(property_data.displayName) }}</dt>
                                         <dd data-property-key="{{ property_data.id }}">
                                             <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
                                             <a class="edit-icon inline-icon" href="javascript:void(0)"
@@ -100,10 +100,10 @@
                                 <dd>{{ UserDetails.id }}</dd>
 
                                 <dt>{{ "Created At" | translate }}</dt>
-                                <dd>{{ UserDetails.created_at | date("jS F Y, g:ia T") }}</dd>
+                                <dd>{{ UserDetails.createdAt | date("jS F Y, g:ia T") }}</dd>
 
                                 <dt>{{ "Last Updated At" | translate }}</dt>
-                                <dd>{{ UserDetails.last_updated_at | date("jS F Y, g:ia T") }}</dd>
+                                <dd>{{ UserDetails.lastUpdatedAt | date("jS F Y, g:ia T") }}</dd>
                             </dl>
                         </div>
 
