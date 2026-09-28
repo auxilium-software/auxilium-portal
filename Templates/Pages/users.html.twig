@@ -8,7 +8,7 @@
         <div class="inner-content">
             <div class="navigation-breadcrumb-container">
                 <a class="navigation-breadcrumb" href="/dashboard">{{ "home" | translate }}</a>
-                <a class="navigation-breadcrumb" href="/all-users">{{ "all users" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/users">{{ "all users" | translate }}</a>
             </div>
 
             <h1>{{ "all users" | translate }}</h1>
@@ -26,12 +26,14 @@
             </div>
 
             <script>
+                const BASE_PARAMS = {
+                    sort: 'createdAt',
+                    order: 'desc',
+                };
+
                 const infiniteScroller = new InfiniteScroller({
                     endpoint: '/api/v3/users',
-                    params: {
-                        sort: 'createdAt',
-                        order: 'desc'
-                    },
+                    params: { ...BASE_PARAMS },
                     target: document.getElementById('AllUsersContainer'),
                     pageSize: 8,
                     compact: false,
@@ -63,15 +65,11 @@
                 });
 
                 document.getElementById('apply-filters').addEventListener('click', () => {
-                    const searchTerm = document.getElementById('UserFilter-Search').value;
-                    const status = document.getElementById('UserFilter-Status').value;
+                    const searchTerm = document.getElementById('UserFilter-Search').value.trim();
 
-                    const newParams = {};
+                    const newParams = { ...BASE_PARAMS };
                     if (searchTerm) {
                         newParams.search = searchTerm;
-                    }
-                    if (status) {
-                        newParams.status = status;
                     }
 
                     infiniteScroller.updateParams(newParams);
@@ -80,3 +78,4 @@
         </div>
     </div>
 {% endblock %}
+
