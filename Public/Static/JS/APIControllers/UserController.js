@@ -72,8 +72,13 @@ class UserController
     async UpdateUser(userID, data, totpCode)
     {
         const [statusCode, payload] = await this.#APIInstance.API_PATCH(
-            `/api/v3/users/${userID}`, data, true, totpCode
+            `/api/v3/users/${userID}`, data, totpCode
         );
+
+        if (statusCode === 200)
+        {
+            return payload;
+        }
         if (statusCode === 204)
         {
             return await this.GetSingleUser(userID);
@@ -213,5 +218,27 @@ class UserController
             { code: totpCode },
         );
         return statusCode === 200 ? payload : false;
+    }
+
+    async PreviewUserMerge(survivorUserID, duplicateUserID)
+    {
+        return await this.#APIInstance.API_POST(
+            `/api/v3/users/${survivorUserID}/merge/preview`,
+            { duplicateUserId: duplicateUserID },
+        );
+    }
+
+    async MergeUsers(survivorUserID, duplicateUserID, fingerprint, fieldChoices, justification, totpCode)
+    {
+        return await this.#APIInstance.API_POST(
+            `/api/v3/users/${survivorUserID}/merge`,
+            {
+                duplicateUserId: duplicateUserID,
+                fingerprint: fingerprint,
+                fieldChoices: fieldChoices,
+                justification: justification,
+            },
+            totpCode,
+        );
     }
 }
