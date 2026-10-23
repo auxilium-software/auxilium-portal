@@ -15,7 +15,8 @@
         <div class="inner-content">
             <div class="navigation-breadcrumb-container">
                 <a class="navigation-breadcrumb" href="/dashboard">{{ "Home" | translate }}</a>
-                <a class="navigation-breadcrumb" href="/case/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/cases">{{ "All Cases" | translate }}</a>
+                <a class="navigation-breadcrumb" href="/cases/{{ CaseID }}">{{ "Case Overview" | translate }}</a>
             </div>
 
             <h1>
@@ -188,7 +189,7 @@
                         </h2>
                         <ul class="collection-list timeline-list">
                             {% for item in CaseDetails.timeline %}
-                                <li class="timeline-entry {{ item.entryType == "note.system" ? 'timeline-entry-system' }}">
+                                <li class="timeline-entry {{ item.entryType == "Note.System" ? 'timeline-entry-system' }}">
                                     <time class="timeline-entry-time">{{ item.occurredAtUtc|date("j M Y, H:i") }}</time><span class="timeline-entry-title">{{ item.title }}</span>{% if item.actor %}<span class="timeline-entry-meta">- {% include '/Partials/InlineUserField.html.twig' with {'_data': item.actor} %}</span>{% endif %}
 
                                     {% if item.description %}
