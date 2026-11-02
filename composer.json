@@ -45,7 +45,7 @@
         "endroid/qr-code-bundle": "^6.0",
         "bigfish/pdf417": "^0.3.0",
 
-        "zbateson/mail-mime-parser": "^3.0",
+        "zbateson/mail-mime-parser": "^4.0",
         "phpmailer/phpmailer": "^6.6",
         "webklex/php-imap": "^6.1",
 
