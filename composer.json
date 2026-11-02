@@ -61,7 +61,7 @@
         "unional/jsonc": "~1.0.1",
         "symfony/yaml": "~6.3",
 
-        "chillerlan/php-qrcode": "~5.0.5"
+        "chillerlan/php-qrcode": "~6.0.1"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
