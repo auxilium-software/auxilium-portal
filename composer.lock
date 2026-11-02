@@ -954,16 +954,16 @@
         },
         {
             "name": "fpdf/fpdf",
-            "version": "1.86.1",
+            "version": "1.90.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/coreydoughty/Fpdf.git",
-                "reference": "2034ab9f7b03b8294933d7fd27828d13963368e5"
+                "reference": "4078bf7667c957627f72d2b307744c7ebf0109e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/coreydoughty/Fpdf/zipball/2034ab9f7b03b8294933d7fd27828d13963368e5",
-                "reference": "2034ab9f7b03b8294933d7fd27828d13963368e5",
+                "url": "https://api.github.com/repos/coreydoughty/Fpdf/zipball/4078bf7667c957627f72d2b307744c7ebf0109e5",
+                "reference": "4078bf7667c957627f72d2b307744c7ebf0109e5",
                 "shasum": ""
             },
             "require": {
@@ -1001,9 +1001,9 @@
             ],
             "support": {
                 "issues": "https://github.com/coreydoughty/Fpdf/issues",
-                "source": "https://github.com/coreydoughty/Fpdf/tree/1.86.1"
+                "source": "https://github.com/coreydoughty/Fpdf/tree/1.90.0"
             },
-            "time": "2025-12-08T14:03:59+00:00"
+            "time": "2026-07-13T17:53:25+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2529,71 +2529,6 @@
                 }
             ],
             "time": "2025-08-16T11:10:48+00:00"
-        },
-        {
-            "name": "phpfui/icalendar",
-            "version": "V1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpfui/icalendar.git",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpfui/icalendar/zipball/1642b0c200ba83912685940a7b76946fc158723f",
-                "reference": "1642b0c200ba83912685940a7b76946fc158723f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4 <8.5"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.3",
-                "phpfui/phpunit-syntax-coverage": "dev-master",
-                "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "<12.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ICalendarOrg\\": "src/ICalendarOrg/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Bruce Wells",
-                    "email": "brucekwells@gmail.com"
-                }
-            ],
-            "description": "A modern fork of the icalendar.org PHP implementation of rfc5545, management of iCal formatted files",
-            "homepage": "https://icalendar.org/php-library.html",
-            "keywords": [
-                "calendar",
-                "daylight",
-                "file",
-                "iCalendar",
-                "management",
-                "rfc2445",
-                "rfc5545",
-                "rfc6321",
-                "standard",
-                "vCalendar",
-                "valarm",
-                "vevent",
-                "vfreebusy",
-                "vjournal",
-                "vtimezone",
-                "vtodo"
-            ],
-            "support": {
-                "issues": "https://github.com/phpfui/icalendar/issues",
-                "source": "https://github.com/phpfui/icalendar/tree/V1.1.0"
-            },
-            "time": "2019-10-31T00:00:00+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -9269,5 +9204,5 @@
         "ext-simplexml": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
