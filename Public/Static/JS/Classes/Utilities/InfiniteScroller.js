@@ -25,6 +25,7 @@ class InfiniteScroller
         this.#renderFunction = config.renderItem || this.#defaultRenderItem.bind(this);
         this.pageSize = config.pageSize || 8;
         this.dataField = config.dataField;
+        this.#compact = config.compact || false;
 
         this.#apiClient = new APIInteractions();
 
@@ -111,7 +112,6 @@ class InfiniteScroller
             {
                 throw new Error(data || 'Request failed');
             }
-
 
             const items = data[this.dataField];
             const totalPages = data.total_pages || data.pages || data.meta?.total_pages;
@@ -220,10 +220,20 @@ class InfiniteScroller
         this.#target.insertBefore(errorDiv, this.#loadingIndicator);
     }
 
+    #clearRenderedItems()
+    {
+        Array.from(this.#target.children).forEach(child =>
+        {
+            if (child !== this.#loadingIndicator)
+            {
+                child.remove();
+            }
+        });
+    }
+
     refresh()
     {
-        const items = this.#target.querySelectorAll('.item-container, .path-name-view, .inline-node-view, .case-item, .error-message');
-        items.forEach(item => item.remove());
+        this.#clearRenderedItems();
 
         // reset state
         this.#currentPage = 1;
@@ -234,9 +244,21 @@ class InfiniteScroller
         this.#loadData();
     }
 
-    updateParams(newParams)
+    updateParams(newParams, { merge = false } = {})
     {
-        this.#params = {...this.#params, ...newParams};
+        this.#params = merge ? { ...this.#params, ...newParams } : { ...newParams };
         this.refresh();
+    }
+
+    destroy()
+    {
+        if (this.scrollHandler)
+        {
+            window.removeEventListener('scroll', this.scrollHandler);
+        }
+        if (this.resizeObserver)
+        {
+            this.resizeObserver.disconnect();
+        }
     }
 }
