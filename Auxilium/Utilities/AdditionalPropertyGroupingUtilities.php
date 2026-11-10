@@ -24,9 +24,9 @@ final class AdditionalPropertyGroupingUtilities
         }
 
         $groups = array_values(array_filter(
-                                   $groups,
-                                   static fn($group) => is_array($group) && isset($group['id'])
-                               ));
+            $groups,
+            static fn($group) => is_array($group) && isset($group['id'])
+        ));
 
         usort(
             $groups,
