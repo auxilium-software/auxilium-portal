@@ -40,6 +40,10 @@
       Type: HREF
       Icon: git-merge
       HREF: /admin-console/object-management/user-management/merge-tools
+    - Label: User Property Groups
+      Type: HREF
+      Icon: folders
+      HREF: /admin-console/object-management/user-management/property-groups
 - Label: Case Management
   Type: Dropdown
   Icon: briefcase
@@ -52,6 +56,10 @@
       Type: HREF
       Icon: git-merge
       HREF: /admin-console/object-management/case-management/merge-tools
+    - Label: Case Property Groups
+      Type: HREF
+      Icon: folders
+      HREF: /admin-console/object-management/case-management/property-groups
 - Label: Data Enumerator Management
   Type: HREF
   Icon: gear
