@@ -13,17 +13,22 @@ class NewPropertyPopup
     #floating = false;
     #enumTypeId = null;
     /**
+     * The Additional Property Group to preselect, or null for none.
+     */
+    #groupId = null;
+    /**
      * Possible types: 'dict', 'array', 'static'
      */
     #mode = null;
 
-    constructor(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null)
+    constructor(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null, groupId = null)
     {
         this.#apiClient = new APIInteractions();
         this.#resourcePath = resourcePath;
         this.#userId = userId;
         this.#floating = floating;
         this.#enumTypeId = enumTypeId;
+        this.#groupId = groupId || null;
 
         if (resourcePath)
         {
@@ -48,9 +53,9 @@ class NewPropertyPopup
         this.#types = this.#normalizeTypes(types);
     }
 
-    static async create(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null)
+    static async create(types = null, resourcePath = null, floating = false, userId = 'me', enumTypeId = null, groupId = null)
     {
-        const instance = new NewPropertyPopup(types, resourcePath, floating, userId, enumTypeId);
+        const instance = new NewPropertyPopup(types, resourcePath, floating, userId, enumTypeId, groupId);
         await instance.#initialize();
         return instance;
     }
@@ -154,6 +159,12 @@ class NewPropertyPopup
             input.classList.add('property-name-input');
             container.appendChild(input);
 
+            const groupPicker = await this.#createGroupPicker();
+            if (groupPicker)
+            {
+                container.appendChild(groupPicker);
+            }
+
             result.element = container;
             result.focusElement = input;
         }
@@ -175,6 +186,52 @@ class NewPropertyPopup
         }
 
         return result;
+    }
+
+    async #createGroupPicker()
+    {
+        const groupController = AdditionalPropertyGroupController.FromResourcePath(this.#resourcePath);
+        if (!groupController)
+        {
+            return null;
+        }
+
+        const groups = await groupController.GetGroups();
+        if (!Array.isArray(groups) || groups.length === 0)
+        {
+            return null;
+        }
+
+        const wrapper = document.createElement('div');
+
+        const label = document.createElement('span');
+        label.innerText = await Localisation.translate('Group');
+        wrapper.appendChild(label);
+
+        const select = document.createElement('select');
+        select.classList.add('property-input', 'property-group-select');
+        select.setAttribute('aria-label', label.innerText);
+
+        const none = document.createElement('option');
+        none.value = '';
+        none.textContent = await Localisation.translate('No group');
+        select.appendChild(none);
+
+        const ordered = groups.slice().sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        for (const group of ordered)
+        {
+            const opt = document.createElement('option');
+            opt.value = group.id;
+            opt.textContent = group.displayName || group.canonicalName;
+            if (this.#groupId && group.id.toLowerCase() === this.#groupId.toLowerCase())
+            {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        }
+
+        wrapper.appendChild(select);
+        return wrapper;
     }
 
     #getDisplayPath()
@@ -609,7 +666,8 @@ class NewPropertyPopup
                 // blank is allowed for enum refs — the API fills it from the canonical name.
                 originalName: this.#readTypedName(),
                 content: content,
-                contentType: contentType
+                contentType: contentType,
+                groupId: this.#readGroupId()
             };
         }
 
@@ -637,6 +695,16 @@ class NewPropertyPopup
     {
         const nameInput = this.#innerContainer.querySelector('.property-name-input');
         return nameInput ? nameInput.value.trim() : '';
+    }
+
+    #readGroupId()
+    {
+        const groupSelect = this.#innerContainer.querySelector('.property-group-select');
+        if (groupSelect)
+        {
+            return groupSelect.value || null;
+        }
+        return this.#groupId;
     }
 
     #createICalendar(type, data)
@@ -750,3 +818,4 @@ class NewPropertyPopup
         this.#onSuccessCallback = callback;
     }
 }
+
