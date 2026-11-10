@@ -3464,3 +3464,381 @@ input[type="color"] {
         color: #000;
     }
 }
+
+
+
+/*  ==================================================
+    CASE MERGING
+    ================================================== */
+/* Step indicator */
+.merge-steps {
+    display: flex;
+    margin-bottom: var(--gap-large);
+    background: var(--surface-color);
+    border: 1px solid var(--rule-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.merge-steps__item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--pad-y-loose) var(--pad-x);
+    font-size: var(--type-data);
+    font-weight: 600;
+    color: var(--label-color);
+    border-right: 1px solid var(--rule-color);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.merge-steps__item:last-child {
+    border-right: none;
+}
+
+.merge-steps__item.is-active {
+    color: var(--foreground-color);
+    background: var(--accent-color-wash);
+    box-shadow: inset 0 -0.125rem 0 var(--accent-color);
+}
+
+.merge-steps__item.is-done {
+    color: var(--positive-color);
+}
+
+.merge-steps__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    font-family: var(--font-data);
+    font-size: var(--type-micro);
+    border: 1px solid currentColor;
+    border-radius: 50%;
+}
+
+.merge-steps__item.is-active .merge-steps__num {
+    color: var(--accent-color-contrast);
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.merge-steps__item.is-done .merge-steps__num {
+    color: var(--page-color);
+    background: var(--positive-color);
+    border-color: var(--positive-color);
+}
+
+/* Notices */
+.merge-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: var(--gap);
+    padding: var(--pad-y-loose) var(--pad-x);
+    font-size: var(--type-data);
+    line-height: 1.45;
+    color: var(--foreground-color-dim);
+    background: var(--information-color-wash);
+    border: 1px solid var(--information-color-edge);
+    border-left: 0.1875rem solid var(--information-color);
+    border-radius: var(--radius-small);
+}
+
+.merge-notice:last-child {
+    margin-bottom: 0;
+}
+
+.merge-notice > i {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    font-size: 1rem;
+    color: var(--information-color);
+}
+
+.merge-notice--warning {
+    background: var(--warning-color-wash);
+    border-color: var(--warning-color-edge);
+    border-left-color: var(--warning-color);
+}
+
+.merge-notice--warning > i {
+    color: var(--warning-color);
+}
+
+.merge-notice--danger {
+    background: var(--error-color-wash);
+    border-color: var(--error-color-edge);
+    border-left-color: var(--error-color);
+}
+
+.merge-notice--danger > i {
+    color: var(--error-color);
+}
+
+.merge-notice--success {
+    background: var(--positive-color-wash);
+    border-color: var(--positive-color-edge);
+    border-left-color: var(--positive-color);
+}
+
+.merge-notice--success > i {
+    color: var(--positive-color);
+}
+
+/* Small text */
+.merge-id {
+    font-family: var(--font-data);
+    font-size: var(--type-micro);
+    font-weight: 400;
+    color: var(--label-color);
+    overflow-wrap: anywhere;
+}
+
+.merge-hint {
+    margin-top: 0.25rem;
+    font-size: var(--type-micro);
+    color: var(--label-color);
+}
+
+.merge-case-title {
+    font-weight: 600;
+    color: var(--foreground-color);
+}
+
+.merge-empty {
+    padding: 1.25rem;
+    text-align: center;
+    font-size: var(--type-data);
+    color: var(--label-color);
+}
+
+/* Values in the comparison and review */
+.merge-value {
+    display: inline-block;
+    max-width: 18rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.merge-value--empty {
+    font-style: italic;
+    color: var(--label-color);
+}
+
+/* Case table: rows ticked for merging */
+.admin-table tbody tr.is-picked {
+    background: var(--accent-color-wash);
+}
+
+.admin-table tbody tr.is-picked td:first-child {
+    box-shadow: inset 0.1875rem 0 0 var(--accent-color);
+}
+
+/* Merge set */
+.merge-section {
+    margin-top: var(--gap-large);
+}
+
+.action-card--primary {
+    border-color: var(--accent-color-edge);
+    box-shadow: inset 0.1875rem 0 0 var(--accent-color);
+}
+
+.merge-set__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.merge-set__primary {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: var(--type-data);
+    color: var(--foreground-color-dim);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* Conflict resolution table */
+.merge-resolve thead th {
+    vertical-align: top;
+}
+
+.merge-resolve td {
+    vertical-align: top;
+}
+
+.merge-resolve td.merge-resolve__field {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.merge-resolve tr.is-conflict td.merge-resolve__field {
+    color: var(--warning-color);
+}
+
+.merge-resolve td.is-chosen {
+    background: var(--positive-color-wash);
+    box-shadow: inset 0 0 0 1px var(--positive-color-edge);
+}
+
+.merge-resolve label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+    cursor: pointer;
+}
+
+.merge-resolve label input {
+    flex-shrink: 0;
+    margin-top: 0.1875rem;
+}
+
+/* Panel furniture */
+.merge-footer {
+    justify-content: flex-end;
+}
+
+.merge-footer--split {
+    justify-content: space-between;
+}
+
+.merge-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    cursor: pointer;
+}
+
+.detail-list--wide {
+    grid-template-columns: minmax(10rem, max-content) 1fr;
+}
+
+.merge-review-grid {
+    margin-bottom: var(--gap-large);
+}
+
+.merge-textarea {
+    width: 100%;
+    min-height: 4rem;
+    resize: vertical;
+}
+
+.merge-ack {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: var(--gap);
+    padding: var(--pad-y-loose) var(--pad-x);
+    font-size: var(--type-data);
+    font-weight: 600;
+    color: var(--foreground-color);
+    background: var(--error-color-wash);
+    border: 1px solid var(--error-color-edge);
+    border-radius: var(--radius-small);
+    cursor: pointer;
+}
+
+.merge-ack input {
+    flex-shrink: 0;
+    margin-top: 0.1875rem;
+}
+
+a.form-btn {
+    text-decoration: none;
+}
+
+/* Confirmation dialogue */
+.merge-confirm__summary {
+    display: flex;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+}
+
+.merge-confirm__icon {
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    color: var(--accent-color);
+}
+
+.merge-confirm__title {
+    margin-bottom: 0.375rem;
+    font-weight: 600;
+    color: var(--foreground-color);
+}
+
+.merge-confirm__desc {
+    font-size: var(--type-data);
+    color: var(--foreground-color-dim);
+}
+
+.merge-totp {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--type-data);
+    font-weight: 600;
+    color: var(--foreground-color);
+}
+
+.merge-totp label {
+    white-space: nowrap;
+}
+
+.merge-totp input {
+    width: 7rem;
+    font-family: var(--font-data);
+    font-size: var(--type-ui);
+    letter-spacing: 0.25em;
+    text-align: center;
+}
+
+.merge-field-error {
+    margin-top: 0.375rem;
+    font-size: var(--type-micro);
+    color: var(--error-color);
+}
+
+/* Toast variant for failures */
+.toast.is-error {
+    border-left-color: var(--error-color);
+}
+
+.toast.is-error .toast__icon {
+    color: var(--error-color);
+}
+
+@media (max-width: 52rem) {
+    .merge-steps {
+        flex-direction: column;
+    }
+
+    .merge-steps__item {
+        border-right: none;
+        border-bottom: 1px solid var(--rule-color);
+    }
+
+    .merge-steps__item:last-child {
+        border-bottom: none;
+    }
+
+    .merge-footer--split {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .merge-value {
+        max-width: 10rem;
+    }
+}
