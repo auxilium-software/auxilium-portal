@@ -1,0 +1,25 @@
+.property-group {
+    margin: 0 0 1.2em 0;
+}
+.property-group:last-child {
+    margin-bottom: 0;
+}
+
+.property-group__heading {
+    margin: 0 0 0.4em 0;
+    padding: 0 0 0.15em 0;
+    font-size: 1.05em;
+    border-width: 0 0 var(--outline-width) 0;
+    border-style: solid;
+    border-color: var(--foreground-color);
+}
+
+.property-group__list {
+    margin-bottom: 0;
+}
+
+.property-group__empty {
+    margin: 0.2em 0 0 0;
+    opacity: 0.75;
+}
+

@@ -1,0 +1,123 @@
+
+{% set _editable = _managerClass is defined and _managerClass is not empty %}
+{% set _anyGroups = _sections|filter(s => s.Group is not null)|length > 0 %}
+{% set _enumContentType = 'application/x-auxilium-data-enumumerator-value-id' %}
+
+<div class="property-groups">
+    {% for section in _sections %}
+        <section
+            class="property-group{{ section.Group is null ? ' property-group--ungrouped' }}"
+            data-group-id="{{ section.Group.id|default('') }}"
+        >
+
+            {% if _anyGroups %}
+                <h3 class="property-group__heading">
+                    {% if section.Group is not null %}
+                        {{ section.Group.displayName|default(section.Group.canonicalName) }}
+                    {% else %}
+                        {{ "Other"|translate }}
+                    {% endif %}
+
+                    {% if _editable %}
+                        <a href="javascript:void(0)"
+                           class="inline-icon add-icon add-property-trigger"
+                           data-type="{{ _addTypes|default('PLAIN_TEXT') }}"
+                           data-resource="{{ _resource }}"
+                           data-group-id="{{ section.Group.id|default('') }}"
+                           title="{{ "Add Entry"|translate }}"
+                        ></a>
+                    {% endif %}
+                </h3>
+            {% endif %}
+
+            {% if section.Properties|length > 0 %}
+                <dl class="property-group__list">
+                    {% for property_data in section.Properties %}
+                        {% if not (property_data.displayName in (hidden_props|default([]))) %}
+                            {% set _isEnum = property_data.contentType == _enumContentType %}
+                            {% set _label = _isEnum
+                                ? (property_data.dataEnumeratorDisplayName|default(property_data.displayName))
+                                : property_data.displayName
+                            %}
+                            {% set _value = _isEnum
+                                ? (property_data.displayValue|default(property_data.content))
+                                : property_data.content
+                            %}
+
+                            <dt data-property-key="{{ property_data.id }}">{{ _label }}</dt>
+                            <dd data-property-key="{{ property_data.id }}">
+                                <span class="property-content">{{ _value }}</span>
+
+                                {% if _editable %}
+                                    {% if _isEnum %}
+                                        <a
+                                            class="edit-icon inline-icon"
+                                            title="{{ "Edit property"|translate }}"
+                                            href="javascript:void(0)"
+                                            onclick="{{ _managerClass }}.editEnumProperty('{{ _subjectId|e('js') }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ _label|e('js') }}')"
+                                        ></a>
+                                    {% else %}
+                                        <a
+                                            class="edit-icon inline-icon"
+                                            title="{{ "Edit property"|translate }}"
+                                            href="javascript:void(0)"
+                                            onclick="{{ _managerClass }}.editProperty('{{ _subjectId|e('js') }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ _label|e('js') }}')"
+                                        ></a>
+                                    {% endif %}
+
+                                    {% if _anyGroups %}
+                                        <a
+                                            class="folder-icon inline-icon"
+                                            title="{{ "Move to another group"|translate }}"
+                                            href="javascript:void(0)"
+                                            onclick="{{ _managerClass }}.moveProperty('{{ _subjectId|e('js') }}', '{{ property_data.id|e('js') }}', '{{ section.Group.id|default('')|e('js') }}', '{{ _label|e('js') }}')"></a>
+                                    {% endif %}
+
+                                    <a
+                                        class="delete-icon inline-icon"
+                                        title="{{ "Remove property"|translate }}"
+                                        href="javascript:void(0)"
+                                        onclick="{{ _managerClass }}.deleteProperty('{{ _subjectId|e('js') }}', '{{ property_data.id|e('js') }}', '{{ _label|e('js') }}')"
+                                    ></a>
+                                {% endif %}
+                            </dd>
+                        {% endif %}
+                    {% endfor %}
+                </dl>
+            {% elseif _anyGroups %}
+                <p class="property-group__empty"><em>{{ "No properties in this group"|translate }}</em></p>
+            {% endif %}
+        </section>
+    {% endfor %}
+</div>
+
+{% if _editable %}
+    <script>
+        if (!window.__additionalPropertyTriggerBound)
+        {
+            window.__additionalPropertyTriggerBound = true;
+
+            document.addEventListener('click', async (e) => {
+                const trigger = e.target.closest('.add-property-trigger');
+                if (!trigger)
+                {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
+                const resource = trigger.dataset.resource;
+
+                const enumTypeId = trigger.dataset.enumTypeId || null;
+
+                const groupId = trigger.dataset.groupId || null;
+
+                const popupWindow = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId, groupId);
+                document.getElementById('main-content').after(popupWindow.render());
+                popupWindow.focus();
+                popupWindow.onSuccess(() => window.location.reload());
+            });
+        }
+    </script>
+{% endif %}

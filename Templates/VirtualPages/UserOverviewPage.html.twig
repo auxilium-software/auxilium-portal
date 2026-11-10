@@ -42,55 +42,18 @@
                                class="inline-icon add-icon add-property-trigger"
                                data-type="PLAIN_TEXT,ENUM"
                                data-resource="/api/v3/users/{{ UserDetails.id }}/additional_properties/*"
+                               data-group-id=""
                                title="{{ "Add Entry" | translate }}"
                             ></a>
-                            <script>
-                                document.addEventListener('click', async (e) => {
-                                    const trigger = e.target.closest('.add-property-trigger');
-                                    if (!trigger) return;
-
-                                    e.preventDefault();
-
-                                    // data-type may list several types (e.g. "PLAIN_TEXT,ENUM"); an array makes NewPropertyPopup show its type-chooser menu.
-                                    const types = (trigger.dataset.type || 'PLAIN_TEXT').split(',').map(s => s.trim()).filter(Boolean);
-                                    const resource = trigger.dataset.resource;
-
-                                    // optional: pin a specific enumerator for the ENUM type
-                                    const enumTypeId = trigger.dataset.enumTypeId || null;
-
-                                    const win = await NewPropertyPopup.create(types, resource, true, 'me', enumTypeId);
-                                    document.getElementById('main-content').after(win.render());
-                                    win.focus();
-                                    win.onSuccess(() => window.location.reload());
-                                });
-                            </script>
                         </h2>
                         <br />
-                        <dl id="properties-list">
-                            {% for property_data in UserDetails.additionalProperties %}
-                                {% if not (property_data.displayName in hidden_props) %}
-                                    {% if property_data.contentType == 'application/x-auxilium-data-enumumerator-value-id' %}
-                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.dataEnumeratorDisplayName|default(property_data.displayName) }}</dt>
-                                        <dd data-property-key="{{ property_data.id }}">
-                                            <span class="property-content">{{ property_data.displayValue|default(property_data.content) }}</span>
-                                            <a class="edit-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editEnumProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.dataEnumeratorId|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
-                                            <a class="delete-icon inline-icon" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
-                                        </dd>
-                                    {% else %}
-                                        <dt data-property-key="{{ property_data.id }}">{{ property_data.displayName }}</dt>
-                                        <dd data-property-key="{{ property_data.id }}">
-                                            <span class="property-content">{{ property_data.content }}</span>
-                                            <a class="edit-icon inline-icon" title="Edit property" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.editProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.content|e('js') }}', '{{ property_data.originalName|e('js') }}')"></a>
-                                            <a class="delete-icon inline-icon" title="Remove property" href="javascript:void(0)"
-                                               onclick="UserPropertyManager.deleteProperty('{{ UserDetails.id }}', '{{ property_data.id|e('js') }}', '{{ property_data.displayName|e('js') }}')"></a>
-                                        </dd>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </dl>
+                        {% include '/Partials/GroupedPropertyList.html.twig' with {
+                            '_sections': PropertySections,
+                            '_subjectId': UserDetails.id,
+                            '_managerClass': 'UserPropertyManager',
+                            '_resource': '/api/v3/users/' ~ UserDetails.id ~ '/additional_properties/*',
+                            '_addTypes': 'PLAIN_TEXT,ENUM',
+                        } %}
 
                         <a href="javascript:toggle_hidden_box('ext_props');"><strong>{{ "Extended Properties" | translate }}</strong><span id="hidden_box_ext_props_toggle_button" class="inline-icon-low-margin inline-icon-shift-right expand-more-icon" style="display: none;"></span></a>
                         <div class="small-spacer"></div>
