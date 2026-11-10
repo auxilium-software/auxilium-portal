@@ -23,7 +23,7 @@
     },
 
     "require": {
-        "php": "^8.2",
+        "php": "^8.5",
 
         "ext-curl": "*",
         "ext-bcmath": "*",
@@ -50,7 +50,7 @@
         "webklex/php-imap": "^6.1",
 
         "firebase/php-jwt": "7.0.0",
-        "lcobucci/jwt": "^3.4.6 || ^4.0.4",
+        "lcobucci/jwt": "5.5.0.0",
 
         "aws/aws-sdk-php": "^3.277",
 
@@ -61,7 +61,9 @@
         "unional/jsonc": "~1.0.1",
         "symfony/yaml": "~6.3",
 
-        "chillerlan/php-qrcode": "~5.0.5"
+        "chillerlan/php-qrcode": "~5.0.5",
+
+        "phpoffice/phpspreadsheet": "5.10.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
