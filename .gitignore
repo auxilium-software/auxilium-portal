@@ -30,3 +30,7 @@ Configuration/Configuration/msft-access-token-primary.json
 !LocalStorage/**/.gitkeep
 LocalStorage
 Public/test.php
+
+# Temp Files
+Public/Static/Fonts/*.json
+Public/Static/Fonts/*.z
