@@ -79,6 +79,7 @@ $routes = [
     "#^/users/" . UUIDUtilities::$Regex . '/files/' . UUIDUtilities::$Regex . '/render$#'   => __DIR__ . '/../RoutedPages/FileRender.php',
 
     "#^/admin-console/object-management/user-management/" . UUIDUtilities::$Regex . "$#"    => __DIR__ . '/../RoutedPages/AdminConsoleUserOverviewPage.php',
+    "#^/admin-console/object-management/(user|case)-management/merge-tools$#"               => __DIR__ . '/../RoutedPages/AdminConsoleObjectMergePage.php',
     "#^/admin-console#"                                                                     => __DIR__ . '/../RoutedPages/AdminConsoleFallback.php',
 
     /*
