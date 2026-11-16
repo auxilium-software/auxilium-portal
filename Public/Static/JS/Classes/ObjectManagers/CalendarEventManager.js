@@ -67,8 +67,8 @@ class CalendarEventManager extends BaseManager
             startOfWeekDay: 0, // monday
             workingDays: [0, 1, 2, 3, 4],
             weekendDays: [5, 6],
-            workingHoursStart: await SystemSettingsUtilities.getSystemSettingByKey("business.workingHours.start"),
-            workingHoursEnd: await SystemSettingsUtilities.getSystemSettingByKey("business.workingHours.end"),
+            workingHoursStart: await SystemSettingsUtilities.getSystemSettingByKey("Business.WorkingHours.Start"),
+            workingHoursEnd: await SystemSettingsUtilities.getSystemSettingByKey("Business.WorkingHours.End"),
             data: initialEvents,
             events: {
                 onEventClick: (event) => this._onEventClicked(event),
