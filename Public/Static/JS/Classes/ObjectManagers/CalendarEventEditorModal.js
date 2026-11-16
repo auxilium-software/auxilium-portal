@@ -64,7 +64,7 @@ class CalendarEventEditorModal extends BaseManager
             Localisation.translate(isEditing ? 'Edit event' : 'New event'),
             Localisation.translate('Title'),
             Localisation.translate('Category'),
-            Localisation.translate('Select a category…'),
+            Localisation.translate('Select a category...'),
             Localisation.translate('All day'),
             Localisation.translate('Start'),
             Localisation.translate('End'),
