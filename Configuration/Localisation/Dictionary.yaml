@@ -1,5 +1,10 @@
 
 ##################################################
+# UNTRANSLATABLES
+
+
+
+##################################################
 # SPECIAL CHARACTERS
 "{greeting}, {username}":
   cy-GB: "{greeting}, {username}"
@@ -142,7 +147,7 @@ Change Password:
   cy-GB: Newid Cyfrinair
 
 Choose a type...:
-  cy-GB: Dewiswch fath…
+  cy-GB: Dewiswch fath...
 
 Clear:
   cy-GB: Clir
