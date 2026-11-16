@@ -9,9 +9,6 @@ use Symfony\Component\Yaml\Yaml;
 
 final class ConfigurationUtilities
 {
-    private const XML_NS = 'http://www.w3.org/XML/1998/namespace';
-    private const REPEATABLE_ELEMENT_NAMES = ['page', 'component', 'option', 'statement', 'item', 'translation'];
-
     public static array $SystemConfiguration;
     public static array $UserConfiguration;
 
@@ -64,111 +61,48 @@ final class ConfigurationUtilities
 
     public static function GetFormDefinition(string $target): array
     {
-        $xmlString = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
-        $xml = new SimpleXMLElement($xmlString);
-        $temp = self::xmlToArray($xml);
+        $temp = file_get_contents(__DIR__ . "/../../Configuration/FormDefinitions/" . $target . ".aux3form");
+        $temp = new SimpleXMLElement($temp);
+        $temp = json_decode(json_encode($temp), true);
 
         $temp["id"] = "AuxiliumFormDefinition" . $temp["id"];
 
-        $temp = self::normalizeRepeatableElements($temp);
+        // if there's only one wizard page
+        if(!array_is_list($temp["pages"]["page"]))
+        {
+            $temp["pages"]["page"] = [$temp["pages"]["page"]];
+        }
+
+        foreach($temp["pages"]["page"] as &$page)
+        {
+            // Ensure components.component is a list
+            if(
+                isset($page["components"]["component"]) &&
+                !array_is_list($page["components"]["component"])
+            )
+            {
+                $page["components"]["component"] = [$page["components"]["component"]];
+            }
+        }
+        unset($page);
+
+
+        // sorts out the options
+        foreach($temp["pages"]["page"] as $iValue)
+        {
+            if(
+                array_key_exists("components", $iValue)
+                && array_key_exists("component", $iValue['components'])
+                && is_array($iValue["components"]["component"])
+            )
+            {
+                for($ii = 0, $iiMax = count($iValue["components"]["component"]); $ii < $iiMax; $ii++)
+                {
+                }
+            }
+        }
 
         return $temp;
-    }
-
-    private static function normalizeRepeatableElements(mixed $node): mixed
-    {
-        if(!is_array($node))
-        {
-            return $node;
-        }
-
-        $result = [];
-
-        foreach($node as $key => $value)
-        {
-            if(is_array($value))
-            {
-                $value = self::normalizeRepeatableElements($value);
-
-                if(in_array($key, self::REPEATABLE_ELEMENT_NAMES, true) && !array_is_list($value))
-                {
-                    $value = [$value];
-                }
-            }
-
-            $result[$key] = $value;
-        }
-
-        return $result;
-    }
-
-    private static function xmlToArray(SimpleXMLElement $node): array|string|int|float|bool
-    {
-        $attributes = [];
-        foreach($node->attributes() as $key => $value)
-        {
-            $attributes[$key] = (string) $value;
-        }
-        foreach($node->attributes(self::XML_NS) as $key => $value)
-        {
-            $attributes[$key] = (string) $value;
-        }
-
-        $children = $node->children();
-
-        if(count($children) === 0)
-        {
-            $text = trim((string) $node);
-
-            if(empty($attributes))
-            {
-                return $text;
-            }
-
-            if(count($attributes) === 1 && isset($attributes['type']))
-            {
-                return self::castTypedValue($text, $attributes['type']);
-            }
-
-            return ['@attributes' => $attributes, '#text' => $text];
-        }
-
-        $result = [];
-        if(!empty($attributes))
-        {
-            $result['@attributes'] = $attributes;
-        }
-
-        foreach($children as $childName => $child)
-        {
-            $childValue = self::xmlToArray($child);
-
-            if(isset($result[$childName]))
-            {
-                if(!is_array($result[$childName]) || !array_is_list($result[$childName]))
-                {
-                    $result[$childName] = [$result[$childName]];
-                }
-                $result[$childName][] = $childValue;
-            }
-            else
-            {
-                $result[$childName] = $childValue;
-            }
-        }
-
-        return $result;
-    }
-
-    private static function castTypedValue(string $text, string $type): int|float|bool|string
-    {
-        return match(strtolower($type))
-        {
-            'integer', 'int' => (int) $text,
-            'float', 'double', 'decimal' => (float) $text,
-            'boolean', 'bool' => filter_var($text, FILTER_VALIDATE_BOOLEAN),
-            default => $text,
-        };
     }
 
     public static function GetAdminConsoleNavigationTree(): array
@@ -180,6 +114,13 @@ final class ConfigurationUtilities
     public static function GetAdminConsoleQuickActions(): array
     {
         $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleQuickActions.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
+
+    public static function GetMergeSubjects(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleObjectMergeSubjectConfig.yaml';
         $fileContents = file_get_contents($filePath);
         return Yaml::parse($fileContents);
     }
