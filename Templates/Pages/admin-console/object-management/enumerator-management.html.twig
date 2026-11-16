@@ -7,6 +7,9 @@
             <span class="page-title__sub">{{ "Manage system-wide Data Enumerators"|translate }}</span>
         </div>
         <div class="page-title__actions">
+            <button class="form-btn" onclick="openCalendarCategories()">
+                <i class="ph-duotone ph-calendar-check"></i> {{ "Manage Calendar Categories"|translate }}
+            </button>
             <button class="form-btn form-btn--primary" onclick="document.getElementById('createEnumeratorDialog').style.display='block'">
                 <i class="ph-duotone ph-plus-circle"></i> {{ "Create a new Data Enumerator"|translate }}
             </button>
@@ -72,8 +75,8 @@
     </div>
 
     {#
-        ==================================================
-        = CREATE ENUMERATOR
+    ==================================================
+    = CREATE ENUMERATOR
     #}
     <div id="createEnumeratorDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
         <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:440px;">
@@ -100,8 +103,8 @@
     </div>
 
     {#
-        ==================================================
-        = EDIT ENUMERATOR
+    ==================================================
+    = EDIT ENUMERATOR
     #}
     <div id="editEnumeratorDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
         <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:440px;">
@@ -129,8 +132,8 @@
     </div>
 
     {#
-        ==================================================
-        = VALUE MANAGEMENT
+    ==================================================
+    = VALUE MANAGEMENT
     #}
     <div id="valuesDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
         <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:680px; max-width:94vw;">
@@ -150,6 +153,7 @@
                         <thead>
                         <tr>
                             <th style="width:80px;">{{ "Order"|translate }}</th>
+                            <th style="width:60px;">{{ "Colour"|translate }}</th>
                             <th>{{ "Canonical Name"|translate }}</th>
                             <th>{{ "Status"|translate }}</th>
                             <th>{{ "Controls"|translate }}</th>
@@ -166,8 +170,8 @@
     </div>
 
     {#
-        ==================================================
-        = ADD / EDIT VALUE
+    ==================================================
+    = ADD / EDIT VALUE
     #}
     <div id="valueDialog" style="display:none; position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5);">
         <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:460px;">
@@ -181,9 +185,15 @@
                     <div class="detail-list" style="grid-template-columns: 130px 1fr;">
                         <dt>{{ "Canonical Name"|translate }}</dt>
                         <dd><input type="text" class="form-input" id="valueCanonicalName" style="width:100%;"></dd>
+
+                        <dt>{{ "Colour"|translate }}</dt>
+                        <dd style="display:flex; align-items:center; gap:8px;">
+                            <input type="color" id="valueColour" value="#64748B" style="width:44px; height:22px; padding:0; border:1px solid #808080; cursor:pointer;">
+                            <input type="text" class="form-input" id="valueColourHex" value="#64748B" maxlength="7" style="width:90px;" placeholder="#64748B">
+                        </dd>
                     </div>
                     <p class="page-title__sub" style="margin-top:8px;">
-                        {{ "The authoritative name for this value. Shown to administrators, and to users only where no translation exists for their language."|translate }}
+                        {{ "The authoritative name for this value. Shown to administrators, and to users only where no translation exists for their language. Colour is optional display metadata used by any feature that renders this value (e.g. the calendar's category swatches) - it isn't required and falls back to a neutral grey if left unset."|translate }}
                     </p>
                 </div>
                 <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
@@ -195,8 +205,8 @@
     </div>
 
     {#
-        ==================================================
-        = MANAGE TRANSLATIONS
+    ==================================================
+    = MANAGE TRANSLATIONS
     #}
     <div id="translationsDialog" style="display:none; position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5);">
         <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:620px; max-width:94vw;">
@@ -234,8 +244,8 @@
     </div>
 
     {#
-        ==================================================
-        = MESSAGE BOX
+    ==================================================
+    = MESSAGE BOX
     #}
     <div class="confirm-overlay" id="msgBox" style="z-index:3200;">
         <div class="confirm-dialog">
@@ -298,7 +308,6 @@
             const icon = MESSAGEBOX_ICONS[options.icon] || MESSAGEBOX_ICONS.info;
             const buttons = options.buttons || ['ok'];
 
-            // X / backdrop / Escape resolve to this; default to the most "negative" button present
             let dismissValue = options.dismissValue;
             if (dismissValue === undefined)
             {
@@ -405,6 +414,14 @@
                     : '<span class="badge badge--inactive">{{ "Inactive"|translate }}</span>';
         }
 
+        const DEFAULT_COLOUR = '#64748B';
+
+        function colourSwatch(colourHex)
+        {
+            const c = colourHex || DEFAULT_COLOUR;
+            return '<span class="color-swatch" style="background:' + escapeHtml(c) + ';" title="' + escapeHtml(c) + '"></span>';
+        }
+
         // ====================================================================================================
         // ENUM LIST
         async function loadEnumerators()
@@ -508,6 +525,21 @@
         function findEnum(id)
         {
             return allEnumerators.find(function (e) { return e.id === id; }) || null;
+        }
+
+        async function openCalendarCategories()
+        {
+            if (allEnumerators.length === 0)
+            {
+                await loadEnumerators();
+            }
+            const calEnum = allEnumerators.find(function (e) { return e.canonicalName === '/data-enumerator/builtin/calendar-event-category'; });
+            if (!calEnum)
+            {
+                await showError('{{ "The calendar-event-category enumerator has not been created yet. See the seeding step in the calendar modules backend README."|translate }}');
+                return;
+            }
+            await openValues(calEnum.id);
         }
 
         // ====================================================================================================
@@ -618,7 +650,7 @@
             {
                 const tr = document.createElement('tr');
                 const td = document.createElement('td');
-                td.colSpan = 4;
+                td.colSpan = 5;
                 td.style.cssText = 'text-align:center; padding:16px; color:#666;';
                 td.textContent = '{{ "No values yet."|translate }}';
                 tr.appendChild(td);
@@ -637,6 +669,11 @@
                         '<button class="form-btn form-btn--sm"   onclick="moveValue(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') +                        '><i class="ph-duotone ph-arrow-up"></i></button> '
                         + '<button class="form-btn form-btn--sm" onclick="moveValue(' + i + ',1)"'  + (i === currentValues.length - 1 ? ' disabled' : '') + '><i class="ph-duotone ph-arrow-down"></i></button>';
                 tr.appendChild(orderTd);
+
+                const colourTd = document.createElement('td');
+                colourTd.style.textAlign = 'center';
+                colourTd.innerHTML = colourSwatch(v.colourHex);
+                tr.appendChild(colourTd);
 
                 const nameTd = document.createElement('td');
                 nameTd.textContent = v.canonicalName;
@@ -670,6 +707,10 @@
             document.getElementById('valueId').value = currentValue ? currentValue.id : '';
             document.getElementById('valueCanonicalName').value = currentValue ? currentValue.canonicalName : '';
 
+            const colour = (currentValue && currentValue.colourHex) || DEFAULT_COLOUR;
+            document.getElementById('valueColour').value = colour;
+            document.getElementById('valueColourHex').value = colour;
+
             document.getElementById('valueDialog').style.display = 'block';
         }
 
@@ -677,20 +718,27 @@
         {
             const valueId = document.getElementById('valueId').value;
             const canonicalName = document.getElementById('valueCanonicalName').value.trim();
+            const colourHex = document.getElementById('valueColourHex').value.trim();
+
             if (!canonicalName)
             {
                 await showError('{{ "Canonical name is required."|translate }}');
+                return;
+            }
+            if (!/^#[0-9A-Fa-f]{6}$/.test(colourHex))
+            {
+                await showError('{{ "Colour must be a 6-digit hex value, e.g. #2F6F65."|translate }}');
                 return;
             }
 
             let result;
             if (valueId)
             {
-                result = await enumController.UpdateValue(currentEnum.id, valueId, canonicalName);
+                result = await enumController.UpdateValue(currentEnum.id, valueId, canonicalName, colourHex);
             }
             else
             {
-                result = await enumController.CreateValue(currentEnum.id, canonicalName, null);
+                result = await enumController.CreateValue(currentEnum.id, canonicalName, colourHex, null);
             }
 
             if (failed(result))
@@ -879,8 +927,8 @@
         async function deleteTranslation(translationId)
         {
             const ok = await confirmDialog(
-                '{{ "Delete this translation? This cannot be undone."|translate }}',
-                '{{ "Delete translation"|translate }}'
+                    '{{ "Delete this translation? This cannot be undone."|translate }}',
+                    '{{ "Delete translation"|translate }}'
             );
             if (!ok)
             {
@@ -904,6 +952,17 @@
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('enumSearch').addEventListener('input', renderEnumerators);
             document.getElementById('filterStatus').addEventListener('change', renderEnumerators);
+
+            document.getElementById('valueColour').addEventListener('input', function () {
+                document.getElementById('valueColourHex').value = this.value;
+            });
+            document.getElementById('valueColourHex').addEventListener('input', function () {
+                const v = this.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(v))
+                {
+                    document.getElementById('valueColour').value = v;
+                }
+            });
 
             // message box: `X` button, backdrop click, and keyboard (`esc` dismisses, `enter` triggers primary)
             document.getElementById('msgBoxX').addEventListener('click', function () { closeMessageBox(msgBoxDismiss); });
