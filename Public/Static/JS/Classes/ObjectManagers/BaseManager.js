@@ -7,7 +7,8 @@ class BaseManager {
 
     closeModal()
     {
-        if (this.modalElement) {
+        if (this.modalElement)
+        {
             this.modalElement.remove();
             this.modalElement = null;
         }

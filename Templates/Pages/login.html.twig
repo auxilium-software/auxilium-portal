@@ -3,6 +3,8 @@
 {% block title %}{{ "Login"|translate }}{% endblock %}
 
 {% block content %}
+    {% set recaptchaSiteKey = GetUserConfiguration("ReCAPTCHA", "SiteKey") %}
+
     <div>
         <div class="inner-content">
             <h1>{{ "Login"|translate }}</h1>
@@ -11,15 +13,21 @@
                 <span id="SuccessText"></span>
             </div>
 
-            <form method="POST" id="LoginForm">
+            <form id="LoginForm" data-client-side-form data-recaptcha-site-key="{{ recaptchaSiteKey }}" novalidate>
+                <p id="ErrorReadout-LoginForm" class="error-toast" role="alert" style="display:none;"></p>
+
                 <label for="email_address">{{ "Email Address"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
-                <input type="text" name="email_address" placeholder="{{ "Email Address"|translate }}" id="email_address" />
-                <p id="ErrorReadout-EmailAddress" class="error-toast" style="display:none;">
+                <input type="email" name="email_address" placeholder="{{ "Email Address"|translate }}" id="email_address"
+                       autocomplete="username" autocapitalize="none" spellcheck="false" required
+                       aria-describedby="ErrorReadout-EmailAddress" />
+                <p id="ErrorReadout-EmailAddress" class="error-toast" role="alert" style="display:none;">
                 </p>
 
                 <label for="raw_password">{{ "Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
-                <input type="password" name="raw_password" placeholder="{{ "Password"|translate }}" id="raw_password" />
-                <p id="ErrorReadout-Password" class="error-toast" style="display:none;">
+                <input type="password" name="raw_password" placeholder="{{ "Password"|translate }}" id="raw_password"
+                       autocomplete="current-password" required
+                       aria-describedby="ErrorReadout-Password" />
+                <p id="ErrorReadout-Password" class="error-toast" role="alert" style="display:none;">
                 </p>
 
                 <button type="submit" id="LoginButton" class="button">
@@ -41,20 +49,25 @@
                 <input type="hidden" id="ReCAPTCHAToken" name="ReCAPTCHAToken">
             </form>
 
-            <form method="POST" id="MfaForm" style="display:none;">
+            <form id="MfaForm" data-client-side-form novalidate style="display:none;">
+                <p id="ErrorReadout-MfaForm" class="error-toast" role="alert" style="display:none;"></p>
+
                 <!-- TOTP input -->
                 <div id="TotpInputSection">
                     <label for="totp_token">{{ "TOTP Token"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
                     <input type="text" name="totp_token" placeholder="XXXXXX" id="totp_token"
-                           inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" />
-                    <p id="ErrorReadout-TotpToken" class="error-toast" style="display:none;"></p>
+                           inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code"
+                           aria-describedby="ErrorReadout-TotpToken" />
+                    <p id="ErrorReadout-TotpToken" class="error-toast" role="alert" style="display:none;"></p>
                 </div>
 
                 <!-- Recovery code input -->
                 <div id="RecoveryCodeSection" style="display:none;">
                     <label for="recovery_code">{{ "Recovery Code"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
-                    <input type="text" name="recovery_code" placeholder="{{ "Recovery Code"|translate }}" id="recovery_code" autocomplete="off" />
-                    <p id="ErrorReadout-RecoveryCode" class="error-toast" style="display:none;"></p>
+                    <input type="text" name="recovery_code" placeholder="{{ "Recovery Code"|translate }}" id="recovery_code"
+                           autocomplete="off" autocapitalize="none" spellcheck="false"
+                           aria-describedby="ErrorReadout-RecoveryCode" />
+                    <p id="ErrorReadout-RecoveryCode" class="error-toast" role="alert" style="display:none;"></p>
                 </div>
 
                 <button type="submit" id="MfaSubmitButton" class="button">
@@ -69,17 +82,23 @@
                 <a href="#" id="BackToLogin">{{ "Back to login"|translate }}</a>
             </form>
 
-            <form method="POST" id="PasswordChangeForm" style="display:none;">
+            <form id="PasswordChangeForm" data-client-side-form novalidate style="display:none;">
                 <h2>{{ "You must change your password"|translate }}</h2>
                 <p>{{ "An administrator has required you to set a new password before continuing."|translate }}</p>
 
+                <p id="ErrorReadout-PasswordChangeForm" class="error-toast" role="alert" style="display:none;"></p>
+
                 <label for="new_password">{{ "New Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
-                <input type="password" name="new_password" placeholder="{{ "New Password"|translate }}" id="new_password" />
-                <p id="ErrorReadout-NewPassword" class="error-toast" style="display:none;"></p>
+                <input type="password" name="new_password" placeholder="{{ "New Password"|translate }}" id="new_password"
+                       autocomplete="new-password" required
+                       aria-describedby="ErrorReadout-NewPassword" />
+                <p id="ErrorReadout-NewPassword" class="error-toast" role="alert" style="display:none;"></p>
 
                 <label for="confirm_password">{{ "Confirm Password"|translate }} {% include '/Partials/RequiredAsterisk.html.twig' %}</label>
-                <input type="password" name="confirm_password" placeholder="{{ "Confirm Password"|translate }}" id="confirm_password" />
-                <p id="ErrorReadout-ConfirmPassword" class="error-toast" style="display:none;"></p>
+                <input type="password" name="confirm_password" placeholder="{{ "Confirm Password"|translate }}" id="confirm_password"
+                       autocomplete="new-password" required
+                       aria-describedby="ErrorReadout-ConfirmPassword" />
+                <p id="ErrorReadout-ConfirmPassword" class="error-toast" role="alert" style="display:none;"></p>
 
                 <button type="submit" id="PasswordChangeButton" class="button">
                     <span class="button-text">{{ "Change Password"|translate }}</span>
@@ -90,6 +109,12 @@
                 <a href="#" id="BackToLoginFromPwChange">{{ "Back to login"|translate }}</a>
             </form>
 
+            <script>
+                document.querySelectorAll('form[data-client-side-form]').forEach(function (form)
+                {
+                    form.addEventListener('submit', function (event) { event.preventDefault(); });
+                });
+            </script>
 
             <h2>{{ "Security Notice"|translate }}</h2>
             <p>
@@ -124,12 +149,7 @@
                 successContainer.style.display = 'none';
         }
     </script>
-    <script src="/Static/JS/Handlers/LoginFormHandler.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render={{ GetUserConfiguration("ReCAPTCHA", "SiteKey")|raw }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            new LoginFormHandler();
-        });
-    </script>
 
+    <script src="https://www.google.com/recaptcha/api.js?render={{ recaptchaSiteKey|url_encode }}" async defer></script>
+    <script src="/Static/JS/Handlers/LoginFormHandler.js" defer></script>
 {% endblock %}

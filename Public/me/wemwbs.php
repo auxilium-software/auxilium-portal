@@ -9,12 +9,9 @@ try
 {
     $assessments = APIInteractions::Get(endpoint: '/api/v3/wemwbs/my-statistics');
 
-    var_dump($assessments);
-    die();
-
     PageBuilder::AutoRender(
         variables: [
-            'Assessments' => $assessments,
+            'Assessments' => $assessments->Payload,
         ]
     );
 }

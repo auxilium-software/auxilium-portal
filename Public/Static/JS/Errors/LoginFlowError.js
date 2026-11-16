@@ -1,0 +1,2 @@
+
+class LoginFlowError extends Error {}

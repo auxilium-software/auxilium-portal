@@ -341,7 +341,10 @@
         const pathParts = window.location.pathname.split('/').filter(Boolean);
         const userId = pathParts[pathParts.length - 1];
 
+        const propertyGroupController = new AdditionalPropertyGroupController(AdditionalPropertyGroupController.SUBJECTS.USERS);
+
         let userData = null;
+        let userPropertyGroups = [];
         let isEditMode = false;
         let pendingAction = null;
 
@@ -350,7 +353,14 @@
         // =========================
         async function loadUser()
         {
-            const user = await api.GetSingleUser(userId);
+            const [user, groups] = await Promise.all([
+                api.GetSingleUser(userId),
+                propertyGroupController.GetGroups(),
+            ]);
+
+            // without groups, properties just show as one list
+            userPropertyGroups = Array.isArray(groups) ? groups : [];
+
             if (!user)
             {
                 document.getElementById('pageSubtitle').textContent = '- {{ "User not found"|translate }}';
@@ -507,18 +517,62 @@
                 return;
             }
 
-            const keys = Object.keys(props);
-            countEl.textContent = keys.length;
+            const allProps = Object.values(props).filter(function (p) { return p && typeof p === 'object'; });
+            countEl.textContent = allProps.length;
+
+            const groups = userPropertyGroups.slice().sort(function (a, b) { return (a.sortOrder || 0) - (b.sortOrder || 0); });
+            const byGroupId = {};
+            groups.forEach(function (g) { byGroupId[g.id.toLowerCase()] = []; });
+
+            const ungrouped = [];
+            allProps.forEach(function (p) {
+                const key = p.groupId ? String(p.groupId).toLowerCase() : null;
+                if (key && byGroupId[key]) byGroupId[key].push(p);
+                else ungrouped.push(p);
+            });
+
+            const byCreation = function (a, b) { return String(a.createdAt || '').localeCompare(String(b.createdAt || '')); };
+
+            const sections = [];
+            groups.forEach(function (g) {
+                const groupProps = byGroupId[g.id.toLowerCase()];
+                if (groupProps.length > 0) sections.push({ heading: g.displayName || g.canonicalName, props: groupProps.sort(byCreation) });
+            });
+
+            const anyGrouped = sections.length > 0;
+            if (ungrouped.length > 0)
+            {
+                sections.push({ heading: anyGrouped ? '{{ "Other"|translate|e('js') }}' : null, props: ungrouped.sort(byCreation) });
+            }
 
             let html = '';
-            for (let i = 0; i < keys.length; i++)
+            for (let s = 0; s < sections.length; s++)
             {
-                const prop = props[keys[i]];
-                const name = prop.prettyName || prop.originalName || keys[i];
-                const content = prop.content || '-';
+                const section = sections[s];
 
-                html += '<dt>' + escapeHtml(name) + '</dt>';
-                html += '<dd>' + escapeHtml(content) + '</dd>';
+                if (section.heading !== null)
+                {
+                    html += '<dt style="grid-column:1/-1; font-weight:bold; border-bottom:1px solid #ccc; padding-top:' + (s === 0 ? '0' : '8px') + ';">'
+                            + '<i class="ph-duotone ph-folder"></i> ' + escapeHtml(section.heading)
+                            + '</dt>';
+                }
+
+                for (let i = 0; i < section.props.length; i++)
+                {
+                    const prop = section.props[i];
+                    const isEnum = prop.contentType === window.ENUM_REF_CONTENT_TYPE;
+
+                    const name = isEnum
+                            ? (prop.dataEnumeratorDisplayName || prop.displayName || prop.id)
+                            : (prop.displayName || prop.id);
+
+                    const content = isEnum
+                            ? (prop.displayValue || prop.content || '-')
+                            : (prop.content || '-');
+
+                    html += '<dt>' + escapeHtml(name) + '</dt>';
+                    html += '<dd>' + escapeHtml(content) + '</dd>';
+                }
             }
 
             container.innerHTML = html;
@@ -653,8 +707,8 @@
                 var chk = document.getElementById('chkBlockLogin');
                 confirmMessage = Object.assign({}, confirmMessage);
                 confirmMessage.title = chk.checked
-                    ? '{{ "Block User Login"|translate }}'
-                    : '{{ "Unblock User Login"|translate }}';
+                        ? '{{ "Block User Login"|translate }}'
+                        : '{{ "Unblock User Login"|translate }}';
             }
 
             document.getElementById('confirmIcon').textContent = confirmMessage.icon;
@@ -808,9 +862,9 @@
             if (!log || !log.length)
             {
                 listEl.innerHTML =
-                    '<li class="audit-list__item" style="justify-content:center; color:#666; padding:12px;">' +
-                    '{{ "No recent activity recorded."|translate }}' +
-                    '</li>';
+                        '<li class="audit-list__item" style="justify-content:center; color:#666; padding:12px;">' +
+                        '{{ "No recent activity recorded."|translate }}' +
+                        '</li>';
                 return;
             }
 
@@ -819,13 +873,13 @@
             {
                 const entry = log[i];
                 html +=
-                    '<li class="audit-list__item">'
+                        '<li class="audit-list__item">'
                         + '<span class="audit-list__time">' + formatDateTime(entry.createdAt) + '</span>'
                         + '<span class="audit-list__action">'
-                            + '<span class="audit-list__actor">' + escapeHtml(entry.createdByName || 'unknown') + '</span> '
-                            + escapeHtml(entry.description || entry.action || '')
+                        + '<span class="audit-list__actor">' + escapeHtml(entry.createdByName || 'unknown') + '</span> '
+                        + escapeHtml(entry.description || entry.action || '')
                         + '</span>'
-                    + '</li>';
+                        + '</li>';
             }
 
             listEl.innerHTML = html;
@@ -868,8 +922,8 @@
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
                 return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-                    + ' '
-                    + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                        + ' '
+                        + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
             }
             catch (e)
             {

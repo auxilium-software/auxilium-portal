@@ -69,7 +69,7 @@
             <id>consent</id>
             <title>
                 <translation xml:lang="en-GB">Data processing consent</translation>
-                <translation xml:lang="en-GB">Caniatâd prosesu data</translation>
+                <translation xml:lang="cy-GB">Caniatâd prosesu data</translation>
             </title>
             <description>
                 <translation xml:lang="en-GB">By completing these questions you consent to us processing your data,

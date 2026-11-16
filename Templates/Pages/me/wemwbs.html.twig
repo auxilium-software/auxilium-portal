@@ -16,9 +16,28 @@
 
             <div class="separator"></div>
 
-            <code>
-                {{ Assessments|json_encode }}
-            </code>
+            <a class="button" href="/me/wemwbs/new-assessment">{{ "New Assessment"|translate }}</a>
+
+
+            <div class="marked-section">
+                <h2> {{ "WEMWBS Overview" | translate }}</h2>
+                <dl id="properties-list" class="">
+                    <dt>{{ "Total Assessments"|translate }}</dt>
+                    <dd>{{ Assessments.totalAssessments }}</dd>
+
+                    <dt>{{ "Average Score"|translate }}</dt>
+                    <dd>{{ Assessments.averageScore }}</dd>
+
+                    <dt>{{ "Lowest Score"|translate }}</dt>
+                    <dd>{{ Assessments.lowestScore }}</dd>
+
+                    <dt>{{ "Highest Score"|translate }}</dt>
+                    <dd>{{ Assessments.highestScore }}</dd>
+
+                    <dt>{{ "Trend"|translate }}</dt>
+                    <dd>{{ Assessments.trend }}</dd>
+                </dl>
+            </div>
         </div>
     </div>
 

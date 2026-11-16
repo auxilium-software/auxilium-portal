@@ -108,10 +108,10 @@
             try
             {
                 const [apiCpu, apiMem, trCpu, trMem] = await Promise.all([
-                    api.GetApiCpuUsageMetrics(),
-                    api.GetApiRamUsageMetrics(),
-                    api.GetTaskRunnerCpuUsageMetrics(),
-                    api.GetTaskRunnerRamUsageMetrics(),
+                    api.GetMetricSeries("Api_CpuUsageAsPercentage"),
+                    api.GetMetricSeries("Api_MemoryUsageInBytes"),
+                    api.GetMetricSeries("TaskRunner_CpuUsageAsPercentage"),
+                    api.GetMetricSeries("TaskRunner_MemoryUsageInBytes"),
                 ]);
 
                 const latest = r => r?.metrics?.[0]?.value ?? 0; // newest-first

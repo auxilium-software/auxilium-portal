@@ -1,0 +1,902 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% set _isCases = PropertySubject == 'cases' %}
+
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-folders"></i>
+            {% if _isCases %}{
+                { "Case Property Groups"|translate }}
+            {% else %}
+                {{ "User Property Groups"|translate }}
+            {% endif %}
+            <span class="page-title__sub">
+                {% if _isCases %}
+                    {{ "Sections that case properties are shown in"|translate }}
+                {% else %}
+                    {{ "Sections that user properties are shown in"|translate }}
+                {% endif %}
+            </span>
+        </div>
+        <div class="page-title__actions">
+            <button class="form-btn form-btn--primary" onclick="openCreateDialog()">
+                <i class="ph-duotone ph-plus-circle"></i> {{ "Create a new group"|translate }}
+            </button>
+        </div>
+    </div>
+
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Total">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Total Groups"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card__value" id="StatCard-Untranslated">{{ "Loading..."|translate }}</div>
+            <div class="stat-card__label">{{ "Missing a translation"|translate }}</div>
+            <div class="stat-card__change">&nbsp;</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Search"|translate }}:</span>
+            <input type="text" class="form-input form-input--search" placeholder="{{ "Name or translation..."|translate }}" id="groupSearch">
+        </div>
+
+        <div class="toolbar__spacer"></div>
+
+        <div class="toolbar__group">
+            <button class="form-btn form-btn--sm" onclick="resetFilters()">✕ {{ "Clear"|translate }}</button>
+            <span class="toolbar__label" id="resultCount"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="groupTable">
+            <caption>
+                {% if _isCases %}
+                    {{ "Case Property Groups"|translate }}
+                {% else %}
+                    {{ "User Property Groups"|translate }}
+                {% endif %}
+            </caption>
+            <thead>
+            <tr>
+                <th style="width:80px;">{{ "Order"|translate }}</th>
+                <th>{{ "Canonical Name"|translate }}</th>
+                {% for locale in SupportedLocales %}
+                    <th>
+                        <span class="badge">
+                            {{ locale }}
+                        </span>
+                    </th>
+                {% endfor %}
+                <th>{{ "Controls"|translate }}</th>
+            </tr>
+            </thead>
+            <tbody id="GroupTableBody"></tbody>
+        </table>
+    </div>
+
+    <p class="page-title__sub" id="reorderHint" style="display:none;">
+        {{ "Clear the search to change the order."|translate }}
+    </p>
+
+    {#
+    ==================================================
+    = CREATE GROUP
+    #}
+    <div id="createGroupDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:460px; max-width:94vw;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-plus-circle"></i>
+                        {{ "Create a new group"|translate }}
+                    </span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('createGroupDialog')">
+                        <i class="ph-duotone ph-x"></i>
+                    </button>
+                </div>
+                <div class="panel__body">
+                    <div class="detail-list" style="grid-template-columns: 130px 1fr;">
+                        <dt>{{ "Canonical Name"|translate }}</dt>
+                        <dd>
+                            <input type="text" class="form-input" id="newGroupName" maxlength="191" style="width:100%;">
+                        </dd>
+
+                        {% for locale in SupportedLocales %}
+                            <dt>
+                                <span class="badge">
+                                    {{ locale }}
+                                </span>
+                            </dt>
+                            <dd>
+                                <input type="text" class="form-input new-group-translation" data-locale="{{ locale }}" style="width:100%;">
+                            </dd>
+                        {% endfor %}
+                    </div>
+                    <p class="page-title__sub" style="margin-top:8px;">
+                        {{ "The canonical name is shown to anyone whose language has no translation. Translations can be added later."|translate }}
+                    </p>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('createGroupDialog')">{{ "Cancel"|translate }}</button>
+                    <button class="form-btn form-btn--primary" onclick="createGroup()"><i class="ph-duotone ph-floppy-disk"></i> {{ "Create"|translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+    ==================================================
+    = RENAME GROUP
+    #}
+    <div id="renameGroupDialog" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:440px; max-width:94vw;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-pencil-simple"></i>
+                        {{ "Rename group"|translate }}
+                    </span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('renameGroupDialog')">
+                        <i class="ph-duotone ph-x"></i>
+                    </button>
+                </div>
+                <div class="panel__body">
+                    <input type="hidden" id="renameGroupId">
+                    <div class="detail-list" style="grid-template-columns: 130px 1fr;">
+                        <dt>{{ "Canonical Name"|translate }}</dt>
+                        <dd>
+                            <input type="text" class="form-input" id="renameGroupName" maxlength="191" style="width:100%;">
+                        </dd>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('renameGroupDialog')">
+                        {{ "Cancel"|translate }}
+                    </button>
+                    <button class="form-btn form-btn--primary" onclick="renameGroup()">
+                        <i class="ph-duotone ph-floppy-disk"></i>
+                        {{ "Save"|translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+    ==================================================
+    = MANAGE TRANSLATIONS
+    #}
+    <div id="translationsDialog" style="display:none; position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5);">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:620px; max-width:94vw;">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-translate"></i>
+                        <span id="translationsDialogTitle">
+                            {{ "Translations"|translate }}
+                        </span>
+                    </span>
+                    <button class="chart-container__header-btn" onclick="closeDialog('translationsDialog')">
+                        <i class="ph-duotone ph-x"></i>
+                    </button>
+                </div>
+                <div class="panel__body" style="max-height:60vh; overflow:auto;">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th style="width:140px;">{{ "Language"|translate }}</th>
+                            <th>{{ "Translation"|translate }}</th>
+                            <th style="width:120px;">{{ "Controls"|translate }}</th>
+                        </tr>
+                        </thead>
+                        <tbody id="TranslationsTableBody"></tbody>
+                    </table>
+
+                    <div class="panel" style="margin-top:12px; margin-bottom:0;">
+                        <div class="panel__header">
+                            <span>
+                                <i class="ph-duotone ph-plus"></i>
+                                {{ "Add a translation for another language"|translate }}
+                            </span>
+                        </div>
+                        <div class="panel__body" style="display:flex; gap:6px; align-items:center;">
+                            <input type="text" class="form-input" id="newTransLang" placeholder="fr-FR" maxlength="35" style="width:130px;">
+                            <input type="text" class="form-input" id="newTransText" placeholder="{{ "Translation"|translate }}" style="flex:1;">
+                            <button class="form-btn form-btn--sm form-btn--primary" onclick="addOtherTranslation()">{{ "Add"|translate }}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button class="form-btn" onclick="closeDialog('translationsDialog')">
+                        {{ "Close"|translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#
+    ==================================================
+    = MESSAGE BOX
+    #}
+    <div class="confirm-overlay" id="msgBox" style="z-index:3200;">
+        <div class="confirm-dialog">
+            <div class="panel" style="margin-bottom:0;">
+                <div class="panel__header">
+                    <span id="msgBoxTitle">{{ "Message"|translate }}</span>
+                    <button class="chart-container__header-btn" id="msgBoxX" title="{{ "Close"|translate }}">
+                        <i class="ph-duotone ph-x"></i>
+                    </button>
+                </div>
+                <div class="panel__body">
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div id="msgBoxIcon" style="font-size:28px; line-height:1; flex-shrink:0;"></div>
+                        <div id="msgBoxMessage" style="flex:1; line-height:1.5; padding-top:2px;"></div>
+                    </div>
+                </div>
+                <div class="panel__footer" style="display:flex; justify-content:flex-end; gap:6px;" id="msgBoxButtons"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const groupController = new AdditionalPropertyGroupController({{ PropertySubject|json_encode|raw }});
+        const SUPPORTED_LOCALES = {{ SupportedLocales|json_encode|raw }};
+
+        // ====================================================================================================
+        // STATE
+        let allGroups = [];
+        let currentGroup = null;
+
+        // ====================================================================================================
+        // MESSAGE BOX
+        const MESSAGEBOX_BUTTONS = {
+            ok:     { label: '{{ "OK"|translate|e('js') }}',        primary: true  },
+            cancel: { label: '{{ "Cancel"|translate|e('js') }}',    primary: false },
+            yes:    { label: '{{ "Yes"|translate|e('js') }}',       primary: true  },
+            no:     { label: '{{ "No"|translate|e('js') }}',        primary: false },
+            close:  { label: '{{ "Close"|translate|e('js') }}',     primary: false }
+        };
+
+        const MESSAGEBOX_ICONS = {
+            info:     { glyph: 'ph-info',           color: '#1941a5' },
+            success:  { glyph: 'ph-check-circle',   color: '#3d8b3d' },
+            warning:  { glyph: 'ph-warning',        color: '#c87f0a' },
+            error:    { glyph: 'ph-warning-circle', color: '#ac2925' },
+            question: { glyph: 'ph-question',       color: '#1941a5' }
+        };
+
+        let messageBoxResolver = null;
+        let messageBoxDismiss = null;
+
+        function messageBox(options)
+        {
+            options = options || {};
+            const title = options.title || '{{ "Message"|translate|e('js') }}';
+            const message = options.message || '';
+            const icon = MESSAGEBOX_ICONS[options.icon] || MESSAGEBOX_ICONS.info;
+            const buttons = options.buttons || ['ok'];
+
+            // X / backdrop / Escape resolve to this; default to the most "negative" button present
+            let dismissValue = options.dismissValue;
+            if (dismissValue === undefined)
+            {
+                dismissValue = null;
+                const order = ['cancel', 'no', 'close', 'ok'];
+                for (let i = 0; i < order.length; i++)
+                {
+                    if (buttons.indexOf(order[i]) !== -1)
+                    {
+                        dismissValue = order[i]; break;
+                    }
+                }
+            }
+
+            document.getElementById('msgBoxTitle').textContent = title;
+            document.getElementById('msgBoxMessage').textContent = message;
+            document.getElementById('msgBoxIcon').innerHTML = '<i class="ph-duotone ' + icon.glyph + '" style="color:' + icon.color + ';"></i>';
+
+            const buttonWrapper = document.getElementById('msgBoxButtons');
+            buttonWrapper.innerHTML = '';
+            for (let i = 0; i < buttons.length; i++)
+            {
+                const id = buttons[i];
+                const buttonDefinition = MESSAGEBOX_BUTTONS[id] || { label: id, primary: false };
+                const buttonInstance = document.createElement('button');
+                buttonInstance.className = 'form-btn' + (buttonDefinition.primary ? ' form-btn--primary' : '');
+                buttonInstance.textContent = buttonDefinition.label;
+                buttonInstance.onclick = (function (clicked) {
+                    return function () { closeMessageBox(clicked); };
+                })(id);
+                buttonWrapper.appendChild(buttonInstance);
+            }
+
+            return new Promise(function (resolve)
+            {
+                messageBoxResolver = resolve;
+                messageBoxDismiss = dismissValue;
+                document.getElementById('msgBox').classList.add('is-visible');
+                const primary = buttonWrapper.querySelector('.form-btn--primary') || buttonWrapper.lastChild;
+                if (primary)
+                {
+                    primary.focus();
+                }
+            });
+        }
+
+        function closeMessageBox(result)
+        {
+            document.getElementById('msgBox').classList.remove('is-visible');
+            if (messageBoxResolver)
+            {
+                const resolver = messageBoxResolver;
+                messageBoxResolver = null;
+                resolver(result);
+            }
+        }
+
+        // shows the API's explanation where there is one, after the generic message
+        function showError(message)
+        {
+            const detail = groupController.LastErrorDetail;
+            return messageBox({
+                title: '{{ "Error"|translate|e('js') }}',
+                message: detail ? message + '\n\n' + detail : message,
+                icon: 'error',
+                buttons: ['ok']
+            });
+        }
+        function showInfo(message)
+        {
+            return messageBox({ title: '{{ "Information"|translate|e('js') }}', message: message, icon: 'info', buttons: ['ok'] });
+        }
+        async function confirmDialog(message, title)
+        {
+            const r = await messageBox({
+                title: title || '{{ "Please confirm"|translate|e('js') }}',
+                message: message,
+                icon: 'question',
+                buttons: ['yes', 'no'],
+                dismissValue: 'no'
+            });
+            return r === 'yes';
+        }
+
+        // ====================================================================================================
+        // HELPERS
+        function escapeHtml(str)
+        {
+            if (str === null || str === undefined)
+            {
+                return '';
+            }
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function closeDialog(id)
+        {
+            const el = document.getElementById(id);
+            if (el)
+            {
+                el.style.display = 'none';
+            }
+        }
+
+        function openDialog(id)
+        {
+            const el = document.getElementById(id);
+            if (el)
+            {
+                el.style.display = 'block';
+            }
+        }
+
+        // the controller returns the payload on success, or `false` on failure
+        function findGroup(id)
+        {
+            return allGroups.find(function (g) { return g.id === id; }) || null;
+        }
+
+        // language codes compare case-insensitively, as the API's unique index does
+        function sameLocale(a, b)
+        {
+            return String(a).toLowerCase() === String(b).toLowerCase();
+        }
+
+        function translationFor(group, locale)
+        {
+            const t = (group.translations || []).find(function (x) { return sameLocale(x.languageCode, locale); });
+            return t ? t.translation : null;
+        }
+
+        function isMissingATranslation(group)
+        {
+            return SUPPORTED_LOCALES.some(function (locale) { return translationFor(group, locale) === null; });
+        }
+
+        // swap a group in the local list for the version the API sent back, without a full reload
+        function replaceGroup(updated)
+        {
+            if (!updated || !updated.id) return;
+            const index = allGroups.findIndex(function (g) { return g.id === updated.id; });
+            if (index !== -1) allGroups[index] = updated;
+            if (currentGroup && currentGroup.id === updated.id) currentGroup = updated;
+        }
+
+        // ====================================================================================================
+        // GROUP LIST
+        async function loadGroups()
+        {
+            const result = await groupController.GetGroups();
+            if (result === false)
+            {
+                await showError('{{ "Failed to load property groups."|translate|e('js') }}');
+                return;
+            }
+            allGroups = result.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+            renderAll();
+        }
+
+        function renderAll()
+        {
+            renderStats();
+            renderGroups();
+        }
+
+        function renderStats()
+        {
+            document.getElementById('StatCard-Total').textContent = allGroups.length.toLocaleString();
+            document.getElementById('StatCard-Untranslated').textContent = allGroups.filter(isMissingATranslation).length.toLocaleString();
+        }
+
+        function getFilteredGroups()
+        {
+            const search = document.getElementById('groupSearch').value.trim().toLowerCase();
+            if (!search)
+            {
+                return allGroups;
+            }
+
+            return allGroups.filter(function (g) {
+                const hay = [g.canonicalName]
+                        .concat((g.translations || []).map(function (t) { return t.translation; }))
+                        .join(' ')
+                        .toLowerCase();
+                return hay.indexOf(search) !== -1;
+            });
+        }
+
+        function renderGroups()
+        {
+            const body = document.getElementById('GroupTableBody');
+            body.innerHTML = '';
+
+            const list = getFilteredGroups();
+
+            // reordering sends the whole order, so it's only offered while every group is visible
+            const canReorder = list.length === allGroups.length;
+            document.getElementById('reorderHint').style.display = canReorder ? 'none' : '';
+
+            document.getElementById('resultCount').textContent = list.length + ' / ' + allGroups.length;
+
+            const columnCount = 3 + SUPPORTED_LOCALES.length;
+
+            if (list.length === 0)
+            {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = columnCount;
+                td.style.cssText = 'text-align:center; padding:20px; color:#666;';
+                td.textContent = allGroups.length === 0
+                        ? '{{ "No groups yet. Properties are shown in a single list until you create one."|translate|e('js') }}'
+                        : '{{ "No groups match your search."|translate|e('js') }}';
+                tr.appendChild(td);
+                body.appendChild(tr);
+                return;
+            }
+
+            for (let i = 0; i < list.length; i++)
+            {
+                const group = list[i];
+                const tr = document.createElement('tr');
+
+                const orderTd = document.createElement('td');
+                orderTd.className = 'cell-actions';
+                orderTd.innerHTML =
+                        '<button class="form-btn form-btn--sm" title="{{ "Move up"|translate|e('html_attr') }}" onclick="moveGroup(' + i + ',-1)"'
+                        + (!canReorder || i === 0 ? ' disabled' : '')
+                        + '><i class="ph-duotone ph-arrow-up"></i></button>'
+                        + '<button class="form-btn form-btn--sm" title="{{ "Move down"|translate|e('html_attr') }}" onclick="moveGroup(' + i + ',1)"'
+                        + (!canReorder || i === list.length - 1 ? ' disabled' : '')
+                        + '><i class="ph-duotone ph-arrow-down"></i></button>';
+                tr.appendChild(orderTd);
+
+                const nameTd = document.createElement('td');
+                nameTd.innerHTML = '<strong>' + escapeHtml(group.canonicalName) + '</strong>';
+                tr.appendChild(nameTd);
+
+                for (let l = 0; l < SUPPORTED_LOCALES.length; l++)
+                {
+                    const td = document.createElement('td');
+                    const translation = translationFor(group, SUPPORTED_LOCALES[l]);
+                    td.innerHTML = translation !== null
+                            ? escapeHtml(translation)
+                            : '<span class="badge badge--pending">{{ "Missing"|translate|e('js') }}</span>';
+                    tr.appendChild(td);
+                }
+
+                const ctrlTd = document.createElement('td');
+                ctrlTd.className = 'cell-actions';
+                ctrlTd.innerHTML =
+                        '<button class="form-btn form-btn--sm" onclick="openTranslations(\'' + group.id + '\')"><i class="ph-duotone ph-translate"></i> {{ "Translations"|translate|e('js') }}</button> '
+                        + '<button class="form-btn form-btn--sm" onclick="openRenameDialog(\'' + group.id + '\')"><i class="ph-duotone ph-pencil-simple"></i> {{ "Rename"|translate|e('js') }}</button> '
+                        + '<button class="form-btn form-btn--sm form-btn--danger" onclick="deleteGroup(\'' + group.id + '\')"><i class="ph-duotone ph-trash"></i> {{ "Delete"|translate|e('js') }}</button>';
+                tr.appendChild(ctrlTd);
+
+                body.appendChild(tr);
+            }
+        }
+
+        function resetFilters()
+        {
+            document.getElementById('groupSearch').value = '';
+            renderGroups();
+        }
+
+        // ====================================================================================================
+        // CREATE / RENAME / DELETE
+        function openCreateDialog()
+        {
+            document.getElementById('newGroupName').value = '';
+            document.querySelectorAll('.new-group-translation').forEach(function (input) { input.value = ''; });
+            openDialog('createGroupDialog');
+            document.getElementById('newGroupName').focus();
+        }
+
+        async function createGroup()
+        {
+            const name = document.getElementById('newGroupName').value.trim();
+            if (!name)
+            {
+                await showInfo('{{ "Canonical name is required."|translate|e('js') }}');
+                return;
+            }
+
+            // only send the languages that were filled in
+            const translations = {};
+            document.querySelectorAll('.new-group-translation').forEach(function (input) {
+                const text = input.value.trim();
+                if (text)
+                {
+                    translations[input.dataset.locale] = text;
+                }
+            });
+
+            const result = await groupController.CreateGroup(name, Object.keys(translations).length > 0 ? translations : null);
+            if (result === false)
+            {
+                await showError('{{ "Failed to create the group."|translate|e('js') }}');
+                return;
+            }
+
+            closeDialog('createGroupDialog');
+            allGroups.push(result);
+            renderAll();
+        }
+
+        function openRenameDialog(id)
+        {
+            const group = findGroup(id);
+            if (!group)
+            {
+                return;
+            }
+            document.getElementById('renameGroupId').value = group.id;
+            document.getElementById('renameGroupName').value = group.canonicalName;
+            openDialog('renameGroupDialog');
+            document.getElementById('renameGroupName').focus();
+        }
+
+        async function renameGroup()
+        {
+            const id = document.getElementById('renameGroupId').value;
+            const name = document.getElementById('renameGroupName').value.trim();
+            if (!name)
+            {
+                await showInfo('{{ "Canonical name is required."|translate|e('js') }}');
+                return;
+            }
+
+            const result = await groupController.RenameGroup(id, name);
+            if (result === false)
+            {
+                await showError('{{ "Failed to rename the group."|translate|e('js') }}');
+                return;
+            }
+
+            closeDialog('renameGroupDialog');
+            replaceGroup(result);
+            renderAll();
+        }
+
+        async function deleteGroup(id)
+        {
+            const group = findGroup(id);
+            if (!group)
+            {
+                return;
+            }
+
+            if (!await confirmDialog(
+                    await Localisation.translate(
+                            'Delete the group "{name}"? The properties in it are kept, and are shown without a group.',
+                            {
+                                '{name}': group.canonicalName,
+                            }
+                    ),
+                    '{{ "Delete group"|translate|e('js') }}'
+            ))
+            {
+                return;
+            }
+
+            const result = await groupController.DeleteGroup(id);
+            if (result === false)
+            {
+                await showError('{{ "Failed to delete the group."|translate|e('js') }}');
+                return;
+            }
+
+            allGroups = allGroups.filter(function (x) { return x.id !== id; });
+            renderAll();
+
+            const count = (result && typeof result.ungroupedPropertyCount === 'number') ? result.ungroupedPropertyCount : 0;
+            if (count > 0)
+            {
+                await showInfo(await Localisation.translate(
+                        "The group was deleted. {count} properties that were in it are now shown without a group.",
+                        {
+                            '{count}': count.toLocaleString(),
+                        }
+                ));
+            }
+        }
+
+        // ====================================================================================================
+        // ORDERING
+        async function moveGroup(index, direction)
+        {
+            const target = index + direction;
+            if (target < 0 || target >= allGroups.length)
+            {
+                return;
+            }
+
+            const temp = allGroups[index];
+            allGroups[index] = allGroups[target];
+            allGroups[target] = temp;
+            renderGroups();
+
+            const result = await groupController.ReorderGroups(allGroups.map(function (g) { return g.id; }));
+            if (result === false)
+            {
+                await showError('{{ "Failed to reorder - reloading."|translate|e('js') }}');
+                await loadGroups();
+                return;
+            }
+
+            allGroups = result.slice().sort(function (a, b) { return a.sortOrder - b.sortOrder; });
+            renderGroups();
+        }
+
+        // ====================================================================================================
+        // TRANSLATIONS
+        async function openTranslations(id)
+        {
+            currentGroup = findGroup(id);
+            if (!currentGroup)
+            {
+                return;
+            }
+
+            document.getElementById('translationsDialogTitle').textContent =
+                await Localisation.translate(
+                    'Translations - {name}',
+                    {
+                        '{name}': currentGroup.canonicalName
+                    }
+                );
+
+            document.getElementById('newTransLang').value = '';
+            document.getElementById('newTransText').value = '';
+            renderTranslations();
+            openDialog('translationsDialog');
+        }
+
+        // one row per supported language whether or not it's translated yet, then any other languages that are
+        function renderTranslations()
+        {
+            const body = document.getElementById('TranslationsTableBody');
+            body.innerHTML = '';
+
+            const existing = currentGroup.translations || [];
+            const others = existing
+                    .map(function (t) { return t.languageCode; })
+                    .filter(function (code) { return !SUPPORTED_LOCALES.some(function (l) { return sameLocale(l, code); }); })
+                    .sort();
+
+            const locales = SUPPORTED_LOCALES.concat(others);
+
+            for (let i = 0; i < locales.length; i++)
+            {
+                const locale = locales[i];
+                const translation = translationFor(currentGroup, locale);
+                const tr = document.createElement('tr');
+
+                const langTd = document.createElement('td');
+                langTd.innerHTML = '<span class="badge">' + escapeHtml(locale) + '</span>';
+                tr.appendChild(langTd);
+
+                const textTd = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-input';
+                input.style.width = '100%';
+                input.value = translation !== null ? translation : '';
+                input.placeholder = translation !== null ? '' : '{{ "Not translated yet"|translate|e('js') }}';
+                input.dataset.locale = locale;
+                textTd.appendChild(input);
+                tr.appendChild(textTd);
+
+                const controlTd = document.createElement('td');
+                controlTd.className = 'cell-actions';
+
+                const saveButton = document.createElement('button');
+                saveButton.className = 'form-btn form-btn--sm form-btn--primary';
+                saveButton.title = '{{ "Save"|translate|e('js') }}';
+                saveButton.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i>';
+                saveButton.onclick = function () { saveTranslation(locale, input.value); };
+                controlTd.appendChild(saveButton);
+
+                if (translation !== null)
+                {
+                    controlTd.appendChild(document.createTextNode(' '));
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'form-btn form-btn--sm';
+                    removeBtn.title = '{{ "Delete"|translate|e('js') }}';
+                    removeBtn.innerHTML = '<i class="ph-duotone ph-trash"></i>';
+                    removeBtn.onclick = function () { removeTranslation(locale); };
+                    controlTd.appendChild(removeBtn);
+                }
+
+                tr.appendChild(controlTd);
+                body.appendChild(tr);
+            }
+        }
+
+        async function saveTranslation(locale, text)
+        {
+            text = (text || '').trim();
+            if (!text)
+            {
+                await showInfo('{{ "Translation cannot be empty."|translate|e('js') }}');
+                return;
+            }
+
+            const result = await groupController.SetTranslation(currentGroup.id, locale, text);
+            if (result === false)
+            {
+                await showError('{{ "Failed to save translation."|translate|e('js') }}');
+                return;
+            }
+
+            replaceGroup(result);
+            renderTranslations();
+            renderAll();
+        }
+
+        async function addOtherTranslation()
+        {
+            const locale = document.getElementById('newTransLang').value.trim();
+            const text = document.getElementById('newTransText').value.trim();
+            if (!locale || !text)
+            {
+                await showInfo('{{ "Language code and translation are both required."|translate|e('js') }}');
+                return;
+            }
+
+            await saveTranslation(locale, text);
+            if (translationFor(currentGroup, locale) !== null)
+            {
+                document.getElementById('newTransLang').value = '';
+                document.getElementById('newTransText').value = '';
+            }
+        }
+
+        async function removeTranslation(locale)
+        {
+            const ok = await confirmDialog(
+                    '{{ "Delete this translation? This cannot be undone."|translate|e('js') }}',
+                    '{{ "Delete translation"|translate|e('js') }}'
+            );
+            if (!ok)
+            {
+                return;
+            }
+
+            const result = await groupController.RemoveTranslation(currentGroup.id, locale);
+            if (result === false)
+            {
+                await showError('{{ "Failed to delete translation."|translate|e('js') }}');
+                return;
+            }
+
+            replaceGroup(result);
+            renderTranslations();
+            renderAll();
+        }
+
+        // ====================================================================================================
+        // INIT
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('groupSearch').addEventListener('input', renderGroups);
+
+            // Enter submits the open create / rename dialog
+            document.getElementById('newGroupName').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    createGroup();
+                }
+            });
+            document.querySelectorAll('.new-group-translation').forEach(function (input) {
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter')
+                    {
+                        e.preventDefault();
+                        createGroup();
+                    }
+                });
+            });
+            document.getElementById('renameGroupName').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    renameGroup();
+                }
+            });
+
+            // message box: `X` button, backdrop click, and keyboard (`esc` dismisses, `enter` triggers primary)
+            document.getElementById('msgBoxX').addEventListener('click', function () { closeMessageBox(messageBoxDismiss); });
+            document.getElementById('msgBox').addEventListener('click', function (e) {
+                if (e.target === this) closeMessageBox(messageBoxDismiss);
+            });
+            document.addEventListener('keydown', function (e) {
+                if (!document.getElementById('msgBox').classList.contains('is-visible')) return;
+                if (e.key === 'Escape')
+                {
+                    e.preventDefault();
+                    closeMessageBox(messageBoxDismiss);
+                }
+                else if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    const primary = document.querySelector('#msgBoxButtons .form-btn--primary');
+                    if (primary) primary.click();
+                }
+            });
+
+            loadGroups();
+        });
+    </script>
+{% endblock %}

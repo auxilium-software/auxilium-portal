@@ -248,12 +248,11 @@ final class APIInteractions
             $responsePayload = json_decode($body, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                PageBuilder::Render(
+                PageBuilder::OfflineRender(
                     template: '/ErrorPages/FatalApiFailureErrorPage.html.twig',
                     variables: [
                         'ErrorMessage' => json_last_error_msg(),
                     ],
-                    useAuth: false,
                 );
             }
         }

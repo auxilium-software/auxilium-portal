@@ -1,0 +1,80 @@
+
+const Adapter = {
+    listNameHtml(item)
+    {
+        return '<div class="merge-case-title">' + escapeHtml(recordName(item)) + '</div>' +
+                '<div class="merge-id">' + escapeHtml(item.id) + '</div>';
+    },
+
+    cardBadges(item)
+    {
+        return enumBadge('status', item.status) + ' ' + enumBadge('sensitivity', item.sensitivity);
+    },
+
+    cardDescription(item, id)
+    {
+        return '<span class="merge-id">' + escapeHtml(id) + '</span> · ' + escapeHtml(formatDateTime(item.createdAt));
+    },
+
+    async review(primary, duplicate)
+    {
+        // clients and workers come from the case summaries, which list them by id
+        const primaryClients = idSet(primary.clients);
+        const primaryWorkers = idSet(primary.workers);
+        const duplicateClients = idSet(duplicate.clients);
+        const allClients = new Set([...primaryClients, ...duplicateClients]);
+        const allWorkers = new Set([...primaryWorkers, ...idSet(duplicate.workers)]);
+        const clientsNew = allClients.size - primaryClients.size;
+        const workersNew = allWorkers.size - primaryWorkers.size;
+
+        const clientSetsDiffer = duplicateClients.size !== primaryClients.size
+                || [...duplicateClients].some(function(x) { return !primaryClients.has(x); });
+
+        const anyClosed = [primary, duplicate].some(function(c)
+        {
+            const s = String(c.status || '').toLowerCase();
+            return s === 'closed' || s === 'archived';
+        });
+
+        const sensitivity = previewField('sensitivity');
+
+        async function withNew(total, added)
+        {
+            if (added <= 0) return escapeHtml(total);
+            const text = await message('FromOtherRecord', { '{count}': added });
+            return escapeHtml(total) + ' <span class="merge-id">(' + escapeHtml(text) + ')</span>';
+        }
+
+        const notices = [];
+        if (clientSetsDiffer)
+        {
+            notices.push(await notice('ClientsDiffer'));
+        }
+        if (sensitivity && sensitivity.differs)
+        {
+            notices.push(await notice('SensitivityDiffers'));
+        }
+        if (workersNew > 0)
+        {
+            notices.push(await notice('WorkersGainAccess', { '{count}': workersNew }));
+        }
+        if ((preview.references || []).some(function(r) { return r.rowsToDiscard > 0; }))
+        {
+            notices.push(await notice('DuplicatesDiscarded'));
+        }
+        if (anyClosed)
+        {
+            notices.push(await notice('ClosedOrArchived'));
+        }
+
+        return {
+            rows: [
+                [Config.messages.ReviewClients, withNew(allClients.size, clientsNew)],
+                [Config.messages.ReviewWorkers, withNew(allWorkers.size, workersNew)],
+            ],
+            notices: notices,
+            // only needed when the clients differ
+            acknowledgementRequired: clientSetsDiffer,
+        };
+    },
+};

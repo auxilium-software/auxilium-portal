@@ -66,10 +66,17 @@ final class PayloadProcessor
         {
             if(str_contains($payload, '$'))
             {
-                // special handling for collectCheckboxValues function calls
                 if(str_contains($payload, 'collectCheckboxValues'))
                 {
                     return $this->handleCheckboxFunction($payload, $vars);
+                }
+
+                if(str_contains($payload, 'collectGridValues'))
+                {
+                    if(preg_match('/collectGridValues\(["\']([^"\']+)["\']\)/', $payload, $matches))
+                    {
+                        return FormDataHelpers::collectGridValues($matches[1], $vars['formData']);
+                    }
                 }
 
                 $result = AuxiliumScript::evaluate_expression($payload, $vars);
@@ -81,15 +88,6 @@ final class PayloadProcessor
                     if(preg_match('/\$formData\[(["\'])([^"\']+)\1\]/', $payload, $matches))
                     {
                         return FormDataHelpers::collectCheckboxValues($matches[2], $vars['formData']);
-                    }
-                }
-
-                // handle the likert grid
-                if(str_contains($payload, 'collectGridValues'))
-                {
-                    if(preg_match('/collectGridValues\(["\']([^"\']+)["\']\)/', $payload, $matches))
-                    {
-                        return FormDataHelpers::collectGridValues($matches[1], $vars['formData']);
                     }
                 }
 

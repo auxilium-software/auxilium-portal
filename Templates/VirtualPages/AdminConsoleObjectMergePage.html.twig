@@ -1,0 +1,1898 @@
+{% extends '/Bases/AdminConsole.html.twig' %}
+
+{% macro jsText(string) -%}
+    {%- if '{' in string -%}
+        {{- string|e('js') -}}
+    {%- else -%}
+        {{- string|translate|e('js') -}}
+    {%- endif -%}
+{%- endmacro %}
+
+{% block content %}
+    <div class="page-title">
+        <div class="page-title__text">
+            <i class="ph-duotone ph-{{ MergeConfig.Icon }}"></i> {{ MergeConfig.Page.Title|translate }}
+            <span class="page-title__sub">{{ MergeConfig.Page.Subtitle|translate }}</span>
+        </div>
+        <div class="page-title__actions">
+            <button class="form-btn" onclick="resetEverything()">
+                <i class="ph-duotone ph-arrow-counter-clockwise"></i>
+                {{ "Start Over"|translate }}
+            </button>
+        </div>
+    </div>
+
+    {# ===== STEP INDICATOR ===== #}
+    <div class="merge-steps">
+        <div class="merge-steps__item is-active" id="Step-1">
+            <span class="merge-steps__num">1</span>
+            {{ MergeConfig.Page.StepSelect|translate }}
+        </div>
+        <div class="merge-steps__item" id="Step-2">
+            <span class="merge-steps__num">2</span>
+            {{ "Resolve Conflicts"|translate }}
+        </div>
+        <div class="merge-steps__item" id="Step-3">
+            <span class="merge-steps__num">3</span>
+            {{ "Review and Merge"|translate }}
+        </div>
+    </div>
+
+    {# ===== STEP 1: FIND RECORDS ===== #}
+    <div class="toolbar">
+        <div class="toolbar__group">
+            <span class="toolbar__label">{{ "Search:"|translate }}</span>
+            <input type="text" class="form-input form-input--search" placeholder="{{ MergeConfig.Page.SearchPlaceholder|translate }}" id="itemSearch">
+            <button class="form-btn" onclick="applyFilters()">
+                <i class="ph-duotone ph-magnifying-glass"></i>
+                {{ "Find"|translate }}
+            </button>
+        </div>
+        {% for Filter in MergeConfig.Filters %}
+            <div class="toolbar__separator"></div>
+            <div class="toolbar__group">
+                <span class="toolbar__label">{{ Filter.Label|translate }}:</span>
+                <select class="form-select" data-filter="{{ Filter.Key }}">
+                    {% for Option in Filter.Options %}
+                        <option value="{{ Option.Value }}">{{ Option.Label|translate }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endfor %}
+        <div class="toolbar__spacer"></div>
+        <div class="toolbar__group">
+            <button class="form-btn form-btn--sm" onclick="resetFilters()">✕ {{ "Clear"|translate }}</button>
+            <span class="toolbar__label" id="resultCount"></span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="itemsTable">
+            <caption>{{ MergeConfig.Page.TableCaption|translate }}</caption>
+            <thead>
+                <tr>
+                    <th class="cell-checkbox"></th>
+                    {% for Column in MergeConfig.Columns %}
+                        {% if Column.Sort is defined %}
+                            <th class="is-sortable{{ Column.DefaultOrder is defined ? ' is-sorted-' ~ Column.DefaultOrder : '' }}" data-sort="{{ Column.Sort }}">
+                                {{ Column.Label|translate }}
+                            </th>
+                        {% else %}
+                            <th>
+                                {{ Column.Label|translate }}
+                            </th>
+                        {% endif %}
+                    {% endfor %}
+                    <th>{{ "Controls"|translate }}</th>
+                </tr>
+            </thead>
+            <tbody id="ItemsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="Pagination">
+    </div>
+
+    {# ===== MERGE SET ===== #}
+    <div class="panel merge-section">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-stack"></i> {{ MergeConfig.Page.MergeSetHeading|translate }}
+            </span>
+            <span id="mergeSetCount"></span>
+        </div>
+        <div class="panel__body" id="mergeSetBody">
+        </div>
+        <div class="panel__footer merge-footer--split">
+            <span>
+                {{ MergeConfig.Page.MergeSetFooter|translate }}
+            </span>
+            <button class="form-btn form-btn--primary" id="compareBtn" onclick="loadComparison()" disabled>
+                <i class="ph-duotone ph-arrows-left-right"></i>
+                {{ MergeConfig.Page.CompareButton|translate }}
+            </button>
+        </div>
+    </div>
+
+    {# ===== STEP 2: RESOLVE CONFLICTS ===== #}
+    <div class="panel merge-section" id="resolvePanel" style="display:none;">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-scales"></i>
+                {{ "Resolve Conflicts"|translate }}
+            </span>
+            <label class="merge-toggle">
+                <input type="checkbox" id="showIdentical" onchange="renderResolveTable()">
+                {{ "Show identical fields"|translate }}
+            </label>
+        </div>
+        <div class="panel__body">
+            <div class="merge-notice merge-notice--info">
+                <i class="ph-duotone ph-info"></i>
+                <div>
+                    {{ MergeConfig.Page.ResolveNotice|translate }}
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="admin-table merge-resolve" id="resolveTable">
+                    <thead id="resolveTableHead"></thead>
+                    <tbody id="resolveTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# ===== STEP 3: REVIEW ===== #}
+    <div class="panel merge-section" id="reviewPanel" style="display:none;">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-clipboard-text"></i>
+                {{ "Review and Merge"|translate }}
+            </span>
+        </div>
+        <div class="panel__body">
+            <div class="detail-grid merge-review-grid">
+                <div>
+                    <dl class="detail-list detail-list--wide" id="reviewSummary"></dl>
+                </div>
+                <div id="reviewWarnings"></div>
+            </div>
+
+            <dl class="detail-list detail-list--wide">
+                <dt>{{ MergeConfig.Page.OtherAfterwardsLabel|translate }}</dt>
+                <dd>{{ MergeConfig.Page.OtherAfterwards|translate }}</dd>
+
+                <dt>
+                    <label for="mergeReason">
+                        {{ "Reason for merge"|translate }}
+                    </label>
+                </dt>
+                <dd>
+                    <textarea
+                            class="form-input merge-textarea"
+                            id="mergeReason"
+                            maxlength="1000"
+                            placeholder="{{ MergeConfig.Page.ReasonPlaceholder|translate }}"
+                            oninput="updateMergeButtonState()"
+                    ></textarea>
+                    <div class="merge-hint">
+                        {{ MergeConfig.Page.ReasonHint|translate }}
+                    </div>
+                </dd>
+            </dl>
+
+            {# the adapter decides whether this is shown #}
+            <div id="acknowledgementRow" style="display:none;">
+                <label class="merge-ack">
+                    <input type="checkbox" id="mergeAcknowledgement" onchange="updateMergeButtonState()">
+                    {{ MergeConfig.Page.Acknowledgement|translate }}
+                </label>
+            </div>
+        </div>
+        <div class="panel__footer merge-footer">
+            <button class="form-btn" onclick="loadComparison()">
+                <i class="ph-duotone ph-arrows-clockwise"></i>
+                {{ "Reload Comparison"|translate }}
+            </button>
+            <button class="form-btn form-btn--danger" id="mergeBtn" onclick="openConfirm()" disabled>
+                <i class="ph-duotone ph-git-merge"></i>
+                {{ MergeConfig.Page.MergeButton|translate }}
+            </button>
+        </div>
+    </div>
+
+    {# ===== SUCCESS ===== #}
+    <div class="panel merge-section" id="successPanel" style="display:none;">
+        <div class="panel__header">
+            <span>
+                <i class="ph-duotone ph-check-circle"></i>
+                {{ "Merge Complete"|translate }}
+            </span>
+        </div>
+        <div class="panel__body">
+            <div class="merge-notice merge-notice--success">
+                <i class="ph-duotone ph-check-circle"></i>
+                <div id="successMessage"></div>
+            </div>
+        </div>
+        <div class="panel__footer merge-footer">
+            <button class="form-btn" onclick="resetEverything()">{{ MergeConfig.Page.MergeMore|translate }}</button>
+            <a class="form-btn form-btn--primary" id="viewKeptBtn" href="#">
+                <i class="ph-duotone ph-{{ MergeConfig.ViewKeptIcon }}"></i>
+                {{ MergeConfig.Page.ViewKept|translate }}
+            </a>
+        </div>
+    </div>
+
+    {# ===== CONFIRMATION DIALOG ===== #}
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-dialog">
+            <div class="panel">
+                <div class="panel__header">
+                    <span>
+                        <i class="ph-duotone ph-warning"></i>
+                        {{ "Confirm Merge"|translate }}
+                    </span>
+                </div>
+                <div class="panel__body">
+                    <div class="merge-confirm__summary">
+                        <div class="merge-confirm__icon"><i class="ph-duotone ph-git-merge"></i></div>
+                        <div>
+                            <div class="merge-confirm__title" id="confirmTitle"></div>
+                            <div class="merge-confirm__desc">
+                                {{ MergeConfig.Page.ConfirmDescription|translate }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="merge-notice merge-notice--warning">
+                        <i class="ph-duotone ph-key"></i>
+                        <div>
+                            {{ "This action requires two-factor authentication."|translate }}
+                        </div>
+                    </div>
+                    <div class="merge-totp">
+                        <label for="totpInput">
+                            {{ "Authenticator Code:"|translate }}
+                        </label>
+                        <input
+                            type="text"
+                            id="totpInput"
+                            class="form-input"
+                            maxlength="6"
+                            placeholder="000000"
+                            autocomplete="one-time-code"
+                            inputmode="numeric"
+                            pattern="[0-9]{6}">
+                    </div>
+                    <div class="merge-field-error" id="totpError" style="display:none;"></div>
+                </div>
+                <div class="panel__footer merge-footer">
+                    <button class="form-btn" id="confirmCancelBtn" onclick="closeConfirm()">
+                        {{ "Cancel"|translate }}
+                    </button>
+                    <button class="form-btn form-btn--danger" id="confirmBtn" onclick="executeMerge()">
+                        {{ "Merge"|translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast__icon" id="toastIcon">✓</span>
+        <span id="toastMessage"></span>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% import _self as m %}
+    <script>
+        // ====================================================================================================
+        // CONFIG
+        // ====================================================================================================
+        const Subject = {
+            queryParam:        {{ MergeConfig.QueryParam|json_encode|raw }},
+            viewUrl:           {{ MergeConfig.ViewUrl|json_encode|raw }},
+            nameField:         {{ MergeConfig.NameField|json_encode|raw }},
+            api:               {{ MergeConfig.Api|json_encode|raw }},
+            primaryPreference: {{ MergeConfig.PrimaryPreference|json_encode|raw }},
+            filterKeys:        {{ MergeConfig.Filters|map(f => f.Key)|json_encode|raw }},
+            reviewFields:      {{ MergeConfig.ReviewFields|json_encode|raw }},
+        };
+
+        const Api = new {{ MergeConfig.Api.Controller }}();
+
+        const Columns = [
+            {% for Column in MergeConfig.Columns %}
+            { key: {{ Column.Key|json_encode|raw }}, format: {{ (Column.Format ?? 'Text')|json_encode|raw }}, cls: {{ (Column.Class ?? '')|json_encode|raw }} },
+            {% endfor %}
+        ];
+
+        const Fields = {
+            {% for Key, Field in MergeConfig.Fields %}
+                {{ Key|json_encode|raw }}: {
+                    label: '{{ m.jsText(Field.Label) }}',
+                    format: {{ (Field.Format ?? 'Text')|json_encode|raw }},
+                    role: {{ (Field.Role ?? false) ? 'true' : 'false' }},
+                    valueLabels: {
+                        {% for Value, Label in Field.ValueLabels ?? {} %}
+                            {{ Value|json_encode|raw }}: '{{ m.jsText(Label) }}',
+                        {% endfor %}
+                    },
+                },
+            {% endfor %}
+        };
+
+        const Badges = {
+            {% for Key, Values in MergeConfig.Badges ?? {} %}
+                {{ Key|json_encode|raw }}: {
+                    {% for Value, Badge in Values %}
+                        {{ Value|lower|json_encode|raw }}: { label: '{{ m.jsText(Badge.Label) }}', cls: {{ ('badge ' ~ Badge.Class)|json_encode|raw }} },
+                    {% endfor %}
+                },
+            {% endfor %}
+        };
+
+        const FlagBadges = [
+            {% for Badge in MergeConfig.FlagBadges ?? [] %}
+                {
+                    key: {{ Badge.Key|json_encode|raw }},
+                    label: '{{ m.jsText(Badge.Label) }}',
+                    cls: {{ ('badge ' ~ Badge.Class)|json_encode|raw }}
+                },
+            {% endfor %}
+        ];
+
+        const MovedAcross = [
+            {% for Row in MergeConfig.MovedAcross ?? [] %}
+                {
+                    label: '{{ m.jsText(Row.Label) }}',
+                    entity: {{ Row.Entity|json_encode|raw }},
+                    property: {{ Row.Property|json_encode|raw }}
+                },
+            {% endfor %}
+        ];
+
+        // anything with {placeholders} needs to go through message() / notice()
+        const Messages = {
+            {% for Key, Text in MergeConfig.Messages %}
+                {{ Key|json_encode|raw }}: '{{ m.jsText(Text) }}',
+            {% endfor %}
+        };
+
+        const Notices = {
+            {% for Key, Notice in MergeConfig.Notices ?? {} %}
+                {{ Key|json_encode|raw }}: {
+                    level: {{ Notice.Level|json_encode|raw }},
+                    icon: {{ Notice.Icon|json_encode|raw }},
+                    text: '{{ m.jsText(Notice.Text) }}'
+                },
+            {% endfor %}
+        };
+
+
+
+
+
+        // ====================================================================================================
+        // STATE
+        // ====================================================================================================
+        const PageSize = 25;
+        const MaxMergeSetSize = 2; // the API only merges one pair at a time
+        const MinReasonLength = 10;
+        const UuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+        // matches DataMergeSourceEnum on the API
+        const MergeSource = Object.freeze({
+            Survivor:  'Survivor',
+            Duplicate: 'Duplicate',
+            Combined:  'Combined',
+        });
+
+        const itemsTableBody = document.getElementById('ItemsTableBody');
+        const paginationContainer = document.getElementById('Pagination');
+
+        let currentPage = 1;
+        let totalPages = null;
+        let totalRecords = null;
+        let hasMore = false;
+        let currentSortBy = null; // set from the table header in setupSortableHeaders()
+        let currentSortOrder = 'desc';
+        let currentSearch = '';
+        let currentFilters = {};
+
+        const mergeSet = new Map(); // id -> list item
+        let primaryId = null;
+        let primaryChosenExplicitly = false;
+        let preview = null; // merge preview from the API
+        let resolutions = {}; // field -> MergeSource
+
+        // these get bumped every time something reloads, so an older request that finishes late can be ignored
+        let pageRequestToken = 0;
+        let comparisonToken = 0;
+        let mergeSetCountToken = 0;
+        let reviewRenderToken = 0;
+
+        let reviewRendered = false; // don't allow merging until the review has actually been drawn
+        let mergeInFlight = false;
+
+
+
+
+
+        // ====================================================================================================
+        // HELPERS
+        // ====================================================================================================
+        function escapeHtml(str)
+        {
+            if (str === null || str === undefined)
+            {
+                return '';
+            }
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr)
+        {
+            if (!dateStr)
+            {
+                return '-';
+            }
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime()))
+            {
+                return dateStr;
+            }
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateTime(dateStr)
+        {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                + ' '
+                + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // missing or broken dates sort last
+        function timeOf(dateStr)
+        {
+            const t = new Date(dateStr).getTime();
+            if (isNaN(t)) return Infinity;
+            return t;
+        }
+
+        // lower-cased ids from a list of ids or objects with an id
+        function idSet(collection)
+        {
+            const set = new Set();
+            if (!Array.isArray(collection))
+            {
+                return set;
+            }
+
+            for (const item of collection)
+            {
+                if (typeof item === 'string')
+                {
+                    set.add(item.toLowerCase());
+                }
+                else if (item && item.id)
+                {
+                    set.add(item.id.toLowerCase());
+                }
+            }
+            return set;
+        }
+
+        function isEmptyValue(value)
+        {
+            if (value === null || value === undefined)
+            {
+                return true;
+            }
+            return typeof value === 'string' && value.trim() === '';
+
+        }
+
+        // list items have real booleans, but the merge preview sends "true" / "false"
+        function isTrue(value)
+        {
+            return value === true || String(value) === 'true';
+        }
+
+        function displayValue(value)
+        {
+            if (isEmptyValue(value))
+            {
+                return '<span class="merge-value merge-value--empty">{{ "(empty)"|translate|e('html') }}</span>';
+            }
+            const text = escapeHtml(value);
+            return '<span class="merge-value" title="' + text + '">' + text + '</span>';
+        }
+
+        function yesNoBadge(isYes)
+        {
+            if (isYes)
+            {
+                return '<span class="badge badge--active">{{ "Yes"|translate|e('html') }}</span>';
+            }
+            return '<span class="badge badge--inactive">{{ "No"|translate|e('html') }}</span>';
+        }
+
+        function enumBadge(badgeKey, value)
+        {
+            if (!value)
+            {
+                return '-';
+            }
+
+            const badgesForKey = Badges[badgeKey] || {};
+            const badge = badgesForKey[String(value).toLowerCase()];
+            if (!badge)
+            {
+                return '<span class="badge badge--user">' + escapeHtml(value) + '</span>';
+            }
+            return '<span class="' + badge.cls + '">' + escapeHtml(badge.label) + '</span>';
+        }
+
+        function flagBadges(item)
+        {
+            let builder = '';
+            for (const badge of FlagBadges)
+            {
+                if (item[badge.key] === true)
+                {
+                    builder += '<span class="' + badge.cls + '">' + escapeHtml(badge.label) + '</span> ';
+                }
+            }
+            return builder;
+        }
+
+        // returns a promise if there are substitutions, as those have to be translated
+        function message(key, substitutions)
+        {
+            if (substitutions)
+            {
+                return Localisation.translate(Messages[key], substitutions);
+            }
+            return Messages[key];
+        }
+
+        // returns [level, icon, text] for the review warnings
+        async function notice(key, substitutions)
+        {
+            const n = Notices[key];
+            let text = n.text;
+            if (substitutions)
+            {
+                text = await Localisation.translate(n.text, substitutions);
+            }
+            return [n.level, n.icon, text];
+        }
+
+        function recordName(item)
+        {
+            if (item && item[Subject.nameField])
+            {
+                return item[Subject.nameField];
+            }
+            return Messages.Untitled;
+        }
+
+        function viewUrl(id)
+        {
+            return Subject.viewUrl.replace('{id}', encodeURIComponent(id));
+        }
+
+        // primary first
+        function orderedIds()
+        {
+            const ids = Array.from(mergeSet.keys());
+            if (!primaryId || !ids.includes(primaryId))
+            {
+                return ids;
+            }
+
+            const others = ids.filter(function(id) { return id !== primaryId; });
+            return [primaryId].concat(others);
+        }
+
+        function duplicateId()
+        {
+            for (const id of mergeSet.keys())
+            {
+                if (id !== primaryId) return id;
+            }
+            return null;
+        }
+
+        function detailOf(payload)
+        {
+            if (!payload || typeof payload !== 'object')
+            {
+                return '';
+            }
+            return payload.detail || payload.title || payload.message || '';
+        }
+
+        let toastTimer = null;
+        function showToast(text, isError = false)
+        {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = isError ? '✕' : '✓';
+            document.getElementById('toastMessage').textContent = text;
+            toast.classList.toggle('is-error', isError);
+            toast.classList.add('is-visible');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                toast.classList.remove('is-visible');
+            }, 5000);
+        }
+
+        function setStep(activeStep)
+        {
+            for (let i = 1; i <= 3; i++)
+            {
+                const el = document.getElementById('Step-' + i);
+                el.classList.toggle('is-active', i === activeStep);
+                el.classList.toggle('is-done', i < activeStep);
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // FORMATTING
+        // ====================================================================================================
+        function columnCellHtml(column, item)
+        {
+            const value = item[column.key];
+
+            switch (column.format)
+            {
+                case 'Name':
+                    return Adapter.listNameHtml(item);
+                case 'Badge':
+                    return enumBadge(column.key, value);
+                case 'YesNo':
+                    return yesNoBadge(isTrue(value));
+                case 'Count':
+                    return Array.isArray(value) ? String(value.length) : '-';
+                case 'Date':
+                    return escapeHtml(formatDate(value));
+                case 'DateTime':
+                    return escapeHtml(formatDateTime(value));
+                default:
+                    return isEmptyValue(value) ? '-' : escapeHtml(value);
+            }
+        }
+
+        function fieldValueHtml(fieldKey, value)
+        {
+            const field = Fields[fieldKey] || { format: 'Text', valueLabels: {} };
+
+            if (field.format === 'YesNo') return yesNoBadge(isTrue(value));
+            if (isEmptyValue(value)) return displayValue(value);
+
+            switch (field.format)
+            {
+                case 'Badge':
+                    return enumBadge(fieldKey, value);
+                case 'Date':
+                    return displayValue(formatDate(value));
+                case 'DateTime':
+                    return displayValue(formatDateTime(value));
+                default:
+                    return displayValue(field.valueLabels[value] || value);
+            }
+        }
+
+        function fieldLabel(fieldKey)
+        {
+            if (Fields[fieldKey]) return Fields[fieldKey].label;
+            return fieldKey;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // ADAPTER
+        // the bits that are different per subject - defines `Adapter` with:
+        //   listNameHtml(item)
+        //   cardBadges(item)
+        //   cardDescription(item, id)
+        //   review(primary, duplicate) -> { rows, notices, acknowledgementRequired }
+        // ====================================================================================================
+        {% include MergeConfig.Adapter %}
+
+
+
+
+
+        // ====================================================================================================
+        // LIST
+        // ====================================================================================================
+        function setTableMessage(text)
+        {
+            itemsTableBody.innerHTML = '';
+
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = document.querySelectorAll('#itemsTable thead th').length;
+            cell.className = 'merge-empty';
+            cell.textContent = text;
+            row.appendChild(cell);
+            itemsTableBody.appendChild(row);
+        }
+
+        async function goToPage(page)
+        {
+            const token = ++pageRequestToken;
+            setTableMessage('{{ "Loading..."|translate|e('js') }}');
+
+            // filters get passed in the order they're listed in the YAML
+            const filterValues = [];
+            for (const key of Subject.filterKeys)
+            {
+                filterValues.push(currentFilters[key] || '');
+            }
+
+            const payload = await Api[Subject.api.List](page, PageSize, currentSortBy, currentSortOrder, currentSearch, ...filterValues);
+            if (token !== pageRequestToken)
+            {
+                return;
+            }
+
+            if (!payload)
+            {
+                setTableMessage(Messages.LoadFailed);
+                return;
+            }
+
+            let items = payload[Subject.api.ListKey];
+            if (!Array.isArray(items))
+            {
+                items = [];
+            }
+
+            // some endpoints send totals, some just send hasMore
+            currentPage = payload.page ?? page;
+            totalRecords = payload.total ?? payload.totalCount ?? null;
+            totalPages = payload.totalPages ?? null;
+            if (totalPages === null && totalRecords !== null)
+            {
+                totalPages = Math.max(1, Math.ceil(totalRecords / PageSize));
+            }
+
+            if (payload.hasMore !== undefined)
+            {
+                hasMore = payload.hasMore;
+            }
+            else if (totalPages !== null)
+            {
+                hasMore = currentPage < totalPages;
+            }
+            else
+            {
+                hasMore = items.length === PageSize;
+            }
+
+            await renderRows(items, token);
+            await renderPagination(token);
+        }
+
+        async function renderRows(items, token)
+        {
+            itemsTableBody.innerHTML = '';
+
+            if (items.length === 0)
+            {
+                setTableMessage(Messages.NoResults);
+                document.getElementById('resultCount').textContent = '';
+                return;
+            }
+
+            for (const item of items)
+            {
+                const row = document.createElement('tr');
+                if (mergeSet.has(item.id))
+                {
+                    row.classList.add('is-picked');
+                }
+
+                // checkbox
+                const checkboxCell = document.createElement('td');
+                checkboxCell.className = 'cell-checkbox';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = mergeSet.has(item.id);
+                checkbox.addEventListener('change', function()
+                {
+                    const ok = toggleMergeSetMember(item, checkbox.checked);
+                    if (!ok)
+                    {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    row.classList.toggle('is-picked', mergeSet.has(item.id));
+                });
+                checkboxCell.appendChild(checkbox);
+                row.appendChild(checkboxCell);
+
+                // columns from the YAML
+                for (const column of Columns)
+                {
+                    const cell = document.createElement('td');
+                    if (column.cls)
+                    {
+                        cell.className = column.cls;
+                    }
+                    cell.innerHTML = columnCellHtml(column, item);
+                    row.appendChild(cell);
+                }
+
+                // controls
+                const controlsCell = document.createElement('td');
+                controlsCell.className = 'cell-actions';
+                const viewLink = document.createElement('a');
+                viewLink.href = viewUrl(item.id);
+                viewLink.target = '_blank';
+                viewLink.rel = 'noopener';
+                viewLink.innerHTML = '<i class="ph-duotone ph-arrow-square-out"></i> {{ "View"|translate|e('html') }}';
+                controlsCell.appendChild(viewLink);
+                row.appendChild(controlsCell);
+
+                itemsTableBody.appendChild(row);
+            }
+
+            const start = ((currentPage - 1) * PageSize) + 1;
+            const end = start + items.length - 1;
+            let resultText;
+            if (totalRecords !== null)
+            {
+                resultText = await Localisation.translate('Showing {start}-{end} of {totalRecords}', { '{start}': start, '{end}': end, '{totalRecords}': totalRecords });
+            }
+            else
+            {
+                resultText = await Localisation.translate('Showing {start}-{end}', { '{start}': start, '{end}': end });
+            }
+
+            if (token !== pageRequestToken) return;
+            document.getElementById('resultCount').textContent = resultText;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // PAGINATION
+        // ====================================================================================================
+        async function renderPagination(token)
+        {
+            let infoText;
+            if (totalPages !== null)
+            {
+                infoText = await Localisation.translate('Page {currentPage} of {totalPages} ({totalRecords} total records)', {
+                    '{currentPage}': currentPage,
+                    '{totalPages}': totalPages,
+                    '{totalRecords}': totalRecords ?? '?'
+                });
+            }
+            else
+            {
+                infoText = await Localisation.translate('Page {currentPage}', {
+                    '{currentPage}': currentPage
+                });
+            }
+
+            if (token !== pageRequestToken)
+            {
+                return;
+            }
+
+            paginationContainer.innerHTML = '';
+
+            const info = document.createElement('span');
+            info.className = 'pagination__info';
+            info.textContent = infoText;
+            paginationContainer.appendChild(info);
+
+            const isFirst = currentPage <= 1;
+            const isLast = !hasMore;
+
+            addPageBtn('<i class="ph-duotone ph-rewind"></i> {{ "First"|translate|e('html') }}', 1, isFirst);
+            addPageBtn('<i class="ph-duotone ph-skip-back"></i> {{ "Prev"|translate|e('html') }}', currentPage - 1, isFirst);
+
+            if (totalPages !== null)
+            {
+                // up to 5 page buttons, kept at 5 near the end
+                const startPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+                const endPage = Math.min(totalPages, startPage + 4);
+                for (let i = startPage; i <= endPage; i++)
+                {
+                    const button = addPageBtn(String(i), i, false);
+                    if (i === currentPage)
+                    {
+                        button.classList.add('is-current');
+                    }
+                }
+            }
+            else
+            {
+                const btn = addPageBtn(String(currentPage), currentPage, false);
+                btn.classList.add('is-current');
+            }
+
+            addPageBtn('{{ "Next"|translate|e('html') }} <i class="ph-duotone ph-skip-forward"></i>', currentPage + 1, isLast);
+            if (totalPages !== null)
+            {
+                addPageBtn('{{ "Last"|translate|e('html') }} <i class="ph-duotone ph-fast-forward"></i>', totalPages, isLast);
+            }
+        }
+
+        function addPageBtn(label, page, disabled)
+        {
+            const button = document.createElement('button');
+            button.className = 'pagination__btn';
+            button.innerHTML = label;
+            button.disabled = disabled;
+            button.addEventListener('click', function() { goToPage(page); });
+            paginationContainer.appendChild(button);
+            return button;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // FILTERS & SORTING
+        // ====================================================================================================
+        function applyFilters()
+        {
+            currentSearch = document.getElementById('itemSearch').value.trim();
+
+            currentFilters = {};
+            document.querySelectorAll('.toolbar select[data-filter]').forEach(function(select) {
+                currentFilters[select.dataset.filter] = select.value;
+            });
+
+            goToPage(1);
+        }
+
+        function resetFilters()
+        {
+            document.getElementById('itemSearch').value = '';
+            document.querySelectorAll('.toolbar select[data-filter]').forEach(function(select) {
+                select.value = '';
+            });
+
+            currentSearch = '';
+            currentFilters = {};
+            goToPage(1);
+        }
+
+        function setupSortableHeaders()
+        {
+            const headers = document.querySelectorAll('#itemsTable thead th.is-sortable[data-sort]');
+
+            // start with whichever column the YAML marked as the default sort
+            headers.forEach(function(th) {
+                if (th.classList.contains('is-sorted-asc'))
+                {
+                    currentSortBy = th.dataset.sort;
+                    currentSortOrder = 'asc';
+                }
+                else if (th.classList.contains('is-sorted-desc'))
+                {
+                    currentSortBy = th.dataset.sort;
+                    currentSortOrder = 'desc';
+                }
+            });
+
+            headers.forEach(function(th) {
+                th.addEventListener('click', function() {
+                    const sortField = th.dataset.sort;
+
+                    // if already sorting by this field, toggle direction
+                    if (currentSortBy === sortField)
+                    {
+                        currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+                    }
+                    else
+                    {
+                        currentSortBy = sortField;
+                        currentSortOrder = 'asc';
+                    }
+
+                    headers.forEach(function(header) {
+                        header.classList.remove('is-sorted-asc', 'is-sorted-desc');
+                    });
+                    th.classList.add(currentSortOrder === 'asc' ? 'is-sorted-asc' : 'is-sorted-desc');
+
+                    goToPage(1);
+                });
+            });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // MERGE SET
+        // ====================================================================================================
+        function toggleMergeSetMember(item, include)
+        {
+            if (include)
+            {
+                if (mergeSet.has(item.id)) return true;
+                if (mergeSet.size >= MaxMergeSetSize)
+                {
+                    showToast(Messages.TooMany, true);
+                    return false;
+                }
+                mergeSet.set(item.id, item);
+            }
+            else
+            {
+                mergeSet.delete(item.id);
+            }
+
+            ensurePrimary();
+            invalidateComparison();
+            renderMergeSet();
+            return true;
+        }
+
+        // compares two records using the PrimaryPreference rules from the YAML, first rule that differs wins
+        function comparePrimaryPreference(a, b)
+        {
+            for (const rule of Subject.primaryPreference)
+            {
+                if (rule.Prefer !== undefined)
+                {
+                    const aMatches = a[rule.Key] === rule.Prefer;
+                    const bMatches = b[rule.Key] === rule.Prefer;
+                    if (aMatches && !bMatches)
+                    {
+                        return -1;
+                    }
+                    if (bMatches && !aMatches)
+                    {
+                        return 1;
+                    }
+                }
+                else if (rule.Order !== undefined)
+                {
+                    const aTime = timeOf(a[rule.Key]);
+                    const bTime = timeOf(b[rule.Key]);
+                    if (aTime === bTime)
+                    {
+                        continue;
+                    }
+
+                    // broken dates always go last, whichever way we're sorting
+                    if (aTime === Infinity)
+                    {
+                        return 1;
+                    }
+                    if (bTime === Infinity)
+                    {
+                        return -1;
+                    }
+
+                    if (rule.Order === 'Newest')
+                    {
+                        return bTime - aTime;
+                    }
+                    return aTime - bTime;
+                }
+            }
+            return 0;
+        }
+
+        // pick a default primary, unless an admin has already chosen one
+        function ensurePrimary()
+        {
+            if (primaryChosenExplicitly && primaryId && mergeSet.has(primaryId))
+            {
+                return;
+            }
+
+            primaryChosenExplicitly = false;
+            primaryId = null;
+
+            const items = Array.from(mergeSet.values()).sort(comparePrimaryPreference);
+            if (items.length > 0)
+            {
+                primaryId = items[0].id;
+            }
+        }
+
+        function setPrimary(id)
+        {
+            if (!mergeSet.has(id) || id === primaryId)
+            {
+                return;
+            }
+
+            primaryId = id;
+            primaryChosenExplicitly = true;
+            invalidateComparison();
+            renderMergeSet();
+        }
+
+        function removeFromMergeSet(id)
+        {
+            mergeSet.delete(id);
+            ensurePrimary();
+            invalidateComparison();
+            renderMergeSet();
+
+            // reload so it gets unticked in the table
+            goToPage(currentPage);
+        }
+
+        function renderMergeSet()
+        {
+            const body = document.getElementById('mergeSetBody');
+            body.innerHTML = '';
+
+            // count
+            const countElement = document.getElementById('mergeSetCount');
+            const countToken = ++mergeSetCountToken;
+            countElement.textContent = '';
+            if (mergeSet.size > 0)
+            {
+                Localisation.translate('{count} of 2 selected', { '{count}': mergeSet.size }).then(function(text) {
+                    if (countToken === mergeSetCountToken) countElement.textContent = text;
+                });
+            }
+
+            document.getElementById('compareBtn').disabled = mergeSet.size !== 2;
+
+            if (mergeSet.size === 0)
+            {
+                body.innerHTML = '<div class="merge-empty">' + escapeHtml(Messages.EmptySet) + '</div>';
+                return;
+            }
+
+            for (const id of orderedIds())
+            {
+                const item = mergeSet.get(id);
+                const isPrimary = id === primaryId;
+
+                const card = document.createElement('div');
+                card.className = 'action-card';
+                if (isPrimary)
+                {
+                    card.classList.add('action-card--primary');
+                }
+
+                // name, badges and description
+                let title = escapeHtml(recordName(item)) + ' ';
+                if (isPrimary)
+                {
+                    title += '<span class="badge badge--caseworker">{{ "Primary"|translate|e('html') }}</span> ';
+                }
+                title += Adapter.cardBadges(item);
+
+                const info = document.createElement('div');
+                info.className = 'action-card__info';
+                info.innerHTML =
+                    '<div class="action-card__title">' + title + '</div>' +
+                    '<div class="action-card__desc">' + Adapter.cardDescription(item, id) + '</div>';
+                card.appendChild(info);
+
+                const control = document.createElement('div');
+                control.className = 'action-card__control merge-set__controls';
+
+                // "keep this one" radio
+                const primaryLabel = document.createElement('label');
+                primaryLabel.className = 'merge-set__primary';
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'primaryItem';
+                radio.checked = isPrimary;
+                radio.addEventListener('change', function() { setPrimary(id); });
+                primaryLabel.appendChild(radio);
+                primaryLabel.appendChild(document.createTextNode(Messages.KeepThis));
+                control.appendChild(primaryLabel);
+
+                // remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'form-btn form-btn--sm';
+                removeBtn.innerHTML = '<i class="ph-duotone ph-x"></i> {{ "Remove"|translate|e('html') }}';
+                removeBtn.addEventListener('click', function() { removeFromMergeSet(id); });
+                control.appendChild(removeBtn);
+
+                card.appendChild(control);
+                body.appendChild(card);
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // COMPARISON (STEP 2)
+        // ====================================================================================================
+        function invalidateComparison()
+        {
+            comparisonToken++;
+            reviewRenderToken++;
+            preview = null;
+            reviewRendered = false;
+            resolutions = {};
+
+            document.getElementById('mergeBtn').disabled = true;
+            document.getElementById('resolvePanel').style.display = 'none';
+            document.getElementById('reviewPanel').style.display = 'none';
+            document.getElementById('successPanel').style.display = 'none';
+            document.getElementById('mergeReason').value = '';
+            document.getElementById('acknowledgementRow').style.display = 'none';
+            document.getElementById('mergeAcknowledgement').checked = false;
+            setStep(1);
+        }
+
+        async function loadComparison()
+        {
+            if (mergeSet.size !== 2)
+            {
+                return;
+            }
+
+            // keep the reason if this is just a reload
+            const reason = document.getElementById('mergeReason').value;
+            invalidateComparison();
+            document.getElementById('mergeReason').value = reason;
+
+            const token = comparisonToken;
+            const compareButton = document.getElementById('compareBtn');
+            compareButton.disabled = true;
+
+            const [statusCode, payload] = await Api[Subject.api.Preview](primaryId, duplicateId());
+
+            compareButton.disabled = mergeSet.size !== 2;
+
+            // selection changed while this was loading
+            if (token !== comparisonToken)
+            {
+                return;
+            }
+
+            if (statusCode !== 200)
+            {
+                const detail = detailOf(payload);
+                showToast(Messages.CompareFailed + (detail ? ' ' + detail : ''), true);
+                return;
+            }
+
+            preview = payload;
+            for (const field of preview.fields)
+            {
+                resolutions[field.field] = field.suggestedSource;
+            }
+
+            document.getElementById('resolvePanel').style.display = '';
+            document.getElementById('reviewPanel').style.display = '';
+            renderResolveTable();
+            renderReview();
+            setStep(2);
+
+            document.getElementById('resolvePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // what the field will end up as, based on the chosen resolution
+        function resolvedValue(field)
+        {
+            if (!field) return null;
+
+            const source = resolutions[field.field];
+
+            if (source === MergeSource.Duplicate)
+            {
+                return field.duplicateValue;
+            }
+
+            if (source === MergeSource.Combined)
+            {
+                if (isEmptyValue(field.duplicateValue) || field.duplicateValue === field.survivorValue)
+                {
+                    return field.survivorValue;
+                }
+                if (isEmptyValue(field.survivorValue))
+                {
+                    return field.duplicateValue;
+                }
+                return field.survivorValue.trimEnd() + '\n\n' + field.duplicateValue.trimStart();
+            }
+
+            return field.survivorValue;
+        }
+
+        function previewField(key)
+        {
+            if (!preview)
+            {
+                return null;
+            }
+            return preview.fields.find(function(f) { return f.field === key; });
+        }
+
+        function renderResolveTable()
+        {
+            if (!preview)
+            {
+                return;
+            }
+
+            const primary = mergeSet.get(primaryId);
+            const duplicate = mergeSet.get(duplicateId());
+            const showIdentical = document.getElementById('showIdentical').checked;
+            const anyCombinable = preview.fields.some(function(f) { return f.differs && f.canCombine; });
+
+            // header
+            let headHtml = '<tr>';
+            headHtml += '<th>{{ "Field"|translate|e('html') }}</th>';
+            headHtml += '<th>' + escapeHtml(recordName(primary)) + ' ({{ "Primary"|translate|e('html') }})<div class="merge-id">' + escapeHtml(primary.id) + '</div></th>';
+            headHtml += '<th>' + escapeHtml(recordName(duplicate)) + '<div class="merge-id">' + escapeHtml(duplicate.id) + '</div></th>';
+            if (anyCombinable)
+            {
+                headHtml += '<th>{{ "Combine both"|translate|e('html') }}</th>';
+            }
+            headHtml += '</tr>';
+            document.getElementById('resolveTableHead').innerHTML = headHtml;
+
+            // body
+            const body = document.getElementById('resolveTableBody');
+            body.innerHTML = '';
+            let rowsShown = 0;
+
+            for (const field of preview.fields)
+            {
+                if (!field.differs && !showIdentical)
+                {
+                    continue;
+                }
+                rowsShown++;
+
+                const row = document.createElement('tr');
+                if (field.differs)
+                {
+                    row.classList.add('is-conflict');
+                }
+
+                const labelCell = document.createElement('td');
+                labelCell.className = 'merge-resolve__field';
+                if (field.differs)
+                {
+                    labelCell.innerHTML = escapeHtml(fieldLabel(field.field))
+                        + ' <span class="badge badge--warning">{{ "Conflict"|translate|e('html') }}</span>';
+                }
+                else
+                {
+                    labelCell.innerHTML = escapeHtml(fieldLabel(field.field))
+                        + ' <span class="badge badge--active">{{ "Identical"|translate|e('html') }}</span>';
+                }
+                row.appendChild(labelCell);
+
+                // identical - just show the value
+                if (!field.differs)
+                {
+                    const sameCell = document.createElement('td');
+                    sameCell.innerHTML = fieldValueHtml(field.field, field.survivorValue);
+                    row.appendChild(sameCell);
+
+                    const otherCell = document.createElement('td');
+                    otherCell.innerHTML = '<span class="merge-value merge-value--empty">{{ "same"|translate|e('html') }}</span>';
+                    row.appendChild(otherCell);
+
+                    if (anyCombinable) row.appendChild(document.createElement('td'));
+                    body.appendChild(row);
+                    continue;
+                }
+
+                // conflict - radio buttons for each option
+                row.appendChild(choiceCell(field, MergeSource.Survivor, fieldValueHtml(field.field, field.survivorValue)));
+                row.appendChild(choiceCell(field, MergeSource.Duplicate, fieldValueHtml(field.field, field.duplicateValue)));
+
+                if (anyCombinable)
+                {
+                    if (field.canCombine)
+                    {
+                        row.appendChild(choiceCell(field, MergeSource.Combined, '<span class="merge-hint">' + escapeHtml(Messages.CombineHint) + '</span>'));
+                    }
+                    else
+                    {
+                        row.appendChild(document.createElement('td'));
+                    }
+                }
+
+                body.appendChild(row);
+            }
+
+            if (rowsShown === 0)
+            {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = anyCombinable ? 4 : 3;
+                cell.className = 'merge-empty';
+                cell.textContent = '{{ "No conflicting fields. Tick \"Show identical fields\" to see everything."|translate|e('js') }}';
+                row.appendChild(cell);
+                body.appendChild(row);
+            }
+        }
+
+        function choiceCell(field, source, valueHtml)
+        {
+            const cell = document.createElement('td');
+            const isChosen = resolutions[field.field] === source;
+            if (isChosen)
+            {
+                cell.classList.add('is-chosen');
+            }
+
+            const label = document.createElement('label');
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'resolve-' + field.field;
+            radio.checked = isChosen;
+            radio.addEventListener('change', function()
+            {
+                resolutions[field.field] = source;
+                renderResolveTable();
+                renderReview();
+            });
+            label.appendChild(radio);
+
+            const valueSpan = document.createElement('span');
+            valueSpan.innerHTML = valueHtml;
+            if (source === field.suggestedSource)
+            {
+                valueSpan.innerHTML += ' <span class="badge badge--info">{{ "Suggested"|translate|e('html') }}</span>';
+            }
+            label.appendChild(valueSpan);
+
+            cell.appendChild(label);
+            return cell;
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // REVIEW (STEP 3)
+        // ====================================================================================================
+        function referenceCounts(entity, property)
+        {
+            const references = preview.references || [];
+            const reference = references.find(function(r) { return r.entity === entity && r.property === property; });
+            if (reference)
+            {
+                return reference;
+            }
+            return { rowsToMove: 0, rowsToDiscard: 0, rowsKeptOnDuplicate: 0 };
+        }
+
+        async function movedAcross(entity, property)
+        {
+            const count = referenceCounts(entity, property).rowsToMove;
+            return escapeHtml(await Localisation.translate('{count} moved across', { '{count}': count }));
+        }
+
+        async function renderReview()
+        {
+            if (!preview)
+            {
+                return;
+            }
+
+            const token = ++reviewRenderToken;
+            reviewRendered = false;
+            document.getElementById('mergeBtn').disabled = true;
+
+            const primary = mergeSet.get(primaryId);
+            const review = await Adapter.review(primary, mergeSet.get(duplicateId()));
+
+            // rows are [label, html] - the html can be a promise if it's waiting on a translation
+            // order is: the kept record, the ReviewFields, the adapter's rows, then the MovedAcross counts
+            const rows = [];
+            rows.push([Messages.ReviewKept, escapeHtml(recordName(primary)) + '<div class="merge-id">' + escapeHtml(primary.id) + '</div>']);
+            for (const key of Subject.reviewFields)
+            {
+                rows.push([fieldLabel(key), fieldValueHtml(key, resolvedValue(previewField(key)))]);
+            }
+            for (const row of review.rows)
+            {
+                rows.push(row);
+            }
+            for (const moved of MovedAcross)
+            {
+                rows.push([moved.label, movedAcross(moved.entity, moved.property)]);
+            }
+
+            let summaryHtml = '';
+            for (const row of rows)
+            {
+                const value = await row[1];
+                summaryHtml += '<dt>' + escapeHtml(row[0]) + '</dt><dd>' + value + '</dd>';
+            }
+
+            let notices = review.notices;
+            if (notices.length === 0)
+            {
+                notices = [['success', 'check-circle', '{{ "No problems spotted. Double-check the summary before merging."|translate|e('js') }}']];
+            }
+
+            let warningsHtml = '';
+            for (const n of notices)
+            {
+                warningsHtml += '<div class="merge-notice merge-notice--' + n[0] + '"><i class="ph-duotone ph-' + n[1] + '"></i><div>' + escapeHtml(n[2]) + '</div></div>';
+            }
+
+            // something else has re-rendered the review since this one started
+            if (token !== reviewRenderToken || !preview)
+            {
+                return;
+            }
+
+            document.getElementById('reviewSummary').innerHTML = summaryHtml;
+            document.getElementById('reviewWarnings').innerHTML = warningsHtml;
+
+            document.getElementById('acknowledgementRow').style.display = review.acknowledgementRequired ? '' : 'none';
+            if (!review.acknowledgementRequired)
+            {
+                document.getElementById('mergeAcknowledgement').checked = false;
+            }
+
+            reviewRendered = true;
+            updateMergeButtonState();
+        }
+
+        function isReadyToMerge()
+        {
+            if (!preview || !reviewRendered)
+            {
+                return false;
+            }
+            if (mergeSet.size !== 2 || !primaryId)
+            {
+                return false;
+            }
+            if (document.getElementById('mergeReason').value.trim().length < MinReasonLength)
+            {
+                return false;
+            }
+
+            const ackShown = document.getElementById('acknowledgementRow').style.display !== 'none';
+            return !(ackShown && !document.getElementById('mergeAcknowledgement').checked);
+        }
+
+        function updateMergeButtonState()
+        {
+            const ready = isReadyToMerge();
+            document.getElementById('mergeBtn').disabled = !ready;
+            if (preview)
+            {
+                setStep(ready ? 3 : 2);
+            }
+        }
+
+        // only send the fields that differ - the API uses its own suggestion for anything missing
+        function collectFieldChoices()
+        {
+            const choices = {};
+            for (const field of preview.fields)
+            {
+                if (field.differs)
+                {
+                    choices[field.field] = resolutions[field.field];
+                }
+            }
+            return choices;
+        }
+
+        // the kept record's name after the merge (it might be taking the other one's name)
+        function keptName()
+        {
+            const name = resolvedValue(previewField(Subject.nameField));
+            if (name)
+            {
+                return name;
+            }
+            return recordName(mergeSet.get(primaryId));
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // CONFIRM & MERGE
+        // ====================================================================================================
+        async function openConfirm()
+        {
+            if (!isReadyToMerge())
+            {
+                return;
+            }
+
+            const kept = keptName();
+            const duplicate = recordName(mergeSet.get(duplicateId()));
+
+            const confirmTitle = document.getElementById('confirmTitle');
+            confirmTitle.textContent = '';
+
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.textContent = '{{ "Merge"|translate|e('js') }}';
+            confirmBtn.disabled = false;
+            document.getElementById('confirmCancelBtn').disabled = false;
+
+            const totpInput = document.getElementById('totpInput');
+            totpInput.value = '';
+            document.getElementById('totpError').style.display = 'none';
+            document.getElementById('confirmOverlay').classList.add('is-visible');
+            setTimeout(function() {
+                totpInput.focus();
+            }, 100);
+
+            confirmTitle.textContent = await message(
+                'ConfirmTitle',
+                {
+                    '{duplicate}': duplicate,
+                    '{kept}': kept
+                }
+            );
+        }
+
+        function closeConfirm()
+        {
+            document.getElementById('confirmOverlay').classList.remove('is-visible');
+            document.getElementById('totpInput').value = '';
+            document.getElementById('totpError').style.display = 'none';
+        }
+
+        function showTotpError(text)
+        {
+            const totpError = document.getElementById('totpError');
+            totpError.textContent = text;
+            totpError.style.display = 'block';
+
+            const totpInput = document.getElementById('totpInput');
+            totpInput.focus();
+            totpInput.select();
+        }
+
+        async function executeMerge()
+        {
+            if (mergeInFlight || !isReadyToMerge())
+            {
+                return;
+            }
+
+            const totpCode = document.getElementById('totpInput').value.replace(/\s/g, '');
+            if (!/^\d{6}$/.test(totpCode))
+            {
+                showTotpError('{{ "Please enter a valid 6-digit code from your authenticator app."|translate|e('js') }}');
+                return;
+            }
+
+            const survivorId = primaryId;
+            const duplicate = duplicateId();
+            const duplicateName = recordName(mergeSet.get(duplicate));
+            const kept = keptName();
+
+            const confirmBtn = document.getElementById('confirmBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            mergeInFlight = true;
+            confirmBtn.disabled = true;
+            cancelBtn.disabled = true;
+            confirmBtn.textContent = '{{ "Merging..."|translate|e('js') }}';
+
+            const [statusCode, payload] = await Api[Subject.api.Merge](
+                survivorId,
+                duplicate,
+                preview.fingerprint,
+                collectFieldChoices(),
+                document.getElementById('mergeReason').value.trim(),
+                totpCode,
+            );
+
+            mergeInFlight = false;
+            confirmBtn.disabled = false;
+            cancelBtn.disabled = false;
+            confirmBtn.textContent = '{{ "Merge"|translate|e('js') }}';
+
+            if (statusCode === 200)
+            {
+                closeConfirm();
+                await onMergeSucceeded(payload, duplicateName, kept);
+                return;
+            }
+
+            const detail = detailOf(payload);
+
+            // 403 - wrong 2FA code, leave the dialog open so they can try again
+            if (statusCode === 403)
+            {
+                showTotpError(detail || '{{ "The authenticator code was not accepted. Please try again."|translate|e('js') }}');
+                return;
+            }
+
+            closeConfirm();
+
+            // 409 - one of the records changed since the comparison was loaded, so reload it
+            if (statusCode === 409)
+            {
+                showToast(Messages.StaleData, true);
+                await loadComparison();
+                return;
+            }
+
+            // 400 / 404 - the API refused it
+            showToast('{{ "The merge failed. Nothing has been changed."|translate|e('js') }}' + (detail ? ' ' + detail : ''), true);
+        }
+
+        async function onMergeSucceeded(result, duplicateName, kept)
+        {
+            const text = await message('Success', {
+                '{duplicate}': duplicateName,
+                '{kept}': kept,
+                '{moved}': result.rowsMoved,
+                '{discarded}': result.rowsDiscarded
+            });
+
+            document.getElementById('successMessage').textContent = text;
+            document.getElementById('viewKeptBtn').href = viewUrl(result.survivorId);
+
+            mergeSet.clear();
+            primaryId = null;
+            primaryChosenExplicitly = false;
+            invalidateComparison();
+            renderMergeSet();
+            goToPage(currentPage);
+
+            document.getElementById('successPanel').style.display = '';
+            setStep(3);
+            document.getElementById('Step-3').classList.add('is-done');
+            showToast(text);
+            document.getElementById('successPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // RESET
+        // ====================================================================================================
+        function resetEverything()
+        {
+            mergeSet.clear();
+            primaryId = null;
+            primaryChosenExplicitly = false;
+            invalidateComparison();
+            document.getElementById('showIdentical').checked = false;
+            renderMergeSet();
+            goToPage(currentPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // DEEP LINKS
+        // e.g. ?cases=<id>,<id>&primary=<id>
+        // ====================================================================================================
+        async function preselectFromQueryString()
+        {
+            const params = new URLSearchParams(window.location.search);
+
+            const requested = [];
+            for (const part of (params.get(Subject.queryParam) || '').split(','))
+            {
+                const id = part.trim();
+                if (UuidRegex.test(id) && requested.length < MaxMergeSetSize)
+                {
+                    requested.push(id);
+                }
+            }
+            if (requested.length === 0)
+            {
+                return;
+            }
+
+            let anyFailed = false;
+            for (const id of requested)
+            {
+                const item = await Api[Subject.api.Single](id);
+                if (item && item.id)
+                {
+                    mergeSet.set(item.id, item);
+                }
+                else
+                {
+                    anyFailed = true;
+                }
+            }
+
+            const requestedPrimary = params.get('primary');
+            if (requestedPrimary && mergeSet.has(requestedPrimary))
+            {
+                primaryId = requestedPrimary;
+                primaryChosenExplicitly = true;
+            }
+            ensurePrimary();
+            renderMergeSet();
+
+            if (anyFailed)
+            {
+                showToast(Messages.LinkedLoadFailed, true);
+            }
+        }
+
+
+
+
+
+        // ====================================================================================================
+        // INIT
+        // ====================================================================================================
+        document.addEventListener('DOMContentLoaded', async function()
+        {
+            setupSortableHeaders();
+
+            // allow pressing `Enter` in the search box
+            document.getElementById('itemSearch').addEventListener('keydown', function(e)
+            {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    applyFilters();
+                }
+            });
+
+            // and in the 2FA box
+            document.getElementById('totpInput').addEventListener('keydown', function(e)
+            {
+                if (e.key === 'Enter')
+                {
+                    e.preventDefault();
+                    executeMerge();
+                }
+            });
+
+            // escape closes the confirmation dialogue, unless a merge is running
+            document.addEventListener('keydown', function(e)
+            {
+                const dialogOpen = document.getElementById('confirmOverlay').classList.contains('is-visible');
+                if (e.key === 'Escape' && dialogOpen && !mergeInFlight)
+                {
+                    closeConfirm();
+                }
+            });
+
+            renderMergeSet();
+            await preselectFromQueryString();
+            goToPage(1);
+        });
+    </script>
+{% endblock %}

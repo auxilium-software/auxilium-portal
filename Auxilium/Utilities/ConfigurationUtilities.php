@@ -117,4 +117,11 @@ final class ConfigurationUtilities
         $fileContents = file_get_contents($filePath);
         return Yaml::parse($fileContents);
     }
+
+    public static function GetMergeSubjects(): array
+    {
+        $filePath = __DIR__ . '/../../Configuration/System/AdminConsoleObjectMergeSubjectConfig.yaml';
+        $fileContents = file_get_contents($filePath);
+        return Yaml::parse($fileContents);
+    }
 }

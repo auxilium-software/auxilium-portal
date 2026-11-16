@@ -13,7 +13,7 @@
         <link rel="icon" type="image/svg" href="/Static/Images/Favicons/AdminPanel.svg" />
         {% include '/Partials/JSImports.html.twig' %}
     </head>
-    <body>
+    <body data-density="{{ Preferences.AdminDensity|default('comfortable') }}">
         <div class="page-container">
 
             {# ====== MOBILE TOGGLE BUTTON ====== #}
@@ -36,7 +36,7 @@
 
                 <div class="nav-content">
                     {% for item in NavigationTree %}
-                    {% include '/Partials/AdminConsoleNavigationItem.html.twig' with {'item': item, 'depth': 0} %}
+                        {% include '/Partials/AdminConsoleNavigationItem.html.twig' with {'item': item, 'depth': 0} %}
                     {% endfor %}
                 </div>
 

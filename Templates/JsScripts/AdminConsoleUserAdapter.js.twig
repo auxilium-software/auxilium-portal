@@ -1,0 +1,98 @@
+
+const RoleFields = Object.keys(Config.fields).filter(function(key) { return Config.fields[key].role; });
+
+const Adapter = {
+    listNameHtml(item)
+    {
+        return '<div class="merge-case-title">' + escapeHtml(recordName(item))
+            + ' '
+            + flagBadges(item)
+            + '</div>'
+            + '<div>'
+            + escapeHtml(item.emailAddress || '-')
+            + '</div>'
+            + '<div class="merge-id">'
+            + escapeHtml(item.id)
+            + '</div>';
+    },
+
+    cardBadges(item)
+    {
+        return flagBadges(item);
+    },
+
+    cardDescription(item, id)
+    {
+        return escapeHtml(item.emailAddress || '-')
+            + ' · '
+            + escapeHtml(item.allowLogin === true ? Config.messages.CanSignIn : Config.messages.CannotSignIn)
+            + ' · '
+            + '<span class="merge-id">'
+            + escapeHtml(id)
+            + '</span>';
+    },
+
+    async review(primary, duplicate)
+    {
+        const resolvedRoles = RoleFields
+            .filter(function(key) { const f = previewField(key); return f && isTrue(resolvedValue(f)); })
+            .map(fieldLabel);
+
+        const notices = [];
+
+        const primaryCanSignIn = primary.allowLogin === true;
+        const duplicateCanSignIn = duplicate.allowLogin === true;
+        if (duplicateCanSignIn && !primaryCanSignIn)
+        {
+            notices.push(await notice('OnlyDuplicateCanSignIn'));
+        }
+        else if (duplicateCanSignIn)
+        {
+            notices.push(await notice('BothCanSignIn'));
+        }
+
+        const email = previewField('emailAddress');
+        if (email && email.differs && resolutions['emailAddress'] === MergeSource.Duplicate)
+        {
+            notices.push(await notice('EmailChanges', { '{email}': email.duplicateValue || '-' }));
+        }
+
+        for (const key of RoleFields)
+        {
+            const field = previewField(key);
+            if (!field || !field.differs)
+            {
+                continue;
+            }
+            const survivorHas = isTrue(field.survivorValue);
+            const resolvedHas = isTrue(resolvedValue(field));
+            if (resolvedHas && !survivorHas)
+            {
+                notices.push(await notice('RoleGained', { '{role}': fieldLabel(key) }));
+            }
+            else if (!resolvedHas && isTrue(field.duplicateValue))
+            {
+                notices.push(await notice('RoleLost', { '{role}': fieldLabel(key) }));
+            }
+        }
+
+        if (referenceCounts('SystemWafUserBlacklistEntry', 'UserId').rowsToMove > 0)
+        {
+            notices.push(await notice('BlockListMoves'));
+        }
+
+        if ((preview.references || []).some(function(r) { return r.behaviour === 'Repoint' && r.rowsToDiscard > 0; }))
+        {
+            notices.push(await notice('DuplicatesDiscarded'));
+        }
+
+        return {
+            rows: [
+                [Config.messages.ReviewRoles, resolvedRoles.length > 0 ? escapeHtml(resolvedRoles.join(', ')) : displayValue(null)],
+            ],
+            notices: notices,
+            acknowledgementRequired: true,
+        };
+    },
+};
+

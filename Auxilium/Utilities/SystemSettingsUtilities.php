@@ -32,32 +32,32 @@ final class SystemSettingsUtilities
 
     public static function GetInstanceName(): ?string
     {
-        return self::Get('instance.branding.name');
-    }
-
-    public static function GetLogoPath(): ?string
-    {
-        return self::Get('instance.branding.logoRelativePath');
-    }
-
-    public static function GetLogoContrastPath(): ?string
-    {
-        return self::Get('instance.branding.logoContrastRelativePath');
+        return self::Get('Instance.Branding.Name');
     }
 
     public static function GetFqdn(): ?string
     {
-        return self::Get('instance.fqdn');
+        return self::Get('Instance.Fqdn');
+    }
+
+    public static function GetLogoPath(): ?string
+    {
+        return self::Get('Instance.Branding.LogoRelativePath');
+    }
+
+    public static function GetLogoContrastPath(): ?string
+    {
+        return self::Get('Instance.Branding.LogoContrastRelativePath');
     }
 
     public static function GetDefaultLanguage(): ?string
     {
-        return self::Get('instance.defaults.language');
+        return self::Get('Instance.Defaults.Language');
     }
 
     public static function GetDefaultTimeZone(): ?string
     {
-        return self::Get('instance.defaults.timeZone');
+        return self::Get('Instance.Defaults.TimeZone');
     }
 
     public static function InvalidateCache(): void

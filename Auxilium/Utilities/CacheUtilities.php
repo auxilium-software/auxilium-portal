@@ -3,6 +3,7 @@
 namespace Auxilium\Utilities;
 
 use Exception;
+use InvalidArgumentException;
 use RuntimeException;
 
 final class CacheUtilities
@@ -13,9 +14,15 @@ final class CacheUtilities
     }
 
 
-
-    public static function SetFormData(string $formInstanceID, string $key, string $value): void
+    public static function SetFormData(string $formInstanceID, string $key, mixed $value): void
     {
+        if(is_array($value))
+        {
+            throw new InvalidArgumentException(
+                "SetFormData received an array value for key '$key' on form '$formInstanceID'."
+            );
+        }
+
         $formData = self::GetFormData($formInstanceID);
         $formData['Data'][$key] = $value;
 
@@ -133,7 +140,7 @@ final class CacheUtilities
         if($requireAuth)
         {
             SecurityUtilities::RequireLogin();
-            $userID = JWTUtilities::GetJwtInfo()->ID;
+            $userID = JWTUtilities::GetJwtInfo()->Sub;
         }
 
 

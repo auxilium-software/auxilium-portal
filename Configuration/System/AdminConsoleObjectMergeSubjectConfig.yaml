@@ -1,0 +1,225 @@
+case-management:
+  Adapter: /JsScripts/AdminConsoleCaseAdapter.js.twig
+  Icon: git-merge
+  ViewKeptIcon: briefcase
+  QueryParam: cases # deep links: ?cases=<id>,<id>&primary=<id>
+  ViewUrl: /cases/{id}
+  NameField: title # the field that names a record, in list items and the merge preview
+
+  Api:
+    Controller: CaseController
+    List: GetCasesPage # (page, pageSize, sortBy, sortOrder, search, ...one value per filter, in order)
+    ListKey: cases
+    Single: GetSingleCase
+    Preview: PreviewCaseMerge
+    Merge: MergeCases
+
+  # which record is kept until an administrator picks one - earlier rules win
+  PrimaryPreference:
+    - { Key: createdAt, Order: Oldest }   # normally the original sign-up
+
+  Page:
+    Title: Merge Cases
+    Subtitle: Combine a duplicate case into the case you keep
+    StepSelect: Select Cases
+    SearchPlaceholder: Title or description...
+    TableCaption: Tick the two cases that are duplicates of each other
+    MergeSetHeading: Cases to Merge
+    MergeSetFooter: The primary case is kept. Everything from the other case is moved into it.
+    CompareButton: Compare Selected Cases
+    ResolveNotice: "Where the cases have conflicting data, pick which value the merged case should keep.  Clients, Caseworkers, Todos, Files, Messages, Timeline entries, and Additional Properties are always moved across, never discarded."
+    OtherAfterwardsLabel: Other case afterwards
+    OtherAfterwards: "Retired: hidden from lists and pointing to the kept case. Its history and audit log are kept."
+    ReasonPlaceholder: e.g. Client signed up twice with different email addresses
+    ReasonHint: Recorded on the merge record and on the kept case's timeline. At least 10 characters.
+    Acknowledgement: I have checked that these cases are about the same person and it is safe for every client listed to see all of the merged material.
+    MergeButton: Merge Cases
+    ConfirmDescription: The other case will be retired. This cannot be undone from the administration console.
+    MergeMore: Merge More Cases
+    ViewKept: View Merged Case
+
+  Columns:
+    - { Label: Case,        Key: title,       Format: Name,     Sort: title }
+    - { Label: Status,      Key: status,      Format: Badge }
+    - { Label: Sensitivity, Key: sensitivity, Format: Badge }
+    - { Label: Clients,     Key: clients,     Format: Count,    Class: cell-number }
+    - { Label: Created At,  Key: createdAt,   Format: DateTime, Sort: createdAt,  DefaultOrder: desc }
+
+  Filters:
+    - Key: status
+      Label: Status
+      Options:
+        - { Value: '',        Label: All }
+        - { Value: open,      Label: Open }
+        - { Value: closed,    Label: Closed }
+        - { Value: staging,   Label: Staging }
+        - { Value: archived,  Label: Archived }
+
+  # the fields the merge preview can return; anything else is shown by its key
+  Fields:
+    title:       { Label: Title }
+    description: { Label: Description }
+    status:      { Label: Status,       Format: Badge }
+    sensitivity: { Label: Sensitivity,  Format: Badge }
+
+  # matched case-insensitively, as the API returns "Open" from the list and "open" from the preview
+  Badges:
+    status:
+      open:     { Label: Open,     Class: badge--active }
+      closed:   { Label: Closed,   Class: badge--inactive }
+      staging:  { Label: Staging,  Class: badge--pending }
+      archived: { Label: Archived, Class: badge--user }
+    # more restrictive sensitivities read as more urgent, so a downgrade is visible at a glance
+    sensitivity:
+      public:       { Label: Public,        Class: badge--info }
+      internal:     { Label: Internal,      Class: badge--user }
+      confidential: { Label: Confidential,  Class: badge--warning }
+      restricted:   { Label: Restricted,    Class: badge--critical }
+
+  # review summary: the kept record, these fields as they will be after merging, the adapter's own rows, then these counts
+  ReviewFields: [ title, status, sensitivity ]
+  MovedAcross:
+    - { Label: To-dos,                Entity: CaseTodo,               Property: CaseId }
+    - { Label: Files,                 Entity: CaseFile,               Property: CaseId }
+    - { Label: Messages,              Entity: CaseMessage,            Property: CaseId }
+    - { Label: Timeline entries,      Entity: CaseTimelineEntry,      Property: CaseId }
+    - { Label: Additional properties, Entity: CaseAdditionalProperty, Property: CaseId }
+    - { Label: Calendar events,       Entity: CalendarEvent,          Property: CaseId }
+
+  Messages:
+    Untitled: Untitled case
+    LoadFailed: Failed to load cases. Please try again.
+    NoResults: No cases found matching your criteria.
+    TooMany: Only two cases can be merged at a time. Untick one first.
+    EmptySet: Tick the two duplicate cases in the table above to start.
+    KeepThis: Keep this case
+    CompareFailed: The cases could not be compared.
+    CombineHint: "Keep both: the primary case's text, then the other's"
+    StaleData: One of the cases changed since you compared them. The comparison has been reloaded; please review it again.
+    LinkedLoadFailed: Could not load one or more of the linked cases.
+    ReviewKept: Surviving case
+    ReviewClients: Clients
+    ReviewWorkers: Case Workers
+    FromOtherRecord: "{count} from the other case"
+    ConfirmTitle: 'Merge "{duplicate}" into "{kept}"?'
+    Success: '"{duplicate}" was merged into "{kept}": {moved} items moved across and {discarded} duplicates removed.'
+
+  Notices:
+    ClientsDiffer:       { Level: danger,   Icon: warning-octagon,  Text: "These cases do not have the same clients. After merging, every client on the case may be able to see messages, files and notes that were only on the other client's case. Only continue if they really are the same person." }
+    SensitivityDiffers:  { Level: warning,  Icon: shield-warning,   Text: "The cases have different sensitivity levels. The more restrictive one is suggested; check the one you have chosen is not lower than it should be." }
+    WorkersGainAccess:   { Level: warning,  Icon: users-three,      Text: "Case worker access will be combined. {count} worker(s) will gain access to material they could not see before." }
+    DuplicatesDiscarded: { Level: info,     Icon: copy,             Text: "Some items are already on the primary case, such as the same client on both cases. They will be removed from the other case rather than added twice, and a full copy of each is kept in the merge record." }
+    ClosedOrArchived:    { Level: info,     Icon: info,             Text: "One or both of the selected cases are closed or archived." }
+
+
+user-management:
+  Adapter: /JsScripts/AdminConsoleUserAdapter.js.twig
+  Icon: git-merge
+  ViewKeptIcon: user
+  QueryParam: users # deep links: ?users=<id>,<id>&primary=<id>
+  ViewUrl: /admin-console/object-management/user-management/{id}
+  NameField: fullName
+
+  Api:
+    Controller: UserController
+    List: GetUsersPage # (page, pageSize, sortBy, sortOrder, search)
+    ListKey: users
+    Single: GetSingleUser
+    Preview: PreviewUserMerge
+    Merge: MergeUsers
+
+  # prefer an account that can sign in, since the kept account keeps its own credentials; otherwise the oldest
+  PrimaryPreference:
+    - { Key: allowLogin,  Prefer: true }
+    - { Key: createdAt,   Order: Oldest }
+
+  Page:
+    Title: Merge Users
+    Subtitle: Combine a duplicate account into the account you keep
+    StepSelect: Select Users
+    SearchPlaceholder: Name, email or ID...
+    TableCaption: Tick the two accounts that belong to the same person
+    MergeSetHeading: Accounts to Merge
+    MergeSetFooter: The primary account is kept, with its own password and two-factor setup. Everything else about the other account is moved into it.
+    CompareButton: Compare Selected Accounts
+    ResolveNotice: Where the accounts disagree, pick which value the kept account should have. Case memberships, messages, files, assessments and additional properties are always moved across, never discarded.
+    OtherAfterwardsLabel: Other account afterwards
+    OtherAfterwards: "Retired: unable to sign in, hidden from lists and pointing to the kept account. Its audit history is kept."
+    ReasonPlaceholder: e.g. Client registered online after a case worker had already created their record
+    ReasonHint: Recorded on the merge record. At least 10 characters.
+    Acknowledgement: I have checked that both accounts belong to the same person. Merging two different people would give each of them access to the other's cases, messages and files.
+    MergeButton: Merge Accounts
+    ConfirmDescription: The other account will be retired and signed out everywhere. This cannot be undone from the administration console.
+    MergeMore: Merge More Accounts
+    ViewKept: View Kept Account
+
+  Columns:
+    - { Label: User,            Key: fullName,        Format: Name,     Sort: fullName }
+    - { Label: Telephone,       Key: telephoneNumber, Format: Text,     Class: cell-number }
+    - { Label: Date of Birth,   Key: dateOfBirth,     Format: Date }
+    - { Label: "Can Sign In?",  Key: allowLogin,      Format: YesNo }
+    - { Label: Created At,      Key: createdAt,       Format: DateTime, Sort: createdAt,  DefaultOrder: desc }
+
+  Filters: []
+
+  # the fields the merge preview can return; anything else is shown by its key.
+  # Role fields are listed most powerful first, which is the order their warnings appear in.
+  Fields:
+    fullName:                        { Label: Full Name }
+    emailAddress:                    { Label: Email Address }
+    fullAddress:                     { Label: Address }
+    telephoneNumber:                 { Label: Telephone }
+    gender:                          { Label: Gender }
+    dateOfBirth:                     { Label: Date of Birth,  Format: Date }
+    howDidYouFindOutAboutOurService: { Label: How they found out about the service }
+    languagePreference:
+      Label: Language
+      ValueLabels:
+        en-GB: British English
+        cy-GB: Cymraeg
+    isAdministrator:                 { Label: Administrator,        Format: YesNo,  Role: true }
+    isCaseWorkerManager:             { Label: Case Worker Manager,  Format: YesNo,  Role: true }
+    isCaseWorker:                    { Label: Case Worker,          Format: YesNo,  Role: true }
+
+  # badges shown next to a name in the list and on the merge-set cards, when the list item's key is true
+  FlagBadges:
+    - { Key: isAdmin,             Label: Admin,               Class: badge--admin }
+    - { Key: isCaseWorkerManager, Label: Case Worker Manager, Class: badge--caseworker-manager }
+    - { Key: isCaseWorker,        Label: Case Worker,         Class: badge--caseworker }
+
+  ReviewFields: [ fullName, emailAddress ]
+  MovedAcross:
+    - { Label: Cases as a client,       Entity: CaseClient,             Property: UserId }
+    - { Label: Cases as a case worker,  Entity: CaseWorker,             Property: UserId }
+    - { Label: Messages sent,           Entity: CaseMessage,            Property: SenderUserId }
+    - { Label: To-dos assigned,         Entity: CaseTodo,               Property: AssignedToUserId }
+    - { Label: Files,                   Entity: UserFile,               Property: UserId }
+    - { Label: Wellbeing assessments,   Entity: WemwbsAssessment,       Property: UserId }
+    - { Label: Additional properties,   Entity: UserAdditionalProperty, Property: UserId }
+
+  Messages:
+    Untitled: Unnamed user
+    LoadFailed: Failed to load users. Please try again.
+    NoResults: No users found matching your criteria.
+    TooMany: Only two accounts can be merged at a time. Untick one first.
+    EmptySet: Tick the two accounts that belong to the same person in the table above to start.
+    KeepThis: Keep this account
+    CompareFailed: The accounts could not be compared.
+    CombineHint: "Keep both: the primary account's text, then the other's"
+    StaleData: One of the accounts changed since you compared them. The comparison has been reloaded; please review it again.
+    LinkedLoadFailed: Could not load one or more of the linked accounts.
+    ReviewKept: Kept account
+    ReviewRoles: Roles
+    CanSignIn: Can sign in
+    CannotSignIn: Cannot sign in
+    ConfirmTitle: 'Merge "{duplicate}" into "{kept}"?'
+    Success: '"{duplicate}" was merged into "{kept}": {moved} items moved across and {discarded} removed.'
+
+  Notices:
+    OnlyDuplicateCanSignIn: { Level: danger,  Icon: sign-in,        Text: "Only the other account can sign in. The kept account keeps its own credentials, so after merging this person will not be able to sign in. Keep the other account instead, unless that is intended." }
+    BothCanSignIn:          { Level: info,    Icon: sign-in,        Text: "Both accounts can sign in. Only the kept account's password and two-factor setup will keep working; the other account is signed out everywhere." }
+    EmailChanges:           { Level: warning, Icon: envelope,       Text: "The kept account will sign in with {email} from now on." }
+    RoleGained:             { Level: danger,  Icon: shield-warning, Text: "The kept account will be given the {role} role." }
+    RoleLost:               { Level: info,    Icon: shield,         Text: "The other account's {role} role will not carry over." }
+    BlockListMoves:         { Level: warning, Icon: prohibit,       Text: "The other account is on the user block list. The block will move to the kept account." }
+    DuplicatesDiscarded:    { Level: info,    Icon: copy,           Text: "Some items are already on the kept account, such as membership of the same case. They will be removed from the other account rather than added twice, and a full copy of each is kept in the merge record." }

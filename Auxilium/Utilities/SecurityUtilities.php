@@ -38,7 +38,7 @@ final class SecurityUtilities
      */
     public static function IsAdmin(): bool
     {
-        return self::fetchUserDetails()['IsAdmin'] ?? false;
+        return self::fetchUserDetails()['IsAdministrator'] ?? false;
     }
 
     public static function RequireAdmin(): void
@@ -111,7 +111,7 @@ final class SecurityUtilities
             'UserID'                => $response->Payload['id'],
             'EmailAddress'          => $response->Payload['emailAddress'],
             'FullName'              => $response->Payload['fullName'],
-            'IsAdmin'               => $response->Payload['isAdmin'],
+            'IsAdministrator'       => $response->Payload['isAdministrator'],
             'LanguagePreference'    => $response->Payload['languagePreference'],
         ];
     }

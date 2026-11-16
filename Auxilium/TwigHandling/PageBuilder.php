@@ -27,7 +27,7 @@ final class PageBuilder
     {
         $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
         $this->twig = new Environment($loader, [
-            'debug' => true,
+            'debug' => false,
             'cache' => false,
         ]);
 
@@ -47,6 +47,7 @@ final class PageBuilder
 
             $this->twig->addGlobal('_IS_LOGGED_IN_', true);
             $this->twig->addGlobal('_IS_ADMIN_', SecurityUtilities::IsAdmin());
+            $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_USER_ID_', SecurityUtilities::GetUserId());
             $this->twig->addGlobal('_CURRENTLY_LOGGED_IN_USER_FULL_NAME_', SecurityUtilities::GetUserName());
         }
         else
@@ -117,7 +118,7 @@ final class PageBuilder
     {
         $loader = new FilesystemLoader(__DIR__ . '/../../Templates');
         $twig = new Environment($loader, [
-            'debug' => true,
+            'debug' => false,
             'cache' => false,
         ]);
         $twig->addGlobal('style_options', []);
@@ -147,10 +148,9 @@ final class PageBuilder
                 $_SERVER['REQUEST_URI']
             );
 
-            self::Render(
+            self::OfflineRender(
                 template: '/ErrorPages/InternalSystemErrorErrorPage.html.twig',
                 variables: ['technical_details' => $technicalDetails],
-                useAuth: false
             );
         }
 

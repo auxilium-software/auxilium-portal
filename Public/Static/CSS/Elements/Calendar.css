@@ -1,0 +1,50 @@
+
+:root {
+    --calendar-js-dark-color: #1B2A41;
+    --calendar-js-dark-lighter-color: #2E4258;
+    --calendar-js-light-color: #FFFFFF;
+    --calendar-js-day-names-color: #F7F8FA;
+    --calendar-js-grid-border-color: #E2E5EA;
+    --calendar-js-input-border-color: #C9CED6;
+    --calendar-js-input-background-color: #FFFFFF;
+    --calendar-js-day-date-picker-hover-color: #E4F0EE;
+    --calendar-js-drop-down-menu-background-color: #EEF1F4;
+
+    --calendar-js-title-bar-text-color: #FFFFFF;
+    --calendar-js-title-bar-button-color: #FFFFFF;
+    --calendar-js-menu-item-icon-color: #1B2A41;
+    --calendar-js-link-color: #2F6F65;
+
+    --calendar-js-primary-button-color: #2F6F65;
+    --calendar-js-secondary-button-color: #1B2A41;
+    --calendar-js-tertiary-button-color: #5B4B8A;
+    --calendar-js-input-hover-color: #2F6F65;
+
+    --calendar-js-event-color: #64748B;
+    --calendar-js-event-text-color: #FFFFFF;
+    --calendar-js-event-color-all-day: #1B2A41;
+    --calendar-js-event-text-color-all-day: #FFFFFF;
+    --calendar-js-event-left-border: 3px solid var(--calendar-js-dark-color);
+
+    --calendar-js-alert-color: #B3261E;
+    --calendar-js-view-time-arrow-color: #C77D22;
+
+    --calendar-js-default-font: "Atkinson Hyperlegible", "Helvetica", "Arial", sans-serif;
+    --calendar-js-title-bar-font-weight: 700;
+    --calendar-js-large-font-size: 0.9rem;
+    --calendar-js-small-font-size: 0.72rem;
+
+    --calendar-js-border-radius: 6px;
+    --calendar-js-spacing: 10px;
+    --calendar-js-transition: all .15s ease;
+    --calendar-js-transition-faster: all .1s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --calendar-js-dark-color: #1B2A41;
+        --calendar-js-primary-button-color: #2F6F65;
+        --calendar-js-secondary-button-color: #1B2A41;
+        --calendar-js-menu-item-icon-color: #1B2A41;
+    }
+}

@@ -50,7 +50,6 @@ class UserController
 
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             url,
-            true,
         );
         return statusCode === 200 ? payload : false;
     }
@@ -59,7 +58,6 @@ class UserController
     {
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             `/api/v3/users/${userID}`,
-            true,
         );
         return statusCode === 200 ? payload : false;
     }
@@ -67,7 +65,6 @@ class UserController
     async GetUserStatistics(period = 'week') {
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             `/api/v3/users/statistics?period=${period}`,
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -75,8 +72,13 @@ class UserController
     async UpdateUser(userID, data, totpCode)
     {
         const [statusCode, payload] = await this.#APIInstance.API_PATCH(
-            `/api/v3/users/${userID}`, data, true, totpCode
+            `/api/v3/users/${userID}`, data, totpCode
         );
+
+        if (statusCode === 200)
+        {
+            return payload;
+        }
         if (statusCode === 204)
         {
             return await this.GetSingleUser(userID);
@@ -89,7 +91,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_PATCH(
             `/api/v3/users/${userID}/permissions`,
             data,
-            true,
             totpCode
         );
         return statusCode === 200 ? payload : false;
@@ -99,7 +100,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/users/${userID}/block`,
             { blocked: blocked },
-            true,
             totpCode
         );
         return statusCode === 204 ? payload : false;
@@ -110,7 +110,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/users/${userID}/force-password-reset`,
             {},
-            true,
             totpCode
         );
         return statusCode === 204 ? payload : false;
@@ -121,7 +120,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/users/${userID}/terminate-sessions`,
             {},
-            true,
             totpCode
         );
         return statusCode === 204 ? payload : false;
@@ -132,7 +130,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/users/${userID}/send-password-reset`,
             {},
-            true,
             totpCode
         );
         return statusCode === 204 ? payload : false;
@@ -152,7 +149,6 @@ class UserController
                 "emailAddress": emailAddress,
                 "languagePreference": language,
             },
-            true,
             totpCode
         );
         return statusCode === 201 ? payload : false;
@@ -162,7 +158,6 @@ class UserController
 
         const [statusCode, payload] = await this.#APIInstance.API_DELETE(
             `/api/v3/users/${userID}`,
-            true,
             totpCode
         );
         return statusCode === 204 ? payload : false;
@@ -171,7 +166,6 @@ class UserController
     async GetUserAuditLog(userID) {
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             `/api/v3/users/${userID}/audit-log`,
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -183,7 +177,6 @@ class UserController
     async GetTotpStatus() {
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             `/api/v3/me/totp/status`,
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -192,7 +185,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/me/totp/setup`,
             {},
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -201,7 +193,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/me/totp/enable`,
             { code: code },
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -210,7 +201,6 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/me/totp/disable`,
             { code: code },
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -218,7 +208,6 @@ class UserController
     async GetRecoveryCodeCount() {
         const [statusCode, payload] = await this.#APIInstance.API_GET(
             `/api/v3/me/totp/recovery-codes/count`,
-            true
         );
         return statusCode === 200 ? payload : false;
     }
@@ -227,8 +216,29 @@ class UserController
         const [statusCode, payload] = await this.#APIInstance.API_POST(
             `/api/v3/me/totp/recovery-codes/regenerate`,
             { code: totpCode },
-            true
         );
         return statusCode === 200 ? payload : false;
+    }
+
+    async PreviewUserMerge(survivorUserID, duplicateUserID)
+    {
+        return await this.#APIInstance.API_POST(
+            `/api/v3/users/${survivorUserID}/merge/preview`,
+            { duplicateUserId: duplicateUserID },
+        );
+    }
+
+    async MergeUsers(survivorUserID, duplicateUserID, fingerprint, fieldChoices, justification, totpCode)
+    {
+        return await this.#APIInstance.API_POST(
+            `/api/v3/users/${survivorUserID}/merge`,
+            {
+                duplicateUserId: duplicateUserID,
+                fingerprint: fingerprint,
+                fieldChoices: fieldChoices,
+                justification: justification,
+            },
+            totpCode,
+        );
     }
 }
