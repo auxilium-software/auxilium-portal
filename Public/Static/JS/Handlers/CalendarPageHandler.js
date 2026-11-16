@@ -18,7 +18,7 @@ class CalendarPageHandler
         await this.calendarManager.init();
 
         await Localisation.preloadTranslations([
-            'New event', 'Edit event', 'Title', 'Category', 'Select a category…',
+            'New event', 'Edit event', 'Title', 'Category', 'Select a category...',
             'All day', 'Start', 'End', 'Location', 'Description',
             'Save', 'Delete', 'Cancel',
         ]);
