@@ -55,16 +55,22 @@ class CalendarSharingPanel extends BaseManager
         modal.className = 'ToDoCreatorModal cal-share-modal-inner';
 
         const [
-            heading, myInvitesLabel, shareLabel, hint,
-            selectPlaceholder, inviteSomeoneLabel, searchPlaceholder, closeLabel,
+            heading,
+            myInvitesLabel,
+            shareLabel,
+            hint,
+            selectPlaceholder,
+            inviteSomeoneLabel,
+            searchPlaceholder,
+            closeLabel,
         ] = await Promise.all([
             Localisation.translate('Sharing'),
             Localisation.translate('My invites'),
             Localisation.translate('Share an event'),
-            Localisation.translate("Events other people have shared with you. Drawn from whatever's currently loaded in the calendar view - an invite to something further out won't show here until you navigate near that date."),
-            Localisation.translate('Select one of your events…'),
+            Localisation.translate("Events other people have shared with you. Only the events in the current calendar view will be visible here."),
+            Localisation.translate('Select one of your events...'),
             Localisation.translate('Invite someone'),
-            Localisation.translate('Search by name or email…'),
+            Localisation.translate('Search by name or email...'),
             Localisation.translate('Close'),
         ]);
 
