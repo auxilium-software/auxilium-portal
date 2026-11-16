@@ -50,7 +50,7 @@
         "webklex/php-imap": "^6.1",
 
         "firebase/php-jwt": "7.0.0",
-        "lcobucci/jwt": "5.5.0.0",
+        "lcobucci/jwt": "5.6.1",
 
         "aws/aws-sdk-php": "^3.277",
 
@@ -59,7 +59,7 @@
         "zircote/swagger-php": "~4.8.7",
 
         "unional/jsonc": "~1.0.1",
-        "symfony/yaml": "~6.3",
+        "symfony/yaml": "8.1.11.0",
 
         "chillerlan/php-qrcode": "~5.0.5",
 
